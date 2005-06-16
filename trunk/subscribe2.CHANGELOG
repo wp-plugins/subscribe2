@@ -1,0 +1,68 @@
+Changelog:
+2.0.9
+added editable subject line when sending an email to all subscribers
+2.0.8
+fixed batch logic
+2.0.7
+fixed broken comment
+2.0.6
+added $dreamhost manual override to force batched notification delivery
+   thanks to Wade Emmert and Joe Mezzanini (http://themezz.com/) for their help
+added Content-Type text/plain for plaintext mail delivery.
+   thanks to Toto: 
+   http://www.skippy.net/blog/2005/02/17/subscribe2/#comment-2059
+2.0.5
+added strip_tags() to plaintext email delivery, to remove HTML from post content
+added date check to suppress sending notification on future-dated posts
+
+2.0.4
+fixed a typo which broke sending excerpts -- Thanks MarcoB!
+
+2.0.3
+added __() and _e(), plus subscribe2.po for localization
+added stripslashes to (I hope!) all output
+2.0.2
+beautified output of categories to exlude
+
+2.0.1
+minor form fixes -- thanks Matt Read
+
+2.0.0
+major overhaul.
+using new admin menu hooks
+added Options page for web-based control of all messages
+added HTML email support
+
+1.5.6:
+tightened up check against our own email; now only checks for an exact match against the admin email as defined in the blog options.
+updated description of $categories_to_skip to indicate that category IDs should be entered
+
+1.5.5:
+fixed error handling when blank or invalid emails are passed to subscribe.php
+fixed name used to sign email messages sent from subscribe.php: now using the admin account (user ID 1) email and nicename
+
+1.5.4: 
+fixed s2_style() to check for 1.5, which should fix it for 1.2 again.  Sorry 'bout that.
+
+1.5.3: 
+fixed s2_style() to only include the style when loading the Subscriber management page adjusted subscribe.php to (hopefully) utilize the active theme (WordPress 1.5+ only)
+
+1.5.2: 
+fixed subscribe.php link generation (thanks Anthony: http://www.anthonyemigration.net/)
+added check before including upgrade-functions.php (thanks Indi: http://www.indi.ca/)
+added $categories_to_skip to allow bypass of email for certain categories
+added email notification to admin on successful (un)subscribe operation
+
+1.5.1: 
+fixed problem for 1.2 users
+
+1.5: 
+integrated management into WordPress admin section
+
+1.1: 
+added is_array() checks to suppress spurious PHP warnings (thanks aalex: www.sourcelibre.com)
+fixed broken $form calls (d'oh)
+
+1.0: 
+first version
+				 
