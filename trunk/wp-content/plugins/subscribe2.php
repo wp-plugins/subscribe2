@@ -22,8 +22,8 @@ add_action ('publish_post', 'subscribe2', 8);
 
 //////////// BEGIN FUNCTIONS //////////////
 function subscribe2_menu() {
-	add_management_page('Subscribers', 'Subscribers', 9, __FILE__, 's2_manage');
-	add_options_page('Subscribe2 Options', 'Subscribe2', 9, __FILE__, 's2_options');
+        add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), 9, __FILE__, 's2_manage');
+	add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2', 'subscribe2'), 9, __FILE__, 's2_options');   
 }
 
 //////////////////////////////////
@@ -244,132 +244,147 @@ if ('options' == $admin) {
 }
 
 $s2 = get_option('s2_options');
-?>
-<div class='wrap'>
-<h2>Notification Settings</h2>
-<form method="POST">
-<input type='hidden' name='s2_admin' value='options' />
-<fieldset class="options"><legend>Email Options:</legend>
-Send email as:&nbsp;&nbsp;
-<input type='radio' name='s2_html' value='html' <?php if ('html' == $s2['s2_html']) { echo "checked='checked' "; } ?>/> HTML &nbsp;&nbsp;
-<input type='radio' name='s2_html' value='text' <?php if ('text' == $s2['s2_html']) { echo "checked='checked' "; } ?>/> Plain Text
-<br /><br />
-Send Email From:&nbsp;&nbsp;
-<input type='radio' name='s2_sender' value='author' <?php if ('author' == $s2['s2_sender']) { echo "checked='checked' "; } ?>/> Author of the post &nbsp;&nbsp;
-<input type='radio' name='s2_sender' value='admin' <?php if ('admin' == $s2['s2_sender']) { echo "checked='checked' "; } ?>/> Blog Admin
-<br /><br />
-Amount of post to deliver:&nbsp;&nbsp;  
-<?php
-$foo = array ('none' => 'None', 'excerpt' => 'Excerpt Only', 'post' => 'Full Post');
-foreach ($foo as $value => $key) {
-        echo "<input type='radio' name='s2_excerpt' value='$value'";
-        if (strtolower($value) == strtolower($s2['s2_excerpt'])) {
-                echo " checked='checked'";
-        }
-        echo " /> $key &nbsp;&nbsp;";
+
+load_plugin_textdomain('subscribe2');
+
+echo '<div class="wrap">';
+echo '<h2>' . __('Notification Settings', 'subscribe2') . "</h2>\r\n";
+echo '<form method="POST">';
+echo '<input type="hidden" name="s2_admin" value="options" />';
+echo '<fieldset class="options"><legend>' . __('Email Options', 'subscribe2') . ':</legend>';
+echo __('Send email as', 'subscribe2') . ': &nbsp;&nbsp;';
+echo '<input type="radio" name="s2_html" value="html"';
+if ('html' == $s2['s2_html']) {
+	echo 'checked="checked" ';
 }
-?>
-</fieldset>
+echo '/> ' . __('HTML', 'subscribe2') .' &nbsp;&nbsp;';
+echo '<input type="radio" name="s2_html" value="text" ';
+if ('text' == $s2['s2_html']) { 
+	echo 'checked="checked" ';
+}
+echo '/> ' . __('Plain Text', 'subscribe2') . "<br /><br />\r\n";
+echo __('Send Email From', 'subscribe2') . ':&nbsp;&nbsp;';
+echo '<input type="radio" name="s2_sender" value="author" ';
+if ('author' == $s2['s2_sender']) { 
+	echo 'checked="checked" ';
+}
+echo ' /> ' . __('Author of the post', 'subscribe2') . ' &nbsp;&nbsp;';
+echo '<input type="radio" name="s2_sender" value="admin" ';
+if ('admin' == $s2['s2_sender']) { 
+	echo 'checked="checked" ';
+}
+echo ' /> ' . __('Blog Admin', 'subscribe2') . "<br /><br />\r\n";
+echo __('Amount of post to deliver', 'subscribe2') . ':&nbsp;&nbsp;';
 
-<fieldset class="options"><legend>Email Template</legend>
-Subject: (must not be empty)<br />
-<input type="text" name="s2_subject" size="60" value="<?php echo stripslashes($s2['s2_subject']); ?>" />
-<br /><br />
-Message: (must not be empty)<br />
-<textarea rows='15' cols='90' name='s2_mailtext'><?php echo stripslashes($s2['s2_mailtext']); ?></textarea>
+$foo = array ('none' => __('None', 'subscribe2'), 'excerpt' => __('Excerpt Only', 'subscribe2'), 'post' => __('Full Post', 'subscribe2'));
+foreach ($foo as $value => $key) {
+        echo '<input type="radio" name="s2_excerpt" value="' . $value . '"';
+        if (strtolower($value) == strtolower($s2['s2_excerpt'])) {
+                echo ' checked="checked"';
+        }
+        echo ' /> ' . $key . '&nbsp;&nbsp;';
+}
+echo '</fieldset>';
 
-<fieldset class="options"><legend>Message substitions:</legend>
-<table width="100%">
-<tr><td width="50%">
-<ul>
-<li><b>BLOGNAME</b>: replaced with <?php bloginfo('name'); ?></li>
-<li><b>BLOGLINK</b>: replaced with <?php bloginfo('url'); ?></li>
-<li><b>TITLE</b>: replaced with the post's title</li>
-<li><b>EXCERPT</b>: replaced with blank, the excerpt, or the entire post, based on the option set above</li>
-</ul>
-</td><td>
-<ul>
-<li><b>PERMALINK</b>: replaced with the post's permalink</li>
-<li><b>S2LINK</b>: replaced with a link to your subscribe.php file</li>
-<li><b>MYNAME</b>: replaced with the post author's name</li>
-<li><b>EMAIL</b>: replaced with the post author's email</li>
-</ul>
-</td></tr>
-</table>
-</fieldset>
-</fieldset>
+echo '<fieldset class="options"><legend>' . __('Email Template', 'subscribe2') . "</legend>\r\n";
+echo __('Subject', 'subscribe2') . ': (' . __('must not be empty', 'subscribe2') . ')';
+echo "<br />\r\n";
+echo '<input type="text" name="s2_subject" size="60" value="' . stripslashes($s2['s2_subject']) . '" />';
+echo "<br /><br />\r\n";
+echo __('Message', 'subscribe2') . ': (' . __('must not be empty', 'subscribe2') . ')';
+echo "<br />\r\n";
+echo '<textarea rows="15" cols="90" name="s2_mailtext">' . stripslashes($s2['s2_mailtext']) . "</textarea>\r\n";
 
-<h2>Subscription Messages</h2>
-<fieldset class="options"><legend>Website messages:</legend>
-<table width="100%" cellspacing="2" cellpadding="5" class="editform">
-<tr><td colspan="2" align="center">
-Welcome message:<br />
-<input type='text' size='90' name='s2_welcome' value="<?php echo stripslashes($s2['s2_welcome']); ?>" />
-</td></tr>
-<tr><td>
-Invalid email was supplied:<br />
-<input type='text' size='53' name='s2_invalid' value="<?php echo stripslashes($s2['s2_invalid']); ?>" />
-</td><td>
-Your email was supplied:<br />
-<input type='text' size='53' name='s2_self' value="<?php echo stripslashes($s2['s2_self']); ?>" />
-<td></tr>
-<tr><td>
-Known email was supplied:<br />
-<input type='text' size='53' name='s2_already_there' value="<?php echo stripslashes($s2['s2_already_there']); ?>" />
-</td><td>
-Non-existant email supplied:<br />
-<input type='text' size='53' name='s2_not_there' value="<?php echo stripslashes($s2['s2_not_there']); ?>" />
-<td></tr>
-<tr><td>
-Subscribe confirmation email dispatched:<br />
-<textarea cols='50' rows='3' name='s2_add_confirm'><?php echo stripslashes($s2['s2_add_confirm']); ?></textarea>
-</td><td>
-Unsubscribe confirmation email dispatched:<br />
-<textarea cols='50' rows='3' name='s2_delete_confirm'><?php echo stripslashes($s2['s2_delete_confirm']); ?></textarea>
-</td><tr>
-<tr><td>
-Successful subscription message:<br />
-<input type='text' size='53' name='s2_added' value="<?php echo stripslashes($s2['s2_added']); ?>" />
-</td><td>
-Successful deletion message:<br />
-<input type='text' size='53' name='s2_deleted' value="<?php echo stripslashes($s2['s2_deleted']); ?>" />
-</td></tr>
-</table>
-</fieldset>
+echo '<fieldset class="options"><legend>' . __('Message substitions', 'subscribe2') . ":</legend>\r\n";
+echo '<table width="100%">';
+echo '<tr><td width="50%">';
+echo '<ul>';
+echo '<li><b>BLOGNAME</b>: ' . __('replaced with', 'subscribe2') . ' ' . bloginfo('name') . "</li>\r\n";
+echo '<li><b>BLOGLINK</b>: ' . __('replaced with', 'subscribe2') . ' ' . bloginfo('url') . "</li>\r\n";
+echo '<li><b>TITLE</b>: ' . __('replaced with', 'subscribe2') . ' ' . __("the post's title", 'subscribe2') . "</li>\r\n";
+echo '<li><b>EXCERPT</b>: ' . __('replaced with', 'subscribe2') . ' ' . __('blank, the excerpt, or the entire post, based on the option set above', 'subscribe2') . "</li>\r\n";
+echo '</ul>';
+echo "</td><td>\r\n";
+echo '<ul>';
+echo '<li><b>PERMALINK</b>: ' . __('replaced with', 'subscribe2') . ' ' . __("the post's permalink", 'subscribe2') . "</li>\r\n";
+echo '<li><b>S2LINK</b>: ' . __('replaced with', 'subscribe2') . ' ' . __('a link to your subscribe.php file', 'subscribe2') . "</li>\r\n";
+echo '<li><b>MYNAME</b>: ' . __('replaced with', 'subscribe2') . ' ' . __("the post author's name", 'subscribe2') . "</li>\r\n";
+echo '<li><b>EMAIL</b>: ' . __('replaced with', 'subscribe2') . ' ' . __("the post author's email", 'subscribe2') . "</li>\r\n";
+echo '</ul>';
+echo '</td></tr>';
+echo "</table>\r\n";
+echo "</fieldset>\r\n";
+echo "</fieldset>\r\n";
 
-<fieldset class="options"><legend>Email messages:</legend>
-<table width="100%" cellspacing="2" cellpadding="5" class="editform">
-<tr><td colspan="2">
-Subject line for all confirmation emails:<br />
-<input type='text' size='50' name='s2_confirm_subject' value="<?php echo stripslashes($s2['s2_confirm_subject']); ?>" />
-</td></tr>
-<tr><td colspan="2">
-Subscribe / Unsubscribe confirmation email:<br />
-<textarea cols='80' rows='5' name='s2_confirm_email'><?php echo stripslashes($s2['s2_confirm_email']); ?></textarea>
-</td></tr>
-<tr><td>
-Subscribe notification subject sent to admin:<br />
-<input type='text' size='50' name='s2_subscribed_admin_subject' value="<?php echo stripslashes($s2['s2_subscribed_admin_subject']); ?>" />
-</td><td>
-Unsubscribe notification subject sent to admin:<br />
-<input type='text' size='50' name='s2_unsubscribed_admin_subject' value="<?php echo stripslashes($s2['s2_unsubscribed_admin_subject']); ?>" />
-</td></tr>
-</table>
+echo '<h2>' . __('Subscription Messages', 'subscribe2') . "</h2>\r\n";
+echo '<fieldset class="options"><legend>' . __('Website messages', 'subscribe2') . ":</legend>\r\n";
+echo '<table width="100%" cellspacing="2" cellpadding="5" class="editform">';
+echo '<tr><td colspan="2" align="center">';
+echo __('Welcome message', 'subscribe2') . ":<br />\r\n";
+echo '<input type="text" size="90" name="s2_welcome" value="' . stripslashes($s2['s2_welcome']) . '" />';
+echo "</td></tr>\r\n";
+echo "<tr><td>\r\n";
+echo __('Invalid email was supplied', 'subscribe2') . ":<br />\r\n";
+echo '<input type="text" size="53" name="s2_invalid" value="' . stripslashes($s2['s2_invalid']) . '" />';
+echo "</td><td>\r\n";
+echo __('Your email was supplied', 'subscribe2') . ":<br />\r\n";
+echo '<input type="text" size="53" name="s2_self" value="' . stripslashes($s2['s2_self']) . '" />';
+echo "<td></tr>\r\n";
+echo "<tr><td>\r\n";
+echo __('Known email was supplied', 'subscribe2') . ":<br />\r\n";
+echo '<input type="text" size="53" name="s2_already_there" value="' . stripslashes($s2['s2_already_there']) . '" />';
+echo "</td><td>\r\n";
+echo __('Non-existant email supplied', 'subscribe2') . ":<br />\r\n";
+echo '<input type="text" size="53" name="s2_not_there" value="' . stripslashes($s2['s2_not_there']) . '" />';
+echo "<td></tr>\r\n";
+echo "<tr><td>\r\n";
+echo __('Subscribe confirmation email dispatched', 'subscribe2') . ":<br />\r\n";
+echo '<textarea cols="50" rows="3" name="s2_add_confirm">' . stripslashes($s2['s2_add_confirm']) . '</textarea>';
+echo "</td><td>\r\n";
+echo __('Unsubscribe confirmation email dispatched', 'subscribe2') . ":<br />\r\n";
+echo '<textarea cols="50" rows="3" name="s2_delete_confirm">' . stripslashes($s2['s2_delete_confirm']) . '</textarea>';
+echo "</td><tr>\r\n";
+echo "<tr><td>\r\n";
+echo __('Successful subscription message', 'subscribe2') . ":<br />\r\n";
+echo '<input type="text" size="53" name="s2_added" value="' . stripslashes($s2['s2_added']) . '" />';
+echo "</td><td>\r\n";
+echo __('Successful deletion message', 'subscribe2') . ":<br />\r\n";
+echo '<input type="text" size="53" name="s2_deleted" value="' . stripslashes($s2['s2_deleted']) . '" />';
+echo "</td></tr>\r\n";
+echo '</table>';
+echo "</fieldset>\r\n";
 
-<fieldset class="options"><legend>Message substitions:</legend>
-<ul>
-<li><b>BLOGNAME</b>: replaced with the blog's name</li>
-<li><b>LINK</b>: replaced with the confirmation link for the user's request</li>
-<li><b>MYNAME</b>: replaced with the post author's name</li>
-<li><b>EMAIL</b>: replaced with the post author's email</li>
-</ul>
-</fieldset>
-</fieldset>
+echo '<fieldset class="options"><legend>' . __('Email messages', 'subscribe2') . ":</legend>\r\n";
+echo '<table width="100%" cellspacing="2" cellpadding="5" class="editform">';
+echo '<tr><td colspan="2">';
+echo __('Subject line for all confirmation emails', 'subscribe2') . ":<br />\r\n";
+echo '<input type="text" size="50" name="s2_confirm_subject" value="' . stripslashes($s2['s2_confirm_subject']) . '" />';
+echo "</td></tr>\r\n";
+echo '<tr><td colspan="2">';
+echo __('Subscribe / Unsubscribe confirmation email', 'subscribe2') . ":<br />\r\n";
+echo '<textarea cols="80" rows="5" name="s2_confirm_email">' . stripslashes($s2['s2_confirm_email']) . '</textarea>';
+echo "</td></tr>\r\n";
+echo "<tr><td>\r\n";
+echo __('Subscribe notification subject sent to admin', 'subscribe2') . ":<br />\r\n";
+echo '<input type="text" size="50" name="s2_subscribed_admin_subject" value="' . stripslashes($s2['s2_subscribed_admin_subject']) . '" />';
+echo "</td><td>\r\n";
+echo __('Unsubscribe notification subject sent to admin', 'subscribe2') . ":<br />\r\n";
+echo '<input type="text" size="50" name="s2_unsubscribed_admin_subject" value="' . stripslashes($s2['s2_unsubscribed_admin_subject']) . '" />';
+echo "</td></tr>\r\n";
+echo "</table>\r\n";
 
-<h2>Categories to Exclude</h2>
-<table width="50%" cellspacing="2" cellpadding="5" class="editform" align="center">
-<tr><td width="50%" align="left"> 
-<?php
+echo '<fieldset class="options"><legend>' . __('Message substitions', 'subscribe2') . ":</legend>\r\n";
+echo '<ul>';
+echo '<li><b>BLOGNAME</b>: ' . __('replaced with', 'subscribe2') . ' ' . __("the blog's name", 'subscribe2') . "</li>\r\n";
+echo '<li><b>LINK</b>: ' . __('replaced with', 'subscribe2') . ' ' . __("the confirmation link for the user's request", 'subscribe2') . "</li>\r\n";
+echo '<li><b>MYNAME</b>: ' . __('replaced with', 'subscribe2') . ' ' . __("the post author's name", 'subscribe2') . "</li>\r\n";
+echo '<li><b>EMAIL</b>: ' . __('replaced with', 'subscribe2') . ' ' . __("the post author's email", 'subscribe2') . "</li>\r\n";
+echo "</ul></fieldset></fieldset>\r\n";
+
+echo '<h2>' . __('Categories to Exclude', 'subscribe2') . "</h2>\r\n";
+echo '<table width="50%" cellspacing="2" cellpadding="5" class="editform" align="center">';
+echo '<tr><td width="50%" align="left">';
+
 // let's collect all of our excluded categories
 $excluded = array();
 $excluded = explode(',', $s2['s2_cats_to_skip']);
@@ -383,39 +398,38 @@ $i = 0;
 $j = 0;
 foreach ($cache_categories as $cat) {
 	if ( ($i > $half) && (0 == $j) ){
-		echo "</td><td width='50%' align='right'>";
+		echo '</td><td width="50%" align="right">';
 		$j++;
 	}
 	if (0 == $j) {
-		echo "<input type='checkbox' name='$cat->cat_ID' ";
+		echo '<input type="checkbox" name="' . $cat->cat_ID . '"  ';
 		if (in_array($cat->cat_ID, $excluded)) {
-			echo "checked='checked' ";
+			echo 'checked="checked" ';
 		}
-		echo "/>$cat->cat_name<br />";
+		echo '/>' . $cat->cat_name . "<br />\r\n";
 	} else {
-		echo "$cat->cat_name <input type='checkbox' name='$cat->cat_ID' ";
+		echo $cat->cat_name . ' <input type="checkbox" name="' . $cat->cat_ID . '"  ';
 		if (in_array($cat->cat_ID, $excluded)) {
-			echo "checked='checked' ";
+			echo 'checked="checked" ';
 		}
-		echo "/><br />";
+		echo "/><br />\r\n";
 	}
 	$i++;
 }
-echo "</td></tr>";
-echo "</table>";
-echo "<p align='center'><input type='submit' name='submit' value='submit' /></p>";
-echo "</form>";
-?>
-<h2>Reset Default</h2>
-<fieldset class="options">
-<p>Use this to reset all options to their defaults.  This <strong><em>will not</em></strong> modify your list of subscribers.</p>
-<form method="POST">
-<p align="center">
-<input type="submit" name="s2_admin" value="RESET" />
-</p>
-</form>
-</fieldset>
-<?php
+echo "</td></tr></table>\r\n";
+echo '<p align="center"><input type="submit" name="submit" value="submit" /></p>';
+echo "</form>\r\n";
+
+echo '<h2>' . __('Reset Default', 'subscribe2') . "</h2>\r\n";
+echo '<fieldset class="options">';
+echo '<p>';
+_e('Use this to reset all options to their defaults. This <strong><em>will not</em></strong> modify your list of subscribers.', 'subscribe2');
+echo "</p>";
+echo '<form method="POST">';
+echo '<p align="center">';
+echo '<input type="submit" name="s2_admin" value="RESET" />';
+echo "</p></form></fieldset>\r\n";
+
 include(ABSPATH . '/wp-admin/admin-footer.php');
 // just to be sure
 die;
@@ -452,6 +466,8 @@ if ('delete' == $admin) {
         s2_admin_toggle();
 }
 
+load_plugin_textdomain('subscribe2');
+
 // get the list of confirmed subscribers
 $sql = "SELECT email FROM " . $s2_table . " WHERE active='1' ORDER BY email ASC";
 $confirmed = $wpdb->get_col($sql);
@@ -460,69 +476,65 @@ $confirmed = $wpdb->get_col($sql);
 $sql = "SELECT email FROM " . $s2_table . " WHERE active='0' ORDER BY email ASC";
 $unconfirmed = $wpdb->get_col($sql);
 if ('admin_sent' == $admin_sent) {
-        echo '<div class="updated"><p align="center">Message delivered!</p></div>';
+        echo '<div class="updated"><p align="center">' . __('Message delivered!', 'subscribe2') . "</p></div>\r\n";
 }
-?>
-<div class='wrap'>
-<h2>Admin Tools</h2>
-<table width="100%">
-<tr><td align='left'>
-<form method='POST'>
-Subscribe Addresses: (one per line, or comma-seperated)<br />
-<textarea rows='10' cols='55' name='addresses'></textarea>
-<br />
-<input type='submit' name='s2_admin' value='subscribe'>
-</form>
-</td><td align="right">
-<form method='POST'>
-Send email to all subscribers:
-<input type='text' size='30' name='s2_subject' value="A message from <?php echo get_settings('blogname'); ?>" /> <br />
-<textarea rows='10' cols='55' name='message'></textarea>
-<br />
-<input type='submit' name='s2_admin' value='send'>&nbsp;
-</form>
-</td></tr></table>
-<div style="clear: both;"><p>&nbsp;</p></div>
-<h2>Subscribers</h2>
-<table width="45%" cellpadding="3" cellspacing="3" align="left">
-<tr><th colspan="3"><strong>Confirmed Subscribers:</strong></th></tr>
-<?php
+
+echo '<div class="wrap">';
+echo '<h2>' . __('Admin Tools', 'subscribe2') . "</h2>\r\n";
+echo '<table width="100%"><tr><td align="left">';
+echo "<form method='POST'>\r\n";
+echo __('Subscribe Addresses', 'subscribe2')  . ': (' . __('one per line, or comma-seperated', 'subscribe2') . ")<br />\r\n";
+echo '<textarea rows="10" cols="55" name="addresses"></textarea>';
+echo "<br />\r\n";
+echo '<input type="submit" name="s2_admin" value="subscribe">';
+echo '</form></td><td align="right">';
+echo "<form method='POST'>\r\n";
+echo __('Send email to all subscribers', 'subscribe2') . ':';
+echo '<input type="text" size="30" name="s2_subject" value="' . __('A message from ', 'subscribe2') . get_settings('blogname') . '" /> <br />';
+echo '<textarea rows="10" cols="55" name="message"></textarea>';
+echo "<br />\r\n";
+echo '<input type="submit" name="s2_admin" value="send">&nbsp;';
+echo "</form></td></tr></table>\r\n";
+echo '<div style="clear: both;"><p>&nbsp;</p></div>';
+echo '<h2>' . __('Subscribers', 'subscribe2') . "</h2>\r\n";
+echo '<table width="45%" cellpadding="3" cellspacing="3" align="left">';
+echo '<tr><th colspan="3"><strong>' . __('Confirmed Subscribers', 'subscribe2') . ':</strong></th></tr>';
+
 if (is_array($confirmed)) {
 	$alternate = 'alternate';
 	foreach ($confirmed as $subscriber) {
-		echo "<tr class='$alternate'>";
-		 echo "<td width='5%' align='center'><form method='POST'><input type='hidden' name='email' value='$subscriber' /><input type='hidden' name='s2_admin' value='delete' /><input type='submit' name='submit' value=' X ' /></form></td>";
-		echo "<td align='center'><a href='mailto:$subscriber'>$subscriber</a></td>";
-		echo "<td width='5%' align='center'><form method='POST'><input type='hidden' name='email' value='$subscriber' /><input type='hidden' name='s2_admin' value='toggle' /><input type='submit' name='submit' value='->' /></form></td>";
-		echo "</tr>";
-		("alternate" == $alternate) ? $alternate = "" : $alternate = "alternate";
+		echo '<tr class="' . $alternate . '">';
+		echo '<td width="5%" align="center"><form method="POST"><input type="hidden" name="email" value="' . $subscriber . '" /><input type="hidden" name="s2_admin" value="delete" /><input type="submit" name="submit" value=" X " /></form></td>';
+		echo '<td align="center"><a href="mailto:' . $subscriber . '">' . $subscriber . "</a></td>\r\n";
+		echo '<td width="5%" align="center"><form method="POST"><input type="hidden" name="email" value="' . $subscriber .'" /><input type="hidden" name="s2_admin" value="toggle" /><input type="submit" name="submit" value="-&gt;" /></form></td>';
+		echo "</tr>\r\n";
+		('alternate' == $alternate) ? $alternate = '' : $alternate = 'alternate';
 	}
 } else {
-	echo "<tr><td width='100%' align='center' colspan='3'><strong>NONE</strong></td></tr>";
+	echo '<tr><td width="100%" align="center" colspan="3"><strong>' . __('NONE', 'subscribe2') . "</strong></td></tr>\r\n";
 }
-?>
-</table>
-<table width="45%" cellpadding="3" cellspacing="3" align="right">
-<tr><th colspan="3"><strong>Uncomfirmed Subscribers:</strong></th></tr>
-<?php
+echo "</table>\r\n";
+echo '<table width="45%" cellpadding="3" cellspacing="3" align="right">';
+echo '<tr><th colspan="3"><strong>' . __('Uncomfirmed Subscribers', 'subscribe2') . ":</strong></th></tr>\r\n";
+
 if (is_array($unconfirmed)) {
 	$alternate = 'alternate';
 	foreach ($unconfirmed as $subscriber) {
-		echo "<tr class='$alternate'>";
-		echo "<td width='5%' align='center'><form method='POST'><input type='hidden' name='email' value='$subscriber' /><input type='hidden' name='s2_admin' value='toggle' /><input type='submit' name='submit' value='<-' /></form></td>";
-		echo "<td align='center'><a href='mailto:$subscriber'>$subscriber</a></td>";
-		echo "<td width='5%' align='center'><form method='POST'><input type='hidden' name='email' value='$subscriber' /><input type='hidden' name='s2_admin' value='delete' /><input type='submit' name='submit' value=' X ' /></form></td>";
-		echo "</tr>";
-		("alternate" == $alternate) ? $alternate = "" : $alternate = "alternate";	
+		echo '<tr class="' . $alternate . '">';
+		echo '<td width="5%" align="center"><form method="POST"><input type="hidden" name="email" value="' . $subscriber . '" /><input type="hidden" name="s2_admin" value="toggle" /><input type="submit" name="submit" value="&lt;-" /></form></td>';
+		echo '<td align="center"><a href="mailto:' . $subscriber . '">' . $subscriber . "</a></td>\r\n";
+		echo '<td width="5%" align="center"><form method="POST"><input type="hidden" name="email" value="' . $subscriber . '" /><input type="hidden" name="s2_admin" value="delete" /><input type="submit" name="submit" value=" X " /></form></td>';
+		echo "</tr>\r\n";
+		('alternate' == $alternate) ? $alternate = '' : $alternate = 'alternate';	
 	}
 } else {
-        echo "<tr><td width='100%' align='center' colspan='3'><strong>NONE</strong></td></tr>";
+        echo '<tr><td width="100%" align="center" colspan="3"><strong>' . __('NONE', 'subscribe2') . "</strong></td></tr>\r\n";
 }
-?>
-</table>
-<div style="clear: both;"><p>&nbsp;</p></div>
-</div>
-<?php
+
+echo "</table>\r\n";
+echo '<div style="clear: both;"><p>&nbsp;</p></div>';
+echo "</div>\r\n";
+
 include(ABSPATH . '/wp-admin/admin-footer.php');
 // just to be sure
 die;

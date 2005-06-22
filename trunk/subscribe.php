@@ -10,6 +10,11 @@ $admin = get_userdata(1);
 
 $s2 = get_option('s2_options');
 
+$domain = 'subscribe2';
+$mofile = ABSPATH . "$domain-$locale.mo";
+load_textdomain($domain, $mofile);
+
+
 // the database table to use
 $s2_table = $table_prefix . "subscribe2";
 
@@ -81,26 +86,23 @@ get_sidebar();
 if ('' == $doing) {
 	$doing = 'welcome';
 }
-echo "<div id='content' class='narrowcolumn'><div class='post'><p>" . stripslashes($s2["s2_$doing"]) . "</p>";
+echo '<div id="content" class="narrowcolumn"><div class="post"><p>' . stripslashes($s2["s2_$doing"]) . "</p>\r\n";
 if ( ('not_there' == $doing) || ('already_there' == $doing) || ('self' == $doing) || ('invalid' == $doing) || ('welcome' == $doing) ) {
-	?>
-	<p><form method="post">
-	Your email:&#160;<input type="text" name="email" value="" size="20" />&#160;<br />
-	<input type="radio" name="action" value="add" checked="checked" />subscribe
-	<input type="radio" name="action" value="delete" />unsubscribe&#160;
-	<input type="submit" value="Send!" />
-	</form>
-	</p>
-<?php
+	echo '<p><form method="post">';
+	echo __('Your email', 'subscribe2') . ':&#160;<input type="text" name="email" value="" size="20" />&#160;<br />';
+	echo '<input type="radio" name="action" value="add" checked="checked" />' . __('subscribe', 'subscribe2') . "\r\n";
+	echo '<input type="radio" name="action" value="delete" />' . __('unsubscribe', 'subscribe2') . "&#160\r\n";
+	echo '<input type="submit" value="Send!" />';
+	echo "</form></p>\r\n";
 }
-echo "<p><strong>Note:</strong> " . get_settings('blogname'). " values personal privacy.<br />";
-echo "This list is used solely to inform you when new posts are added.<br />";
-echo "Your email address will not be shared with any other party.</p>";
-echo "<p><a href='" . get_settings('siteurl') . "'>Return to " . get_settings('blogname') . "</a></p>\n\n";
-?>
-</div>
-</div>
-<?php
+echo '<p><strong>' . __('Note', 'subscribe2') . ':</strong> ' . get_settings('blogname') . ' ' . __('values personal privacy', 'subscribe2') . '.<br />';
+_e('This list is used solely to inform you when new posts are added.', 'subscribe2');
+echo "<br />\r\n";
+_e('Your email address will not be shared with any other party', 'subscribe2');
+echo ".</p>\r\n";
+echo '<p><a href="' . get_settings('siteurl') . '">' . __('Return to ', 'subscribe2') . get_settings('blogname') . "</a></p>\r\n";
+echo "</div></div>\r\n";
+
 get_footer();
 die;
 } // main()
@@ -168,7 +170,7 @@ $admin = get_userdata(1);
 if ('2' == s2_check($email)) {
 	$sql = "UPDATE " . $s2_table . " SET active = '1' WHERE email = '" . $email . "'";
 	$result = $wpdb->query($sql);
-	$mailtext = "The following email address has successfully subscribed to your blog:\n\n $email\n";
+	$mailtext = __('The following email address has successfully subscribed to your blog', 'subscribe2') . ":\n\n $email\n";
 	$mailheaders = "From: $admin->user_nickname <$admin->user_email>";
 	mail($admin->user_email, stripslashes($s2['s2_subscribed_admin_subject']), $mailtext, $mailheaders);
 }	
@@ -194,7 +196,7 @@ $result = $wpdb->query($sql);
 
 $admin = get_userdata(1);
 
-$mailtext = "The following email address has successfully unsubscribed from your blog:\n\n $email\n";
+$mailtext = __('The following email address has successfully unsubscribed from your blog', 'subscribe2') . ":\n\n $email\n";
 $mailheaders = "From: $admin->user_nickname <$admin->user_email>";
 mail($admin->user_email, $s2['s2_unsubscribed_admin_subject'], $mailtext, $mailheaders);
 } // s2_delete
