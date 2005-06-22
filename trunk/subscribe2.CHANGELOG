@@ -1,4 +1,7 @@
 Changelog:
+2.1.0
+fresh i18n effort: /wp-content/subscribe2/ contains the .mo and .po files
+both subscribe2.php and subscribe.php are translatable: place the appropriate .po file in the same directory as the source file for which it provides the translation
 2.0.9
 added editable subject line when sending an email to all subscribers
 2.0.8

@@ -38,3 +38,6 @@ To enable this batch operation, edit the file subscribe2.php, move to line 14, a
 Reminder: because subscribe2 places all recipients in BCC fields, and places the blog admin in the TO field, the blog admin will receive one email per batched delivery.  So if you have 90 subscribers, the blog admin should receive three post notification emails, one for eah set of 30 BCC recipients.
 
 Many thanks to Wade Emmert and Joe Messanini for their patience and their assistance in testing this new functionality.
+
+== TRANSLATION ==
+Using the files in /wp-content/subscribe2/ you can translate the text that this plugin displays.  There are two files, a .mo and a .po, for each of the translatable files.  To translate all the text in subscribe2.php (which is what gets displayed to you, the blog owner), create a new .po file for your language from subscribe2-en_US.po.  To translate all the text displayed to your users, create a new .po file from subscribe-en_US.po.
