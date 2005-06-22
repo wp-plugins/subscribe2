@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://www.skippy.net/blog/2005/02/17/subscribe2
 Description: Notifies an email list when new entries are posted. 
-Version: 2.1.0
+Version: 2.1.1
 Author: Scott Merrill
 Author URI: http://www.skippy.net/
 */
@@ -299,8 +299,8 @@ echo '<fieldset class="options"><legend>' . __('Message substitions', 'subscribe
 echo '<table width="100%">';
 echo '<tr><td width="50%">';
 echo '<ul>';
-echo '<li><b>BLOGNAME</b>: ' . __('replaced with', 'subscribe2') . ' ' . bloginfo('name') . "</li>\r\n";
-echo '<li><b>BLOGLINK</b>: ' . __('replaced with', 'subscribe2') . ' ' . bloginfo('url') . "</li>\r\n";
+echo '<li><b>BLOGNAME</b>: ' . __('replaced with', 'subscribe2') . ' ' . get_bloginfo('name') . "</li>\r\n";
+echo '<li><b>BLOGLINK</b>: ' . __('replaced with', 'subscribe2') . ' ' . get_bloginfo('url') . "</li>\r\n";
 echo '<li><b>TITLE</b>: ' . __('replaced with', 'subscribe2') . ' ' . __("the post's title", 'subscribe2') . "</li>\r\n";
 echo '<li><b>EXCERPT</b>: ' . __('replaced with', 'subscribe2') . ' ' . __('blank, the excerpt, or the entire post, based on the option set above', 'subscribe2') . "</li>\r\n";
 echo '</ul>';
