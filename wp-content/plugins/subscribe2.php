@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://www.skippy.net/blog/2005/02/17/subscribe2
 Description: Notifies an email list when new entries are posted. 
-Version: 2.0.9
+Version: 2.1.0
 Author: Scott Merrill
 Author URI: http://www.skippy.net/
 */
