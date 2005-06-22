@@ -10,7 +10,7 @@ $admin = get_userdata(1);
 
 $s2 = get_option('s2_options');
 
-$domain = 'subscribe2';
+$domain = 'subscribe';
 $mofile = ABSPATH . "$domain-$locale.mo";
 load_textdomain($domain, $mofile);
 
