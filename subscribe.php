@@ -10,10 +10,10 @@ $admin = get_userdata(1);
 
 $s2 = get_option('s2_options');
 
-$domain = 'subscribe';
-$mofile = ABSPATH . "$domain-$locale.mo";
+$domain = 'subscribe2';
+$locale = get_locale();
+$mofile = ABSPATH . "wp-content/plugins/$domain-$locale.mo";
 load_textdomain($domain, $mofile);
-
 
 // the database table to use
 $s2_table = $table_prefix . "subscribe2";
