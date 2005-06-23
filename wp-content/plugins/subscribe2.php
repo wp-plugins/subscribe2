@@ -427,7 +427,8 @@ _e('Use this to reset all options to their defaults. This <strong><em>will not</
 echo "</p>";
 echo '<form method="POST">';
 echo '<p align="center">';
-echo '<input type="submit" name="s2_admin" value="RESET" />';
+echo '<input type="hidden" name="s2_admin" value="RESET" />';
+echo '<input type="submit" name="submit" value="' . __('RESET', 'subscribe2') . '" />';
 echo "</p></form></fieldset>\r\n";
 
 include(ABSPATH . '/wp-admin/admin-footer.php');
@@ -486,14 +487,16 @@ echo "<form method='POST'>\r\n";
 echo __('Subscribe Addresses', 'subscribe2')  . ': (' . __('one per line, or comma-seperated', 'subscribe2') . ")<br />\r\n";
 echo '<textarea rows="10" cols="55" name="addresses"></textarea>';
 echo "<br />\r\n";
-echo '<input type="submit" name="s2_admin" value="subscribe">';
+echo '<input type="hidden" name="s2_admin" value="subscribe" />';
+echo '<input type="submit" name="submit" value="' . __('Subscribe', 'subscribe2') . '" />';
 echo '</form></td><td align="right">';
 echo "<form method='POST'>\r\n";
 echo __('Send email to all subscribers', 'subscribe2') . ':';
 echo '<input type="text" size="30" name="s2_subject" value="' . __('A message from ', 'subscribe2') . get_settings('blogname') . '" /> <br />';
 echo '<textarea rows="10" cols="55" name="message"></textarea>';
 echo "<br />\r\n";
-echo '<input type="submit" name="s2_admin" value="send">&nbsp;';
+echo '<input type="hidden" name="s2_admin" value="send">';
+echo '<input type="submit" name="submit" value="' . __('Send', 'subscribe2') . '">&nbsp;';
 echo "</form></td></tr></table>\r\n";
 echo '<div style="clear: both;"><p>&nbsp;</p></div>';
 echo '<h2>' . __('Subscribers', 'subscribe2') . "</h2>\r\n";
