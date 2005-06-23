@@ -25,7 +25,7 @@ $hash = (isset($_GET['x'])) ? $_GET['x'] : '';
 if ('' != $hash) {
 	$foo = explode('x', $hash);
 	$action = $foo[0];
-	$id = $foo[2];
+	$id = intval($foo[2]);
 	$sql = "SELECT email FROM " . $s2_table . " WHERE id='" . $id . "'";
 	$email = $wpdb->get_var($sql);
 	if ('' == $email) {
