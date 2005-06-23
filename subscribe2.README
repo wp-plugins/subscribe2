@@ -40,4 +40,10 @@ Reminder: because subscribe2 places all recipients in BCC fields, and places the
 Many thanks to Wade Emmert and Joe Messanini for their patience and their assistance in testing this new functionality.
 
 == TRANSLATION ==
-Using the files in /wp-content/subscribe2/ you can translate the text that this plugin displays.  There are two files, a .mo and a .po, for each of the translatable files.  To translate all the text in subscribe2.php (which is what gets displayed to you, the blog owner), create a new .po file for your language from subscribe2-en_US.po.  To translate all the text displayed to your users, create a new .po file from subscribe-en_US.po.
+Using the files in /wp-content/subscribe2/ you can translate the text that this plugin displays.  Create a subscribe2-xx_XX.po and subscribe2-xx_XX.mo file (where xx_XX is your langauge locale) and place these files in /wp-content/plugins/. subscribe2 will should immediately begin using the translated text you supply.
+
+The .mo file you create or download will provide translations for both the WordPress administration screens, as well as the user subscription page.
+
+See here for additional localization information:
+  http://codex.wordpress.org/Localizing_WordPress
+

@@ -2,23 +2,71 @@ msgid ""
 msgstr ""
 "Project-Id-Version: subscribe2\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2005-06-22 15:28-0500\n"
+"PO-Revision-Date: 2005-06-22 19:59-0500\n"
 "Last-Translator: skippy <skippy@skippy.net>\n"
 "Language-Team: skippy <skippy@skippy.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: English\n"
-"X-Poedit-Country: UNITED STATES\n"
+"X-Poedit-Country: United States\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Keywords: __,_e\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: .\n"
 
+#: subscribe.php:92
+msgid "Your email"
+msgstr "Your email"
+
+#: subscribe.php:93
+msgid "subscribe"
+msgstr "subscribe"
+
+#: subscribe.php:94
+msgid "unsubscribe"
+msgstr "unsubscribe"
+
+#: subscribe.php:98
+msgid "Note"
+msgstr "Note"
+
+#: subscribe.php:98
+msgid "values personal privacy"
+msgstr "values personal privacy"
+
+#: subscribe.php:99
+msgid "This list is used solely to inform you when new posts are added."
+msgstr "This list is used solely to inform you when new posts are added."
+
+#: subscribe.php:101
+msgid "Your email address will not be shared with any other party"
+msgstr "Your email address will not be shared with any other party"
+
+#: subscribe.php:103
+msgid "Return to "
+msgstr "Return to "
+
+#: subscribe.php:173
+msgid "The following email address has successfully subscribed to your blog"
+msgstr "The following email address has successfully subscribed to your blog"
+
+#: subscribe.php:199
+msgid "The following email address has successfully unsubscribed from your blog"
+msgstr "The following email address has successfully unsubscribed from your blog"
+
 #: subscribe2.php:25
 #: subscribe2.php:499
 msgid "Subscribers"
 msgstr "Subscribers"
+
+#: subscribe2.php:26
+msgid "Subscribe2 Options"
+msgstr "Subscribe2 Options"
+
+#: subscribe2.php:26
+msgid "Subscribe2"
+msgstr "Subscribe2"
 
 #: subscribe2.php:251
 msgid "Notification Settings"
