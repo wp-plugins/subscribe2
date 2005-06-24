@@ -1,6 +1,8 @@
 Changelog:
-2.1.1
+2.1.2
 tidied up i18n: made HTML form submit buttons translatable
+2.1.1
+more i18n
 2.1.0
 fresh i18n effort: /wp-content/subscribe2/ contains the .mo and .po files
 both subscribe2.php and subscribe.php are translatable: place the appropriate .po file in the same directory as the source file for which it provides the translation
