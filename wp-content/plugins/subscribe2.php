@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://www.skippy.net/blog/2005/02/17/subscribe2
 Description: Notifies an email list when new entries are posted. 
-Version: 2.1.2
+Version: 2.1.3
 Author: Scott Merrill
 Author URI: http://www.skippy.net/
 */
@@ -68,8 +68,16 @@ if ('author' == $s2['s2_sender']) {
 	// get admin detailts
 	$user = get_userdata(1);
 }
-$myname = $user->user_nicename;
 $myemailadd = $user->user_email;
+$idmode = $userdata->user_idmode;
+if ($idmode == 'nickname')  $myname = $user->user_nickname;
+if ($idmode == 'login')     $myname = $user->user_login;
+if ($idmode == 'firstname') $myname = $user->user_firstname;
+if ($idmode == 'lastname')  $myname = $user->user_lastname;
+if ($idmode == 'namefl')    $myname = $user->user_firstname.' '.$user->user_lastname;
+if ($idmode == 'namelf')    $myname = $user->user_uastname.' '.$user->user_firstname;
+if (!$idmode) $myname = $user->user_nickname;
+
 
 // gets the path to your blog directory
 $s2_link = get_settings('siteurl') . "/subscribe.php";
