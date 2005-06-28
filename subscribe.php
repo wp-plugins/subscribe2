@@ -92,7 +92,7 @@ if ( ('not_there' == $doing) || ('already_there' == $doing) || ('self' == $doing
 	echo __('Your email', 'subscribe2') . ':&#160;<input type="text" name="email" value="" size="20" />&#160;<br />';
 	echo '<input type="radio" name="action" value="add" checked="checked" />' . __('subscribe', 'subscribe2') . "\r\n";
 	echo '<input type="radio" name="action" value="delete" />' . __('unsubscribe', 'subscribe2') . "&#160\r\n";
-	echo '<input type="submit" value="Send!" />';
+	echo '<input type="submit" value="' . __('Send', 'subscribe2') . '!" />';
 	echo "</form></p>\r\n";
 }
 echo '<p><strong>' . __('Note', 'subscribe2') . ':</strong> ' . get_settings('blogname') . ' ' . __('values personal privacy', 'subscribe2') . '.<br />';
