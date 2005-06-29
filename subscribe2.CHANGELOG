@@ -1,4 +1,6 @@
 Changelog:
+2.1.4
+more i18n fixes
 2.1.3
 finally (!) updated to use whatever value is used for the author/admin display name, as defined by "How to display name:" in the user's Profile.
 2.1.2
