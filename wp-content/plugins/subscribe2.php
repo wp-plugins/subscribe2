@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://www.skippy.net/blog/2005/02/17/subscribe2
 Description: Notifies an email list when new entries are posted. 
-Version: 2.1.4
+Version: 2.1.5
 Author: Scott Merrill
 Author URI: http://www.skippy.net/
 */
@@ -11,7 +11,7 @@ Author URI: http://www.skippy.net/
 // ****************************************
 // CHANGE THIS TO 1 IF YOU ARE ON DREAMHOST
 // ****************************************
-$dreamhost = 1;
+$dreamhost = 0;
 
 /////////////////////
 // main program block
@@ -35,13 +35,19 @@ $s2_table = $table_prefix . "subscribe2";
 
 // gets the name of your blog
 $blogname = get_settings('blogname');
+
+// we do this to work around a bug with drafts in WP 1.5.1.3 and below
+$postdata = $wpdb->get_row("SELECT * FROM $wpdb->posts WHERE ID = '$post_ID'");
+global $post_cache;
+$post_cache[$post_ID] = $postdata;
+
 // gets the link to the new post
 $postlink = get_permalink($post_ID);
-$postdata = get_postdata($post_ID);
+
 $cats = wp_get_post_cats('1', $post_ID);
 
 // is this post's date set in the future?
-if ($postdata['Date'] > current_time('mysql')) {
+if ($postdata->post_date > current_time('mysql')) {
 	// if so, let's not tell anyone about this
         return $post_ID;
 }
@@ -63,7 +69,7 @@ if ('1' == $bypass) { return $post_ID; }
 // do we send as admin, or post author?
 if ('author' == $s2['s2_sender']) {
 	// get author details
-	$user = get_userdata($postdata['Author_ID']);
+	$user = get_userdata($postdata->post_author);
 } else {
 	// get admin detailts
 	$user = get_userdata(1);
@@ -94,7 +100,7 @@ if (count($recipients) == 0) {
 $subject = stripslashes($s2['s2_subject']);
 // do any substitutions that are necessary
 $subject = str_replace('BLOGNAME', $blogname, $subject);
-$subject = str_replace('TITLE', $postdata['Title'], $subject);
+$subject = str_replace('TITLE', $postdata->post_title, $subject);
 $subject = str_replace('MYNAME', $myname, $subject);
 $subject = str_replace('EMAIL', $myemailadd, $subject);
 
@@ -139,15 +145,15 @@ if (1 == $dreamhost) {
 $mailtext = stripslashes($s2['s2_mailtext']);
 $mailtext = str_replace('BLOGNAME', $blogname, $mailtext);
 $mailtext = str_replace('BLOGLINK', get_bloginfo('url'), $mailtext);
-$mailtext = str_replace('TITLE', $postdata['Title'], $mailtext);
+$mailtext = str_replace('TITLE', $postdata->post_title, $mailtext);
 $mailtext = str_replace('PERMALINK', $postlink, $mailtext);
 $mailtext = str_replace('S2LINK', $s2_link, $mailtext);
 $mailtext = str_replace('MYNAME', $myname, $mailtext);
 $mailtext = str_replace('EMAIL', $myemailadd, $mailtext);
 if ('post' == $s2['s2_excerpt']) {
-	$content = $postdata['Content'];
+	$content = $postdata->post_content;
 } elseif ('excerpt' == $s2['s2_excerpt']) {
-	$content = $postdata['Excerpt'];
+	$content = $postdata->post_excerpt;
 } else {
 	$content = '';
 }
