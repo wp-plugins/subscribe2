@@ -1,0 +1,318 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: subscribe2\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2005-07-29 23:16-0500\n"
+"Last-Translator: skippy <skippy@skippy.net>\n"
+"Language-Team: skippy <skippy@skippy.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-Country: United States\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: subscribe2.php:25
+#: subscribe2.php:516
+msgid "Subscribers"
+msgstr ""
+
+#: subscribe2.php:26
+msgid "Subscribe2 Options"
+msgstr ""
+
+#: subscribe2.php:26
+msgid "Subscribe2"
+msgstr ""
+
+#: subscribe2.php:265
+msgid "Notification Settings"
+msgstr ""
+
+#: subscribe2.php:268
+msgid "Email Options"
+msgstr ""
+
+#: subscribe2.php:269
+msgid "Send email as"
+msgstr ""
+
+#: subscribe2.php:274
+msgid "HTML"
+msgstr ""
+
+#: subscribe2.php:279
+msgid "Plain Text"
+msgstr ""
+
+#: subscribe2.php:280
+msgid "Send Email From"
+msgstr ""
+
+#: subscribe2.php:285
+msgid "Author of the post"
+msgstr ""
+
+#: subscribe2.php:290
+msgid "Blog Admin"
+msgstr ""
+
+#: subscribe2.php:291
+msgid "Amount of post to deliver"
+msgstr ""
+
+#: subscribe2.php:293
+msgid "None"
+msgstr ""
+
+#: subscribe2.php:293
+msgid "Excerpt Only"
+msgstr ""
+
+#: subscribe2.php:293
+msgid "Full Post"
+msgstr ""
+
+#: subscribe2.php:303
+msgid "Email Template"
+msgstr ""
+
+#: subscribe2.php:304
+msgid "Subject"
+msgstr ""
+
+#: subscribe2.php:304
+#: subscribe2.php:308
+msgid "must not be empty"
+msgstr ""
+
+#: subscribe2.php:308
+msgid "Message"
+msgstr ""
+
+#: subscribe2.php:312
+#: subscribe2.php:390
+msgid "Message substitions"
+msgstr ""
+
+#: subscribe2.php:316
+#: subscribe2.php:317
+#: subscribe2.php:318
+#: subscribe2.php:319
+#: subscribe2.php:323
+#: subscribe2.php:324
+#: subscribe2.php:325
+#: subscribe2.php:326
+#: subscribe2.php:392
+#: subscribe2.php:393
+#: subscribe2.php:394
+#: subscribe2.php:395
+msgid "replaced with"
+msgstr ""
+
+#: subscribe2.php:318
+msgid "the post's title"
+msgstr ""
+
+#: subscribe2.php:319
+msgid "blank, the excerpt, or the entire post, based on the option set above"
+msgstr ""
+
+#: subscribe2.php:323
+msgid "the post's permalink"
+msgstr ""
+
+#: subscribe2.php:324
+msgid "a link to your subscribe.php file"
+msgstr ""
+
+#: subscribe2.php:325
+#: subscribe2.php:394
+msgid "the post author's name"
+msgstr ""
+
+#: subscribe2.php:326
+#: subscribe2.php:395
+msgid "the post author's email"
+msgstr ""
+
+#: subscribe2.php:333
+msgid "Subscription Messages"
+msgstr ""
+
+#: subscribe2.php:334
+msgid "Website messages"
+msgstr ""
+
+#: subscribe2.php:337
+msgid "Welcome message"
+msgstr ""
+
+#: subscribe2.php:341
+msgid "Invalid email was supplied"
+msgstr ""
+
+#: subscribe2.php:344
+msgid "Your email was supplied"
+msgstr ""
+
+#: subscribe2.php:348
+msgid "Known email was supplied"
+msgstr ""
+
+#: subscribe2.php:351
+msgid "Non-existant email supplied"
+msgstr ""
+
+#: subscribe2.php:355
+msgid "Subscribe confirmation email dispatched"
+msgstr ""
+
+#: subscribe2.php:358
+msgid "Unsubscribe confirmation email dispatched"
+msgstr ""
+
+#: subscribe2.php:362
+msgid "Successful subscription message"
+msgstr ""
+
+#: subscribe2.php:365
+msgid "Successful deletion message"
+msgstr ""
+
+#: subscribe2.php:371
+msgid "Email messages"
+msgstr ""
+
+#: subscribe2.php:374
+msgid "Subject line for all confirmation emails"
+msgstr ""
+
+#: subscribe2.php:378
+msgid "Subscribe / Unsubscribe confirmation email"
+msgstr ""
+
+#: subscribe2.php:382
+msgid "Subscribe notification subject sent to admin"
+msgstr ""
+
+#: subscribe2.php:385
+msgid "Unsubscribe notification subject sent to admin"
+msgstr ""
+
+#: subscribe2.php:392
+msgid "the blog's name"
+msgstr ""
+
+#: subscribe2.php:393
+msgid "the confirmation link for the user's request"
+msgstr ""
+
+#: subscribe2.php:398
+msgid "Categories to Exclude"
+msgstr ""
+
+#: subscribe2.php:434
+msgid "submit"
+msgstr ""
+
+#: subscribe2.php:437
+msgid "Reset Default"
+msgstr ""
+
+#: subscribe2.php:440
+msgid "Use this to reset all options to their defaults. This <strong><em>will not</em></strong> modify your list of subscribers."
+msgstr ""
+
+#: subscribe2.php:445
+msgid "RESET"
+msgstr ""
+
+#: subscribe2.php:494
+msgid "Message delivered!"
+msgstr ""
+
+#: subscribe2.php:498
+msgid "Admin Tools"
+msgstr ""
+
+#: subscribe2.php:501
+msgid "Subscribe Addresses"
+msgstr ""
+
+#: subscribe2.php:501
+msgid "one per line, or comma-seperated"
+msgstr ""
+
+#: subscribe2.php:505
+msgid "Subscribe"
+msgstr ""
+
+#: subscribe2.php:508
+msgid "Send email to all subscribers"
+msgstr ""
+
+#: subscribe2.php:509
+msgid "A message from "
+msgstr ""
+
+#: subscribe2.php:513
+#: subscribe.php:95
+msgid "Send"
+msgstr ""
+
+#: subscribe2.php:518
+msgid "Confirmed Subscribers"
+msgstr ""
+
+#: subscribe2.php:531
+#: subscribe2.php:548
+msgid "NONE"
+msgstr ""
+
+#: subscribe2.php:535
+msgid "Uncomfirmed Subscribers"
+msgstr ""
+
+#: subscribe.php:92
+msgid "Your email"
+msgstr ""
+
+#: subscribe.php:93
+msgid "subscribe"
+msgstr ""
+
+#: subscribe.php:94
+msgid "unsubscribe"
+msgstr ""
+
+#: subscribe.php:98
+msgid "Note"
+msgstr ""
+
+#: subscribe.php:98
+msgid "values personal privacy"
+msgstr ""
+
+#: subscribe.php:99
+msgid "This list is used solely to inform you when new posts are added."
+msgstr ""
+
+#: subscribe.php:101
+msgid "Your email address will not be shared with any other party"
+msgstr ""
+
+#: subscribe.php:103
+msgid "Return to "
+msgstr ""
+
+#: subscribe.php:173
+msgid "The following email address has successfully subscribed to your blog"
+msgstr ""
+
+#: subscribe.php:199
+msgid "The following email address has successfully unsubscribed from your blog"
+msgstr ""
+
