@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://www.skippy.net/blog/2005/02/17/subscribe2
 Description: Notifies an email list when new entries are posted. 
-Version: 2.1.5
+Version: 2.1.6
 Author: Scott Merrill
 Author URI: http://www.skippy.net/
 */
@@ -162,13 +162,13 @@ $mailtext = str_replace('EXCERPT', $content, $mailtext);
 if ('html' == $s2['s2_html']) {
 	// To send HTML mail, the Content-type header must be set
 	$headers .= 'MIME-Version: 1.0' . "\r\n";
-	$headers .= 'Content-type: ' . get_bloginfo('html_type') . '; charset='. get_bloginfo('charset');
+	$headers .= 'Content-type: ' . get_bloginfo('html_type') . '; charset='. get_bloginfo('charset') . '\r\n';
 	$mailtext = apply_filters('the_content', $mailtext);
 	$mailtext = str_replace(']]>', ']]&gt;', $mailtext);
 	$mailtext = "<html><head><title>$subject</title></head><body>" . $mailtext . "</body></html>";
 } else {
 	 $headers .= 'MIME-Version: 1.0' . "\r\n";
-	 $headers .= 'Content-type: text/plain; charset='. get_bloginfo('charset');
+	 $headers .= 'Content-type: text/plain; charset='. get_bloginfo('charset') . '\r\n';
 	$mailtext = strip_tags($mailtext);
 }
 
