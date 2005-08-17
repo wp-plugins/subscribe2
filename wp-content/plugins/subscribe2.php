@@ -81,7 +81,7 @@ if ($idmode == 'login')     $myname = $user->user_login;
 if ($idmode == 'firstname') $myname = $user->user_firstname;
 if ($idmode == 'lastname')  $myname = $user->user_lastname;
 if ($idmode == 'namefl')    $myname = $user->user_firstname.' '.$user->user_lastname;
-if ($idmode == 'namelf')    $myname = $user->user_uastname.' '.$user->user_firstname;
+if ($idmode == 'namelf')    $myname = $user->user_lastname.' '.$user->user_firstname;
 if (!$idmode) $myname = $user->user_nickname;
 
 
