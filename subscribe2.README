@@ -47,3 +47,16 @@ The .mo file you create or download will provide translations for both the WordP
 See here for additional localization information:
   http://codex.wordpress.org/Localizing_WordPress
 
+== Frequently Asked Questions ==
+Q. No emails are sent!
+A. In the overwhelming majority of cases so far, this is caused by spam filters at the recipient end incorrectly flagging messages as spam.  Feel free to contact me if you feel something else is going on.
+
+Q. The subscribe form is way below my sidebar!
+A.edit subscribe.php and move the line:
+   get_sidebar
+from the top to the bottom, just above
+   get_footer
+Be sure to enclose it in <?php ?> as needed.
+
+Q. I posted an item dated for tomorrow, but no notification was sent!
+A. Future-dated posts do not generate notification emails.
