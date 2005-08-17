@@ -171,7 +171,9 @@ if ('2' == s2_check($email)) {
 	$sql = "UPDATE " . $s2_table . " SET active = '1' WHERE email = '" . $email . "'";
 	$result = $wpdb->query($sql);
 	$mailtext = __('The following email address has successfully subscribed to your blog', 'subscribe2') . ":\n\n $email\n";
-	$mailheaders = "From: $admin->user_nickname <$admin->user_email>";
+	$mailheaders = "From: $admin->user_nickname <$admin->user_email>\r\n";
+	$mailheaders .= 'MIME-Version: 1.0' . "\r\n";
+	$mailheaders .= 'Content-type: text/plain; charset='. get_bloginfo('charset');
 	mail($admin->user_email, stripslashes($s2['s2_subscribed_admin_subject']), $mailtext, $mailheaders);
 }	
 } // s2_confirm
@@ -197,7 +199,9 @@ $result = $wpdb->query($sql);
 $admin = get_userdata(1);
 
 $mailtext = __('The following email address has successfully unsubscribed from your blog', 'subscribe2') . ":\n\n $email\n";
-$mailheaders = "From: $admin->user_nickname <$admin->user_email>";
+$mailheaders = "From: $admin->user_nickname <$admin->user_email>\r\n";
+$mailheaders .= 'MIME-Version: 1.0' . "\r\n";
+$mailheaders .= 'Content-type: text/plain; charset='. get_bloginfo('charset');
 mail($admin->user_email, $s2['s2_unsubscribed_admin_subject'], $mailtext, $mailheaders);
 } // s2_delete
 
