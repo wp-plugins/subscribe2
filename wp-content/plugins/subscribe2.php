@@ -431,7 +431,7 @@ foreach ($cache_categories as $cat) {
 	$i++;
 }
 echo "</td></tr></table>\r\n";
-echo '<p align="center"><input type="submit" name="submit" value=' . __('submit', 'subscribe2') . '"submit" /></p>';
+echo '<p align="center"><input type="submit" name="submit" value=' . __('submit', 'subscribe2') . ' /></p>';
 echo "</form>\r\n";
 
 echo '<h2>' . __('Reset Default', 'subscribe2') . "</h2>\r\n";
