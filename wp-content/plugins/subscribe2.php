@@ -178,10 +178,10 @@ if (isset($_POST['publish'])) { // we only want to send on publish
 	if ( (1 == $dreamhost) && (isset($batch)) ) {
 		foreach ($batch as $bcc) {
 			$newheaders = $headers . $bcc;
-			mail($myemailadd, $subject, $mailtext, $newheaders);
+			wp_mail($myemailadd, $subject, $mailtext, $newheaders);
 		}
 	} else {
-		mail($myemailadd, $subject, $mailtext, $headers);
+		wp_mail($myemailadd, $subject, $mailtext, $headers);
 	}
 }
 return $post_ID;
@@ -689,10 +689,10 @@ if ('html' == $s2['s2_html']) {
 if ( (1 == $dreamhost) && (isset($batch)) ) {
 	foreach ($batch as $bcc) {
 		$newheaders = $headers . $bcc;
-		mail($myemailadd, $subject, $mailtext, $newheaders);
+		wp_mail($myemailadd, $subject, $mailtext, $newheaders);
 	}
 } else {
-	mail($user_email, $subject, $mailtext, $headers);
+	wp_mail($user_email, $subject, $mailtext, $headers);
 }
 
 $_POST['s2_admin'] = '';

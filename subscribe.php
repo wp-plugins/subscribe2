@@ -174,7 +174,7 @@ if ('2' == s2_check($email)) {
 	$mailheaders = "From: $admin->user_nickname <$admin->user_email>\r\n";
 	$mailheaders .= 'MIME-Version: 1.0' . "\r\n";
 	$mailheaders .= 'Content-type: text/plain; charset='. get_bloginfo('charset');
-	mail($admin->user_email, stripslashes($s2['s2_subscribed_admin_subject']), $mailtext, $mailheaders);
+	wp_mail($admin->user_email, stripslashes($s2['s2_subscribed_admin_subject']), $mailtext, $mailheaders);
 }	
 } // s2_confirm
 
@@ -202,7 +202,7 @@ $mailtext = __('The following email address has successfully unsubscribed from y
 $mailheaders = "From: $admin->user_nickname <$admin->user_email>\r\n";
 $mailheaders .= 'MIME-Version: 1.0' . "\r\n";
 $mailheaders .= 'Content-type: text/plain; charset='. get_bloginfo('charset');
-mail($admin->user_email, $s2['s2_unsubscribed_admin_subject'], $mailtext, $mailheaders);
+wp_mail($admin->user_email, $s2['s2_unsubscribed_admin_subject'], $mailtext, $mailheaders);
 } // s2_delete
 
 ///////////////////////////
