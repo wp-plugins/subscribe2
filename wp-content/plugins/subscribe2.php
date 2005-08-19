@@ -105,7 +105,7 @@ $subject = str_replace('MYNAME', $myname, $subject);
 $subject = str_replace('EMAIL', $myemailadd, $subject);
 
 // Set sender details
-$headers = "From: " . $myname . " <" . $myemailadd . ">\r\n";
+$headers = "From: \"$myname\" <" . $myemailadd . ">\n";
 
 // BCC all recipients
 // with batching for Dreamhost
@@ -161,14 +161,14 @@ $mailtext = str_replace('EXCERPT', $content, $mailtext);
 
 if ('html' == $s2['s2_html']) {
 	// To send HTML mail, the Content-type header must be set
-	$headers .= 'MIME-Version: 1.0' . "\r\n";
-	$headers .= 'Content-type: ' . get_bloginfo('html_type') . '; charset='. get_bloginfo('charset') . '\r\n';
+	$headers .= "MIME-Version: 1.0\n";
+	$headers .= "Content-type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
 	$mailtext = apply_filters('the_content', $mailtext);
 	$mailtext = str_replace(']]>', ']]&gt;', $mailtext);
 	$mailtext = "<html><head><title>$subject</title></head><body>" . $mailtext . "</body></html>";
 } else {
-	 $headers .= 'MIME-Version: 1.0' . "\r\n";
-	 $headers .= 'Content-type: text/plain; charset='. get_bloginfo('charset') . '\r\n';
+	 $headers .= "MIME-Version: 1.0\n";
+	 $headers .= "Content-type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 	$mailtext = strip_tags($mailtext);
 }
 
@@ -178,10 +178,10 @@ if (isset($_POST['publish'])) { // we only want to send on publish
 	if ( (1 == $dreamhost) && (isset($batch)) ) {
 		foreach ($batch as $bcc) {
 			$newheaders = $headers . $bcc;
-			wp_mail($myemailadd, $subject, $mailtext, $newheaders);
+			@wp_mail($myemailadd, $subject, $mailtext, $newheaders);
 		}
 	} else {
-		wp_mail($myemailadd, $subject, $mailtext, $headers);
+		@wp_mail($myemailadd, $subject, $mailtext, $headers);
 	}
 }
 return $post_ID;
@@ -633,7 +633,7 @@ $mailtext = stripslashes($_POST['message']);
 $s2_table = $table_prefix . "subscribe2";
 
 // Set sender details
-$headers = "From: " . $user_identity . " <" . $user_email . ">\r\n";
+$headers = "From: \"$user_identity\" <" . $user_email . ">\n";
 
 // get the list of active recipients from the database
 $sql = "SELECT email FROM $s2_table WHERE active='1'";
@@ -679,20 +679,20 @@ if (1 == $dreamhost) {
 $s2 = get_option('s2_options');
 if ('html' == $s2['s2_html']) {
 	$mailtext = "<html><head><title>$subject</title></head><body>$mailtext</body></html>";
-	$headers .= 'MIME-Version: 1.0' . "\r\n";
-	$headers .= 'Content-type: ' . get_bloginfo('html_type') . '; charset='. get_bloginfo('charset');
+	$headers .= "MIME-Version: 1.0\n";
+	$headers .= "Content-type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
 } else {
-	$headers .= 'MIME-Version: 1.0' . "\r\n";
-	$headers .= 'Content-type: text/plain; charset='. get_bloginfo('charset');
+	$headers .= "MIME-Version: 1.0\n";
+	$headers .= "Content-type: text/plain; charset=\"" . get_bloginfo('charset') . "\"\n" ;
 }
 
 if ( (1 == $dreamhost) && (isset($batch)) ) {
 	foreach ($batch as $bcc) {
 		$newheaders = $headers . $bcc;
-		wp_mail($myemailadd, $subject, $mailtext, $newheaders);
+		@wp_mail($myemailadd, $subject, $mailtext, $newheaders);
 	}
 } else {
-	wp_mail($user_email, $subject, $mailtext, $headers);
+	@wp_mail($user_email, $subject, $mailtext, $headers);
 }
 
 $_POST['s2_admin'] = '';
