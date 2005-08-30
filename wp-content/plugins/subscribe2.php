@@ -116,7 +116,7 @@ if (1 == $dreamhost) {
 	foreach ($recipients as $recipient) {
 		$recipient = trim($recipient);
 		if (! empty($recipient)) {
-			$bcc .= "Bcc: " . $recipient . "\r\n";
+			$bcc .= "Bcc: " . $recipient . "\n";
 		}
 		if (30 == $count) {
 			$count = 1;
@@ -136,7 +136,7 @@ if (1 == $dreamhost) {
 	foreach ($recipients as $recipient) {
 		$recipient = trim($recipient);
 		if (! empty($recipient)) {
-			$headers .= "Bcc: " . $recipient . "\r\n";
+			$headers .= "Bcc: " . $recipient . "\n";
 		}
 	}
 }
@@ -662,7 +662,7 @@ if (1 == $dreamhost) {
         foreach ($recipients as $recipient) {
                 $recipient = trim($recipient);
                 if (! empty($recipient)) {
-                        $bcc .= "BCC: " . $recipient . "\r\n";
+                        $bcc .= "BCC: " . $recipient . "\n";
                 }
                 if (30 == $count) {
                         $batch[] = $bcc;
@@ -681,7 +681,7 @@ if (1 == $dreamhost) {
 	foreach ($recipients as $recipient) {
         	$recipient = trim($recipient);
 	        if (! empty($recipient)) {
-	                $headers .= "BCC: " . $recipient . "\r\n";
+	                $headers .= "BCC: " . $recipient . "\n";
 	        }
 	}
 }

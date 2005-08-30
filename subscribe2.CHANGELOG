@@ -1,4 +1,7 @@
 Changelog:
+2.1.6
+fix some header issues
+If sending Excerpts, and the excerpt is empty, use the text before a <!--more--> tag, if present -- thanks Gene! (http://www.terrik.com/)
 2.1.5
 work about the postcache bug in WordPress 1.5.1.3 and below
 2.1.4
