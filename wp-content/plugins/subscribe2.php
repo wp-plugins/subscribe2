@@ -152,8 +152,24 @@ $mailtext = str_replace('MYNAME', $myname, $mailtext);
 $mailtext = str_replace('EMAIL', $myemailadd, $mailtext);
 if ('post' == $s2['s2_excerpt']) {
 	$content = $postdata->post_content;
+	if (false !== strpos('<!--more-->', $postdata->post_content)) {
+		// use the pre-more text, if present
+		list($content, $more) = explode('<!--more-->',$postdata->post_content, 2);
+		// strip leading and trailing whitespace
+		$content = preg_replace('/^[\s]*(.*)[\s]*$/','\\1',$content);
+	}
 } elseif ('excerpt' == $s2['s2_excerpt']) {
 	$content = $postdata->post_excerpt;
+
+	if ('' == $content) {
+		// no excerpt
+		// let's see if a <!--more--> tag exists in the body
+		if (false !== strpos('<!--more-->', $postdata->post_content)) {
+			list($content, $more) = explode('<!--more-->',$postdata->post_content, 2);
+			// strip leading and trailing whitespace
+			$content = preg_replace('/^[\s]*(.*)[\s]*$/','\\1',$content);
+		}
+	}
 } else {
 	$content = '';
 }
