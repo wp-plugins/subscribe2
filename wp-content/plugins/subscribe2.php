@@ -158,7 +158,7 @@ if ('post' == $s2['s2_excerpt']) {
 	if ('' == $content) {
 		// no excerpt
 		// let's see if a <!--more--> tag exists in the body
-		if (false !== strpos('<!--more-->', $postdata->post_content)) {
+		if (false !== strpos($postdata->post_content, '<!--more-->')) {
 			list($content, $more) = explode('<!--more-->',$postdata->post_content, 2);
 			// strip leading and trailing whitespace
 			$content = preg_replace('/^[\s]*(.*)[\s]*$/','\\1',$content);
