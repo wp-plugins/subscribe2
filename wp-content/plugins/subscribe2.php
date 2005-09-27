@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Subscribe2
-Plugin URI: http://www.skippy.net/blog/2005/02/17/subscribe2
+Plugin URI: http://www.skippy.net/blog/plugins
 Description: Notifies an email list when new entries are posted. 
 Version: 2.1.6
 Author: Scott Merrill
