@@ -239,7 +239,10 @@ $subject = stripslashes(str_replace("BLOGNAME", get_settings('blogname'), $s2['s
 $subject = str_replace("MYNAME", $admin->user_nickname, $subject);
 $subject = str_replace("EMAIL", $admin->user_email, $subject);
 
+$mailheaders .= "MIME-Version: 1.0\n";
+$mailheaders .= "Content-type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 $mailheaders = "From: $admin->user_nickname <$admin->user_email>";
+
 mail ($email, $subject, $body, $mailheaders);
 } // s2_send_confirmation()
 
