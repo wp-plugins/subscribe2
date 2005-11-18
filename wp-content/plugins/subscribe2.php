@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://www.skippy.net/blog/plugins
 Description: Notifies an email list when new entries are posted. 
-Version: 2.1.6
+Version: 2.1.7
 Author: Scott Merrill
 Author URI: http://www.skippy.net/
 */
@@ -15,13 +15,17 @@ $dreamhost = 0;
 
 /////////////////////
 // main program block
+$s2_version = "2.1.7";
 add_action ('admin_menu', 'subscribe2_menu');
 add_action ('publish_post', 'subscribe2', 8);
 //////////// END MAIN PROGRAM /////////////
 
-
 //////////// BEGIN FUNCTIONS //////////////
 function subscribe2_menu() {
+	global $s2_version;
+	if ($s2_version != get_option('s2_version')) {
+		s2_db_upgrade();
+	}
         add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), 9, __FILE__, 's2_manage');
 	add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2', 'subscribe2'), 9, __FILE__, 's2_options');   
 }
@@ -214,6 +218,20 @@ maybe_create_table($s2_table, $s2_table_sql);
 
 s2_reset();
 } // s2_install
+
+///////////////////////
+function s2_db_upgrade() {
+// include upgrade-functions for maybe_create_table;
+if (! function_exists('maybe_create_table')) {
+        require_once(ABSPATH . '/wp-admin/upgrade-functions.php');
+}
+global $wpdb, $table_prefix, $s2_version;
+$s2_table = $table_prefix . "subscribe2";
+
+$date = date('Y-m-d');
+maybe_add_column($s2_table, "date", "ALTER TABLE `$s2_table` ADD `date` DATE DEFAULT '$date' NOT NULL AFTER `active` ;");
+update_option('s2_version', $s2_version);
+}// s2_db_upgrade
 
 ///////////////////
 function s2_reset() {
@@ -498,8 +516,8 @@ $sql = "SELECT email FROM " . $s2_table . " WHERE active='1' ORDER BY email ASC"
 $confirmed = $wpdb->get_col($sql);
 
 // get unconfirmed subscribers
-$sql = "SELECT email FROM " . $s2_table . " WHERE active='0' ORDER BY email ASC";
-$unconfirmed = $wpdb->get_col($sql);
+$sql = "SELECT email,date FROM " . $s2_table . " WHERE active='0' ORDER BY email ASC";
+$unconfirmed = $wpdb->get_results($sql);
 if ('admin_sent' == $admin_sent) {
         echo '<div class="updated"><p align="center">' . __('Message delivered!', 'subscribe2') . "</p></div>\r\n";
 }
@@ -548,9 +566,9 @@ if (is_array($unconfirmed)) {
 	$alternate = 'alternate';
 	foreach ($unconfirmed as $subscriber) {
 		echo '<tr class="' . $alternate . '">';
-		echo '<td width="5%" align="center"><form method="POST"><input type="hidden" name="email" value="' . $subscriber . '" /><input type="hidden" name="s2_admin" value="toggle" /><input type="submit" name="submit" value="&lt;-" /></form></td>';
-		echo '<td align="center"><a href="mailto:' . $subscriber . '">' . $subscriber . "</a></td>\r\n";
-		echo '<td width="5%" align="center"><form method="POST"><input type="hidden" name="email" value="' . $subscriber . '" /><input type="hidden" name="s2_admin" value="delete" /><input type="submit" name="submit" value=" X " /></form></td>';
+		echo '<td width="5%" align="center"><form method="POST"><input type="hidden" name="email" value="' . $subscriber->email . '" /><input type="hidden" name="s2_admin" value="toggle" /><input type="submit" name="submit" value="&lt;-" /></form></td>';
+		echo '<td align="center"><a href="mailto:' . $subscriber->email . '">' . $subscriber->email . "</a> (" . $subscriber->date . ")</td>\r\n";
+		echo '<td width="5%" align="center"><form method="POST"><input type="hidden" name="email" value="' . $subscriber->email . '" /><input type="hidden" name="s2_admin" value="delete" /><input type="submit" name="submit" value=" X " /></form></td>';
 		echo "</tr>\r\n";
 		('alternate' == $alternate) ? $alternate = '' : $alternate = 'alternate';	
 	}

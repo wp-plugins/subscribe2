@@ -32,7 +32,10 @@ if ('' != $hash) {
 		main('invalid');
 	}
 	if ('a' == $action) {
-		if ('2' == s2_check($email)) {
+		$result = s2_check($email);
+		if ('0' === $result) {
+			main('not_there');
+		} elseif ($result > 1) {
 			s2_confirm($email);
 			main('added');
 		} else {
@@ -56,13 +59,14 @@ if ( strtolower($admin->user_email) == strtolower($email) ) {
 }
 
 if ('add' == $action) { 
-	if ('0' !== s2_check($email)) {
+	$result = s2_check($email);
+	if ( ($result == 1) || ($result > date('Y-m-d', strtotime('-1 day'))) ) {
 		main('already_there');
 	}
-	s2_add($email); 
+	s2_add($email, $result); 
 	s2_send_confirmation ($email, 'add');
 	main('add_confirm');
-}elseif ('delete' == $action) { 
+} elseif ('delete' == $action) { 
 	if ('0' === s2_check($email)) {
 		main('not_there');
 	}
@@ -88,7 +92,7 @@ if ('' == $doing) {
 }
 echo '<div id="content" class="narrowcolumn"><div class="post"><p>' . stripslashes($s2["s2_$doing"]) . "</p>\r\n";
 if ( ('not_there' == $doing) || ('already_there' == $doing) || ('self' == $doing) || ('invalid' == $doing) || ('welcome' == $doing) ) {
-	echo '<form method="post" action="' . get_bloginfo('home') . '"><p>';
+	echo '<form method="post" action="' . get_bloginfo('home') . '/subscribe.php"><p>';
 	echo __('Your email', 'subscribe2') . ':&#160;<input type="text" name="email" value="" size="20" />&#160;<br />';
 	echo '<input type="radio" name="action" value="add" checked="checked" />' . __('subscribe', 'subscribe2') . "\r\n";
 	echo '<input type="radio" name="action" value="delete" />' . __('unsubscribe', 'subscribe2') . "&#160;\r\n";
@@ -113,7 +117,7 @@ die;
 // return values:
 // 0 == not present
 // 1 == present, and confirmed
-// 2 == present, and not confirmed
+// YYY-MM-DD == present, and not confirmed (date of subscription)
 ////////////////////
 function s2_check ($email = '') {
 global $wpdb, $s2_table;
@@ -128,7 +132,7 @@ $foo = $wpdb->get_row($query);
 if ('1' === $foo->active) {
 	return '1';
 } elseif ('0' === $foo->active) {
-	return '2';
+	return $foo->date;
 } else {
 	return '0';
 }
@@ -138,18 +142,24 @@ if ('1' === $foo->active) {
 // *** s2_add() ***
 // add an email address to the database with a status of "0" (unconfirmed)
 ///////////////////
-function s2_add ($email = '') {
+function s2_add ($email = '', $status = '0') {
 global $wpdb, $s2_table;
 if ( ('' == $email) || (! is_email($email)) ) {
 	// no valid email, so bail out
 	return;
 }
-// check to make sure the address isn't already there
-if ('0' != s2_check($email)) {
-	// user exists, so bail out
-	return '1';
+
+if ($status > 1) {
+	// this is a known unconfirmed address
+	// update their timestamp because we're sending them a new 
+	// confirmation email
+	$sql = "UPDATE $s2_table SET date = '" . date('Y-m-d') . "' WHERE email = '$email'";
+	$result = $wpdb->query($sql);
+	return;
 }
-$sql = "INSERT INTO " . $s2_table . " (email, active) VALUES ('" . $email . "', '0')";
+
+// add this address
+$sql = "INSERT INTO $s2_table (email, active, date) VALUES ('$email', '0', '" . date('Y-m-d') . "')";
 $result = $wpdb->query($sql);
 } // s2_add
 
@@ -167,7 +177,7 @@ if ( ('' == $email) || (! is_email($email)) ) {
 
 $admin = get_userdata(1);
 
-if ('2' == s2_check($email)) {
+if (s2_check($email) > 1) {
 	$sql = "UPDATE " . $s2_table . " SET active = '1' WHERE email = '" . $email . "'";
 	$result = $wpdb->query($sql);
 	$mailtext = __('The following email address has successfully subscribed to your blog', 'subscribe2') . ":\n\n $email\n";
