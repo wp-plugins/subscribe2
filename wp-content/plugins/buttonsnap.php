@@ -3,7 +3,7 @@
 BUTTONSNAP CLASS LIBRARY By Owen Winkler
 http://asymptomatic.net
 WordPress Downloads are at http://redalt.com/downloads
-Version: 1.3
+Version: 1.3.1
 *******************************************************************************/
 
 if (!class_exists('buttonsnap')) :
@@ -380,15 +380,16 @@ MORESCRIPT;
 		$this->markers[$marker] = $cssclass;
 	}
 	
-	function basename() 
+	function basename($src='') 
 	{
-		$name = preg_replace('/^.*wp-content[\\\\\/]plugins[\\\\\/]/', '', __FILE__);
+		if($src == '') $src = __FILE__;
+		$name = preg_replace('/^.*wp-content[\\\\\/]plugins[\\\\\/]/', '', $src);
 		return str_replace('\\', '/', $name);
 	}
 	
-	function plugin_uri()
+	function plugin_uri($src = '')
 	{
-		return get_settings('siteurl') . '/wp-content/plugins/' . $this->basename(); 
+		return get_settings('siteurl') . '/wp-content/plugins/' . $this->basename($src); 
 	}
 	
 	function include_up($filename) {
@@ -430,7 +431,7 @@ function buttonsnap_jsbutton_page($imgsrc, $alttext, $js) { global $buttonsnap; 
 function buttonsnap_ajaxbutton_page($imgsrc, $alttext, $hook) { global $buttonsnap; return $buttonsnap->ajaxbutton($imgsrc, $alttext, $hook, 'page');}
 function buttonsnap_separator_page() { global $buttonsnap; return $buttonsnap->separator('page');}
 
-function buttonsnap_dirname() {global $buttonsnap; return dirname($buttonsnap->plugin_uri());}
+function buttonsnap_dirname($src = '') {global $buttonsnap; return dirname($buttonsnap->plugin_uri($src));}
 function buttonsnap_register_marker($marker, $cssclass) {global $buttonsnap; return $buttonsnap->register_marker($marker, $cssclass);}
 endif;
 if (!defined('ABSPATH')) {
