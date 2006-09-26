@@ -1,14 +1,15 @@
 <?php
 /*
 Plugin Name: Subscribe2
-Plugin URI: http://www.prescriber.org.uk/subscribe2.php
+Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.2.6
+Version: 2.2.7
 Author: Matthew Robinson
-Author URI: http://www.prescriber.org.uk/subscribe2.php
+Author URI: http://subscribe2.wordpress.com
 */
 
 /*
+Copyright (C) 2006 Matthew Robinson
 Based on the Original Subscribe2 plugin by 
 Copyright (C) 2005 Scott Merrill (skippy@skippy.net)
 
@@ -39,14 +40,14 @@ define('DREAMHOST', false);
 // by default, subscribe2 grabs the first page from your database for use
 // when displaying the confirmation screen to public subscribers.
 // You can override this by specifying a page ID below.
-define('S2PAGE', '0');
+define('S2PAGE', '107');
 
 // change this to TRUE if you want a daily digest of the day's posts
 // send to your subscribers
 define('S2DIGEST', false);
 
 // our version number. Don't touch.
-define('S2VERSION', '2.2.6');
+define('S2VERSION', '2.2.7');
 
 // start our class
 class subscribe2 {
@@ -227,17 +228,19 @@ class subscribe2 {
 		}
 		$headers = "From: $this->myname <$this->myemail>\n";
 		$headers .= "Return-Path: <$this->myemail>\n";
+		$headers .= "X-Mailer:PHP" . phpversion() . "\n";
 		$headers .= "Precedence: list\nList-Id: " . get_settings('blogname') . "\n";
 
 		if ('html' == $type) {
 				// To send HTML mail, the Content-type header must be set
 				$headers .= "MIME-Version: 1.0\n";
 				$headers .= "Content-type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
-				$mailtext = "<html><head><title>$subject</title></head><body>" . $message . "</body></html>";
+				$mailtext = "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>";
 		} else {
 				$headers .= "MIME-Version: 1.0\n";
 				$headers .= "Content-type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
-				$message = preg_replace('|&.{3,6};|', '', $message);
+				$message = preg_replace('|&[^a][^m][^p].{0,3};|', '', $message);
+				$message = preg_replace('|&amp;|', '&', $message);
 				$mailtext = wordwrap(strip_tags($message), 80, "\n");
 		}
 
@@ -397,7 +400,7 @@ class subscribe2 {
 		$this->myemail = $user->user_email;
 		$this->myname = $user->display_name;
 		// Get email subject
-		$subject = $this->substitute($this->s2_subject);
+		$subject = $this->substitute(stripslashes($this->s2_subject));
 		// Get the message template
 		$mailtext = $this->substitute(stripslashes(get_option('s2_mailtext')));
 
@@ -512,6 +515,9 @@ class subscribe2 {
 		$mailheaders .= "MIME-Version: 1.0\n";
 		$mailheaders .= "Content-type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 		$mailheaders .= "From: $admin->display_name <$admin->user_email>";
+		$mailheaders .= "Return-Path: <$admin->user_email>\n";
+		$mailheaders .= "X-Mailer:PHP" . phpversion() . "\n";
+		$mailheaders .= "Precedence: list\nList-Id: " . get_settings('blogname') . "\n";
 
 		@wp_mail ($this->email, $subject, $body, $mailheaders);
 	} // end send_confirm()
@@ -547,7 +553,6 @@ class subscribe2 {
 		}
 	} // end get_all_categories()
 
-
 /* ===== Subscriber functions ===== */
 	/**
 	Given a public subscriber ID, returns the email address
@@ -575,7 +580,6 @@ class subscribe2 {
 
 	/**
 	Activate an email address
-
 	If the address is not already present, it will be added
 	*/
 	function activate ($email = '') {
@@ -975,6 +979,12 @@ class subscribe2 {
 	function manage_menu() {
 		global $wpdb;
 
+		//Get Registered Subscribers for bulk management
+		$registered = $this->get_registered();
+		if(!empty($registered)) {
+			$emails = implode(",", $registered);
+		}
+
 		$what = '';
 		$reminderform = '';
 
@@ -995,7 +1005,7 @@ class subscribe2 {
 				$this->toggle($_POST['email']);
 				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . $_POST['email'] . ' ' . __('status changed!', 'subscribe2') . "</p></strong></div>";
 			} elseif ('remind' == $_POST['s2_admin']) {
-				$this->remind($_POST['emails']);
+				$this->remind($_POST['reminderemails']);
 				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('Reminder Email(s) Sent!','subscribe2') . "</p></strong></div>"; 
 			} elseif ( ('register' == $_POST['s2_admin']) && ('Subscribe' == $_POST['submit']) ) {
 				$this->subscribe_registered_users($_POST['emails'], $_POST['category']);
@@ -1011,7 +1021,6 @@ class subscribe2 {
 				$what = 'all';
 				$confirmed = $this->get_public();
 				$unconfirmed = $this->get_public(0);
-				$registered = $this->get_registered();
 				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$registered);
 			} elseif ('public' == $_POST['what']) {
 				$what = 'public';
@@ -1020,29 +1029,26 @@ class subscribe2 {
 				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed);
 			} elseif ('confirmed' == $_POST['what']) {
 				$what = 'confirmed';
-				$confirmed = $this->get_public();
+				$confirmed = $this->get_public();				
 				$subscribers = $confirmed;
 			} elseif ('unconfirmed' == $_POST['what']) {
 				$what = 'unconfirmed';
-				$unconfirmed = $this->get_public(0);
+				$unconfirmed = $this->get_public(0);				
 				$subscribers = $unconfirmed;
 				if (!empty($unconfirmed)) {
-					$emails = implode(",", $unconfirmed);
-					$reminderform = "<span class=\"submit\"><form method=\"post\" action=\"\"><input type=\"hidden\" name=\"emails\" value=\"$emails\" /><input type=\"hidden\" name=\"s2_admin\" value=\"remind\" /><input type=\"submit\" name=\"submit\" value=\"" . __('Send Reminder Email','subscribe2') . "\" /></form></span>";
+					$reminderemails = implode(",", $unconfirmed);
+					$reminderform = "<span class=\"submit\"><form method=\"post\" action=\"\"><input type=\"hidden\" name=\"reminderemails\" value=\"$reminderemails\" /><input type=\"hidden\" name=\"s2_admin\" value=\"remind\" /><input type=\"submit\" name=\"submit\" value=\"" . __('Send Reminder Email','subscribe2') . "\" /></form></span>";
 				}
 			} elseif (is_numeric($_POST['what'])) {
 				$what = intval($_POST['what']);
 				$subscribers = $this->get_registered("cats=$what");
 			} elseif ('registered' == $_POST['what']) {
 				$what = 'registered';
-				$subscribers = $this->get_registered();
-				if(!empty($subscribers)) {
-					$emails = implode(",", $subscribers);
-				}
+				$subscribers = $registered;
 			}
 		} elseif ('' == $what) {
-			$subscribers = $this->get_registered();
 			$what = 'registered';
+			$subscribers = $registered;
 			$registermessage = '';
 			if (empty($subscribers)) {
 				$confirmed = $this->get_public();
@@ -1118,15 +1124,14 @@ class subscribe2 {
 		//show bulk managment form
 		echo "<div class=\"wrap\">";
 		echo "<h2 >" . __('Categories', 'subscribe2') . "</h2>\r\n";
-		echo "Existing Registered Users can be automatically (un)subscribed to categories using this section.<br />\r\n";
-		echo "<strong>Changes cannot be undone</strong> so carefully consider <strong><em style=\"color: red\">User Privacy</em></strong> before making changes.";
+		echo __('Existing Registered Users can be automatically (un)subscribed to categories using this section.', 'subscribe2') . "<br />\r\n";
+		echo "<strong><em style=\"color: red\">" . __('Consider User Privacy as changes cannot be undone', 'subscribe2') . "</em></strong><br />\r\n";
 		echo "<span class=\"submit\"><form method=\"post\" action=\"\"><input type=\"hidden\" name=\"emails\" value=\"$emails\" /><input type=\"hidden\" name=\"s2_admin\" value=\"register\" />";
 		$this->display_category_form(explode(',', $this->get_excluded_cats()));
 		echo "<input type=\"submit\" id=\"deletepost\" name=\"submit\" value=\"" . __('Subscribe','subscribe2') . "\" />";
 		echo "<input type=\"submit\" id=\"deletepost\" name=\"submit\" value=\"" . __('Unsubscribe','subscribe2') . "\" /></form></span>";
 
 		echo "</div>\r\n";
-
 		echo "<div style=\"clear: both;\"><p>&nbsp;</p></div>";
 
 		include(ABSPATH . '/wp-admin/admin-footer.php');
@@ -1232,7 +1237,6 @@ class subscribe2 {
 		// excluded categories
 		echo "<h2>" . __('Excluded Categories', 'subscribe2') . "</h2>\r\n";
 		$this->display_category_form(explode(',', $this->get_excluded_cats()));
-
 		echo "<p align=\"center\"><input type=\"checkbox\" name=\"override\" ";
 		if ('1' == $this->override) {
 			echo "checked=\"checked\"";
@@ -1253,8 +1257,8 @@ class subscribe2 {
 		// submit
 		echo "<p align=\"center\"><span class=\"submit\"><input type=\"submit\" id=\"save\" name=\"submit\" value=\"" . __('Submit', 'subscribe2') . "\" /></span></p>";
 		echo "</form>\r\n";
-
 		echo "</div><div class=\"wrap\">";
+
 		// reset
 		echo "<h2>" . __('Reset Default', 'subscribe2') . "</h2>\r\n";
 		echo "<p>" . __('Use this to reset all options to their defaults. This <strong><em>will not</em></strong> modify your list of subscribers.', 'subscribe2') . "</p>\r\n";
@@ -1350,7 +1354,7 @@ class subscribe2 {
 				}
 				echo " /> $value ";
 			}
-			_e('<p>Note: HTML format will always deliver the full post.</p>', 'subscribe2');
+			echo __('<p>Note: HTML format will always deliver the full post.</p>', 'subscribe2');
 
 			// subscribed categories
 			echo "<h2>" . __('Subscribed Categories', 'subscribe2') . "</h2>\r\n";
@@ -1373,7 +1377,6 @@ class subscribe2 {
 		// submit
 		echo "<p align=\"right\"><span class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __("Update Preferences &raquo;", 'subscribe2') . "\" /></span></p>";
 		echo "</form></div>\r\n";
-
 
 		include(ABSPATH . '/wp-admin/admin-footer.php');
 		// just to be sure
@@ -1482,7 +1485,6 @@ class subscribe2 {
 
 	/**
 	Display a drop-down form to select subscribers
-
 	$selected is the option to select
 	$submit is the text to use on the Submit button
 	*/
@@ -1550,7 +1552,7 @@ class subscribe2 {
 	Display our form; also handles (un)subscribe requests
 	*/
 	function filter($content = '') {
-		if ('' == $content) { return $content; }
+		if (('' == $content) || (! preg_match('|<!--subscribe2-->|', $content))) { return $content; }
 		$this->s2form = $this->form;
 
 		global $user_ID;
@@ -1604,13 +1606,12 @@ class subscribe2 {
 				}
 			}
 		}
-		return preg_replace('|<p>(\n)*<!--subscribe2-->(\n)*</p>|', $this->s2form, $content);
+		return preg_replace('|(<p>)(\n)*<!--subscribe2-->(\n)*(</p>)|', $this->s2form, $content);
 	} // end filter()
 
 	/**
 	Overrides the default query when handling a (un)subscription confirmation
-
-	this is basically a trick: if the s2 variable is in the query string, just grab the first static page
+	This is basically a trick: if the s2 variable is in the query string, just grab the first static page
 	and override it's contents later with title_filter() and template_filter()
 	*/
 	function query_filter() {
