@@ -207,7 +207,6 @@ class subscribe2 {
 		$string = str_replace('BLOGNAME', get_settings('blogname'), $string);
 		$string = str_replace('BLOGLINK', get_bloginfo('url'), $string);
 		$string = str_replace('TITLE', stripslashes($this->post_title), $string);
-		$string = str_replace('PERMALINK', $this->permalink, $string);
 		$string = str_replace('MYNAME', stripslashes($this->myname), $string);
 		$string = str_replace('EMAIL', $this->myemail, $string);
 		return $string;
@@ -387,7 +386,6 @@ class subscribe2 {
 		// we set these class variables so that we can avoid
 		// passing them in function calls a little later
 		$this->post_title = $post->post_title;
-		$this->permalink = get_permalink($id);
 
 		// do we send as admin, or post author?
 		if ('author' == get_option('s2_sender')) {
@@ -404,6 +402,7 @@ class subscribe2 {
 		// Get the message template
 		$mailtext = $this->substitute(stripslashes(get_option('s2_mailtext')));
 
+		$this->permalink = get_permalink($id);
 		$plaintext = $post->post_content;
 		$content = apply_filters('the_content', $post->post_content);
 		$content = str_replace(']]>', ']]&gt', $content);
@@ -430,6 +429,7 @@ class subscribe2 {
 		}
 		// first we send plaintext summary emails
 		$body = str_replace('POST', $excerpt, $mailtext);
+		$body = str_replace('PERMALINK', $this->permalink, $body);
 		$registered = $this->get_registered("cats=$post_cats_string&format=text&amount=excerpt");
 		if (empty($registered)) {
 			$recipients = (array)$public;
@@ -442,10 +442,13 @@ class subscribe2 {
 		$this->mail($recipients, $subject, $body);
 		// next we send plaintext full content emails
 		$body = str_replace('POST', strip_tags($plaintext), $mailtext);
+		$body = str_replace('PERMALINK', $this->permalink, $body);
 		$this->mail($this->get_registered("cats=$post_cats_string&format=text&amount=post"), $subject, $body);
 		// finally we send html full content emails
 		$body = str_replace("\r\n", "<br />\r\n", $mailtext);
 		$body = str_replace('POST', $content, $body);
+		$this->permalink = "<a href=\"" . $this->permalink . "\">" . $this->permalink . "</a>";
+		$body = str_replace('PERMALINK', $this->permalink, $body);
 		$this->mail($this->get_registered("cats=$post_cats_string&format=html"), $subject, $body, 'html');
 
 		return $id;
@@ -889,11 +892,28 @@ class subscribe2 {
 		} else {
 			// add the usermeta for new registrations, but don't subscribe them
 			$check = get_usermeta($user_id, 's2_subscribed');
-			if (empty($check)) {
 			// ensure existing subscriptions are not overwritten on upgrade
-				update_usermeta($user_id, 's2_subscribed', '');
-				update_usermeta($user_id, 's2_format', 'text');
-				update_usermeta($user_id, 's2_excerpt', 'excerpt');
+			if (empty($check)) {
+				if ('yes' == get_option('s2_autosub')) {
+					update_usermeta($user_id, 's2_subscribed', $this->get_all_categories());
+						foreach(explode(',', $this->get_all_categories()) as $cat) {
+							update_usermeta($user_id, 's2_cat' . $cat, "$cat");
+						}
+					if ('html' == get_option('s2_autoformat')) {
+						update_usermeta($user_id, 's2_format', 'html');
+						update_usermeta($user_id, 's2_excerpt', 'full');
+					} elseif ('fulltext' == get_option('s2_autoformat')) {
+						update_usermeta($user_id, 's2_format', 'text');
+						update_usermeta($user_id, 's2_excerpt', 'full');
+					} else {
+						update_usermeta($user_id, 's2_format', 'text');
+						update_usermeta($user_id, 's2_excerpt', 'excerpt');
+					}
+				} else {
+					update_usermeta($user_id, 's2_subscribed', '');
+					update_usermeta($user_id, 's2_format', 'text');
+					update_usermeta($user_id, 's2_excerpt', 'excerpt');
+				}
 			}
 		}
 		return $user_id;
@@ -1179,6 +1199,12 @@ class subscribe2 {
 				$remind_email = $_POST['s2_remind_email'];
 				update_option('s2_remind_email', $remind_email);
 
+				//automatic subscription
+				$autosub_option = $_POST['s2_autosub'];
+				update_option('s2_autosub', $autosub_option);
+				$autosub_format_option = $_POST['s2_autoformat'];
+				update_option('s2_autoformat', $autosub_format_option);
+				
 				//barred domains
 				$barred_option = $_POST['s2_barred'];
 				update_option('s2_barred', $barred_option);
@@ -1192,6 +1218,7 @@ class subscribe2 {
 		$this->remind_email = get_option('s2_remind_email');
 		$this->override = get_option('s2_reg_override');
 		$this->show_button = get_option('s2_show_button');
+		$this->autosub = get_option('s2_autosub');
 		$this->barred_option = get_option('s2_barred');
 
 		echo "<div class=\"wrap\">";
@@ -1248,6 +1275,36 @@ class subscribe2 {
 			echo "checked=\"checked\"";
 		}
 		echo "/> " . __('Show the Subscribe2 button on the Write toolbar?', 'subscribe2') . "</p>";
+		
+		//Auto Subscription for new registrations
+		echo "<h2>" . __('Auto Subscribe', 'subscribe2') . "</h2>\r\n";
+		echo __('Automatically subscribe new users registering with your blog.', 'subscribe2') . "<br />\r\n";
+		echo "<input type=\"radio\" name=\"s2_autosub\" value=\"yes\" ";
+		if ('yes' == $this->autosub) {
+			echo "checked=\"checked\" ";
+		}
+		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"s2_autosub\" value=\"no\" ";
+		if ('no' == $this->autosub) {
+			echo "checked=\"checked\" ";
+		}
+		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
+		echo __('Auto-subscribe users to receive email as', 'subscribe2') . ": <br />\r\n";
+			echo "<input type=\"radio\" name=\"s2_autoformat\" value=\"html\"";
+			if ('html' == get_option('s2_autoformat')) {
+				echo "checked=\"checked\" ";
+			}
+			echo "/> " . __('HTML', 'subscribe2') ." &nbsp;&nbsp;";
+			echo "<input type=\"radio\" name=\"s2_autoformat\" value=\"fulltext\" ";
+			if ('fulltext' == get_option('s2_autoformat')) {
+				echo "checked=\"checked\" ";
+			}
+			echo "/> " . __('Plain Text - Full', 'subscribe2') . " &nbsp;&nbsp;";
+			echo "<input type=\"radio\" name=\"s2_autoformat\" value=\"text\" ";
+			if ('text' == get_option('s2_autoformat')) {
+				echo "checked=\"checked\" ";
+			}
+			echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . " &nbsp;&nbsp;";
 		
 		//barred domains
 		echo "<h2>" . __('Barred Domains', 'subscribe2') . "</h2>\r\n";
