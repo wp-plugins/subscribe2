@@ -207,6 +207,7 @@ class subscribe2 {
 		$string = str_replace('BLOGNAME', get_settings('blogname'), $string);
 		$string = str_replace('BLOGLINK', get_bloginfo('url'), $string);
 		$string = str_replace('TITLE', stripslashes($this->post_title), $string);
+		$string = str_replace('PERMALINK', $this->permalink, $string);
 		$string = str_replace('MYNAME', stripslashes($this->myname), $string);
 		$string = str_replace('EMAIL', $this->myemail, $string);
 		return $string;
@@ -386,6 +387,7 @@ class subscribe2 {
 		// we set these class variables so that we can avoid
 		// passing them in function calls a little later
 		$this->post_title = $post->post_title;
+		$this->permalink = "<a href=\"" . get_permalink($id) . "\">" . get_permalink($id) . "</a>";
 
 		// do we send as admin, or post author?
 		if ('author' == get_option('s2_sender')) {
@@ -402,7 +404,6 @@ class subscribe2 {
 		// Get the message template
 		$mailtext = $this->substitute(stripslashes(get_option('s2_mailtext')));
 
-		$this->permalink = get_permalink($id);
 		$plaintext = $post->post_content;
 		$content = apply_filters('the_content', $post->post_content);
 		$content = str_replace(']]>', ']]&gt', $content);
@@ -429,7 +430,6 @@ class subscribe2 {
 		}
 		// first we send plaintext summary emails
 		$body = str_replace('POST', $excerpt, $mailtext);
-		$body = str_replace('PERMALINK', $this->permalink, $body);
 		$registered = $this->get_registered("cats=$post_cats_string&format=text&amount=excerpt");
 		if (empty($registered)) {
 			$recipients = (array)$public;
@@ -442,13 +442,10 @@ class subscribe2 {
 		$this->mail($recipients, $subject, $body);
 		// next we send plaintext full content emails
 		$body = str_replace('POST', strip_tags($plaintext), $mailtext);
-		$body = str_replace('PERMALINK', $this->permalink, $body);
 		$this->mail($this->get_registered("cats=$post_cats_string&format=text&amount=post"), $subject, $body);
 		// finally we send html full content emails
 		$body = str_replace("\r\n", "<br />\r\n", $mailtext);
 		$body = str_replace('POST', $content, $body);
-		$this->permalink = "<a href=\"" . $this->permalink . "\">" . $this->permalink . "</a>";
-		$body = str_replace('PERMALINK', $this->permalink, $body);
 		$this->mail($this->get_registered("cats=$post_cats_string&format=html"), $subject, $body, 'html');
 
 		return $id;
