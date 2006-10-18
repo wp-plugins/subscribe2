@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.2.7
+Version: 2.2.8
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -40,14 +40,14 @@ define('DREAMHOST', false);
 // by default, subscribe2 grabs the first page from your database for use
 // when displaying the confirmation screen to public subscribers.
 // You can override this by specifying a page ID below.
-define('S2PAGE', '107');
+define('S2PAGE', '0');
 
 // change this to TRUE if you want a daily digest of the day's posts
 // send to your subscribers
 define('S2DIGEST', false);
 
 // our version number. Don't touch.
-define('S2VERSION', '2.2.7');
+define('S2VERSION', '2.2.8');
 
 // start our class
 class subscribe2 {
@@ -514,7 +514,7 @@ class subscribe2 {
 
 		$mailheaders .= "MIME-Version: 1.0\n";
 		$mailheaders .= "Content-type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
-		$mailheaders .= "From: $admin->display_name <$admin->user_email>";
+		$mailheaders .= "From: $admin->display_name <$admin->user_email>\n";
 		$mailheaders .= "Return-Path: <$admin->user_email>\n";
 		$mailheaders .= "X-Mailer:PHP" . phpversion() . "\n";
 		$mailheaders .= "Precedence: list\nList-Id: " . get_settings('blogname') . "\n";
@@ -1338,6 +1338,7 @@ class subscribe2 {
 
 		// was anything POSTed?
 		if ( (isset($_POST['s2_admin'])) && ('user' == $_POST['s2_admin']) ) {
+			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Subscription preferences updated.', 'subscribe2') . "</strong></p></div>\n";
 			$format = 'text';
 			$post = 'post';
 			if ('html' == $_POST['s2_format']) {
