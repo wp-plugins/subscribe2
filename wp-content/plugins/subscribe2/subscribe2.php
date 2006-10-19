@@ -210,6 +210,7 @@ class subscribe2 {
 		$string = str_replace('PERMALINK', $this->permalink, $string);
 		$string = str_replace('MYNAME', stripslashes($this->myname), $string);
 		$string = str_replace('EMAIL', $this->myemail, $string);
+		$string = str_replace('AUTHORNAME', $this->authorname, $string);
 		return $string;
 	} // end sustitute()
 
@@ -388,13 +389,16 @@ class subscribe2 {
 		// passing them in function calls a little later
 		$this->post_title = $post->post_title;
 		$this->permalink = "<a href=\"" . get_permalink($id) . "\">" . get_permalink($id) . "</a>";
+		
+		$author = get_userdata($post->post_author);
+		$this->authorname = $author->display_name;
 
 		// do we send as admin, or post author?
 		if ('author' == get_option('s2_sender')) {
 		// get author details
-			$user = get_userdata($post->post_author);
+			$user = $author;
 		} else {
-			// get admin detailts
+			// get admin details
 			$user = get_userdata(1);
 		}
 		$this->myemail = $user->user_email;
@@ -1250,6 +1254,7 @@ class subscribe2 {
 		echo "<dt><b>MYNAME</b></dt><dd>" . __("the admin or post author's name", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>EMAIL</b></dt><dd>" . __("the admin or post author's email", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>LINK</b></dt><dd>" . __('the generated link to confirm a request<br />(<i>only used in the confirmation email template</i>)', 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>AUTHORNAME</b></dt><dd>" . __("the post author's name", 'subscribe2') . "</dd>\r\n";
 		echo "</dl></td></tr><tr><td>";
 		echo __('Subscribe / Unsubscribe confirmation email', 'subscribe2') . ":<br />\r\n";
 		echo "<textarea rows=\"9\" cols=\"60\" name=\"s2_confirm_email\">" . stripslashes($this->confirm_email) . "</textarea><p>";
