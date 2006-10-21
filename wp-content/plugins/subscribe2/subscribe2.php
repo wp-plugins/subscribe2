@@ -174,9 +174,9 @@ class subscribe2 {
 
 		// let's take the time to check process registered users
 		//  existing public subscribers are subscribed to all categories
-		$check = $wpdb->get_col("SELECT ID FROM $wpdb->users");
-		if (! empty($check)) {
-			foreach ($check as $user) {
+		$users = $wpdb->get_col("SELECT ID FROM $wpdb->users");
+		if (! empty($users)) {
+			foreach ($users as $user) {
 				$this->register($user);
 			}
 		}
@@ -223,7 +223,7 @@ class subscribe2 {
 
 		// Set sender details
 		if ('' == $this->myname) {
-			$admin = get_userdata('1');
+			$admin = get_userdata(1);
 			$this->myname = $admin->display_name;
 			$this->myemail = $admin->user_email;
 		}
@@ -255,39 +255,39 @@ class subscribe2 {
 				foreach ($recipients as $recipient) {
 				// advance the array pointer by one, for use down below
 				// the array pointer _is not_ advanced by the foreach() loop itself
-				next($recipients);
-						$recipient = trim($recipient);
-				// sanity check -- make sure we have a valid email
-				if (! is_email($recipient)) { continue; }
-				// and NOT the sender's email, since they'll
-				// get a copy anyway
-						if ( (! empty($recipient)) && ($this->myemail != $recipient) ) {
-							('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ",\r\n $recipient";
-							// Headers constructed as per definition at http://www.ietf.org/rfc/rfc2822.txt
-						}
-						if (30 == $count) {
-								$count = 1;
-								$batch[] = $bcc;
-								$bcc = '';
+					next($recipients);
+					$recipient = trim($recipient);
+					// sanity check -- make sure we have a valid email
+					if (! is_email($recipient)) { continue; }
+					// and NOT the sender's email, since they'll
+					// get a copy anyway
+					if ( (! empty($recipient)) && ($this->myemail != $recipient) ) {
+						('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ",\r\n $recipient";
+						// Headers constructed as per definition at http://www.ietf.org/rfc/rfc2822.txt
+					}
+					if (30 == $count) {
+						$count = 1;
+						$batch[] = $bcc;
+						$bcc = '';
+					} else {
+						if (false == current($recipients)) {
+						// we've reached the end of the subscriber list
+						// add what we have to the batch, and move on
+							$batch[] = $bcc;
+							break;
 						} else {
-							if (false == current($recipients)) {
-							// we've reached the end of the subscriber list
-							// add what we have to the batch, and move on
-								$batch[] = $bcc;
-								break;
-							} else {
-								$count++;
-							}
+							$count++;
 						}
+					}
 				}
 			// rewind the array, just to be safe
 			reset($recipients);
 		} else {
 			// we're not on dreamhost, or have less than 30
 			// subscribers, so do it normal
-				foreach ($recipients as $recipient) {
-					$recipient = trim($recipient);
-					// sanity check -- make sure we have a valid email
+			foreach ($recipients as $recipient) {
+				$recipient = trim($recipient);
+				// sanity check -- make sure we have a valid email
 					if (! is_email($recipient)) { continue; }
 					// and NOT the sender's email, since they'll
 					// get a copy anyway
@@ -295,18 +295,18 @@ class subscribe2 {
 						('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ",\r\n $recipient";
 						// Headers constructed as per definition at http://www.ietf.org/rfc/rfc2822.txt
 						}
-				}
-				$headers .= "$bcc\r\n";
+			}
+			$headers .= "$bcc\r\n";
 		}
 		// actually send mail
-			if ( (defined('DREAMHOST') && true == DREAMHOST) && (isset($batch)) ) {
-				foreach ($batch as $bcc) {
-						$newheaders = $headers . "$bcc\r\n";
-						@wp_mail($this->myemail, $subject, $mailtext, $newheaders);
-				}
-			} else {
-						@wp_mail($this->myemail, $subject, $mailtext, $headers);
+		if ( (defined('DREAMHOST') && true == DREAMHOST) && (isset($batch)) ) {
+			foreach ($batch as $bcc) {
+					$newheaders = $headers . "$bcc\r\n";
+					@wp_mail($this->myemail, $subject, $mailtext, $newheaders);
 			}
+		} else {
+			@wp_mail($this->myemail, $subject, $mailtext, $headers);
+		}
 	} // end mail()
 
 	/**
@@ -396,7 +396,7 @@ class subscribe2 {
 		// do we send as admin, or post author?
 		if ('author' == get_option('s2_sender')) {
 		// get author details
-			$user = $author;
+			$user =& $author;
 		} else {
 			// get admin details
 			$user = get_userdata(1);
@@ -458,22 +458,22 @@ class subscribe2 {
 	/**
 	Sends a notification when a draft post is published
 	*/
-	function private2publish($ID = 0) {
-		if (0 == $ID) { return $ID; }
+	function private2publish($id = 0) {
+		if (0 == $id) { return $id; }
 
-		$this->publish($ID);
+		$this->publish($id);
 		$this->private = TRUE;
-		return $ID;
+		return $id;
 	} // end private2publish()
 
 	/**
 	Prevents notifications from being sent when editing posts
 	*/
-	function edit($ID = 0) {
-		if (0 == $ID) { return; }
+	function edit($id = 0) {
+		if (0 == $id) { return; }
 
 		$this->private = TRUE;
-		return $ID;
+		return $id;
 	}
 
 	/**
@@ -1814,17 +1814,17 @@ class subscribe2 {
 	/**
 	If the to-be-deleted post was future-dated, remove it from the list of future-dated posts
 	*/
-	function delete_future($ID = 0) {
-		if (0 == $ID) { return $ID; }
+	function delete_future($id = 0) {
+		if (0 == $id) { return $id; }
 
 		$future = get_settings('s2_future_posts');
 		// if we have no future-dated posts scheduled, bail out
 		if ( ! $future) {
-			return $ID;
+			return $id;
 		}
 		foreach ($future as $post) {
 			// is the deleted post in the list of future posts?
-			if ($ID == $post['id']) {
+			if ($id == $post['id']) {
 				// skip it
 				continue;
 			} else {
