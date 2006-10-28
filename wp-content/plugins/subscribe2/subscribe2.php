@@ -902,10 +902,10 @@ class subscribe2 {
 						}
 					if ('html' == get_option('s2_autoformat')) {
 						update_usermeta($user_id, 's2_format', 'html');
-						update_usermeta($user_id, 's2_excerpt', 'full');
+						update_usermeta($user_id, 's2_excerpt', 'post');
 					} elseif ('fulltext' == get_option('s2_autoformat')) {
 						update_usermeta($user_id, 's2_format', 'text');
-						update_usermeta($user_id, 's2_excerpt', 'full');
+						update_usermeta($user_id, 's2_excerpt', 'post');
 					} else {
 						update_usermeta($user_id, 's2_format', 'text');
 						update_usermeta($user_id, 's2_excerpt', 'excerpt');
