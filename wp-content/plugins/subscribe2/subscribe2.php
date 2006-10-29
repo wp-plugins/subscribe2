@@ -1794,14 +1794,20 @@ class subscribe2 {
 			$message .= "$excerpt\r\n\r\n";
 		}
 
+		$author = get_userdaa(Spost->post_author);
+		$this->authorname = $author->display_name;
+		
 		// do we send as admin, or post author?
 		if ('author' == get_option('s2_sender')) {
 			// get author details
-			$user = get_userdata($post->post_author);
+			$user =& $author;
 		} else {
 			// get admin detailts
 			$user = get_userdata(1);
 		}
+		$this->myemail = $user->user_email;
+		$this->myname = $user->display_name;
+		
 		$subject = '[' . get_settings('blogname') . '] ' . __('Daily Digest', 'subscribe2') . ' ' . $yesterday;
 		$public = $this->get_public();
 		$registered = $this->get_registered();
