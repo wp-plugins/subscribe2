@@ -516,12 +516,12 @@ class subscribe2 {
 
 		$body = str_replace("LINK", $link, $body);
 
-		$mailheaders .= "MIME-Version: 1.0\n";
-		$mailheaders .= "Content-type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 		$mailheaders .= "From: $admin->display_name <$admin->user_email>\n";
 		$mailheaders .= "Return-Path: <$admin->user_email>\n";
 		$mailheaders .= "X-Mailer:PHP" . phpversion() . "\n";
 		$mailheaders .= "Precedence: list\nList-Id: " . get_settings('blogname') . "\n";
+		$mailheaders .= "MIME-Version: 1.0\n";
+		$mailheaders .= "Content-type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 
 		@wp_mail ($this->email, $subject, $body, $mailheaders);
 	} // end send_confirm()
@@ -1794,7 +1794,7 @@ class subscribe2 {
 			$message .= "$excerpt\r\n\r\n";
 		}
 
-		$author = get_userdaa(Spost->post_author);
+		$author = get_userdata($post->post_author);
 		$this->authorname = $author->display_name;
 		
 		// do we send as admin, or post author?
