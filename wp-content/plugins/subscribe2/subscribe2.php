@@ -88,9 +88,9 @@ class subscribe2 {
 
 		$this->remind_subject = "[" . get_settings('blogname') . "] " . __('Subscription Reminder', 'subscribe2');
 
-		$this->subscribe = __('subscribe', 'subscribe2'); //SUBSCRIBE replacement in if subscribing confirmation email
+		$this->subscribe = __('subscribe', 'subscribe2'); //ACTION replacement in if subscribing confirmation email
 
-		$this->unsubscribe = __('unsubscribe', 'subscribe2'); //SUBSCRIBE replacement if unsubscribing in confirmation email
+		$this->unsubscribe = __('unsubscribe', 'subscribe2'); //ACTION replacement if unsubscribing in confirmation email
 
 		// menu strings
 		$this->options_saved = __('Options saved!', 'subscribe2');
@@ -518,9 +518,9 @@ class subscribe2 {
 		} else {
 			$body = $this->substitute(stripslashes(get_option('s2_confirm_email')));
 			if ('add' == $what) {
-				$body = str_replace("SUBSCRIBE", $this->subscribe, $body);
+				$body = str_replace("ACTION", $this->subscribe, $body);
 			} elseif ('del' == $what) {
-				$body = str_replace("SUBSCRIBE", $this->unsubscribe, $body);
+				$body = str_replace("ACTION", $this->unsubscribe, $body);
 			}
 			$subject = stripslashes($this->confirm_subject);
 		}
@@ -1266,7 +1266,7 @@ class subscribe2 {
 		echo "<dt><b>EMAIL</b></dt><dd>" . __("the admin or post author's email", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>AUTHORNAME</b></dt><dd>" . __("the post author's name", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>LINK</b></dt><dd>" . __("the generated link to confirm a request<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>SUBSCRIBE</b></dt><dd>" . __("the post author's name<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>ACTION</b></dt><dd>" . __("Action performed by LINK in confirmation email<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
  		echo "</dl></td></tr><tr><td>";
 		echo __('Subscribe / Unsubscribe confirmation email', 'subscribe2') . ":<br />\r\n";
 		echo "<textarea rows=\"9\" cols=\"60\" name=\"s2_confirm_email\">" . stripslashes($this->confirm_email) . "</textarea><p>";
