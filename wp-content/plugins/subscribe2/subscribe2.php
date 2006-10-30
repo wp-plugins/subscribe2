@@ -86,6 +86,12 @@ class subscribe2 {
 
 		$this->confirm_subject = "[" . get_settings('blogname') . "] " . __('Please confirm your request', 'subscribe2');
 
+		$this->remind_subject = "[" . get_settings('blogname') . "] " . __('Subscription Reminder', 'subscribe2');
+
+		$this->subscribe = __('subscribe', 'subscribe2'); //SUBSCRIBE replacement in if subscribing confirmation email
+
+		$this->unsubscribe = __('unsubscribe', 'subscribe2'); //SUBSCRIBE replacement if unsubscribing in confirmation email
+
 		// menu strings
 		$this->options_saved = __('Options saved!', 'subscribe2');
 		$this->options_reset = __('Options reset!', 'subscribe2');
@@ -507,11 +513,16 @@ class subscribe2 {
 		$this->myname = $admin->display_name;
     
 		if ($is_remind == TRUE) {
-			$body = $this->substitute(get_option('s2_remind_email'));
-			$subject = __('Subscription Reminder', 'subscribe2');
+			$body = $this->substitute(stripslashes(get_option('s2_remind_email')));
+			$subject = stripslashes($this->remind_subject);
 		} else {
-			$body = $this->substitute(get_option('s2_confirm_email'));
-			$subject = $this->substitute($this->confirm_subject);
+			$body = $this->substitute(stripslashes(get_option('s2_confirm_email')));
+			if ('add' == $what) {
+				$body = str_replace("SUBSCRIBE", $this->subscribe, $body);
+			} elseif ('del' == $what) {
+				$body = str_replace("SUBSCRIBE", $this->unsubscribe, $body);
+			}
+			$subject = stripslashes($this->confirm_subject);
 		}
 
 		$body = str_replace("LINK", $link, $body);
@@ -1253,9 +1264,10 @@ class subscribe2 {
 		echo "<dt><b>PERMALINK</b></dt><dd>" . __("the post's permalink", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>MYNAME</b></dt><dd>" . __("the admin or post author's name", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>EMAIL</b></dt><dd>" . __("the admin or post author's email", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>LINK</b></dt><dd>" . __('the generated link to confirm a request<br />(<i>only used in the confirmation email template</i>)', 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>AUTHORNAME</b></dt><dd>" . __("the post author's name", 'subscribe2') . "</dd>\r\n";
-		echo "</dl></td></tr><tr><td>";
+		echo "<dt><b>LINK</b></dt><dd>" . __("the generated link to confirm a request<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>SUBSCRIBE</b></dt><dd>" . __("the post author's name<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
+ 		echo "</dl></td></tr><tr><td>";
 		echo __('Subscribe / Unsubscribe confirmation email', 'subscribe2') . ":<br />\r\n";
 		echo "<textarea rows=\"9\" cols=\"60\" name=\"s2_confirm_email\">" . stripslashes($this->confirm_email) . "</textarea><p>";
 		echo "</td></tr><tr><td>";
@@ -1808,7 +1820,7 @@ class subscribe2 {
 		$this->myemail = $user->user_email;
 		$this->myname = $user->display_name;
 		
-		$subject = '[' . get_settings('blogname') . '] ' . __('Daily Digest', 'subscribe2') . ' ' . $yesterday;
+		$subject = '[' . stripslashes(get_settings('blogname')) . '] ' . __('Daily Digest', 'subscribe2') . ' ' . $yesterday;
 		$public = $this->get_public();
 		$registered = $this->get_registered();
 		$recipients = array_merge((array)$public, (array)$registered);
