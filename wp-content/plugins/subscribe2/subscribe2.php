@@ -1003,6 +1003,28 @@ class subscribe2 {
 			}
 		}
 	} // end unsubscribe_registered_users
+
+	/**
+	Autosubscribe registered users to newly created categories
+	if registered user has selected this option
+	*/
+	function autosub_new_category ($new_category='') {
+		global $wpdb;
+
+		$sql = "SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE $wpdb->usermeta.meta_key='s2_autosub' AND $wpdb->usermeta.meta_value='yes'";
+		$user_IDs = $wpdb->get_col($sql);
+
+		foreach ($user_IDs as $user_ID) {	
+			$old_cats = explode(',', get_usermeta($user_ID, 's2_subscribed'));
+			if (! is_array($old_cats)) {
+				$old_cats = array($old_cats);
+			}
+			// add subscription to these cat IDs
+			update_usermeta($user_ID, 's2_cat' . $new_category, "$new_category");
+			$newcats = array_merge($old_cats, (array)$new_category, );
+			update_usermeta($user_ID, 's2_subscribed', implode(',', $newcats));
+		}
+	} // end autosub_new_category
 	
 /* ===== Menus ===== */
 	/**
@@ -1267,7 +1289,7 @@ class subscribe2 {
 		echo "<dt><b>AUTHORNAME</b></dt><dd>" . __("the post author's name", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>LINK</b></dt><dd>" . __("the generated link to confirm a request<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>ACTION</b></dt><dd>" . __("Action performed by LINK in confirmation email<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
- 		echo "</dl></td></tr><tr><td>";
+		echo "</dl></td></tr><tr><td>";
 		echo __('Subscribe / Unsubscribe confirmation email', 'subscribe2') . ":<br />\r\n";
 		echo "<textarea rows=\"9\" cols=\"60\" name=\"s2_confirm_email\">" . stripslashes($this->confirm_email) . "</textarea><p>";
 		echo "</td></tr><tr><td>";
@@ -1366,6 +1388,7 @@ class subscribe2 {
 			}
 			update_usermeta($user_ID, 's2_excerpt', $post);
 			update_usermeta($user_ID, 's2_format', $format);
+			update_usermeta($user_ID, 's2_autosub', $_POST['new_category']);
 
 			$cats = $_POST['category'];
 			if (empty($cats)) {
@@ -1426,7 +1449,17 @@ class subscribe2 {
 				}
 				echo " /> $value ";
 			}
-			echo __('<p>Note: HTML format will always deliver the full post.</p>', 'subscribe2');
+			echo __('<p>Note: HTML format will always deliver the full post.</p>', 'subscribe2') . "<br /><br />\r\n";
+			echo __('Automatically subscribe me to newly created categories', 'subscribe2') . ': &nbsp;&nbsp;';
+			 echo "<input type=\"radio\" name=\"new_category\" value=\"yes\" ";
+			 if ('yes' == get_usermeta($user_ID, 's2_autosub')) {
+			 	echo "checked=\"yes\" ";
+			}
+			echo "/> Yes <input type=\"radio\" name=\"new_category\" value=\"no\" ";
+			if ('no' == get_usermeta($user_ID, 's2_autosub')) {
+				echo "checked=\"yes\" ";
+			}
+			echo "/> No";
 
 			// subscribed categories
 			echo "<h2>" . __('Subscribed Categories', 'subscribe2') . "</h2>\r\n";
@@ -1784,7 +1817,7 @@ class subscribe2 {
 			if ($check) {
 				continue;
 			}
-			$message .= "$post->post_title\r\n";
+			$message .= $post->post_title . "\r\n";
 			$message .= get_permalink($post->ID) . "\r\n";
 			$excerpt = $post->post_excerpt;
 			if ('' == $excerpt) {
@@ -1803,7 +1836,7 @@ class subscribe2 {
 					}
 				}
 			}
-			$message .= "$excerpt\r\n\r\n";
+			$message .= $excerpt . "\r\n\r\n";
 		}
 
 		$author = get_userdata($post->post_author);
@@ -1883,6 +1916,7 @@ class subscribe2 {
 		add_action('edit_post', array(&$this, 'edit'));
 		add_action('private_to_published', array(&$this, 'private2publish'));
 		add_action('user_register', array(&$this, 'register'));
+		add_action('create_category', array(&$this, 'autosub_new_category'));
 		add_filter('the_content', array(&$this, 'filter'));
 		add_action('wp_cron_hourly', array(&$this, 'subscribe2_hourly'));
 		if ( defined('S2DIGEST') && TRUE == S2DIGEST ) {
