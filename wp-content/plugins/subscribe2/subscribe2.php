@@ -1021,7 +1021,7 @@ class subscribe2 {
 			}
 			// add subscription to these cat IDs
 			update_usermeta($user_ID, 's2_cat' . $new_category, "$new_category");
-			$newcats = array_merge($old_cats, (array)$new_category, );
+			$newcats = array_merge($old_cats, (array)$new_category);
 			update_usermeta($user_ID, 's2_subscribed', implode(',', $newcats));
 		}
 	} // end autosub_new_category
