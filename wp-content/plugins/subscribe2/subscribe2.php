@@ -1513,7 +1513,7 @@ class subscribe2 {
 			$this->myname = $user_identity;
 			$this->myemail = $user_email;
 			$subject = strip_tags($_POST['subject']);
-			$message = $_POST['message'];
+			$message = stripslashes($_POST['message']);
 			$this->mail($recipients, $subject, $message, 'text');
 			$message = $this->mail_sent;
 		}
