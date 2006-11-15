@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.2.8
+Version: 2.2.9
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -47,7 +47,7 @@ define('S2PAGE', '0');
 define('S2DIGEST', false);
 
 // our version number. Don't touch.
-define('S2VERSION', '2.2.8');
+define('S2VERSION', '2.2.9');
 
 // start our class
 class subscribe2 {
@@ -1013,6 +1013,7 @@ class subscribe2 {
 
 		$sql = "SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE $wpdb->usermeta.meta_key='s2_autosub' AND $wpdb->usermeta.meta_value='yes'";
 		$user_IDs = $wpdb->get_col($sql);
+		if ('' == $user_IDs) { return; }
 
 		foreach ($user_IDs as $user_ID) {	
 			$old_cats = explode(',', get_usermeta($user_ID, 's2_subscribed'));
