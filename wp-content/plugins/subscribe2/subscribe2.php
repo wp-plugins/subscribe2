@@ -1903,7 +1903,9 @@ class subscribe2 {
 		if(mysql_query("SELECT COUNT(*) FROM ".$this->public)==FALSE) {	$this->install(); }
 		//do we need to upgrade anything?
 		$this->version = get_option('s2_version');
-		if ($this->version !== S2VERSION) { $this->upgrade(); }
+		if ($this->version !== S2VERSION) {
+			add_action('init', array(&$this, 'upgrade'));
+		}
 
 		if (isset($_GET['s2'])) {
 			// someone is confirming a request
