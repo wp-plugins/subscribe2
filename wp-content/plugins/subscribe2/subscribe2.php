@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.2.9
+Version: 2.3.0 for WP2.1
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -47,7 +47,7 @@ define('S2PAGE', '0');
 define('S2DIGEST', false);
 
 // our version number. Don't touch.
-define('S2VERSION', '2.2.9');
+define('S2VERSION', '2.3.0');
 
 // start our class
 class subscribe2 {
@@ -1549,7 +1549,7 @@ class subscribe2 {
 	function display_category_form($selected = array(), $override = 1) {
 		global $wpdb;
 
-		$all_cats = $this->get_all_categories('array');
+		$all_cats =get_categories("type=post&hide_empty=1&hierarchical=0");
 		if (0 == $override) {
 			// registered users are not allowed to subscribe to
 			// excluded categories
@@ -1565,24 +1565,24 @@ class subscribe2 {
 		$j = 0;
 		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"5\" class=\"editform\">";
 		echo "<tr valign=\"top\"><td width=\"50%\" align=\"left\">";
-		foreach ($all_cats as $cat_ID => $cat_name) {
+		foreach ($all_cats as $cat) {
 			 if ( ($i >= $half) && (0 == $j) ){
 						echo "</td><td width=\"50%\" align=\"left\">";
 						$j++;
 				}
 				if (0 == $j) {
-						echo "<input type=\"checkbox\" name=\"category[]\" value=\"" . $cat_ID . "\"";
-						if (in_array($cat_ID, $selected)) {
+						echo "<input type=\"checkbox\" name=\"category[]\" value=\"" . $cat->cat_ID . "\"";
+						if (in_array($cat->cat_ID, $selected)) {
 								echo " checked=\"checked\" ";
 						}
-						echo " /> " . $cat_name . "<br />\r\n";
+						echo " /> " . $cat->cat_name . "<br />\r\n";
 					} else {
 
-						echo "<input type=\"checkbox\" name=\"category[]\" value=\"" . $cat_ID . "\"";
-						if (in_array($cat_ID, $selected)) {
+						echo "<input type=\"checkbox\" name=\"category[]\" value=\"" . $cat->cat_ID . "\"";
+						if (in_array($cat->cat_ID, $selected)) {
 									echo " checked=\"checked\" ";
 						}
-						echo " /> " . $cat_name . "<br />\r\n";
+						echo " /> " . $cat->cat_name . "<br />\r\n";
 				}
 				$i++;
 		}
