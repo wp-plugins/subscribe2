@@ -1450,7 +1450,7 @@ class subscribe2 {
 				}
 				echo " /> $value ";
 			}
-			echo __('<p>Note: HTML format will always deliver the full post.</p>', 'subscribe2') . "<br /><br />\r\n";
+			echo "<p style=\"color: red\">" . __('Note: HTML format will always deliver the full post.', 'subscribe2') . "</p>\r\n";
 			echo __('Automatically subscribe me to newly created categories', 'subscribe2') . ': &nbsp;&nbsp;';
 			 echo "<input type=\"radio\" name=\"new_category\" value=\"yes\" ";
 			 if ('yes' == get_usermeta($user_ID, 's2_autosub')) {
@@ -1460,7 +1460,7 @@ class subscribe2 {
 			if ('no' == get_usermeta($user_ID, 's2_autosub')) {
 				echo "checked=\"yes\" ";
 			}
-			echo "/> No";
+			echo "/> No<br /><br />";
 
 			// subscribed categories
 			echo "<h2>" . __('Subscribed Categories', 'subscribe2') . "</h2>\r\n";
