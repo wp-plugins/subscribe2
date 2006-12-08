@@ -551,23 +551,6 @@ class subscribe2 {
 		}
 	} // end get_excluded_cats()
 
-	/**
-	Return either a comma-separated list of all the category IDs in the blog or an array of cat_ID => cat_name
-	*/
-	function get_all_categories($select = 'id') {
-		global $wpdb;
-		if ('id' == $select) {
-			return implode(',', $wpdb->get_col("SELECT cat_ID FROM $wpdb->categories"));
-		} else {
-			$cats = array();
-			$result = $wpdb->get_results("SELECT cat_ID, cat_name FROM $wpdb->categories", ARRAY_N);
-			foreach ($result as $result) {
-				$cats[$result[0]] = $result[1];
-			}
-			return $cats;
-		}
-	} // end get_all_categories()
-
 /* ===== Subscriber functions ===== */
 	/**
 	Given a public subscriber ID, returns the email address
@@ -890,14 +873,19 @@ class subscribe2 {
 
 		if (0 == $user_id) { return $user_id; }
 		$user = get_userdata($user_id);
+		$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
+		foreach ($all_cats as $cat) {
+			('' == $cats) ? $cats = "$cat->cat_ID" : $cats .= ",$cat->cat_ID";
+		}
+
 
 		// has this user previously signed up for email notification?
 		if (false !== $this->is_public($user->user_email)) {
 			// delete this user from the public table, and subscribe them to all the categories
 			$this->delete($user->user_email);
-			update_usermeta($user_id, 's2_subscribed', $this->get_all_categories());
-			foreach(explode(',', $this->get_all_categories()) as $cat) {
-				update_usermeta($user_id, 's2_cat' . $cat, "$cat");
+			update_usermeta($user_id, 's2_subscribed', $cats);
+			foreach(explode(',', $cats) as $cat) {
+				update_usermeta($user_id, 's2_cat' . $all_cats->cat_ID, "$all_cats->cat_ID");
 			}
 			update_usermeta($user_id, 's2_format', 'text');
 			update_usermeta($user_id, 's2_excerpt', 'excerpt');
@@ -907,9 +895,9 @@ class subscribe2 {
 			// ensure existing subscriptions are not overwritten on upgrade
 			if (empty($check)) {
 				if ('yes' == get_option('s2_autosub')) {
-					update_usermeta($user_id, 's2_subscribed', $this->get_all_categories());
-						foreach(explode(',', $this->get_all_categories()) as $cat) {
-							update_usermeta($user_id, 's2_cat' . $cat, "$cat");
+					update_usermeta($user_id, 's2_subscribed', $cats);
+						foreach(explode(',', $cats) as $cat) {
+							update_usermeta($user_id, 's2_cat' . $all_cats->cat_ID, "$all_cats->cat_ID");
 						}
 					if ('html' == get_option('s2_autoformat')) {
 						update_usermeta($user_id, 's2_format', 'html');
@@ -1450,7 +1438,7 @@ class subscribe2 {
 				}
 				echo " /> $value ";
 			}
-			echo __('<p>Note: HTML format will always deliver the full post.</p>', 'subscribe2') . "<br /><br />\r\n";
+			echo "<p style=\"color: red\">" . __('Note: HTML format will always deliver the full post.', 'subscribe2') . "</p>\r\n";
 			echo __('Automatically subscribe me to newly created categories', 'subscribe2') . ': &nbsp;&nbsp;';
 			 echo "<input type=\"radio\" name=\"new_category\" value=\"yes\" ";
 			 if ('yes' == get_usermeta($user_ID, 's2_autosub')) {
@@ -1460,7 +1448,7 @@ class subscribe2 {
 			if ('no' == get_usermeta($user_ID, 's2_autosub')) {
 				echo "checked=\"yes\" ";
 			}
-			echo "/> No";
+			echo "/> No<br /><br />";
 
 			// subscribed categories
 			echo "<h2>" . __('Subscribed Categories', 'subscribe2') . "</h2>\r\n";
@@ -1549,7 +1537,7 @@ class subscribe2 {
 	function display_category_form($selected = array(), $override = 1) {
 		global $wpdb;
 
-		$all_cats =get_categories("type=post&hide_empty=1&hierarchical=0");
+		$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
 		if (0 == $override) {
 			// registered users are not allowed to subscribe to
 			// excluded categories
@@ -1615,7 +1603,7 @@ class subscribe2 {
 		}
 		$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='s2_subscribed'");
 		$count['all'] = ($count['confirmed'] + $count['unconfirmed'] + $count['registered']);
-		foreach ($this->get_all_categories('array') as $cat_ID => $cat_name) {
+		foreach (get_categories('type=post&hide_empty=1&hierarchical=0') as $cat -> $cat_name) {
 			$count[$cat_name] = $wpdb->get_var("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key='s2_cat$cat_ID'");
 		}
 
@@ -1638,13 +1626,12 @@ class subscribe2 {
 			echo ">$display (" . ($count[$whom]) . ")</option>\r\n";
 		}
 
-		if ($count['registered'] > 0) {
-			foreach ($this->get_all_categories('array') as $cat_ID => $cat_name) {
-				if (in_array($cat_ID, $exclude)) { continue; }
-				if (0 == $count[$cat_name]) { continue; }
-				echo "<option value=\"$cat_ID\"";
-				if ($cat_ID == $selected) { echo " selected=\"selected\" "; }
-				echo "> &nbsp;&nbsp;$cat_name (" . $count[$cat_name] . ") </option>\r\n";
+	if ($count['registered'] > 0) {
+			foreach (get_categories('type=post&hide_empty=1&hierarchical=0') as $cat) {
+				if (in_array($cat->cat_ID, $exclude)) { continue; }
+				echo "<option value=\"" . $cat->cat_ID . "\"";
+				if ($cat->cat_ID == $selected) { echo " selected=\"selected\" "; }
+				echo "> &nbsp;&nbsp;" . $cat->cat_name . "&nbsp;(" . $cat->category_count . ") </option>\r\n";
 			}
 		}
 		echo "</select>";
