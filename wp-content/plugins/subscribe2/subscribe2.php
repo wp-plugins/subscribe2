@@ -171,12 +171,6 @@ class subscribe2 {
 		}
 		$date = date('Y-m-d');
 		maybe_add_column($this->public, 'date', "ALTER TABLE `$this->public` ADD `date` DATE DEFAULT '$date' NOT NULL AFTER `active`;");
-		//add reminder email template info for version 2.2.4
-		$s2_remind_email = get_option('s2_remind_email');
-		if (empty($s2_remind_email)) {
-			update_option('s2_remind_email', "This email address was subscribed for notifications at BLOGNAME (BLOGLINK) but the subscription remains incomplete.\n\nIf you wish to complete your subscription please click on the link below:\n\nLINK\n\nIf you do not wish to complete your subscription please ignore this email and your address will be removed from our database.\n\nRegards,\nMYNAME");
-		}
-		update_option('s2_version', S2VERSION);
 
 		// let's take the time to check process registered users
 		//  existing public subscribers are subscribed to all categories
@@ -186,21 +180,31 @@ class subscribe2 {
 				$this->register($user);
 			}
 		}
+		// update the options table to serialized format
+		// We'll deal with s2_future_posts another time
+		// TODO: Fix s2_future posts
+		$old_options = $wpdb->get_col( "SELECT option_name from {$wpdb->prefix}options where option_name LIKE 's2%' AND option_name != 's2_future_posts'" );
+
+		if (!empty($old_options)) {
+			foreach ($old_options as $option) {
+				$value = get_option($option);
+				$this->subscribe2_options[$option] = $value;
+				delete_option($option);
+			}
+		}
+		$this->subscribe2_options['version'] = S2VERSION;
+		update_option( 'subscribe2_options', $this->subscribe2_options );
 	} // end upgrade()
 
 	/**
 	Reset our options
 	*/
 	function reset() {
-		update_option('s2_sender', 'author');
-		update_option('s2_mailtext', "BLOGNAME has posted a new item, 'TITLE'\r\nPOST\r\nYou may view the latest post at\r\nPERMALINK\r\nYou received this e-mail because you asked to be notified when new updates are posted.\r\nBest regards,\r\nMYNAME\r\nEMAIL");
-		update_option('s2_confirm_email', "In order to confirm your request for BLOGNAME, please click on the link below:\n\nLINK\n\nIf you did not request this, please feel free to disregard this notice!\n\nThank you,\nMYNAME.");
-		update_option('s2_remind_email', "This email address was subscribed for notifications at BLOGNAME (BLOGLINK) but the subscription remains incomplete.\n\nIf you wish to complete your subscription please click on the link below:\n\nLINK\n\nIf you do not wish to complete your subscription please ignore this email and your address will be removed from our database.\n\nRegards,\nMYNAME");
-		update_option('s2_exclude', '');
-		update_option('s2_reg_override', '1');
-		update_option('s2_show_button', '1');
-		update_option('s2_barred', '');
-	 } // end reset()
+		// This works because include.php is *always* loaded and contains defaults
+		delete_option('subscribe2_options');
+		unset($this->subscribe2_options);
+		require(ABSPATH . "/wp-content/plugins/subscribe2/include.php");
+	} // end reset()
 
 /* ===== mail handling ===== */
 	/**
@@ -349,7 +353,7 @@ class subscribe2 {
 		if ($check) {
 			// hang on -- can registered users subscribe to
 			// excluded categories?
-			if ('0' == get_option('s2_reg_override')) {
+			if ('0' == $this->subscribe2_options['reg_override']) {
 				// nope? okay, let's leave
 				return $id;
 			}
@@ -400,7 +404,7 @@ class subscribe2 {
 		$this->authorname = $author->display_name;
 
 		// do we send as admin, or post author?
-		if ('author' == get_option('s2_sender')) {
+		if ('author' == $this->subscribe2_options['sender']) {
 		// get author details
 			$user =& $author;
 		} else {
@@ -412,7 +416,7 @@ class subscribe2 {
 		// Get email subject
 		$subject = $this->substitute(stripslashes($this->s2_subject));
 		// Get the message template
-		$mailtext = $this->substitute(stripslashes(get_option('s2_mailtext')));
+		$mailtext = $this->substitute(stripslashes($this->subscribe2_options['mailtext']));
 
 		$plaintext = $post->post_content;
 		$content = apply_filters('the_content', $post->post_content);
@@ -513,10 +517,10 @@ class subscribe2 {
 		$this->myname = $admin->display_name;
     
 		if ($is_remind == TRUE) {
-			$body = $this->substitute(stripslashes(get_option('s2_remind_email')));
+			$body = $this->substitute(stripslashes($this->subscribe2_options['remind_email']));
 			$subject = stripslashes($this->remind_subject);
 		} else {
-			$body = $this->substitute(stripslashes(get_option('s2_confirm_email')));
+			$body = $this->substitute(stripslashes($this->subscribe2_options['confirm_email']));
 			if ('add' == $what) {
 				$body = str_replace("ACTION", $this->subscribe, $body);
 			} elseif ('del' == $what) {
@@ -546,7 +550,7 @@ class subscribe2 {
 			return $this->excluded_cats;
 		} else {
 			global $wpdb;
-			$this->excluded_cats = get_option('s2_exclude');
+			$this->excluded_cats = $this->subscribe2_options['exclude'];
 			return $this->excluded_cats;
 		}
 	} // end get_excluded_cats()
@@ -682,7 +686,7 @@ class subscribe2 {
 	Check email is not from a barred domain
 	*/
 	function is_barred($email='') {
-		$barred_option = get_option('s2_barred');
+		$barred_option = $this->subscribe2_options['barred'];
 		list($user, $domain) = split('@', $email);
 		$bar_check = stristr($barred_option, $domain);
 		
@@ -902,7 +906,7 @@ class subscribe2 {
 					if ('html' == get_option('s2_autoformat')) {
 						update_usermeta($user_id, 's2_format', 'html');
 						update_usermeta($user_id, 's2_excerpt', 'post');
-					} elseif ('fulltext' == get_option('s2_autoformat')) {
+					} elseif ('fulltext' == $this->subscribe2_options['s2_autoformat']) {
 						update_usermeta($user_id, 's2_format', 'text');
 						update_usermeta($user_id, 's2_excerpt', 'post');
 					} else {
@@ -1198,64 +1202,56 @@ class subscribe2 {
 				} else {
 					$exclude_cats = '';
 				}
-				update_option('s2_exclude', $exclude_cats);
+                $this->subscribe2_options['exclude'] = $exclude_cats;
 				// allow override?
 				(isset($_POST['override'])) ? $override = '1' : $override = '0';
-				update_option('s2_reg_override', $override);
+				$this->subscribe2_options['reg_override'] = $override;
 
 				// show button?
 				(isset($_POST['showbutton'])) ? $showbutton = '1' : $showbutton = '0';
-				update_option('s2_show_button', $showbutton);
+                $this->subscribe2_options['show_button'] = $showbutton;
 
 				// send as author or admin?
 				$sender = 'author';
 				if ('admin' == $_POST['s2_sender']) {
 					$sender = 'admin';
 				}
-				update_option('s2_sender', $sender);
+                $this->subscribe2_options['sender'] = $sender;
 
 				// email templates
 				$mailtext = $_POST['s2_mailtext'];
-				update_option('s2_mailtext', $mailtext);
+                $this->subscribe2_options['mailtext'] = $mailtext;
 				$confirm_email = $_POST['s2_confirm_email'];
-				update_option('s2_confirm_email', $confirm_email);
+                $this->subscribe2_options['confirm_email'] = $confirm_email;
 				$remind_email = $_POST['s2_remind_email'];
-				update_option('s2_remind_email', $remind_email);
+                $this->subscribe2_options['remind_email'] = $remind_email;
 
 				//automatic subscription
 				$autosub_option = $_POST['s2_autosub'];
-				update_option('s2_autosub', $autosub_option);
+                $this->subscribe2_options['autosub']= $autosub_option;
 				$autosub_format_option = $_POST['s2_autoformat'];
-				update_option('s2_autoformat', $autosub_format_option);
+                $this->subscribe2_options['autoformat']= $autosub_format_option;
 				
 				//barred domains
 				$barred_option = $_POST['s2_barred'];
-				update_option('s2_barred', $barred_option);
+                $this->subscribe2_options['barred'] = $barred_option;
 				echo "<div id=\"message\" class=\"updated fade\"><strong><p>$this->options_saved</p></strong></div>";
+                update_option( 'subscribe2_options',$this->subscribe2_options );
 			}
 		}
 		// show our form
-		$this->sender = get_option('s2_sender');
-		$this->mailtext = get_option('s2_mailtext');
-		$this->confirm_email = get_option('s2_confirm_email');
-		$this->remind_email = get_option('s2_remind_email');
-		$this->override = get_option('s2_reg_override');
-		$this->show_button = get_option('s2_show_button');
-		$this->autosub = get_option('s2_autosub');
-		$this->barred_option = get_option('s2_barred');
-
 		echo "<div class=\"wrap\">";
 		echo "<form method=\"post\" action=\"\">";
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"options\" />";
 		echo "<h2>" . __('Delivery Options', 'subscribe2') . ":</h2>";
 		echo __('Send Email From', 'subscribe2') . ': ';
 		echo "<input type=\"radio\" name=\"s2_sender\" value=\"author\" ";
-		if ('author' == $this->sender) {
+		if ('author' == $this->subscribe2_options['sender']) {
 			echo "checked=\"checked\" ";
 		}
 		echo " /> " . __('Author of the post', 'subscribe2') . " &nbsp;&nbsp;";
 		echo "<input type=\"radio\" name=\"s2_sender\" value=\"admin\" ";
-		if ('admin' == $this->sender) {
+		if ('admin' == $this->subscribe2_options['sender']) {
 			echo "checked=\"checked\" ";
 		}
 		echo " /> " . __('Blog Admin', 'subscribe2') . "<br />\r\n";
@@ -1264,7 +1260,7 @@ class subscribe2 {
 		echo "<tr><td>";
 		echo __('New Post email (must not be empty)', 'subscribe2') . ":";
 		echo "<br />\r\n";
-		echo "<textarea rows=\"9\" cols=\"60\" name=\"s2_mailtext\">" . stripslashes($this->mailtext) . "</textarea><p>\r\n";
+		echo "<textarea rows=\"9\" cols=\"60\" name=\"s2_mailtext\">" . stripslashes($this->subscribe2_options['mailtext']) . "</textarea><p>\r\n";
 		echo "</td><td valign=\"top\" rowspan=\"3\">";
 		echo "<h3>" . __('Message substitions', 'subscribe2') . "</h3>\r\n";
 		echo "<dl>";
@@ -1280,23 +1276,23 @@ class subscribe2 {
 		echo "<dt><b>ACTION</b></dt><dd>" . __("Action performed by LINK in confirmation email<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "</dl></td></tr><tr><td>";
 		echo __('Subscribe / Unsubscribe confirmation email', 'subscribe2') . ":<br />\r\n";
-		echo "<textarea rows=\"9\" cols=\"60\" name=\"s2_confirm_email\">" . stripslashes($this->confirm_email) . "</textarea><p>";
+		echo "<textarea rows=\"9\" cols=\"60\" name=\"s2_confirm_email\">" . stripslashes($this->subscribe2_options['confirm_email']) . "</textarea><p>";
 		echo "</td></tr><tr><td>";
 		echo __('Reminder email to Unconfirmed Subscribers', 'subscribe2') . ":<br />\r\n";
-		echo "<textarea rows=\"9\" cols=\"60\" name=\"s2_remind_email\">" . stripslashes($this->remind_email) . "</textarea><p>";
+		echo "<textarea rows=\"9\" cols=\"60\" name=\"s2_remind_email\">" . stripslashes($this->subscribe2_options['remind_email']) . "</textarea><p>";
 		echo "</td></tr></table>\r\n";
 
 		// excluded categories
 		echo "<h2>" . __('Excluded Categories', 'subscribe2') . "</h2>\r\n";
 		$this->display_category_form(explode(',', $this->get_excluded_cats()));
 		echo "<p align=\"center\"><input type=\"checkbox\" name=\"override\" ";
-		if ('1' == $this->override) {
+		if ('1' == $this->subscribe2_options['reg_override']) {
 			echo "checked=\"checked\"";
 		}
 		echo "/> " . __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</p>";
 		echo "<h2>" . __('Writing Options', 'subscribe2') . "</h2>\r\n";
 		echo "<p align=\"center\"><input type=\"checkbox\" name=\"showbutton\" ";
-		if ('1' == $this->show_button) {
+		if ('1' == $this->subscribe2_options['show_button']) {
 			echo "checked=\"checked\"";
 		}
 		echo "/> " . __('Show the Subscribe2 button on the Write toolbar?', 'subscribe2') . "</p>";
@@ -1305,28 +1301,28 @@ class subscribe2 {
 		echo "<h2>" . __('Auto Subscribe', 'subscribe2') . "</h2>\r\n";
 		echo __('Automatically subscribe new users registering with your blog.', 'subscribe2') . "<br />\r\n";
 		echo "<input type=\"radio\" name=\"s2_autosub\" value=\"yes\" ";
-		if ('yes' == $this->autosub) {
+		if ('yes' == $this->subscribe2_options['autosub']) {
 			echo "checked=\"checked\" ";
 		}
 		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
 		echo "<input type=\"radio\" name=\"s2_autosub\" value=\"no\" ";
-		if ('no' == $this->autosub) {
+		if ('no' == $this->subscribe2_options['autosub']) {
 			echo "checked=\"checked\" ";
 		}
 		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
 		echo __('Auto-subscribe users to receive email as', 'subscribe2') . ": <br />\r\n";
 			echo "<input type=\"radio\" name=\"s2_autoformat\" value=\"html\"";
-			if ('html' == get_option('s2_autoformat')) {
+			if ('html' == $this->subscribe2_options['autoformat']) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('HTML', 'subscribe2') ." &nbsp;&nbsp;";
 			echo "<input type=\"radio\" name=\"s2_autoformat\" value=\"fulltext\" ";
-			if ('fulltext' == get_option('s2_autoformat')) {
+			if ('fulltext' == $this->subscribe2_options['autoformat']) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('Plain Text - Full', 'subscribe2') . " &nbsp;&nbsp;";
 			echo "<input type=\"radio\" name=\"s2_autoformat\" value=\"text\" ";
-			if ('text' == get_option('s2_autoformat')) {
+			if ('text' == $this->subscribe2_options['autoformat']) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . " &nbsp;&nbsp;";
@@ -1334,7 +1330,7 @@ class subscribe2 {
 		//barred domains
 		echo "<h2>" . __('Barred Domains', 'subscribe2') . "</h2>\r\n";
 		echo __('Enter domains to bar from public subscriptions: <br /> (Use a new line for each entry and omit the "@" symbol, for example email.com)', 'subscribe2');
-		echo "<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"s2_barred\">" . $this->barred_option . "</textarea>";
+		echo "<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"s2_barred\">" . $this->subscribe2_options['barred'] . "</textarea>";
 		
 		// submit
 		echo "<p align=\"center\"><span class=\"submit\"><input type=\"submit\" id=\"save\" name=\"submit\" value=\"" . __('Submit', 'subscribe2') . "\" /></span></p>";
@@ -1452,7 +1448,7 @@ class subscribe2 {
 
 			// subscribed categories
 			echo "<h2>" . __('Subscribed Categories', 'subscribe2') . "</h2>\r\n";
-			$this->display_category_form(explode(',', get_usermeta($user_ID, 's2_subscribed')), get_option('s2_reg_override'));
+			$this->display_category_form(explode(',', get_usermeta($user_ID, 's2_subscribed')), $this->subscribe2_options['reg_override']);
 		} else {
 			// we're doing daily digests, so just show
 			// subscribe / unnsubscribe
@@ -1831,7 +1827,7 @@ class subscribe2 {
 		$this->authorname = $author->display_name;
 		
 		// do we send as admin, or post author?
-		if ('author' == get_option('s2_sender')) {
+		if ('author' == $this->subscribe2_options['sender']) {
 			// get author details
 			$user =& $author;
 		} else {
@@ -1845,7 +1841,7 @@ class subscribe2 {
 		$public = $this->get_public();
 		$registered = $this->get_registered();
 		$recipients = array_merge((array)$public, (array)$registered);
-		$mailtext = $this->substitute(stripslashes(get_option('s2_mailtext')));
+		$mailtext = $this->substitute(stripslashes($this->subscribe2_options['mailtext']));
 		$body = str_replace('POST', $message, $mailtext);
 		$this->mail($recipients, $subject, $body);
 	} // end subscribe2_daily
@@ -1885,14 +1881,18 @@ class subscribe2 {
 
 		load_plugin_textdomain('subscribe2', 'wp-content/plugins/subscribe2');
 
+		// load the options
+		$this->subscribe2_options = array();
+		$this->subscribe2_options = get_option('subscribe2_options');
+		require_once( ABSPATH . 'wp-content/plugins/subscribe2/include.php' );
+
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
 		if(mysql_query("SELECT COUNT(*) FROM ".$this->public)==FALSE) {	$this->install(); }
 		//do we need to upgrade anything?
-		$this->version = get_option('s2_version');
-		if ($this->version !== S2VERSION) {
-			add_action('init', array(&$this, 'upgrade'));
-		}
+		if ($this->subscribe2_options['version'] !== S2VERSION) {
+  			add_action('init', array(&$this, 'upgrade'));
+  		}
 
 		if (isset($_GET['s2'])) {
 			// someone is confirming a request
@@ -1914,7 +1914,7 @@ class subscribe2 {
 		}
 		add_action('delete_post', array(&$this, 'delete_future'));
 		// add our button
-		if ('1' == get_option('s2_show_button')) {
+		if ('1' == $this->subscribe2_options['s2_show_button']) {
 			add_action('init', array(&$this, 's2_button_init'));
 			add_action('marker_css', array(&$this, 'subscribe2_css'));
 		}
