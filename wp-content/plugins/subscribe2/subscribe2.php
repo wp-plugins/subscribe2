@@ -61,7 +61,7 @@ class subscribe2 {
 
 		$this->please_log_in = "<p>" . __('To manage your subscription options please ', 'subscribe2') . "<a href=\"" . get_settings('siteurl') . "/wp-login.php\">login</a>.</p>";
 
-		$this->use_profile = "<p>" . __('You may manage your subscription options from your ', 'subscribe2') . "<a href=\"" . get_settings('siteurl') . "/wp-admin/profile.php?page=subscribe2/subscribe2.php\">profile</a>.</p>";
+		$this->use_profile = "<p>" . __('You may manage your subscription options from your ', 'subscribe2') . "<a href=\"" . get_settings('siteurl') . "/wp-admin/profile.php?page=" . plugin_basename(__FILE__) . "\">profile</a>.</p>";
 
 		$this->confirmation_sent = "<p>" . __('A confirmation message is on its way!', 'subscribe2') . "</p>";
 
@@ -88,9 +88,9 @@ class subscribe2 {
 
 		$this->remind_subject = "[" . get_settings('blogname') . "] " . __('Subscription Reminder', 'subscribe2');
 
-		$this->subscribe = __('subscribe', 'subscribe2'); //ACTION replacement in if subscribing confirmation email
+		$this->subscribe = __('subscribe', 'subscribe2'); //ACTION replacement in subscribing confirmation email
 
-		$this->unsubscribe = __('unsubscribe', 'subscribe2'); //ACTION replacement if unsubscribing in confirmation email
+		$this->unsubscribe = __('unsubscribe', 'subscribe2'); //ACTION replacement in unsubscribing in confirmation email
 
 		// menu strings
 		$this->options_saved = __('Options saved!', 'subscribe2');
@@ -1205,17 +1205,13 @@ class subscribe2 {
 	*/
 	function options_menu() {
 		// was anything POSTed?
-		if (isset($_POST['s2_admin'])) {
-			if ('RESET' == $_POST['s2_admin']) {
+		if (isset($_POST['admin'])) {
+			if ('RESET' == $_POST['admin']) {
 				$this->reset();
 				echo "<div id=\"message\" class=\"updated fade\"><strong><p>$this->options_reset</p></strong></div>";
-			} elseif ('options' == $_POST['s2_admin']) {
+			} elseif ('options' == $_POST['admin']) {
 				// excluded categories
-				echo "<pre>";
-				print_r($this->subscribe2_options);
-				echo '$_POST:';
-				print_r($_POST['showbutton']);
-				echo "</pre>";
+				
 				if (!empty($_POST['category'])) {
 					$exclude_cats = implode(',', $_POST['category']);
 				} else {
@@ -1223,37 +1219,36 @@ class subscribe2 {
 				}
                 $this->subscribe2_options['exclude'] = $exclude_cats;
 				// allow override?
-				(isset($_POST['override'])) ? $override = '1' : $override = '0';
+				(isset($_POST['reg_override'])) ? $override = '1' : $override = '0';
 				$this->subscribe2_options['reg_override'] = $override;
 
 				// show button?
-				(isset($_POST['showbutton'])) ? $showbutton = '1' : $showbutton = '0';
-				echo $showbutton;
+				($_POST['show_button'] == '1') ? $showbutton = '1' : $showbutton = '0';
 				$this->subscribe2_options['show_button'] = $showbutton;
 
 				// send as author or admin?
 				$sender = 'author';
-				if ('admin' == $_POST['s2_sender']) {
+				if ('admin' == $_POST['sender']) {
 					$sender = 'admin';
 				}
                 $this->subscribe2_options['sender'] = $sender;
 
 				// email templates
-				$mailtext = $_POST['s2_mailtext'];
+				$mailtext = $_POST['mailtext'];
                 $this->subscribe2_options['mailtext'] = $mailtext;
-				$confirm_email = $_POST['s2_confirm_email'];
+				$confirm_email = $_POST['confirm_email'];
                 $this->subscribe2_options['confirm_email'] = $confirm_email;
-				$remind_email = $_POST['s2_remind_email'];
+				$remind_email = $_POST['remind_email'];
                 $this->subscribe2_options['remind_email'] = $remind_email;
 
 				//automatic subscription
-				$autosub_option = $_POST['s2_autosub'];
+				$autosub_option = $_POST['autosub'];
                 $this->subscribe2_options['autosub']= $autosub_option;
-				$autosub_format_option = $_POST['s2_autoformat'];
+				$autosub_format_option = $_POST['autoformat'];
                 $this->subscribe2_options['autoformat']= $autosub_format_option;
 				
 				//barred domains
-				$barred_option = $_POST['s2_barred'];
+				$barred_option = $_POST['barred'];
                 $this->subscribe2_options['barred'] = $barred_option;
 				echo "<div id=\"message\" class=\"updated fade\"><strong><p>$this->options_saved</p></strong></div>";
                 update_option( 'subscribe2_options', $this->subscribe2_options );
@@ -1265,12 +1260,12 @@ class subscribe2 {
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"options\" />";
 		echo "<h2>" . __('Delivery Options', 'subscribe2') . ":</h2>";
 		echo __('Send Email From', 'subscribe2') . ': ';
-		echo "<input type=\"radio\" name=\"s2_sender\" value=\"author\" ";
+		echo "<input type=\"radio\" name=\"sender\" value=\"author\" ";
 		if ('author' == $this->subscribe2_options['sender']) {
 			echo "checked=\"checked\" ";
 		}
 		echo " /> " . __('Author of the post', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"s2_sender\" value=\"admin\" ";
+		echo "<input type=\"radio\" name=\"sender\" value=\"admin\" ";
 		if ('admin' == $this->subscribe2_options['sender']) {
 			echo "checked=\"checked\" ";
 		}
@@ -1280,7 +1275,7 @@ class subscribe2 {
 		echo "<tr><td>";
 		echo __('New Post email (must not be empty)', 'subscribe2') . ":";
 		echo "<br />\r\n";
-		echo "<textarea rows=\"9\" cols=\"60\" name=\"s2_mailtext\">" . stripslashes($this->subscribe2_options['mailtext']) . "</textarea><p>\r\n";
+		echo "<textarea rows=\"9\" cols=\"60\" name=\"mailtext\">" . stripslashes($this->subscribe2_options['mailtext']) . "</textarea><p>\r\n";
 		echo "</td><td valign=\"top\" rowspan=\"3\">";
 		echo "<h3>" . __('Message substitions', 'subscribe2') . "</h3>\r\n";
 		echo "<dl>";
@@ -1296,22 +1291,22 @@ class subscribe2 {
 		echo "<dt><b>ACTION</b></dt><dd>" . __("Action performed by LINK in confirmation email<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "</dl></td></tr><tr><td>";
 		echo __('Subscribe / Unsubscribe confirmation email', 'subscribe2') . ":<br />\r\n";
-		echo "<textarea rows=\"9\" cols=\"60\" name=\"s2_confirm_email\">" . stripslashes($this->subscribe2_options['confirm_email']) . "</textarea><p>";
+		echo "<textarea rows=\"9\" cols=\"60\" name=\"confirm_email\">" . stripslashes($this->subscribe2_options['confirm_email']) . "</textarea><p>";
 		echo "</td></tr><tr><td>";
 		echo __('Reminder email to Unconfirmed Subscribers', 'subscribe2') . ":<br />\r\n";
-		echo "<textarea rows=\"9\" cols=\"60\" name=\"s2_remind_email\">" . stripslashes($this->subscribe2_options['remind_email']) . "</textarea><p>";
+		echo "<textarea rows=\"9\" cols=\"60\" name=\"remind_email\">" . stripslashes($this->subscribe2_options['remind_email']) . "</textarea><p>";
 		echo "</td></tr></table>\r\n";
 
 		// excluded categories
 		echo "<h2>" . __('Excluded Categories', 'subscribe2') . "</h2>\r\n";
 		$this->display_category_form(explode(',', $this->get_excluded_cats()));
-		echo "<p align=\"center\"><input type=\"checkbox\" name=\"override\" ";
+		echo "<p align=\"center\"><input type=\"checkbox\" name=\"reg_override\" value=\"1\"";
 		if ('1' == $this->subscribe2_options['reg_override']) {
 			echo "checked=\"checked\"";
 		}
 		echo "/> " . __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</p>";
 		echo "<h2>" . __('Writing Options', 'subscribe2') . "</h2>\r\n";
-		echo "<p align=\"center\"><input type=\"checkbox\" name=\"showbutton\" ";
+		echo "<p align=\"center\"><input type=\"checkbox\" name=\"show_button\" value=\"1\"";
 		if ('1' == $this->subscribe2_options['show_button']) {
 			echo "checked=\"checked\"";
 		}
@@ -1320,28 +1315,28 @@ class subscribe2 {
 		//Auto Subscription for new registrations
 		echo "<h2>" . __('Auto Subscribe', 'subscribe2') . "</h2>\r\n";
 		echo __('Automatically subscribe new users registering with your blog.', 'subscribe2') . "<br />\r\n";
-		echo "<input type=\"radio\" name=\"s2_autosub\" value=\"yes\" ";
+		echo "<input type=\"radio\" name=\"autosub\" value=\"yes\" ";
 		if ('yes' == $this->subscribe2_options['autosub']) {
 			echo "checked=\"checked\" ";
 		}
 		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"s2_autosub\" value=\"no\" ";
+		echo "<input type=\"radio\" name=\"autosub\" value=\"no\" ";
 		if ('no' == $this->subscribe2_options['autosub']) {
 			echo "checked=\"checked\" ";
 		}
 		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
 		echo __('Auto-subscribe users to receive email as', 'subscribe2') . ": <br />\r\n";
-			echo "<input type=\"radio\" name=\"s2_autoformat\" value=\"html\"";
+			echo "<input type=\"radio\" name=\"autoformat\" value=\"html\"";
 			if ('html' == $this->subscribe2_options['autoformat']) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('HTML', 'subscribe2') ." &nbsp;&nbsp;";
-			echo "<input type=\"radio\" name=\"s2_autoformat\" value=\"fulltext\" ";
+			echo "<input type=\"radio\" name=\"autoformat\" value=\"fulltext\" ";
 			if ('fulltext' == $this->subscribe2_options['autoformat']) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('Plain Text - Full', 'subscribe2') . " &nbsp;&nbsp;";
-			echo "<input type=\"radio\" name=\"s2_autoformat\" value=\"text\" ";
+			echo "<input type=\"radio\" name=\"autoformat\" value=\"text\" ";
 			if ('text' == $this->subscribe2_options['autoformat']) {
 				echo "checked=\"checked\" ";
 			}
@@ -1350,7 +1345,7 @@ class subscribe2 {
 		//barred domains
 		echo "<h2>" . __('Barred Domains', 'subscribe2') . "</h2>\r\n";
 		echo __('Enter domains to bar from public subscriptions: <br /> (Use a new line for each entry and omit the "@" symbol, for example email.com)', 'subscribe2');
-		echo "<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"s2_barred\">" . $this->subscribe2_options['barred'] . "</textarea>";
+		echo "<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"barred\">" . $this->subscribe2_options['barred'] . "</textarea>";
 		
 		// submit
 		echo "<p align=\"center\"><span class=\"submit\"><input type=\"submit\" id=\"save\" name=\"submit\" value=\"" . __('Submit', 'subscribe2') . "\" /></span></p>";
@@ -1362,7 +1357,7 @@ class subscribe2 {
 		echo "<p>" . __('Use this to reset all options to their defaults. This <strong><em>will not</em></strong> modify your list of subscribers.', 'subscribe2') . "</p>\r\n";
 		echo "<form method=\"post\" action=\"\">";
 		echo "<p align=\"center\"><span class=\"submit\">";
-		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"RESET\" />";
+		echo "<input type=\"hidden\" name=\"admin\" value=\"RESET\" />";
 		echo "<input type=\"submit\" id=\"deletepost\" name=\"submit\" value=\"" . __('RESET', 'subscribe2') .
 		"\" />";
 		echo "</span></p></form></div>\r\n";
@@ -1905,7 +1900,6 @@ class subscribe2 {
 		// load the options
 		$this->subscribe2_options = array();
 		$this->subscribe2_options = get_option('subscribe2_options');
-		require_once( ABSPATH . 'wp-content/plugins/subscribe2/include.php' );
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
