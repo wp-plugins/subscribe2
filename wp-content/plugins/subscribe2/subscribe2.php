@@ -171,7 +171,6 @@ class subscribe2 {
 		}
 		$date = date('Y-m-d');
 		maybe_add_column($this->public, 'date', "ALTER TABLE `$this->public` ADD `date` DATE DEFAULT '$date' NOT NULL AFTER `active`;");
-	    
 
 		// let's take the time to check process registered users
 		//  existing public subscribers are subscribed to all categories
@@ -202,7 +201,6 @@ class subscribe2 {
 	Reset our options
 	*/
 	function reset() {
-		// This works because include.php is *always* loaded and contains defaults
 		delete_option('subscribe2_options');
 		unset($this->subscribe2_options);
 		require(ABSPATH . "/wp-content/plugins/subscribe2/include.php");
@@ -702,6 +700,17 @@ class subscribe2 {
 	} //end remind()
 
 	/**
+	Export email list to CSV download
+	*/
+	function exportcsv($emails = '') {
+		if ('' == $emails) {return false; }
+
+		$f = fopen(ABSPATH . '/wp-content/email.csv', 'w');
+		fwrite($f, $emails);
+		fclose($f);
+	} //end exportcsv
+
+	/**
 	Check email is not from a barred domain
 	*/
 	function is_barred($email='') {
@@ -1068,6 +1077,9 @@ class subscribe2 {
 			} elseif ('remind' == $_POST['s2_admin']) {
 				$this->remind($_POST['reminderemails']);
 				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('Reminder Email(s) Sent!','subscribe2') . "</p></strong></div>"; 
+			} elseif ('exportcsv' == $_POST['s2_admin']) {
+				$this->exportcsv($_POST['exportcsv']);
+				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('CSV File Created in wp-content','subscribe2') . "</p></strong></div>"; 
 			} elseif ( ('register' == $_POST['s2_admin']) && ('Subscribe' == $_POST['submit']) ) {
 				$this->subscribe_registered_users($_POST['emails'], $_POST['category']);
 				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('Registered Users Subscribed!','subscribe2') . "</p></strong></div>";
@@ -1149,8 +1161,12 @@ class subscribe2 {
 		$this->display_subscriber_dropdown($what, __('Filter', 'subscribe2'));
 		// show the selected subscribers
 		$alternate = 'alternate';
-		if (! empty($subscribers)) {
+		if (!empty($subscribers)) {
 			echo "<p align=\"center\"><b>" . __('Registered on the left, confirmed in the middle, unconfirmed on the right', 'subscribe2') . "</b></p>";
+			if (is_writable(ABSPATH . '/wp-content')) {
+				$exportcsv = implode(",", $subscribers);
+				echo "<span class=\"submit\"><form method=\"post\" action=\"\"><input type=\"hidden\" name=\"exportcsv\" value=\"$exportcsv\" /><input type=\"hidden\" name=\"s2_admin\" value=\"exportcsv\" /><input type=\"submit\" name=\"submit\" value=\"" . __('Save Emails to CSV File','subscribe2') . "\" /></form></span>";
+			}
 		}
 		echo "<table cellpadding=\"2\" cellspacing=\"2\">";
 		if (!empty($subscribers)) {
@@ -1205,13 +1221,12 @@ class subscribe2 {
 	*/
 	function options_menu() {
 		// was anything POSTed?
-		if (isset($_POST['admin'])) {
-			if ('RESET' == $_POST['admin']) {
+		if (isset($_POST['s2_admin'])) {
+			if ('RESET' == $_POST['s2_admin']) {
 				$this->reset();
 				echo "<div id=\"message\" class=\"updated fade\"><strong><p>$this->options_reset</p></strong></div>";
-			} elseif ('options' == $_POST['admin']) {
+			} elseif ('options' == $_POST['s2_admin']) {
 				// excluded categories
-				
 				if (!empty($_POST['category'])) {
 					$exclude_cats = implode(',', $_POST['category']);
 				} else {
@@ -1357,7 +1372,7 @@ class subscribe2 {
 		echo "<p>" . __('Use this to reset all options to their defaults. This <strong><em>will not</em></strong> modify your list of subscribers.', 'subscribe2') . "</p>\r\n";
 		echo "<form method=\"post\" action=\"\">";
 		echo "<p align=\"center\"><span class=\"submit\">";
-		echo "<input type=\"hidden\" name=\"admin\" value=\"RESET\" />";
+		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"RESET\" />";
 		echo "<input type=\"submit\" id=\"deletepost\" name=\"submit\" value=\"" . __('RESET', 'subscribe2') .
 		"\" />";
 		echo "</span></p></form></div>\r\n";
