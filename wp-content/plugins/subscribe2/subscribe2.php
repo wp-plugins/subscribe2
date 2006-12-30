@@ -228,9 +228,8 @@ class subscribe2 {
 	Delivers email to recipients in HTML or plaintext
 	*/
 	function mail ($recipients = array(), $subject = '', $message = '', $type='text') {
-		if (empty($recipients)) { return; }
-		if ('' == $message) { return; }
-
+		if ( (empty($recipients)) || ('' == $message) ) { return; }
+		
 		// Set sender details
 		if ('' == $this->myname) {
 			$admin = get_userdata(1);
