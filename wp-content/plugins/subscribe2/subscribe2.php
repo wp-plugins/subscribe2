@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.2.9
+Version: 2.2.10
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -47,7 +47,7 @@ define('S2PAGE', '0');
 define('S2DIGEST', false);
 
 // our version number. Don't touch.
-define('S2VERSION', '2.2.9');
+define('S2VERSION', '2.2.10');
 
 // start our class
 class subscribe2 {
