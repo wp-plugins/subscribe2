@@ -739,7 +739,7 @@ class subscribe2 {
 		$id = intval(substr($code, 1));
 		if ($id) {
 			$this->email = $this->get_email($id);
-			if (! $this->email) {
+			if ( (!$this->email) || ($hash !== md5($this->email)) ) {
 				return $this->no_such_email;
 			}
 		} else {
@@ -1938,7 +1938,7 @@ class subscribe2 {
 		add_action('create_category', array(&$this, 'autosub_new_category'));
 		add_filter('the_content', array(&$this, 'filter'));
 		add_action('wp_cron_hourly', array(&$this, 'subscribe2_hourly'));
-		if ( defined('S2DIGEST') && TRUE == S2DIGEST ) {
+		if (defined('S2DIGEST') && TRUE == S2DIGEST) {
 			add_action('wp_cron_daily', array(&$this, 'subscribe2_daily'));
 		}
 		add_action('delete_post', array(&$this, 'delete_future'));
