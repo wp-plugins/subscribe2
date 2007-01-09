@@ -3,10 +3,36 @@
 == Licence ==
 Released under the terms of the GNU General Public License.
 Distributed with no warranty.  Use it at your own risk.
-Version 2.2.3 to 2.2.6 by Matthew Robinson based on:
+Version 2.2.3 to 2.2.10 by Matthew Robinson based on:
 Version 2.2.2 copyright (c) 2004 Scott Merrill (http://skippy.net/)
 
 == Version History ==
+Version 2.3.0 by Matthew Robinson
++ Updated for WordPress 2.1 Branch
+
+Version 2.2.10 by Matthew Robinson
++ Improved sign up process by double checking email address
++ Fix for submenu issues encountered in WP 2.0.6
+
+Version 2.2.9 by Matthew Robinson
++ Fixed get_userdata call issue
++ Added CSV export
++ Reworked options storage routines
+
+Version 2.2.8 by Matthew Robinson
++ Fixed missing line return in email headers that was causing failed emails
++ Added user feedback messages to profile area
++ Added ‘Authorname’ to the list of message substitutions in email messages
++ Fixed name and email substitution in Digest Mails
++ Fixed stripslashes issue in email subjects
++ Added new ‘Action’ token for confirmation emails
+
+Version 2.2.7 by Matthew Robinson
++ Link to post in HTML emails is now functional
++ Fixed bug in Bulk Management so it works when first loaded
++ Ability to auto subscribe newly registering users
++ Added additional email header information
+
 Version 2.2.6 by Matthew Robinson
 + Fixed email headers to comply with RFC2822 standard (after breaking them in the first place)
 + Impoved XHTML compliance of user feedback messages and subscription form when presented on a blog
