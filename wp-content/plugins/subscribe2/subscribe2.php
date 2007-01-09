@@ -1265,7 +1265,7 @@ class subscribe2 {
 				$barred_option = $_POST['barred'];
                 $this->subscribe2_options['barred'] = $barred_option;
 				echo "<div id=\"message\" class=\"updated fade\"><strong><p>$this->options_saved</p></strong></div>";
-                update_option( 'subscribe2_options', $this->subscribe2_options );
+                update_option('subscribe2_options', $this->subscribe2_options);
 			}
 		}
 		// show our form
