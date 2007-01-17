@@ -108,6 +108,24 @@ class subscribe2 {
 		add_submenu_page('post.php', __('Mail Subscribers','subscribe2'), __('Mail Subscribers', 'subscribe2'),"manage_options", __FILE__, array(&$this, 'write_menu'));
 	}
 
+	/**
+	Insert Javascript into admin_header
+	*/
+	function admin_head() {
+		echo "<script type=\"text/javascript\">\r\n";
+		echo "<!--\r\n";
+		echo "function setAll(theElement) {\r\n";
+		echo "	var theForm = theElement.form, z = 0;\r\n";
+		echo "	for(z=0; z<theForm.length;z++){\r\n";
+		echo "		if(theForm[z].type == 'checkbox' && theForm[z].name == 'category[]'){\r\n";
+		echo "			theForm[z].checked = theElement.checked;\r\n";
+		echo "		}\r\n";
+		echo "	}\r\n";
+		echo "}\r\n";
+		echo "-->\r\n";
+		echo "</script>\r\n";
+	}
+
 /* ===== ButtonSnap configuration ===== */
 	/**
 	Register our button in the QuickTags bar
@@ -921,6 +939,7 @@ class subscribe2 {
 			// ensure existing subscriptions are not overwritten on upgrade
 			if (empty($check)) {
 				if ('yes' == $this->subscribe2_options['s2_autosub']) {
+					// don't add entires by default if autosub is off, messes up daily digests
 					update_usermeta($user_id, 's2_subscribed', $this->get_all_categories());
 						foreach(explode(',', $this->get_all_categories()) as $cat) {
 							update_usermeta($user_id, 's2_cat' . $cat, "$cat");
@@ -935,11 +954,7 @@ class subscribe2 {
 						update_usermeta($user_id, 's2_format', 'text');
 						update_usermeta($user_id, 's2_excerpt', 'excerpt');
 					}
-				} else {
-					update_usermeta($user_id, 's2_subscribed', '');
-					update_usermeta($user_id, 's2_format', 'text');
-					update_usermeta($user_id, 's2_excerpt', 'excerpt');
-				}
+				} 
 			}
 		}
 		return $user_id;
@@ -1412,7 +1427,7 @@ class subscribe2 {
 						delete_usermeta($user_ID, "s2_cat" . $cat);
 					}
 				}
-				update_usermeta($user_ID, 's2_subscribed', '');
+				delete_usermeta($user_ID, 's2_subscribed');
 			} else {
 				 if (! is_array($cats)) {
 				 	$cats = array($_POST['category']);
@@ -1556,7 +1571,6 @@ class subscribe2 {
 /* ===== helper functions: forms and stuff ===== */
 	/**
 	Display a table of categories with checkboxes
-
 	Optionally pre-select those categories specified
 	*/
 	function display_category_form($selected = array(), $override = 1) {
@@ -1599,7 +1613,11 @@ class subscribe2 {
 				}
 				$i++;
 		}
-		echo "</td></tr></table>\r\n";
+		echo "</td></tr>\r\n";
+		echo "<tr><td>\r\n";
+		echo "<input type=\"checkbox\" name=\"checkall\" onclick=\"setAll(this)\" /> Select / Unselect All\r\n";
+		echo "</td></tr>\r\n";
+		echo "</table>\r\n";
 	} // end display_category_form()
 
 	/**
@@ -1930,6 +1948,7 @@ class subscribe2 {
 			add_filter('the_content', array(&$this, 'confirm'));
 		}
 
+		add_action('admin_head', array(&$this, 'admin_head'));
 		add_action('admin_menu', array(&$this, 'admin_menu'));
 		add_action('publish_post', array(&$this, 'publish'));
 		add_action('edit_post', array(&$this, 'edit'));
