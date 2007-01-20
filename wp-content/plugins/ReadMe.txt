@@ -7,6 +7,10 @@ Version 2.2.3 to 2.2.10 by Matthew Robinson based on:
 Version 2.2.2 copyright (c) 2004 Scott Merrill (http://skippy.net/)
 
 == Version History ==
+Version 2.2.11 by Matthew Robinson
++ Fixed bug that would cause all subscribers to get digest emails
++ Added Select All check box to category listing
+
 Version 2.2.10 by Matthew Robinson
 + Improved sign up process by double checking email address
 + Fix for submenu issues encountered in WP 2.0.6

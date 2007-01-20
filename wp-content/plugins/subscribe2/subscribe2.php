@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.2.11
+Version: 2.2.12
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -29,9 +29,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 http://www.gnu.org/licenses/gpl.html
 */
 
-// use Owen's excellent ButtonSnap library
-include(ABSPATH . '/wp-content/plugins/buttonsnap.php');
-
 // change this to TRUE if you're on Dreamhost
 // (or any other host that limits the number of recipients
 // permitted on each outgoing email message)
@@ -47,7 +44,55 @@ define('S2PAGE', '0');
 define('S2DIGEST', false);
 
 // our version number. Don't touch.
-define('S2VERSION', '2.2.11');
+define('S2VERSION', '2.2.12');
+
+// Add the Subscribe code into the WP API
+add_action('init', 's2init');
+
+// maybe add our button
+$s2_options = array();
+$s2_options = get_option('subscribe2_options');
+if ('1' == $s2_options['show_button']) {
+	// use Owen's excellent ButtonSnap library
+	include(ABSPATH . '/wp-content/plugins/buttonsnap.php');
+	add_action('init', 's2_button_init');
+	add_action('marker_css', 'subscribe2_css');
+}
+unset($s2_options);
+
+function s2init() {
+	global $subscribe2;
+	$mysubscribe2 = new subscribe2();
+	$mysubscribe2->subscribe2();
+}
+
+/* ===== ButtonSnap configuration ===== */
+/**
+Register our button in the QuickTags bar
+*/
+function s2_button_init() {
+	$url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_button.png';
+	buttonsnap_textbutton($url, 'Subscribe2', '<!--subscribe2-->');
+	buttonsnap_register_marker('subscribe2', 's2_marker');
+}
+
+/**
+	Style a marker in the Rich Text Editor for our tag
+	By default, the RTE suppresses output of HTML comments, so this places a CSS style on our token in order to make it display
+*/
+function subscribe2_css() {
+	$marker_url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_marker.png';
+	echo "
+		.s2_marker {
+			display: block;
+			height: 45px;
+			margin-top: 5px;
+			background-image: url({$marker_url});
+			background-repeat: no-repeat;
+			background-position: center;
+		}
+	";
+}
 
 // start our class
 class subscribe2 {
@@ -124,35 +169,6 @@ class subscribe2 {
 		echo "}\r\n";
 		echo "-->\r\n";
 		echo "</script>\r\n";
-	}
-
-/* ===== ButtonSnap configuration ===== */
-	/**
-	Register our button in the QuickTags bar
-	*/
-	function s2_button_init() {
-		$url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_button.png';
-		buttonsnap_textbutton($url, 'Subscribe2', '<!--subscribe2-->');
-		buttonsnap_register_marker('subscribe2', 's2_marker');
-	}
-
-	/**
-	Style a marker in the Rich Text Editor for our tag
-
-	By default, the RTE suppresses output of HTML comments, so this places a CSS style on our token in order to make it display
-	*/
-	function subscribe2_css() {
-		$marker_url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_marker.png';
-		echo "
-			.s2_marker {
-				display: block;
-				height: 45px;
-				margin-top: 5px;
-				background-image: url({$marker_url});
-				background-repeat: no-repeat;
-				background-position: center;
-			}
-		";
 	}
 
 /* ===== Install, upgrade, reset ===== */
@@ -450,7 +466,7 @@ class subscribe2 {
 				// no <!--more-->, so grab the first 55 words
 						$excerpt = strip_tags($plaintext);
 						$excerpt_length = 55;
-						$words = explode(' ', $plaintext, $excerpt_length + 1);
+						$words = explode(' ', $excerpt, $excerpt_length + 1);
 						if (count($words) > $excerpt_length) {
 								array_pop($words);
 								array_push($words, '[...]');
@@ -1961,11 +1977,7 @@ class subscribe2 {
 			add_action('wp_cron_daily', array(&$this, 'subscribe2_daily'));
 		}
 		add_action('delete_post', array(&$this, 'delete_future'));
-		// add our button
-		if ('1' == $this->subscribe2_options['show_button']) {
-			add_action('init', array(&$this, 's2_button_init'));
-			add_action('marker_css', array(&$this, 'subscribe2_css'));
-		}
+
 		// load our strings
 		$this->load_strings();
 	} // end subscribe2()
@@ -2009,12 +2021,4 @@ class subscribe2 {
 	var $options_reset = '';
 
 } // end class subscribe2
-
-function s2init() {
-	global $subscribe2;
-	$mysubscribe2 = new subscribe2();
-	$mysubscribe2->subscribe2();
-}
-
-add_action('init', 's2init');
 ?>
