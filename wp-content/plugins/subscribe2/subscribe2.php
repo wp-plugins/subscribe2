@@ -238,6 +238,7 @@ class subscribe2 {
 		delete_option('subscribe2_options');
 		unset($this->subscribe2_options);
 		require(ABSPATH . "/wp-content/plugins/subscribe2/include.php");
+		update_option('subscribe2_options', $this->subscribe2_options);
 	} // end reset()
 
 /* ===== mail handling ===== */
