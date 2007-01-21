@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.2.12
+Version: 2.2.13
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -44,7 +44,7 @@ define('S2PAGE', '0');
 define('S2DIGEST', false);
 
 // our version number. Don't touch.
-define('S2VERSION', '2.2.12');
+define('S2VERSION', '2.2.13');
 
 // Add the Subscribe code into the WP API
 add_action('init', 's2init');
@@ -1391,7 +1391,7 @@ class subscribe2 {
 		//barred domains
 		echo "<h2>" . __('Barred Domains', 'subscribe2') . "</h2>\r\n";
 		echo __('Enter domains to bar from public subscriptions: <br /> (Use a new line for each entry and omit the "@" symbol, for example email.com)', 'subscribe2');
-		echo "<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"barred\">" . $this->subscribe2_options['barred'] . "</textarea>";
+		echo "<br />\r\n<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"barred\">" . $this->subscribe2_options['barred'] . "</textarea>";
 		
 		// submit
 		echo "<p align=\"center\"><span class=\"submit\"><input type=\"submit\" id=\"save\" name=\"submit\" value=\"" . __('Submit', 'subscribe2') . "\" /></span></p>";
@@ -1631,7 +1631,7 @@ class subscribe2 {
 				$i++;
 		}
 		echo "</td></tr>\r\n";
-		echo "<tr><td>\r\n";
+		echo "<tr><td align=\"left\">\r\n";
 		echo "<input type=\"checkbox\" name=\"checkall\" onclick=\"setAll(this)\" /> Select / Unselect All\r\n";
 		echo "</td></tr>\r\n";
 		echo "</table>\r\n";
