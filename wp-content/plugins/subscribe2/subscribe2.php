@@ -29,9 +29,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 http://www.gnu.org/licenses/gpl.html
 */
 
-// use Owen's excellent ButtonSnap library
-include(ABSPATH . '/wp-content/plugins/buttonsnap.php');
-
 // change this to TRUE if you're on Dreamhost
 // (or any other host that limits the number of recipients
 // permitted on each outgoing email message)
@@ -48,6 +45,54 @@ define('S2DIGEST', false);
 
 // our version number. Don't touch.
 define('S2VERSION', '2.3.0');
+
+// Add the Subscribe code into the WP API
+add_action('init', 's2init');
+
+// maybe add our button
+$s2_options = array();
+$s2_options = get_option('subscribe2_options');
+if ('1' == $s2_options['show_button']) {
+	// use Owen's excellent ButtonSnap library
+	include(ABSPATH . '/wp-content/plugins/buttonsnap.php');
+	add_action('init', 's2_button_init');
+	add_action('marker_css', 'subscribe2_css');
+}
+unset($s2_options);
+
+function s2init() {
+	global $subscribe2;
+	$mysubscribe2 = new subscribe2();
+	$mysubscribe2->subscribe2();
+}
+
+/* ===== ButtonSnap configuration ===== */
+/**
+Register our button in the QuickTags bar
+*/
+function s2_button_init() {
+	$url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_button.png';
+	buttonsnap_textbutton($url, 'Subscribe2', '<!--subscribe2-->');
+	buttonsnap_register_marker('subscribe2', 's2_marker');
+}
+
+/**
+	Style a marker in the Rich Text Editor for our tag
+	By default, the RTE suppresses output of HTML comments, so this places a CSS style on our token in order to make it display
+*/
+function subscribe2_css() {
+	$marker_url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_marker.png';
+	echo "
+		.s2_marker {
+			display: block;
+			height: 45px;
+			margin-top: 5px;
+			background-image: url({$marker_url});
+			background-repeat: no-repeat;
+			background-position: center;
+		}
+	";
+}
 
 // start our class
 class subscribe2 {
@@ -108,33 +153,22 @@ class subscribe2 {
 		add_submenu_page('post-new.php', __('Mail Subscribers','subscribe2'), __('Mail Subscribers', 'subscribe2'),"manage_options", __FILE__, array(&$this, 'write_menu'));
 	}
 
-/* ===== ButtonSnap configuration ===== */
 	/**
-	Register our button in the QuickTags bar
+	Insert Javascript into admin_header
 	*/
-	function s2_button_init() {
-		$url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_button.png';
-		buttonsnap_textbutton($url, 'Subscribe2', '<!--subscribe2-->');
-		buttonsnap_register_marker('subscribe2', 's2_marker');
-	}
-
-	/**
-	Style a marker in the Rich Text Editor for our tag
-
-	By default, the RTE suppresses output of HTML comments, so this places a CSS style on our token in order to make it display
-	*/
-	function subscribe2_css() {
-		$marker_url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_marker.png';
-		echo "
-			.s2_marker {
-				display: block;
-				height: 45px;
-				margin-top: 5px;
-				background-image: url({$marker_url});
-				background-repeat: no-repeat;
-				background-position: center;
-			}
-		";
+	function admin_head() {
+		echo "<script type=\"text/javascript\">\r\n";
+		echo "<!--\r\n";
+		echo "function setAll(theElement) {\r\n";
+		echo "	var theForm = theElement.form, z = 0;\r\n";
+		echo "	for(z=0; z<theForm.length;z++){\r\n";
+		echo "		if(theForm[z].type == 'checkbox' && theForm[z].name == 'category[]'){\r\n";
+		echo "			theForm[z].checked = theElement.checked;\r\n";
+		echo "		}\r\n";
+		echo "	}\r\n";
+		echo "}\r\n";
+		echo "-->\r\n";
+		echo "</script>\r\n";
 	}
 
 /* ===== Install, upgrade, reset ===== */
@@ -204,6 +238,7 @@ class subscribe2 {
 		delete_option('subscribe2_options');
 		unset($this->subscribe2_options);
 		require(ABSPATH . "/wp-content/plugins/subscribe2/include.php");
+		update_option('subscribe2_options', $this->subscribe2_options);
 	} // end reset()
 
 /* ===== mail handling ===== */
@@ -432,7 +467,7 @@ class subscribe2 {
 				// no <!--more-->, so grab the first 55 words
 						$excerpt = strip_tags($plaintext);
 						$excerpt_length = 55;
-						$words = explode(' ', $plaintext, $excerpt_length + 1);
+						$words = explode(' ', $excerpt, $excerpt_length + 1);
 						if (count($words) > $excerpt_length) {
 								array_pop($words);
 								array_push($words, '[...]');
@@ -926,6 +961,7 @@ class subscribe2 {
 			// ensure existing subscriptions are not overwritten on upgrade
 			if (empty($check)) {
 				if ('yes' == $this->subscribe2_options['s2_autosub']) {
+					// don't add entires by default if autosub is off, messes up daily digests
 					update_usermeta($user_id, 's2_subscribed', $this->get_all_categories());
 						foreach(explode(',', $this->get_all_categories()) as $cat) {
 							update_usermeta($user_id, 's2_cat' . $cat, "$cat");
@@ -940,11 +976,7 @@ class subscribe2 {
 						update_usermeta($user_id, 's2_format', 'text');
 						update_usermeta($user_id, 's2_excerpt', 'excerpt');
 					}
-				} else {
-					update_usermeta($user_id, 's2_subscribed', '');
-					update_usermeta($user_id, 's2_format', 'text');
-					update_usermeta($user_id, 's2_excerpt', 'excerpt');
-				}
+				} 
 			}
 		}
 		return $user_id;
@@ -1364,7 +1396,7 @@ class subscribe2 {
 		//barred domains
 		echo "<h2>" . __('Barred Domains', 'subscribe2') . "</h2>\r\n";
 		echo __('Enter domains to bar from public subscriptions: <br /> (Use a new line for each entry and omit the "@" symbol, for example email.com)', 'subscribe2');
-		echo "<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"barred\">" . $this->subscribe2_options['barred'] . "</textarea>";
+		echo "<br />\r\n<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"barred\">" . $this->subscribe2_options['barred'] . "</textarea>";
 		
 		// submit
 		echo "<p align=\"center\"><span class=\"submit\"><input type=\"submit\" id=\"save\" name=\"submit\" value=\"" . __('Submit', 'subscribe2') . "\" /></span></p>";
@@ -1417,7 +1449,7 @@ class subscribe2 {
 						delete_usermeta($user_ID, "s2_cat" . $cat);
 					}
 				}
-				update_usermeta($user_ID, 's2_subscribed', '');
+				delete_usermeta($user_ID, 's2_subscribed');
 			} else {
 				 if (! is_array($cats)) {
 				 	$cats = array($_POST['category']);
@@ -1561,7 +1593,6 @@ class subscribe2 {
 /* ===== helper functions: forms and stuff ===== */
 	/**
 	Display a table of categories with checkboxes
-
 	Optionally pre-select those categories specified
 	*/
 	function display_category_form($selected = array(), $override = 1) {
@@ -1604,7 +1635,11 @@ class subscribe2 {
 				}
 				$i++;
 		}
-		echo "</td></tr></table>\r\n";
+		echo "</td></tr>\r\n";
+		echo "<tr><td align=\"left\">\r\n";
+		echo "<input type=\"checkbox\" name=\"checkall\" onclick=\"setAll(this)\" /> Select / Unselect All\r\n";
+		echo "</td></tr>\r\n";
+		echo "</table>\r\n";
 	} // end display_category_form()
 
 	/**
@@ -1934,6 +1969,7 @@ class subscribe2 {
 			add_filter('the_content', array(&$this, 'confirm'));
 		}
 
+		add_action('admin_head', array(&$this, 'admin_head'));
 		add_action('admin_menu', array(&$this, 'admin_menu'));
 		add_action('publish_post', array(&$this, 'publish'));
 		add_action('edit_post', array(&$this, 'edit'));
@@ -1946,11 +1982,7 @@ class subscribe2 {
 			add_action('wp_cron_daily', array(&$this, 'subscribe2_daily'));
 		}
 		add_action('delete_post', array(&$this, 'delete_future'));
-		// add our button
-		if ('1' == $this->subscribe2_options['show_button']) {
-			add_action('init', array(&$this, 's2_button_init'));
-			add_action('marker_css', array(&$this, 'subscribe2_css'));
-		}
+
 		// load our strings
 		$this->load_strings();
 	} // end subscribe2()
@@ -1994,12 +2026,4 @@ class subscribe2 {
 	var $options_reset = '';
 
 } // end class subscribe2
-
-function s2init() {
-	global $subscribe2;
-	$mysubscribe2 = new subscribe2();
-	$mysubscribe2->subscribe2();
-}
-
-add_action('init', 's2init');
 ?>
