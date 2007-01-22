@@ -1632,7 +1632,7 @@ class subscribe2 {
 		}
 		echo "</td></tr>\r\n";
 		echo "<tr><td align=\"left\">\r\n";
-		echo "<input type=\"checkbox\" name=\"checkall\" onclick=\"setAll(this)\" /> Select / Unselect All\r\n";
+		echo "<input type=\"checkbox\" name=\"checkall\" onclick=\"setAll(this)\" />" . __('Select / Unselect All' ,'subscribe2') . "\r\n";
 		echo "</td></tr>\r\n";
 		echo "</table>\r\n";
 	} // end display_category_form()
