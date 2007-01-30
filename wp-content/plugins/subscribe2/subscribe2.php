@@ -1451,6 +1451,9 @@ class subscribe2 {
 		echo "<h2>" . __('Reset Default', 'subscribe2') . "</h2>\r\n";
 		echo "<p>" . __('Use this to reset all options to their defaults. This <strong><em>will not</em></strong> modify your list of subscribers.', 'subscribe2') . "</p>\r\n";
 		echo "<form method=\"post\" action=\"\">";
+		if (function_exists('wp_nonce_field')) {
+			wp_nonce_field('subscribe2-options_subscribers' . $s2nonce);
+		}
 		echo "<p align=\"center\"><span class=\"submit\">";
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"RESET\" />";
 		echo "<input type=\"submit\" id=\"deletepost\" name=\"submit\" value=\"" . __('RESET', 'subscribe2') .
