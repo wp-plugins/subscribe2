@@ -77,6 +77,7 @@ New in version 2.2, registered users of the blog can subscribe to individual cat
 8) Create a WordPress Page (http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the subscribe2 token.  Or, if you prefer, you may manually insert the subscribe2 token:
      <!--subscribe2-->
 This token will automatically be replaced by the subscription form, and will display all messages as necessary.
+9) In the subscribe2.php file define S2PAGE to point at your WordPress page created in step 8.
 
 == UPGRADING ==
 If you are upgrading from any 2.1.x version of subscribe2, please delete both the /subscribe.php and /wp-content/plugins/subscribe2.php files before copying the new files into place.  Your subscriber list will remain intact, and your options should be preserved.
