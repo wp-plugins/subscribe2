@@ -3,12 +3,23 @@
 == Licence ==
 Released under the terms of the GNU General Public License.
 Distributed with no warranty.  Use it at your own risk.
-Version 2.2.3 to 2.2.10 by Matthew Robinson based on:
+Version 2.2.x and 2.3.x by Matthew Robinson based on:
 Version 2.2.2 copyright (c) 2004 Scott Merrill (http://skippy.net/)
 
 == Version History ==
 Version 2.3.0 by Matthew Robinson
 + Updated for WordPress 2.1 Branch
+
+Version 2.2.13 by Matthew Robinson
++ Added WordPress nonce functionality to improve admin security
+
+Version 2.2.12 by Matthew Robinson
++ Fix for missing Quicktags (probably since version 2.2.10)
++ Fix for occasional email issue where excerpts are incomplete
+
+Version 2.2.11 by Matthew Robinson
++ Fixed bug that would cause all subscribers to get digest emails
++ Added Select All check box to category listing
 
 Version 2.2.10 by Matthew Robinson
 + Improved sign up process by double checking email address
