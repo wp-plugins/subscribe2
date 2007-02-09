@@ -151,8 +151,11 @@ class subscribe2 {
 	function admin_menu() {
 		add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'manage_menu'));
 		add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2','subscribe2'), "manage_options", __FILE__, array(&$this, 'options_menu'));
-		add_submenu_page('users.php', __('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
-		add_submenu_page('profile.php', __('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
+		if (current_user_can('manage_options')) {
+			add_submenu_page('users.php', __('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
+		} else {
+			add_submenu_page('profile.php', __('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
+		}
 		add_submenu_page('post-new.php', __('Mail Subscribers','subscribe2'), __('Mail Subscribers', 'subscribe2'),"manage_options", __FILE__, array(&$this, 'write_menu'));
 		$s2nonce = md5('subscribe2');
 	}
@@ -219,8 +222,6 @@ class subscribe2 {
 			}
 		}
 		// update the options table to serialized format
-		// We'll deal with s2_future_posts another time
-		// TODO: Fix s2_future posts
 		$old_options = $wpdb->get_col("SELECT option_name from $wpdb->options where option_name LIKE 's2%' AND option_name != 's2_future_posts'");
 
 		if (!empty($old_options)) {
@@ -232,6 +233,8 @@ class subscribe2 {
 			}
 		}
 		$this->subscribe2_options['version'] = S2VERSION;
+		//double check that the options are in the database
+		require_once(ABSPATH . "/wp-content/plugins/subscribe2/include.php");
 		update_option('subscribe2_options', $this->subscribe2_options);
 	} // end upgrade()
 
@@ -2031,7 +2034,7 @@ class subscribe2 {
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
-		if(mysql_query("SELECT COUNT(*) FROM ".$this->public)==FALSE) {	$this->install(); }
+		if(mysql_query("SELECT COUNT(*) FROM ".$this->public)==FALSE) {	 $this->install(); }
 		//do we need to upgrade anything?
 		if ($this->subscribe2_options['version'] !== S2VERSION) {
   			$this->upgrade();
