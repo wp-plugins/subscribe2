@@ -216,8 +216,6 @@ class subscribe2 {
 			}
 		}
 		// update the options table to serialized format
-		// We'll deal with s2_future_posts another time
-		// TODO: Fix s2_future posts
 		$old_options = $wpdb->get_col("SELECT option_name from $wpdb->options where option_name LIKE 's2%' AND option_name != 's2_future_posts'");
 
 		if (!empty($old_options)) {
@@ -229,6 +227,8 @@ class subscribe2 {
 			}
 		}
 		$this->subscribe2_options['version'] = S2VERSION;
+		//double check that the options are in the database
+		require_once(ABSPATH . "/wp-content/plugins/subscribe2/include.php");
 		update_option('subscribe2_options', $this->subscribe2_options);
 	} // end upgrade()
 

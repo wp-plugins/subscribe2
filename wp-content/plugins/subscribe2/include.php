@@ -36,7 +36,7 @@ if (!isset($this->subscribe2_options['mailtext'])) {
 } // Default notification email text
 
 if (!isset($this->subscribe2_options['confirm_email'])) {
-	$this->subscribe2_options['confirm_email'] = "In order to confirm your request for BLOGNAME, please click on the link below:\n\nLINK\n\nIf you did not request this, please feel free to disregard this notice!\n\nThank you,\nMYNAME.";
+	$this->subscribe2_options['confirm_email'] = "BLOGNAME has received a request to ACTION for this email address. To complete your request please click on the link below:\n\nLINK\n\nIf you did not request this, please feel free to disregard this notice!\n\nThank you,\nMYNAME.";
 } // Default confirmation email text
 
 if (!isset($this->subscribe2_options['remind_email'])) {
