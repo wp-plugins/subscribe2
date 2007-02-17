@@ -29,10 +29,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 http://www.gnu.org/licenses/gpl.html
 */
 
-// change this to TRUE if you're on Dreamhost
-// (or any other host that limits the number of recipients
-// permitted on each outgoing email message)
-define('DREAMHOST', false);
+// If you are on a host that limits the numner of recipients
+// permitted on each outgoing email message
+// change this value to your hosts limit
+define('BCCLIMIT', '0');
 
 // by default, subscribe2 grabs the first page from your database for use
 // when displaying the confirmation screen to public subscribers.
@@ -298,8 +298,8 @@ class subscribe2 {
 
 		// BCC all recipients
 		$bcc = '';
-		if ( (defined('DREAMHOST') && true == DREAMHOST) &&
-			(count($recipients) > 30) ) {
+		if ( (defined('BCCLIMIT') && (BCCLIMIT > 0) ) &&
+			(count($recipients) > BCCLIMIT) ) {
 			// we're on Dreamhost, and have more than 30 susbcribers
 				$count = 1;
 				$batch = array();
@@ -350,7 +350,7 @@ class subscribe2 {
 			$headers .= "$bcc\r\n";
 		}
 		// actually send mail
-		if ( (defined('DREAMHOST')) && (true == DREAMHOST) && (isset($batch)) ) {
+		if ( (defined('BCCLIMIT')) && (BCCLIMIT > 0) && (isset($batch)) ) {
 			foreach ($batch as $bcc) {
 					$newheaders = $headers . "$bcc\r\n";
 					@wp_mail($this->myemail, $subject, $mailtext, $newheaders);
