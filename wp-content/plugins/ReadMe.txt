@@ -10,6 +10,10 @@ Version 2.2.2 copyright (c) 2004 Scott Merrill (http://skippy.net/)
 Version 2.3.0 by Matthew Robinson
 + Updated for WordPress 2.1 Branch
 
+Version 2.2.14 by Matthew Robinson
++ Amended DREAMHOST setting to BCCLIMIT as more hosts are limiting emails
++ Fixed oversight in upgrade() function
+
 Version 2.2.13 by Matthew Robinson
 + Added WordPress nonce functionality to improve admin security
 
@@ -105,9 +109,9 @@ So for each new post you make, you may receive up to three emails.
 ***********************
 Some hosting providers place a restriction on the maximum number of recipients in any one email message.  For example, the venerable Dreamhost (http://www.dreamhost.com/) does not allow any message to contain more than 30 recipients.
 
-Subscribe2 provides a facility to work around this restriction by sending batches of emails.  To enable this feature, edit subscribe2.php in a text editor and go to line 36:
-     define('DREAMHOST', FALSE);
-Change the "FALSE" to "TRUE" (without the quotation marks).
+Subscribe2 provides a facility to work around this restriction by sending batches of emails.  To enable this feature, edit subscribe2.php in a text editor and go to line 35:
+     define('BCCLIMIT', 0);
+Change the 0 to the number of allowed outgoing email recipients as set by your host.
 
 Reminder: because subscribe2 places all recipients in BCC fields, and places the blog admin in the TO field, the blog admin will receive one email per batched delivery.  So if you have 90 subscribers, the blog admin should receive three post notification emails, one for eah set of 30 BCC recipients.
 
