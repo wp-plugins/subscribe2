@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.2.13
+Version: 2.2.14
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -44,7 +44,7 @@ define('S2PAGE', '0');
 define('S2DIGEST', false);
 
 // our version number. Don't touch.
-define('S2VERSION', '2.2.13');
+define('S2VERSION', '2.2.14');
 
 // Add the Subscribe code into the WP API
 add_action('init', 's2init');
@@ -956,16 +956,16 @@ class subscribe2 {
 			$check = get_usermeta($user_id, 's2_subscribed');
 			// ensure existing subscriptions are not overwritten on upgrade
 			if (empty($check)) {
-				if ('yes' == $this->subscribe2_options['s2_autosub']) {
+				if ('yes' == $this->subscribe2_options['autosub']) {
 					// don't add entires by default if autosub is off, messes up daily digests
 					update_usermeta($user_id, 's2_subscribed', $this->get_all_categories());
 						foreach(explode(',', $this->get_all_categories()) as $cat) {
 							update_usermeta($user_id, 's2_cat' . $cat, "$cat");
 						}
-					if ('html' == $this->subscribe2_options['s2_autoformat']) {
+					if ('html' == $this->subscribe2_options['autoformat']) {
 						update_usermeta($user_id, 's2_format', 'html');
 						update_usermeta($user_id, 's2_excerpt', 'post');
-					} elseif ('fulltext' == $this->subscribe2_options['s2_autoformat']) {
+					} elseif ('fulltext' == $this->subscribe2_options['autoformat']) {
 						update_usermeta($user_id, 's2_format', 'text');
 						update_usermeta($user_id, 's2_excerpt', 'post');
 					} else {
