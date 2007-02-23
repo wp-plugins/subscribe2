@@ -1664,11 +1664,10 @@ class subscribe2 {
 	Optionally pre-select those categories specified
 	*/
 	function display_category_form($selected = array(), $override = 1) {
-		global $wpdb, $all_cats;
+		global $wpdb;
 
-		if ('' == $all_cats) {
-			$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
-		}
+		$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
+
 		if (0 == $override) {
 			// registered users are not allowed to subscribe to
 			// excluded categories
@@ -1718,7 +1717,7 @@ class subscribe2 {
 	$submit is the text to use on the Submit button
 	*/
 	function display_subscriber_dropdown ($selected = 'registered', $submit = '', $exclude = array()) {
-		global $wpdb, $all_cats;
+		global $wpdb;
 
 		$who = array('all' => __('All Subscribers', 'subscribe2'),
 			'public' => __('Public Subscribers', 'subscribe2'),
@@ -1726,9 +1725,7 @@ class subscribe2 {
 			'unconfirmed' => ' &nbsp;&nbsp;' . __('Unconfirmed', 'subscribe2'),
 			'registered' => __('Registered Subscribers', 'subscribe2'));
 
-		if ('' == $all_cats) {
-			$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
-		}
+		$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
 
 		// count the number of subscribers
 		$count['confirmed'] = $wpdb->get_var("SELECT COUNT(id) FROM $this->public WHERE active='1'");
