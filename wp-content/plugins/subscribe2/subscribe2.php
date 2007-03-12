@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.3.0 for WP2.1
+Version: 2.3.1 for WP2.1
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -39,12 +39,8 @@ define('BCCLIMIT', '0');
 // You can override this by specifying a page ID below.
 define('S2PAGE', '0');
 
-// change this to TRUE if you want a daily digest of the day's posts
-// send to your subscribers
-define('S2DIGEST', false);
-
 // our version number. Don't touch.
-define('S2VERSION', '2.3.0');
+define('S2VERSION', '2.3.1');
 
 // Add the Subscribe code into the WP API
 add_action('init', 's2init');
@@ -178,6 +174,11 @@ class subscribe2 {
 		echo "</script>\r\n";
 	}
 
+	function add_weekly_sched($sched) {
+		$sched['weekly'] = array('interval' => 604800, 'display' => __('Once Weekly','subscribe2'));
+		return $sched;
+	}
+
 /* ===== Install, upgrade, reset ===== */
 	/**
 	Install our table
@@ -214,7 +215,7 @@ class subscribe2 {
 		maybe_add_column($this->public, 'date', "ALTER TABLE `$this->public` ADD `date` DATE DEFAULT '$date' NOT NULL AFTER `active`;");
 
 		// let's take the time to check process registered users
-		//  existing public subscribers are subscribed to all categories
+		// existing public subscribers are subscribed to all categories
 		$users = $wpdb->get_col("SELECT ID FROM $wpdb->users");
 		if (!empty($users)) {
 			foreach ($users as $user) {
@@ -363,21 +364,18 @@ class subscribe2 {
 	/**
 	Sends an email notification of a new post
 	*/
-	function publish($id = 0, $cron = 0) {
-		if (!$id) { return $id; }
+	function publish($id = 0) {
+		if ( (!$id) || is_page($id) ) { return $id; }
 
 		// are we doing daily digests? If so, don't send anything now
-		if ( (defined('S2DIGEST')) && (true == S2DIGEST) ) { return; }
+		if ($this->subscribe2_options['email_freq'] != 'never') { return; }
 
 		// we need to determine whether this is a new post, or an edit
-		if (0 == $cron) {
-			// we're not being called from WP-Cron
-			if ($this->private) {
-				// this post was published from draft status
-				// OR is an edit of an existing post
-				// so send no notification
-				return $id;
-			}
+		if ($this->private) {
+			// this post was published from draft status
+			// OR is an edit of an existing post
+			// so send no notification
+			return $id;
 		}
 
 		$post_cats = wp_get_post_cats('1', $id);
@@ -404,19 +402,6 @@ class subscribe2 {
 		$post =& get_post($id);
 		// is this post set in the future?
 		if ($post->post_date > current_time('mysql')) {
-			// is wp-cron installed?
-			if (function_exists('wp_cron_init')) {
-				// are we doing daily digests?
-				if ( (defined('S2DIGEST')) && (false == S2DIGEST) ) {
-					// not doing daily digests, so
-					// add this post to the list of
-					// future posts
-					$our_post = array('id' => $id, 'date' => $post->post_date);
-					$future_posts = get_option('s2_future_posts');
-					$future_posts[] = $our_post;
-					update_option('s2_future_posts', $future_posts);
-				}
-			}
 			// bail out
 			return $id;
 		}
@@ -556,7 +541,7 @@ class subscribe2 {
 
 		$admin = get_userdata(1);
 		$this->myname = $admin->display_name;
-    
+
 		if ($is_remind == TRUE) {
 			$body = $this->substitute(stripslashes($this->subscribe2_options['remind_email']));
 			$subject = stripslashes($this->remind_subject);
@@ -951,7 +936,6 @@ class subscribe2 {
 			('' == $cats) ? $cats = "$cat->cat_ID" : $cats .= ",$cat->cat_ID";
 		}
 
-
 		// has this user previously signed up for email notification?
 		if (false !== $this->is_public($user->user_email)) {
 			// delete this user from the public table, and subscribe them to all the categories
@@ -1320,7 +1304,7 @@ class subscribe2 {
 				} else {
 					$exclude_cats = '';
 				}
-                $this->subscribe2_options['exclude'] = $exclude_cats;
+				$this->subscribe2_options['exclude'] = $exclude_cats;
 				// allow override?
 				(isset($_POST['reg_override'])) ? $override = '1' : $override = '0';
 				$this->subscribe2_options['reg_override'] = $override;
@@ -1334,27 +1318,37 @@ class subscribe2 {
 				if ('admin' == $_POST['sender']) {
 					$sender = 'admin';
 				}
-                $this->subscribe2_options['sender'] = $sender;
+				$this->subscribe2_options['sender'] = $sender;
+
+				// send per-post or digest emails
+				$email_freq = $_POST['email_freq'];
+				$this->subscribe2_options['email_freq'] = $email_freq;
+				wp_clear_scheduled_hook('s2_digest_cron');
+				$scheds = (array) wp_get_schedules();
+				$interval = ( isset($scheds[$email_freq]['interval']) ) ? (int) $scheds[$email_freq]['interval'] : 0;
+				if ( !wp_next_scheduled('s2_digest_cron') && ($interval !== 0) ) {
+					wp_schedule_event(time() + $interval, $email_freq, 's2_digest_cron');
+				}
 
 				// email templates
 				$mailtext = $_POST['mailtext'];
-                $this->subscribe2_options['mailtext'] = $mailtext;
+				$this->subscribe2_options['mailtext'] = $mailtext;
 				$confirm_email = $_POST['confirm_email'];
-                $this->subscribe2_options['confirm_email'] = $confirm_email;
+				$this->subscribe2_options['confirm_email'] = $confirm_email;
 				$remind_email = $_POST['remind_email'];
-                $this->subscribe2_options['remind_email'] = $remind_email;
+				$this->subscribe2_options['remind_email'] = $remind_email;
 
 				//automatic subscription
 				$autosub_option = $_POST['autosub'];
-                $this->subscribe2_options['autosub']= $autosub_option;
+				$this->subscribe2_options['autosub']= $autosub_option;
 				$autosub_format_option = $_POST['autoformat'];
-                $this->subscribe2_options['autoformat']= $autosub_format_option;
+				$this->subscribe2_options['autoformat']= $autosub_format_option;
 				
 				//barred domains
 				$barred_option = $_POST['barred'];
-                $this->subscribe2_options['barred'] = $barred_option;
+				$this->subscribe2_options['barred'] = $barred_option;
 				echo "<div id=\"message\" class=\"updated fade\"><strong><p>$this->options_saved</p></strong></div>";
-                update_option('subscribe2_options', $this->subscribe2_options);
+				update_option('subscribe2_options', $this->subscribe2_options);
 			}
 		}
 		// show our form
@@ -1375,7 +1369,12 @@ class subscribe2 {
 		if ('admin' == $this->subscribe2_options['sender']) {
 			echo "checked=\"checked\" ";
 		}
-		echo " /> " . __('Blog Admin', 'subscribe2') . "<br />\r\n";
+		echo " /> " . __('Blog Admin', 'subscribe2') . "<br /><br />\r\n";
+		if (function_exists('wp_schedule_event')) {
+			echo __('Send Email as Digest', 'subscribe2') . ": <br /><br />\r\n";
+			$this->display_digest_choices();
+			echo "<br />\r\n";
+		}
 		echo "<h2>" . __('Email Templates', 'subscribe2') . "</h2>\r\n";
 		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" class=\"editform\">";
 		echo "<tr><td>";
@@ -1540,7 +1539,7 @@ class subscribe2 {
 			wp_nonce_field('subscribe2-user_subscribers' . $s2nonce);
 		}
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"user\" />";
-		if ( (defined('S2DIGEST')) && (FALSE == S2DIGEST) ) {
+		if ($this->subscribe2_options['email_freq'] == 'never') {
 			echo __('Receive email as', 'subscribe2') . ": &nbsp;&nbsp;";
 			echo "<input type=\"radio\" name=\"s2_format\" value=\"html\"";
 			if ('html' == get_usermeta($user_ID, 's2_format')) {
@@ -1776,6 +1775,31 @@ class subscribe2 {
 		}
 	} // end display_subscriber_dropdown()
 
+	function display_digest_choices() {
+		global $wpdb;
+		$schedule = (array)wp_get_schedules();
+		$schedule = array_merge(array('never' => array('interval' => 0, 'display' => __('Per Post Email','subscribe2'))), $schedule);
+		$sort = array();
+		foreach ( (array)$schedule as $key => $value ) $sort[$key] = $value['interval'];
+		asort($sort);
+		$schedule_sorted = array();
+		foreach ($sort as $key => $value) {
+			$schedule_sorted[$key] = $schedule[$key];
+		}
+		foreach ($schedule_sorted as $key => $value) {
+			echo "<input type=\"radio\" name=\"email_freq\" value=\"" . $key . "\"";
+			if ($key == $this->subscribe2_options['email_freq']) {
+				echo " checked=\"checked\" ";
+			}
+			echo " /> " . $value['display'] . "<br />\r\n";
+		}
+		if (wp_next_scheduled('s2_digest_cron')) {
+			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
+			echo "<p>" . __('Next email notification will be sent', 'subscribe2') . ": \r\n";
+			echo "<strong>" . gmdate($datetime, wp_next_scheduled('s2_digest_cron') + (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
+		}
+	} // end display_digest_choices()
+
 /* ===== template and filter functions ===== */
 	/**
 	Display our form; also handles (un)subscribe requests
@@ -1885,45 +1909,18 @@ class subscribe2 {
 
 /* ===== wp-cron functions ===== */
 	/**
-	Send notifications for any posts that are now visible
-	*/
-	function subscribe2_hourly() {
-		$future_posts = get_option('s2_future_posts');
-
-		// if we have no future posts, bail out
-		if (!$future_posts) { return; }
-
-		// this will hold the posts that aren't yet visible
-		$not_yet = array();
-
-		foreach ($future_posts as $post) {
-			if ( (current_time('mysql')) > ($post['date']) ) {
-				// this post is now visible, so let's
-				// send a notification
-				$this->publish($post['id'], 1);
-			} else {
-				array_push($not_yet, $post);
-			}
-		}
-		// are the number of elements in $not_yet
-		// the same as in $future posts?
-		if ( (count($not_yet)) != (count($future_posts)) ) {
-			// if not, then some posts have been removed
-			// from $future_posts, and the remainder need
-			// to be recorded back to the database
-			update_option('s2_future_posts', $not_yet);
-		}
-	} // end subscribe2_hourly
-
-	/**
 	Send a daily digest of today's new posts
 	*/
-	function subscribe2_daily() {
+	function subscribe2_cron() {
 		global $wpdb;
 
-		// collect yesterday's posts
-		$yesterday = date('Y-m-d', (get_option('wp_cron_daily_lastrun')-60));
-		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content FROM $wpdb->posts WHERE post_date > '$yesterday 00:00:00' AND post_date < '$yesterday 23:59:59' AND post_status='publish'");
+		// collect posts
+		$scheds = (array) wp_get_schedules();
+		$email_freq = $this->subscribe2_options['email_freq'];
+		$interval = ( isset($scheds[$email_freq]['interval']) ) ? (int) $scheds[$email_freq]['interval'] : 0;
+		$now = date('Y-m-d H:i:s', time());
+		$prev = date('Y-m-d H:i:s', time() - $interval);
+		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content FROM $wpdb->posts WHERE post_date > '$prev' AND post_date < '$now' AND post_status='publish' AND post_type='post'");
 
 		// do we have any posts?
 		if (!$posts) { return; }
@@ -1988,33 +1985,7 @@ class subscribe2 {
 		$mailtext = $this->substitute(stripslashes($this->subscribe2_options['mailtext']));
 		$body = str_replace('POST', $message, $mailtext);
 		$this->mail($recipients, $subject, $body);
-	} // end subscribe2_daily
-
-	/**
-	If the to-be-deleted post was future-dated, remove it from the list of future-dated posts
-	*/
-	function delete_future($id = 0) {
-		if (0 == $id) { return $id; }
-
-		$future = get_settings('s2_future_posts');
-		// if we have no future-dated posts scheduled, bail out
-		if (!$future) {
-			return $id;
-		}
-		foreach ($future as $post) {
-			// is the deleted post in the list of future posts?
-			if ($id == $post['id']) {
-				// skip it
-				continue;
-			} else {
-				// add this to the new list of future posts
-				$new_future[] = $post;
-			}
-		}
-		if ($new_future != $future) {
-			update_option('s2_future_posts', $new_future);
-		}
-	} // end delete_future()
+	} // end subscribe2_cron
 
 /* ===== Our constructor ===== */
 	/**
@@ -2034,8 +2005,8 @@ class subscribe2 {
 		if(mysql_query("SELECT COUNT(*) FROM ".$this->public)==FALSE) {	 $this->install(); }
 		//do we need to upgrade anything?
 		if ($this->subscribe2_options['version'] !== S2VERSION) {
-  			$this->upgrade();
-  		}
+			$this->upgrade();
+		}
 
 		if (isset($_GET['s2'])) {
 			// someone is confirming a request
@@ -2046,18 +2017,19 @@ class subscribe2 {
 
 		add_action('admin_head', array(&$this, 'admin_head'));
 		add_action('admin_menu', array(&$this, 'admin_menu'));
-		add_action('publish_post', array(&$this, 'publish'));
-		add_action('edit_post', array(&$this, 'edit'));
-		add_action('private_to_published', array(&$this, 'private2publish'));
 		add_action('user_register', array(&$this, 'register'));
 		add_action('create_category', array(&$this, 'autosub_new_category'));
 		add_filter('the_content', array(&$this, 'filter'));
-		add_action('wp_cron_hourly', array(&$this, 'subscribe2_hourly'));
-		if ( (defined('S2DIGEST')) && (TRUE == S2DIGEST) ) {
-			add_action('wp_cron_daily', array(&$this, 'subscribe2_daily'));
-		}
-		add_action('delete_post', array(&$this, 'delete_future'));
+		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
 
+		if ($this->subscribe2_options['email_freq'] == 'never') {
+			add_action('publish_post', array(&$this, 'publish'));
+			add_action('edit_post', array(&$this, 'edit'));
+			add_action('private_to_published', array(&$this, 'private2publish'));
+		} else {
+			add_action('s2_digest_cron', array(&$this, 'subscribe2_cron'));
+		}
+		
 		// load our strings
 		$this->load_strings();
 	} // end subscribe2()
