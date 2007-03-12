@@ -31,6 +31,10 @@ if (!isset($this->subscribe2_options['barred'])) {
 	$this->subscribe2_options['barred'] = '';
 } // option containing domains barred from public registration
 
+if (!isset($this->subscribe2_options['email_freq'])) {
+	$this->subscribe2_options['email_freq'] = "never";
+} // option for sending emails periodically or per-post
+
 if (!isset($this->subscribe2_options['mailtext'])) {
 	$this->subscribe2_options['mailtext'] = "BLOGNAME has posted a new item, 'TITLE'\r\nPOST\r\nYou may view the latest post at\r\nPERMALINK\r\nYou received this e-mail because you asked to be notified when new updates are posted.\r\nBest regards,\r\nMYNAME\r\nEMAIL";
 } // Default notification email text

@@ -2022,12 +2022,12 @@ class subscribe2 {
 		add_filter('the_content', array(&$this, 'filter'));
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
 
-		if ($this->subscribe2_options['email_freq'] == 'never') {
+		if ($this->subscribe2_options['email_freq'] != 'never') {
+			add_action('s2_digest_cron', array(&$this, 'subscribe2_cron'));
+		} else {
 			add_action('publish_post', array(&$this, 'publish'));
 			add_action('edit_post', array(&$this, 'edit'));
 			add_action('private_to_published', array(&$this, 'private2publish'));
-		} else {
-			add_action('s2_digest_cron', array(&$this, 'subscribe2_cron'));
 		}
 		
 		// load our strings
