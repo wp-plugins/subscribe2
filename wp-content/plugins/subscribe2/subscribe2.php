@@ -1353,19 +1353,19 @@ class subscribe2 {
 		}
 		// show our form
 		echo "<div class=\"wrap\">";
-		echo "<form method=\"post\" action=\"\">";
+		echo "<form method=\"post\" action=\"\">\r\n";
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-options_subscribers' . $s2nonce);
 		}
-		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"options\" />";
-		echo "<h2>" . __('Delivery Options', 'subscribe2') . ":</h2>";
+		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"options\" />\r\n";
+		echo "<h2>" . __('Delivery Options', 'subscribe2') . ":</h2>\r\n";
 		echo __('Send Email From', 'subscribe2') . ': ';
-		echo "<input type=\"radio\" name=\"sender\" value=\"author\" ";
+		echo "<input type=\"radio\" name=\"sender\" value=\"author\"";
 		if ('author' == $this->subscribe2_options['sender']) {
 			echo "checked=\"checked\" ";
 		}
 		echo " /> " . __('Author of the post', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"sender\" value=\"admin\" ";
+		echo "<input type=\"radio\" name=\"sender\" value=\"admin\"";
 		if ('admin' == $this->subscribe2_options['sender']) {
 			echo "checked=\"checked\" ";
 		}
@@ -1376,11 +1376,11 @@ class subscribe2 {
 			echo "<br />\r\n";
 		}
 		echo "<h2>" . __('Email Templates', 'subscribe2') . "</h2>\r\n";
-		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" class=\"editform\">";
+		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" class=\"editform\">\r\n";
 		echo "<tr><td>";
 		echo __('New Post email (must not be empty)', 'subscribe2') . ":";
 		echo "<br />\r\n";
-		echo "<textarea rows=\"9\" cols=\"60\" name=\"mailtext\">" . stripslashes($this->subscribe2_options['mailtext']) . "</textarea><p>\r\n";
+		echo "<textarea rows=\"9\" cols=\"60\" name=\"mailtext\">" . stripslashes($this->subscribe2_options['mailtext']) . "</textarea><br /><br />\r\n";
 		echo "</td><td valign=\"top\" rowspan=\"3\">";
 		echo "<h3>" . __('Message substitions', 'subscribe2') . "</h3>\r\n";
 		echo "<dl>";
@@ -1396,38 +1396,38 @@ class subscribe2 {
 		echo "<dt><b>ACTION</b></dt><dd>" . __("Action performed by LINK in confirmation email<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "</dl></td></tr><tr><td>";
 		echo __('Subscribe / Unsubscribe confirmation email', 'subscribe2') . ":<br />\r\n";
-		echo "<textarea rows=\"9\" cols=\"60\" name=\"confirm_email\">" . stripslashes($this->subscribe2_options['confirm_email']) . "</textarea><p>";
-		echo "</td></tr><tr><td>";
+		echo "<textarea rows=\"9\" cols=\"60\" name=\"confirm_email\">" . stripslashes($this->subscribe2_options['confirm_email']) . "</textarea><br /><br />\r\n";
+		echo "</td></tr><tr valign=\"top\"><td>";
 		echo __('Reminder email to Unconfirmed Subscribers', 'subscribe2') . ":<br />\r\n";
-		echo "<textarea rows=\"9\" cols=\"60\" name=\"remind_email\">" . stripslashes($this->subscribe2_options['remind_email']) . "</textarea><p>";
-		echo "</td></tr></table>\r\n";
+		echo "<textarea rows=\"9\" cols=\"60\" name=\"remind_email\">" . stripslashes($this->subscribe2_options['remind_email']) . "</textarea><br /><br />\r\n";
+		echo "</td></tr></table><br />\r\n";
 
 		// excluded categories
 		echo "<h2>" . __('Excluded Categories', 'subscribe2') . "</h2>\r\n";
 		$this->display_category_form(explode(',', $this->get_excluded_cats()));
-		echo "<p align=\"center\"><input type=\"checkbox\" name=\"reg_override\" value=\"1\"";
+		echo "<center><input type=\"checkbox\" name=\"reg_override\" value=\"1\"";
 		if ('1' == $this->subscribe2_options['reg_override']) {
-			echo "checked=\"checked\"";
+			echo " checked=\"checked\"";
 		}
-		echo "/> " . __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</p>";
+		echo " /> " . __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</center><br />\r\n";
 		echo "<h2>" . __('Writing Options', 'subscribe2') . "</h2>\r\n";
-		echo "<p align=\"center\"><input type=\"checkbox\" name=\"show_button\" value=\"1\"";
+		echo "<input type=\"checkbox\" name=\"show_button\" value=\"1\"";
 		if ('1' == $this->subscribe2_options['show_button']) {
-			echo "checked=\"checked\"";
+			echo " checked=\"checked\"";
 		}
-		echo "/> " . __('Show the Subscribe2 button on the Write toolbar?', 'subscribe2') . "</p>";
+		echo " /> " . __('Show the Subscribe2 button on the Write toolbar?', 'subscribe2') . "<br /><br />\r\n";
 		
 		//Auto Subscription for new registrations
 		echo "<h2>" . __('Auto Subscribe', 'subscribe2') . "</h2>\r\n";
 		echo __('Automatically subscribe new users registering with your blog.', 'subscribe2') . "<br />\r\n";
-		echo "<input type=\"radio\" name=\"autosub\" value=\"yes\" ";
+		echo "<input type=\"radio\" name=\"autosub\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['autosub']) {
-			echo "checked=\"checked\" ";
+			echo " checked=\"checked\"";
 		}
 		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"autosub\" value=\"no\" ";
+		echo "<input type=\"radio\" name=\"autosub\" value=\"no\"";
 		if ('no' == $this->subscribe2_options['autosub']) {
-			echo "checked=\"checked\" ";
+			echo " checked=\"checked\"";
 		}
 		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
 		echo __('Auto-subscribe users to receive email as', 'subscribe2') . ": <br />\r\n";
@@ -1445,7 +1445,7 @@ class subscribe2 {
 			if ('text' == $this->subscribe2_options['autoformat']) {
 				echo "checked=\"checked\" ";
 			}
-			echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . " &nbsp;&nbsp;";
+			echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . " <br /><br />";
 		
 		//barred domains
 		echo "<h2>" . __('Barred Domains', 'subscribe2') . "</h2>\r\n";
