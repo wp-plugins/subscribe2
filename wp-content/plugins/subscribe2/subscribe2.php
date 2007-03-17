@@ -9,7 +9,7 @@ Author URI: http://subscribe2.wordpress.com
 */
 
 /*
-Copyright (C) 2006 Matthew Robinson
+Copyright (C) 2006-7 Matthew Robinson
 Based on the Original Subscribe2 plugin by 
 Copyright (C) 2005 Scott Merrill (skippy@skippy.net)
 
@@ -31,15 +31,16 @@ http://www.gnu.org/licenses/gpl.html
 
 // If you are on a host that limits the numner of recipients
 // permitted on each outgoing email message
-// change this value to your hosts limit
+// change the value on the line below to your hosts limit
 define('BCCLIMIT', '0');
 
 // by default, subscribe2 grabs the first page from your database for use
 // when displaying the confirmation screen to public subscribers.
-// You can override this by specifying a page ID below.
+// You can override this by specifying a page ID on the line below.
 define('S2PAGE', '0');
 
-// our version number. Don't touch.
+// our version number. Don't touch this or any line below
+// unless you know exacly what you are doing
 define('S2VERSION', '2.3.1');
 
 // Add the Subscribe code into the WP API
@@ -1326,8 +1327,16 @@ class subscribe2 {
 				wp_clear_scheduled_hook('s2_digest_cron');
 				$scheds = (array) wp_get_schedules();
 				$interval = ( isset($scheds[$email_freq]['interval']) ) ? (int) $scheds[$email_freq]['interval'] : 0;
-				if ( !wp_next_scheduled('s2_digest_cron') && ($interval !== 0) ) {
-					wp_schedule_event(time() + $interval, $email_freq, 's2_digest_cron');
+				if ($interval == 0) {
+					// if we are on per-post emails remove last_cron entry
+					unset($this->subscribe2_options['last_s2cron']);
+				} else {
+					if (!wp_next_scheduled('s2_digest_cron')) {
+						// if we are using digest schedule the event and prime last_cron as now
+						wp_schedule_event(time() + $interval, $email_freq, 's2_digest_cron');
+						$now = date('Y-m-d H:i:s', time());
+						$this->subscribe2_options['last_s2cron'] = $now;
+					}
 				}
 
 				// email templates
@@ -1877,10 +1886,10 @@ class subscribe2 {
 
 		global $wpdb;
 
-		if ( (defined('S2PAGE')) && (0 !== S2PAGE) ) {
+		if ( (defined('S2PAGE')) && (0 != S2PAGE) ) {
 			return "page_id=" . S2PAGE;
 		} else {
-			$id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_status='static' LIMIT 1");
+			$id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_type='page' LIMIT 1");
 			if ($id) {
 				return "page_id=$id";
 			} else {
@@ -1915,15 +1924,16 @@ class subscribe2 {
 		global $wpdb;
 
 		// collect posts
-		$scheds = (array) wp_get_schedules();
-		$email_freq = $this->subscribe2_options['email_freq'];
-		$interval = ( isset($scheds[$email_freq]['interval']) ) ? (int) $scheds[$email_freq]['interval'] : 0;
 		$now = date('Y-m-d H:i:s', time());
-		$prev = date('Y-m-d H:i:s', time() - $interval);
-		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content FROM $wpdb->posts WHERE post_date > '$prev' AND post_date < '$now' AND post_status='publish' AND post_type='post'");
+		$prev = $this->subscribe2_options['last_s2cron'];
+		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status='publish' AND post_type='post'");
 
+		// update last_s2cron execution time before completing or bailing
+		$this->subscribe2_options['last_s2cron'] = $now;
+		update_option('subscribe2_options', $this->subscribe2_options);
+	
 		// do we have any posts?
-		if (!$posts) { return; }
+		if (empty($posts)) { return; }
 
 		// if we have posts, let's prepare the digest
 		foreach ($posts as $post) {
@@ -1965,7 +1975,6 @@ class subscribe2 {
 		}
 
 		$author = get_userdata($post->post_author);
-		$this->authorname = $author->display_name;
 		
 		// do we send as admin, or post author?
 		if ('author' == $this->subscribe2_options['sender']) {
@@ -1977,8 +1986,11 @@ class subscribe2 {
 		}
 		$this->myemail = $user->user_email;
 		$this->myname = $user->display_name;
-		
-		$subject = '[' . stripslashes(get_settings('blogname')) . '] ' . __('Daily Digest', 'subscribe2') . ' ' . $yesterday;
+
+		$scheds = (array) wp_get_schedules();
+		$email_freq = $this->subscribe2_options['email_freq'];
+		$display = $scheds[$email_freq]['display'];
+		$subject = '[' . stripslashes(get_settings('blogname')) . '] ' . $display . ' ' . __('Digest Email', 'subscribe2');
 		$public = $this->get_public();
 		$registered = $this->get_registered();
 		$recipients = array_merge((array)$public, (array)$registered);
@@ -2029,7 +2041,7 @@ class subscribe2 {
 			add_action('edit_post', array(&$this, 'edit'));
 			add_action('private_to_published', array(&$this, 'private2publish'));
 		}
-		
+
 		// load our strings
 		$this->load_strings();
 	} // end subscribe2()
