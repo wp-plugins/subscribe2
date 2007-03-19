@@ -1675,17 +1675,19 @@ class subscribe2 {
 		global $wpdb;
 
 		$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
+		$exclude = explode(',', $this->get_excluded_cats());
 
 		if (0 == $override) {
 			// registered users are not allowed to subscribe to
 			// excluded categories
-			foreach (explode(',', $this->get_excluded_cats()) as $cat) {
-				$category = get_category($cat);
-				$excluded[$cat] = $category->cat_name;
+			foreach ($all_cats as $cat) {
+				if (in_array($cat->cat_ID, $exclude)) {
+					$cat = (int)$cat;
+					unset($all_cats[$cat]);
+				}
 			}
-			$all_cats = array_diff($all_cats, $excluded);
 		}
-
+		
 		$half = (count($all_cats) / 2);
 		$i = 0;
 		$j = 0;
@@ -1878,7 +1880,7 @@ class subscribe2 {
 	/**
 	Overrides the default query when handling a (un)subscription confirmation
 	This is basically a trick: if the s2 variable is in the query string, just grab the first static page
-	and override it's contents later with title_filter() and template_filter()
+	and override it's contents later with title_filter()
 	*/
 	function query_filter() {
 		// don't interfere if we've already done our thing
@@ -1906,15 +1908,6 @@ class subscribe2 {
 		if (1 == $this->filtered) { return; }
 		return __('Subscription Confirmation', 'subscribe2');
 	} // end title_filter()
-
-	/**
-	Override the template filter to make sure a special template is not used
-	*/
-	function template_filter() {
-		// don't interfere if we've already done our thing
-		if (1 == $this->filtered) { return; }
-		return;
-	} // end template_filter()
 
 /* ===== wp-cron functions ===== */
 	/**
