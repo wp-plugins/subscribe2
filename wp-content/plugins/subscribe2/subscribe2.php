@@ -384,7 +384,7 @@ class subscribe2 {
 		$check = false;
 		// is the current post assigned to any categories
 		// which should not generate a notification email?
-		foreach (explode(',', $this->get_excluded_cats()) as $cat) {
+		foreach (explode(',', $this->subscribe2_options['exclude']) as $cat) {
 			if (in_array($cat, $post_cats)) {
 				$check = true;
 			}
@@ -569,19 +569,6 @@ class subscribe2 {
 	} // end send_confirm()
 
 /* ===== Category functions ===== */
-	/**
-	Returns a comma-separated list of category IDs which should not generate notifications
-	*/
-	function get_excluded_cats() {
-		if ('' != $this->excluded_cats) {
-			return $this->excluded_cats;
-		} else {
-			global $wpdb;
-			$this->excluded_cats = $this->subscribe2_options['exclude'];
-			return $this->excluded_cats;
-		}
-	} // end get_excluded_cats()
-
 	/**
 	Return either a comma-separated list of all the category IDs in the blog or an array of cat_ID => cat_name
 	*/
@@ -1413,7 +1400,7 @@ class subscribe2 {
 
 		// excluded categories
 		echo "<h2>" . __('Excluded Categories', 'subscribe2') . "</h2>\r\n";
-		$this->display_category_form(explode(',', $this->get_excluded_cats()));
+		$this->display_category_form(explode(',', $this->subscribe2_options['exclude']));
 		echo "<center><input type=\"checkbox\" name=\"reg_override\" value=\"1\"";
 		if ('1' == $this->subscribe2_options['reg_override']) {
 			echo " checked=\"checked\"";
@@ -1675,7 +1662,7 @@ class subscribe2 {
 		global $wpdb;
 
 		$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
-		$exclude = explode(',', $this->get_excluded_cats());
+		$exclude = explode(',', $this->subscribe2_options['exclude']);
 
 		if (0 == $override) {
 			// registered users are not allowed to subscribe to
@@ -1935,7 +1922,7 @@ class subscribe2 {
 			$check = false;
 			// is the current post assigned to any categories
 			// which should not generate a notification email?
-			foreach (explode(',', $this->get_excluded_cats()) as $cat) {
+			foreach (explode(',', $this->subscribe2_options['exclude']) as $cat) {
 				if (in_array($cat, $post_cats)) {
 					$check = true;
 				}
