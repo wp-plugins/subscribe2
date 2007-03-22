@@ -941,8 +941,8 @@ class subscribe2 {
 			if (empty($check)) {
 				if ('yes' == $this->subscribe2_options['autosub']) {
 					// don't add entires by default if autosub is off, messes up daily digests
-					update_usermeta($user_id, 's2_subscribed', $this->get_all_categories());
-						foreach(explode(',', $this->get_all_categories()) as $cat) {
+					update_usermeta($user_id, 's2_subscribed', $cats);
+						foreach(explode(',', $cats) as $cat) {
 							update_usermeta($user_id, 's2_cat' . $cat, "$cat");
 						}
 					if ('html' == $this->subscribe2_options['autoformat']) {
