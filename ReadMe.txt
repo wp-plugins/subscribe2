@@ -4,7 +4,7 @@ Contributors: MattyRob, Skippy
 Donate link: http://subscribe2.wordpress.com/donate/
 Requires at least: 2.0.x
 Tested up to: 2.1.x
-Stable tag: 2.2.14 for 2.0.x and 2.3.0 for 2.1.x
+Stable tag: 2.2.15 for 2.0.x and 2.3.1 for 2.1.x
 
 Sends a list of subscribers an email when new posts are published to your blog
 
