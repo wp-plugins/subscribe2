@@ -3,13 +3,13 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.2.15
+Version: 2.2.16
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
 
 /*
-Copyright (C) 2006 Matthew Robinson
+Copyright (C) 2006-7 Matthew Robinson
 Based on the Original Subscribe2 plugin by 
 Copyright (C) 2005 Scott Merrill (skippy@skippy.net)
 
@@ -31,12 +31,12 @@ http://www.gnu.org/licenses/gpl.html
 
 // If you are on a host that limits the number of recipients
 // permitted on each outgoing email message
-// change the value in the line below to your hosts limit
+// change the value on the line below to your hosts limit
 define('BCCLIMIT', '0');
 
 // by default, subscribe2 grabs the first page from your database for use
 // when displaying the confirmation screen to public subscribers.
-// You can override this by specifying a page ID in the line below.
+// You can override this by specifying a page ID on the line below.
 define('S2PAGE', '0');
 
 // change the value below to TRUE if you want a daily digest
@@ -45,21 +45,20 @@ define('S2DIGEST', false);
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '2.2.15');
+define('S2VERSION', '2.2.16');
 
 // Add the Subscribe code into the WP API
 add_action('init', 's2init');
 
 // maybe add our button
-$s2_options = array();
-$s2_options = get_option('subscribe2_options');
-if ('1' == $s2_options['show_button']) {
+$subscribe2_options = array();
+$subscribe2_options = get_option('subscribe2_options');
+if ('1' == $subscribe2_options['show_button']) {
 	// use Owen's excellent ButtonSnap library
 	include(ABSPATH . '/wp-content/plugins/buttonsnap.php');
 	add_action('init', 's2_button_init');
 	add_action('marker_css', 'subscribe2_css');
 }
-unset($s2_options);
 
 function s2init() {
 	global $subscribe2;
@@ -229,7 +228,7 @@ class subscribe2 {
 		}
 		$this->subscribe2_options['version'] = S2VERSION;
 		//double check that the options are in the database
-		require_once(ABSPATH . "/wp-content/plugins/subscribe2/include.php");
+		require(ABSPATH . "/wp-content/plugins/subscribe2/include.php");
 		update_option('subscribe2_options', $this->subscribe2_options);
 	} // end upgrade()
 
@@ -960,7 +959,9 @@ class subscribe2 {
 						update_usermeta($user_id, 's2_format', 'text');
 						update_usermeta($user_id, 's2_excerpt', 'excerpt');
 					}
-				} 
+				}  else {
+					update_usermeta($user_id, 's2_subscribed', '');
+				}
 			}
 		}
 		return $user_id;
@@ -1815,8 +1816,8 @@ class subscribe2 {
 
 	/**
 	Overrides the default query when handling a (un)subscription confirmation
-	This is basically a trick: if the s2 variable is in the query string grab the
-	S2PAGE or the first static page and override it's contents later with title_filter()
+	This is basically a trick: if the s2 variable is in the query string, just grab the first static page
+	and override it's contents later with title_filter()
 	*/
 	function query_filter() {
 		// don't interfere if we've already done our thing
@@ -1983,17 +1984,16 @@ class subscribe2 {
 	Subscribe2 constructor
 	*/
 	function subscribe2() {
-		global $table_prefix;
+		global $table_prefix, $subscribe2_options;
 
 		load_plugin_textdomain('subscribe2', 'wp-content/plugins/subscribe2');
 
 		// load the options
-		$this->subscribe2_options = array();
-		$this->subscribe2_options = get_option('subscribe2_options');
+		$this->subscribe2_options = $subscribe2_options;
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
-		if(mysql_query("SELECT COUNT(*) FROM ".$this->public)==FALSE) {	$this->install(); }
+		if(mysql_query("SELECT COUNT(*) FROM ".$this->public)==FALSE) {	 $this->install(); }
 		//do we need to upgrade anything?
 		if ($this->subscribe2_options['version'] !== S2VERSION) {
 			$this->upgrade();
