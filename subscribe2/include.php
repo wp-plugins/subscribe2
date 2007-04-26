@@ -32,7 +32,7 @@ if (!isset($this->subscribe2_options['barred'])) {
 } // option containing domains barred from public registration
 
 if (!isset($this->subscribe2_options['mailtext'])) {
-	$this->subscribe2_options['mailtext'] = "BLOGNAME has posted a new item, 'TITLE'\r\nPOST\r\nYou may view the latest post at\r\nPERMALINK\r\nYou received this e-mail because you asked to be notified when new updates are posted.\r\nBest regards,\r\nMYNAME\r\nEMAIL";
+	$this->subscribe2_options['mailtext'] = "BLOGNAME has posted a new item, 'TITLE'\n\nPOST\n\nYou may view the latest post at\nPERMALINK\n\nYou received this e-mail because you asked to be notified when new updates are posted.\nBest regards,\nMYNAME\nEMAIL";
 } // Default notification email text
 
 if (!isset($this->subscribe2_options['confirm_email'])) {

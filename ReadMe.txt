@@ -3,8 +3,8 @@ Tags: posts, subscription, email
 Contributors: MattyRob, Skippy
 Donate link: http://subscribe2.wordpress.com/donate/
 Requires at least: 2.0.x
-Tested up to: 2.1.x
-Stable tag: 2.2.16 for 2.0.x and 2.3.2 for 2.1.x
+Tested up to: 2.0.10
+Stable tag: 2.2.17
 
 Sends a list of subscribers an email when new posts are published to your blog
 
@@ -41,7 +41,9 @@ This token will automatically be replaced by the subscription form, and will dis
 == Frequently Asked Questions ==
 
 = Is there a version for WordPress 2.1.x? =
-Yes, there is. Visit http://subscribe2.wordpress.com for information. The version of subscribe2 here is for WordPress 2.0.x only and will remain like this until 2.0.x is no longer supported. WordPress 2.1.x will soon be replaced by 2.2.x!
+Yes, there is. Visit http://subscribe2.wordpress.com for information. The version of Subscribe2 here is for WordPress 2.0.x only and will remain like this until 2.0.x is no longer supported. WordPress 2.1.x will soon be replaced by 2.2.x!
+
+The current stable version for WordPress 2.1.x is Subscribe2 3.2. It is available at http://subscribe2.wordpress.com
 
 = How do I upgrade from a previous version? =
 If you are upgrading from any 2.1.x version of subscribe2, please delete both the /subscribe.php and /wp-content/plugins/subscribe2.php files before copying the new files into place.  Your subscriber list will remain intact, and your options should be preserved. Now create a WordPress Page as described above.
@@ -63,7 +65,16 @@ There are no screenshots of Subscribe2, the appearence will rely upon your theme
 
 == Version History ==
 
-Version 2.3.2 by Matthew Robinson
+Current Server time displayed for Cron tasks
+Fixed bug so Registered users now identified correctly
+Upgrade action added to WordPress hook to prevent calls to undefined functions 
+
+Version 2.3.3 by Matthew Robinson
+
+* QuickTag button added! Works with Visual and Standard Editor. __Look in Code for token addition if using RTE.__
+* Current Server time displayed for Cron tasks
+* Fixed bug so Registered users now identified correctly
+* Upgrade function called via WordPress hook to prevent calls to undefined functions 
 
 * Fixed a bug affecting Registered Users not appearing in the drop down list
 * Improved handling of the Subscribe2 option array
@@ -78,6 +89,12 @@ Version 2.3.1 by Matthew Robinson
 Version 2.3.0 by Matthew Robinson
 
 * Updated for WordPress 2.1 Branch
+
+Version 2.2.17 by Matthew Robinson
+
+* Current Server time displayed for Cron tasks
+* Fixed bug so Registered users now identified correctly
+* Upgrade function called via WordPress hook to prevent calls to undefined functions 
 
 Version 2.2.16 by Matthew Robinson
 
@@ -121,10 +138,10 @@ Version 2.2.8 by Matthew Robinson
 
 * Fixed missing line return in email headers that was causing failed emails
 * Added user feedback messages to profile area
-* Added ‘Authorname’ to the list of message substitutions in email messages
+* Added 'Authorname' to the list of message substitutions in email messages
 * Fixed name and email substitution in Digest Mails
 * Fixed stripslashes issue in email subjects
-* Added new ‘Action’ token for confirmation emails
+* Added new 'Action' token for confirmation emails
 
 Version 2.2.7 by Matthew Robinson
 

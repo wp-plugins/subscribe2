@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.2.16
+Version: 2.2.17
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -34,7 +34,7 @@ http://www.gnu.org/licenses/gpl.html
 // change the value on the line below to your hosts limit
 define('BCCLIMIT', '0');
 
-// by default, subscribe2 grabs the first page from your database for use
+// by default, Subscribe2 grabs the first page from your database for use
 // when displaying the confirmation screen to public subscribers.
 // You can override this by specifying a page ID on the line below.
 define('S2PAGE', '0');
@@ -45,54 +45,13 @@ define('S2DIGEST', false);
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '2.2.16');
+define('S2VERSION', '2.2.17');
 
-// Add the Subscribe code into the WP API
-add_action('init', 's2init');
+// use Owen's excellent ButtonSnap library
+require(ABSPATH . '/wp-content/plugins/buttonsnap.php');
 
-// maybe add our button
-$subscribe2_options = array();
-$subscribe2_options = get_option('subscribe2_options');
-if ('1' == $subscribe2_options['show_button']) {
-	// use Owen's excellent ButtonSnap library
-	include(ABSPATH . '/wp-content/plugins/buttonsnap.php');
-	add_action('init', 's2_button_init');
-	add_action('marker_css', 'subscribe2_css');
-}
-
-function s2init() {
-	global $subscribe2;
-	$mysubscribe2 = new subscribe2();
-	$mysubscribe2->subscribe2();
-}
-
-/* ===== ButtonSnap configuration ===== */
-/**
-Register our button in the QuickTags bar
-*/
-function s2_button_init() {
-	$url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_button.png';
-	buttonsnap_textbutton($url, 'Subscribe2', '<!--subscribe2-->');
-	buttonsnap_register_marker('subscribe2', 's2_marker');
-}
-
-/**
-	Style a marker in the Rich Text Editor for our tag
-	By default, the RTE suppresses output of HTML comments, so this places a CSS style on our token in order to make it display
-*/
-function subscribe2_css() {
-	$marker_url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_marker.png';
-	echo "
-		.s2_marker {
-			display: block;
-			height: 45px;
-			margin-top: 5px;
-			background-image: url({$marker_url});
-			background-repeat: no-repeat;
-			background-position: center;
-		}
-	";
-}
+$mysubscribe2 = new subscribe2();
+$mysubscribe2->s2init();
 
 // start our class
 class subscribe2 {
@@ -272,8 +231,8 @@ class subscribe2 {
 			$this->myname = $admin->display_name;
 			$this->myemail = $admin->user_email;
 		}
-		$headers = "From: $this->myname <$this->myemail>\n";
-		$headers .= "Return-Path: <$this->myemail>\n";
+		$headers = "From: " . $this->myname . " <" . $this->myemail . ">\n";
+		$headers .= "Return-Path: <" . $this->myemail . ">\n";
 		$headers .= "X-Mailer:PHP" . phpversion() . "\n";
 		$headers .= "Precedence: list\nList-Id: " . get_settings('blogname') . "\n";
 
@@ -475,8 +434,8 @@ class subscribe2 {
 								$excerpt = implode(' ', $words);
 						}
 			}
-
 		}
+
 		// first we send plaintext summary emails
 		$body = str_replace('POST', $excerpt, $mailtext);
 		$registered = $this->get_registered("cats=$post_cats_string&format=text&amount=excerpt");
@@ -960,7 +919,7 @@ class subscribe2 {
 						update_usermeta($user_id, 's2_excerpt', 'excerpt');
 					}
 				}  else {
-					update_usermeta($user_id, 's2_subscribed', '');
+					update_usermeta($user_id, 's2_subscribed', '-1');
 				}
 			}
 		}
@@ -996,8 +955,8 @@ class subscribe2 {
 					update_usermeta($user_ID, 's2_cat' . $id, "$id");
 				}
 			}
-		$newcats = array_merge($cats, $old_cats);
-		update_usermeta($user_ID, 's2_subscribed', implode(',', $newcats));
+			$newcats = array_merge($cats, $old_cats);
+			update_usermeta($user_ID, 's2_subscribed', implode(',', $newcats));
 		}
 	} // end subscribe_registered_users
 
@@ -1035,7 +994,7 @@ class subscribe2 {
 				foreach ($cats as $id) {
 					delete_usermeta($user_ID, 's2_cat' . $id, "$id");
 				}
-				update_usermeta($user_ID, 's2_subscribed', '');
+				update_usermeta($user_ID, 's2_subscribed', '-1');
 			}
 		}
 	} // end unsubscribe_registered_users
@@ -1486,7 +1445,7 @@ class subscribe2 {
 						delete_usermeta($user_ID, "s2_cat" . $cat);
 					}
 				}
-				delete_usermeta($user_ID, 's2_subscribed');
+				update_usermeta($user_ID, 's2_subscribed', '-1');
 			} else {
 				 if (!is_array($cats)) {
 				 	$cats = array($_POST['category']);
@@ -1932,7 +1891,7 @@ class subscribe2 {
 
 		$author = get_userdata($post->post_author);
 		$this->authorname = $author->display_name;
-		
+
 		// do we send as admin, or post author?
 		if ('author' == $this->subscribe2_options['sender']) {
 			// get author details
@@ -1983,20 +1942,28 @@ class subscribe2 {
 	/**
 	Subscribe2 constructor
 	*/
-	function subscribe2() {
-		global $table_prefix, $subscribe2_options;
-
+	function s2init() {
 		load_plugin_textdomain('subscribe2', 'wp-content/plugins/subscribe2');
 
 		// load the options
-		$this->subscribe2_options = $subscribe2_options;
+		$this->subscribe2_options = array();
+		$this->subscribe2_options = get_option('subscribe2_options');
+
+		add_action('init', array(&$this, 'subscribe2'));
+		if('1' == $this->subscribe2_options['show_button']) {
+			add_action('init', array(&$this, 'button_init'));
+		}
+	}
+
+	function subscribe2() {
+		global $table_prefix;
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
 		if(mysql_query("SELECT COUNT(*) FROM ".$this->public)==FALSE) {	 $this->install(); }
 		//do we need to upgrade anything?
 		if ($this->subscribe2_options['version'] !== S2VERSION) {
-			$this->upgrade();
+			add_action('shutdown', array(&$this, 'upgrade'));
 		}
 
 		if (isset($_GET['s2'])) {
@@ -2023,6 +1990,34 @@ class subscribe2 {
 		// load our strings
 		$this->load_strings();
 	} // end subscribe2()
+	
+	/* ===== ButtonSnap configuration ===== */
+	/**
+	Register our button in the QuickTags bar
+	*/
+	function button_init() {
+		$url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_button.png';
+		buttonsnap_textbutton($url, 'Subscribe2', '<!--subscribe2-->');
+		buttonsnap_register_marker('subscribe2', 's2_marker');
+	}
+
+	/**
+		Style a marker in the Rich Text Editor for our tag
+		By default, the RTE suppresses output of HTML comments, so this places a CSS style on our token 	in order to make it display
+	*/
+	function subscribe2_css() {
+		$marker_url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_marker.png';
+		echo "
+			.s2_marker {
+				display: block;
+				height: 45px;
+				margin-top: 5px;
+				background-image: url({$marker_url});
+				background-repeat: no-repeat;
+				background-position: center;
+			}
+		";
+	}
 
 /* ===== our variables ===== */
 	// cache variables
