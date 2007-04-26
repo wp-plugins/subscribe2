@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.3.2 for WP2.1
+Version: 2.3.3 for WP2.1
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -41,54 +41,13 @@ define('S2PAGE', '0');
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '2.3.2');
+define('S2VERSION', '2.3.3');
 
-// Add the Subscribe code into the WP API
-add_action('init', 's2init');
+// use Owen's excellent ButtonSnap library
+require(ABSPATH . '/wp-content/plugins/buttonsnap.php');
 
-// maybe add our button
-$subscribe2_options = array();
-$subscribe2_options = get_option('subscribe2_options');
-if ('1' == $subscribe2_options['show_button']) {
-	// use Owen's excellent ButtonSnap library
-	include(ABSPATH . '/wp-content/plugins/buttonsnap.php');
-	add_action('init', 's2_button_init');
-	add_action('marker_css', 'subscribe2_css');
-}
-
-function s2init() {
-	global $subscribe2;
-	$mysubscribe2 = new subscribe2();
-	$mysubscribe2->subscribe2();
-}
-
-/* ===== ButtonSnap configuration ===== */
-/**
-Register our button in the QuickTags bar
-*/
-function s2_button_init() {
-	$url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_button.png';
-	buttonsnap_textbutton($url, 'Subscribe2', '<!--subscribe2-->');
-	buttonsnap_register_marker('subscribe2', 's2_marker');
-}
-
-/**
-	Style a marker in the Rich Text Editor for our tag
-	By default, the RTE suppresses output of HTML comments, so this places a CSS style on our token in order to make it display
-*/
-function subscribe2_css() {
-	$marker_url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_marker.png';
-	echo "
-		.s2_marker {
-			display: block;
-			height: 45px;
-			margin-top: 5px;
-			background-image: url({$marker_url});
-			background-repeat: no-repeat;
-			background-position: center;
-		}
-	";
-}
+$mysubscribe2 = new subscribe2();
+$mysubscribe2->s2init();
 
 // start our class
 class subscribe2 {
@@ -279,8 +238,8 @@ class subscribe2 {
 			$this->myname = $admin->display_name;
 			$this->myemail = $admin->user_email;
 		}
-		$headers = "From: $this->myname <$this->myemail>\n";
-		$headers .= "Return-Path: <$this->myemail>\n";
+		$headers = "From: " . $this->myname . " <" . $this->myemail . ">\n";
+		$headers .= "Return-Path: <" . $this->myemail . ">\n";
 		$headers .= "X-Mailer:PHP" . phpversion() . "\n";
 		$headers .= "Precedence: list\nList-Id: " . get_settings('blogname') . "\n";
 
@@ -466,8 +425,8 @@ class subscribe2 {
 								$excerpt = implode(' ', $words);
 						}
 			}
-
 		}
+
 		// first we send plaintext summary emails
 		$body = str_replace('POST', $excerpt, $mailtext);
 		$registered = $this->get_registered("cats=$post_cats_string&format=text&amount=excerpt");
@@ -955,7 +914,7 @@ class subscribe2 {
 						update_usermeta($user_id, 's2_excerpt', 'excerpt');
 					}
 				}  else {
-					update_usermeta($user_id, 's2_subscribed', '');
+					update_usermeta($user_id, 's2_subscribed', '-1');
 				}
 			}
 		}
@@ -974,9 +933,8 @@ class subscribe2 {
 
 		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ('$useremails')";
 		$user_IDs = $wpdb->get_col($sql);
-		$cats = $_POST['category'];
 		if (!is_array($cats)) {
-		 	$cats = array($_POST['category']);
+		 	$cats = array($cats);
 		}
 		
 		foreach ($user_IDs as $user_ID) {	
@@ -991,8 +949,8 @@ class subscribe2 {
 					update_usermeta($user_ID, 's2_cat' . $id, "$id");
 				}
 			}
-		$newcats = array_merge($cats, $old_cats);
-		update_usermeta($user_ID, 's2_subscribed', implode(',', $newcats));
+			$newcats = array_merge($cats, $old_cats);
+			update_usermeta($user_ID, 's2_subscribed', implode(',', $newcats));
 		}
 	} // end subscribe_registered_users
 
@@ -1008,9 +966,8 @@ class subscribe2 {
 
 		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ('$useremails')";
 		$user_IDs = $wpdb->get_col($sql);
-		$cats = $_POST['category'];
 		if (!is_array($cats)) {
-		 	$cats = array($_POST['category']);
+		 	$cats = array($cats);
 		}
 		
 		foreach ($user_IDs as $user_ID) {	
@@ -1030,7 +987,7 @@ class subscribe2 {
 				foreach ($cats as $id) {
 					delete_usermeta($user_ID, 's2_cat' . $id, "$id");
 				}
-				update_usermeta($user_ID, 's2_subscribed', '');
+				update_usermeta($user_ID, 's2_subscribed', '-1');
 			}
 		}
 	} // end unsubscribe_registered_users
@@ -1504,7 +1461,7 @@ class subscribe2 {
 						delete_usermeta($user_ID, "s2_cat" . $cat);
 					}
 				}
-				delete_usermeta($user_ID, 's2_subscribed');
+				update_usermeta($user_ID, 's2_subscribed', '-1');
 			} else {
 				 if (!is_array($cats)) {
 				 	$cats = array($_POST['category']);
@@ -1794,6 +1751,9 @@ class subscribe2 {
 		}
 		if (wp_next_scheduled('s2_digest_cron')) {
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
+			$now = time();
+			echo "<p>" . __('Current server time is', 'subscribe2') . ": \r\n";
+			echo "<strong>" . gmdate($datetime, $now+ (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
 			echo "<p>" . __('Next email notification will be sent', 'subscribe2') . ": \r\n";
 			echo "<strong>" . gmdate($datetime, wp_next_scheduled('s2_digest_cron') + (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
 		}
@@ -1867,8 +1827,8 @@ class subscribe2 {
 
 	/**
 	Overrides the default query when handling a (un)subscription confirmation
-	This is basically a trick: if the s2 variable is in the query string, just grab the first static page
-	and override it's contents later with title_filter()
+	This is basically a trick: if the s2 variable is in the query string, just grab the first
+	static page and override it's contents later with title_filter()
 	*/
 	function query_filter() {
 		// don't interfere if we've already done our thing
@@ -1957,7 +1917,7 @@ class subscribe2 {
 
 		$author = get_userdata($post->post_author);
 		$this->authorname = $author->display_name;
-		
+
 		// do we send as admin, or post author?
 		if ('author' == $this->subscribe2_options['sender']) {
 			// get author details
@@ -1985,20 +1945,28 @@ class subscribe2 {
 	/**
 	Subscribe2 constructor
 	*/
-	function subscribe2() {
-		global $table_prefix, $subscribe2_options;
-
+	function s2init() {
 		load_plugin_textdomain('subscribe2', 'wp-content/plugins/subscribe2');
 
 		// load the options
-		$this->subscribe2_options = $subscribe2_options;
+		$this->subscribe2_options = array();
+		$this->subscribe2_options = get_option('subscribe2_options');
+		
+		add_action('init', array(&$this, 'subscribe2'));
+		if('1' == $this->subscribe2_options['show_button']) {
+			add_action('init', array(&$this, 'button_init'));
+		}
+	}
+
+	function subscribe2() {
+		global $table_prefix;
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
 		if(mysql_query("SELECT COUNT(*) FROM ".$this->public)==FALSE) {	 $this->install(); }
 		//do we need to upgrade anything?
 		if ($this->subscribe2_options['version'] !== S2VERSION) {
-			$this->upgrade();
+			add_action('shutdown', array(&$this, 'upgrade'));
 		}
 
 		if (isset($_GET['s2'])) {
@@ -2008,6 +1976,10 @@ class subscribe2 {
 			add_filter('the_content', array(&$this, 'confirm'));
 		}
 
+		if ('1' == $this->subscribe2_options['show_button']) {
+			add_action('edit_page_form', array(&$this, 's2_edit_form'));
+			add_action('edit_form_advanced', array(&$this, 's2_edit_form'));
+		}
 		add_action('admin_head', array(&$this, 'admin_head'));
 		add_action('admin_menu', array(&$this, 'admin_menu'));
 		add_action('user_register', array(&$this, 'register'));
@@ -2026,6 +1998,52 @@ class subscribe2 {
 		// load our strings
 		$this->load_strings();
 	} // end subscribe2()
+	
+	/* ===== ButtonSnap configuration ===== */
+	/**
+	Register our button in the QuickTags bar
+	*/
+	function button_init() {
+		if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) return;
+			if ( 'true' == get_user_option('rich_editing') ) {
+				// Load and append our TinyMCE external plugin
+				add_filter('mce_plugins', array(&$this, 'mce_plugins'));
+				add_filter('mce_buttons', array(&$this, 'mce_buttons'));
+				add_action('tinymce_before_init', array(&$this, 'tinymce_before_init'));
+			} else {
+				buttonsnap_separator();
+				buttonsnap_jsbutton(get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
+			}
+	}
+
+	// Add buttons in WordPress v2.1+, thanks to An-archos
+	function mce_plugins($plugins) {
+		array_push($plugins, '-subscribe2quicktags');
+		return $plugins;
+	}
+
+	function mce_buttons($buttons) {
+		array_push($buttons, 'separator');
+		array_push($buttons, 'subscribe2quicktags');
+		return $buttons;
+	}
+
+	function tinymce_before_init() {
+		$this->fullpath = get_settings('siteurl') . '/wp-content/plugins/subscribe2/tinymce/';
+		echo "tinyMCE.loadPlugin('subscribe2quicktags', '" . $this->fullpath . "');\n"; 
+	}
+
+	function s2_edit_form() { 
+		echo "<!-- Start Subscribe2 Quicktags Javascript -->\r\n";
+		echo "<script type=\"text/javascript\">\r\n";
+		echo "//<![CDATA[\r\n";
+		echo "function s2_insert_token() {
+			buttonsnap_settext('<!--subscribe2-->');
+		}\r\n";
+		echo "//]]>\r\n";
+		echo "</script>\r\n";
+		echo "<!-- End Subscribe2 Quicktags Javascript -->\r\n";
+	}
 
 /* ===== our variables ===== */
 	// cache variables
