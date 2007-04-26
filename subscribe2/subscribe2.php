@@ -50,11 +50,11 @@ define('S2VERSION', '2.2.17');
 // use Owen's excellent ButtonSnap library
 require(ABSPATH . '/wp-content/plugins/buttonsnap.php');
 
-$mysubscribe2 = new subscribe2();
+$mysubscribe2 = new s2class;
 $mysubscribe2->s2init();
 
 // start our class
-class subscribe2 {
+class s2class {
 // variables and constructor are declared at the end
 
 	/**
