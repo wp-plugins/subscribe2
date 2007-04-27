@@ -1960,7 +1960,7 @@ class s2class {
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
-		if(mysql_query("SELECT COUNT(*) FROM ".$this->public)==FALSE) {	 $this->install(); }
+		if(!mysql_query("DESCRIBE " . $this->public)==FALSE) { $this->install(); }
 		//do we need to upgrade anything?
 		if ($this->subscribe2_options['version'] !== S2VERSION) {
 			add_action('shutdown', array(&$this, 'upgrade'));
