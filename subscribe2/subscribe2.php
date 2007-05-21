@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.2.17
+Version: 2.2.18
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -45,7 +45,7 @@ define('S2DIGEST', false);
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '2.2.17');
+define('S2VERSION', '2.2.18');
 
 // use Owen's excellent ButtonSnap library
 require(ABSPATH . '/wp-content/plugins/buttonsnap.php');
@@ -233,6 +233,7 @@ class s2class {
 		}
 		$headers = "From: " . $this->myname . " <" . $this->myemail . ">\n";
 		$headers .= "Return-Path: <" . $this->myemail . ">\n";
+		$headers .= "Reply-To: " . $this->myemail . "\n";
 		$headers .= "X-Mailer:PHP" . phpversion() . "\n";
 		$headers .= "Precedence: list\nList-Id: " . get_settings('blogname') . "\n";
 
@@ -269,7 +270,7 @@ class s2class {
 						('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ",\r\n $recipient";
 						// Headers constructed as per definition at http://www.ietf.org/rfc/rfc2822.txt
 					}
-					if (30 == $count) {
+					if (BCCLIMIT == $count) {
 						$count = 1;
 						$batch[] = $bcc;
 						$bcc = '';
@@ -918,7 +919,7 @@ class s2class {
 						update_usermeta($user_id, 's2_format', 'text');
 						update_usermeta($user_id, 's2_excerpt', 'excerpt');
 					}
-				}  else {
+				} else {
 					update_usermeta($user_id, 's2_subscribed', '-1');
 				}
 			}
@@ -1369,27 +1370,27 @@ class s2class {
 		}
 		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
 		echo __('Auto-subscribe users to receive email as', 'subscribe2') . ": <br />\r\n";
-			echo "<input type=\"radio\" name=\"autoformat\" value=\"html\"";
-			if ('html' == $this->subscribe2_options['autoformat']) {
-				echo "checked=\"checked\" ";
-			}
-			echo "/> " . __('HTML', 'subscribe2') ." &nbsp;&nbsp;";
-			echo "<input type=\"radio\" name=\"autoformat\" value=\"fulltext\" ";
-			if ('fulltext' == $this->subscribe2_options['autoformat']) {
-				echo "checked=\"checked\" ";
-			}
-			echo "/> " . __('Plain Text - Full', 'subscribe2') . " &nbsp;&nbsp;";
-			echo "<input type=\"radio\" name=\"autoformat\" value=\"text\" ";
-			if ('text' == $this->subscribe2_options['autoformat']) {
-				echo "checked=\"checked\" ";
-			}
-			echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . " <br /><br />";
-		
+		echo "<input type=\"radio\" name=\"autoformat\" value=\"html\"";
+		if ('html' == $this->subscribe2_options['autoformat']) {
+			echo "checked=\"checked\" ";
+		}
+		echo "/> " . __('HTML', 'subscribe2') ." &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"autoformat\" value=\"fulltext\" ";
+		if ('fulltext' == $this->subscribe2_options['autoformat']) {
+			echo "checked=\"checked\" ";
+		}
+		echo "/> " . __('Plain Text - Full', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"autoformat\" value=\"text\" ";
+		if ('text' == $this->subscribe2_options['autoformat']) {
+			echo "checked=\"checked\" ";
+		}
+		echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . " <br /><br />";
+
 		//barred domains
 		echo "<h2>" . __('Barred Domains', 'subscribe2') . "</h2>\r\n";
 		echo __('Enter domains to bar from public subscriptions: <br /> (Use a new line for each entry and omit the "@" symbol, for example email.com)', 'subscribe2');
 		echo "<br />\r\n<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"barred\">" . $this->subscribe2_options['barred'] . "</textarea>";
-		
+
 		// submit
 		echo "<p align=\"center\"><span class=\"submit\"><input type=\"submit\" id=\"save\" name=\"submit\" value=\"" . __('Submit', 'subscribe2') . "\" /></span></p>";
 		echo "</form>\r\n";
@@ -1497,7 +1498,7 @@ class s2class {
 				if ($key == get_usermeta($user_ID, 's2_excerpt')) {
 					echo " checked=\"checked\"";
 				}
-				echo " /> $value ";
+				echo " /> " . $value . "&nbsp;&nbsp;";
 			}
 			echo "<p style=\"color: red\">" . __('Note: HTML format will always deliver the full post.', 'subscribe2') . "</p>\r\n";
 			echo __('Automatically subscribe me to newly created categories', 'subscribe2') . ': &nbsp;&nbsp;';
@@ -1505,7 +1506,8 @@ class s2class {
 			if ('yes' == get_usermeta($user_ID, 's2_autosub')) {
 				echo "checked=\"yes\" ";
 			}
-			echo "/> Yes <input type=\"radio\" name=\"new_category\" value=\"no\" ";
+			echo "/> Yes &nbsp;&nbsp;";
+			echo "<input type=\"radio\" name=\"new_category\" value=\"no\" ";
 			if ('no' == get_usermeta($user_ID, 's2_autosub')) {
 				echo "checked=\"yes\" ";
 			}
@@ -1617,11 +1619,11 @@ class s2class {
 		$half = (count($all_cats) / 2);
 		$i = 0;
 		$j = 0;
-		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"5\" class=\"editform\">";
-		echo "<tr valign=\"top\"><td width=\"50%\" align=\"left\">";
+		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"5\" class=\"editform\">\r\n";
+		echo "<tr valign=\"top\"><td width=\"50%\" align=\"left\">\r\n";
 		foreach ($all_cats as $cat_ID => $cat_name) {
 			 if ( ($i >= $half) && (0 == $j) ){
-						echo "</td><td width=\"50%\" align=\"left\">";
+						echo "</td><td width=\"50%\" align=\"left\">\r\n";
 						$j++;
 				}
 				if (0 == $j) {
@@ -1775,8 +1777,8 @@ class s2class {
 
 	/**
 	Overrides the default query when handling a (un)subscription confirmation
-	This is basically a trick: if the s2 variable is in the query string, just grab the first static page
-	and override it's contents later with title_filter()
+	This is basically a trick: if the s2 variable is in the query string, just grab the first
+	static page and override it's contents later with title_filter()
 	*/
 	function query_filter() {
 		// don't interfere if we've already done our thing
@@ -1943,8 +1945,6 @@ class s2class {
 	Subscribe2 constructor
 	*/
 	function s2init() {
-		load_plugin_textdomain('subscribe2', 'wp-content/plugins/subscribe2');
-
 		// load the options
 		$this->subscribe2_options = array();
 		$this->subscribe2_options = get_option('subscribe2_options');
@@ -1958,9 +1958,11 @@ class s2class {
 	function subscribe2() {
 		global $table_prefix;
 
+		load_plugin_textdomain('subscribe2', 'wp-content/plugins/subscribe2');
+
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
-		if(!mysql_query("DESCRIBE " . $this->public)==FALSE) { $this->install(); }
+		if(!mysql_query("DESCRIBE " . $this->public)) { $this->install(); }
 		//do we need to upgrade anything?
 		if ($this->subscribe2_options['version'] !== S2VERSION) {
 			add_action('shutdown', array(&$this, 'upgrade'));

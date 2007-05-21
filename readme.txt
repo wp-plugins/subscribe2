@@ -4,7 +4,7 @@ Contributors: MattyRob, Skippy
 Donate link: http://subscribe2.wordpress.com/donate/
 Requires at least: 2.0.x
 Tested up to: 2.0.10
-Stable tag: 2.2.17
+Stable tag: 2.2.18
 
 Sends a list of subscribers an email when new posts are published to your blog
 
@@ -67,7 +67,16 @@ There are no screenshots of Subscribe2, the appearence will rely upon your theme
 
 Current Server time displayed for Cron tasks
 Fixed bug so Registered users now identified correctly
-Upgrade action added to WordPress hook to prevent calls to undefined functions 
+Upgrade action added to WordPress hook to prevent calls to undefined functions
+
+Version 2.3.4 by Matthew Robinson
+* QuickTag button now displays a Marker! (HUGE thanks to Raven!)
+* Fix for excluded categories in User Menu
+* BCCLIMIT typo corrected in Mail function
+* Call to translation files moved to avoid call to undefined function
+* Options added to send mails for pages and password protected posts
+* Option added to display subscription checkbox in WordPress Register screen
+* Small typo and layout amendments
 
 Version 2.3.3 by Matthew Robinson
 
@@ -89,6 +98,12 @@ Version 2.3.1 by Matthew Robinson
 Version 2.3.0 by Matthew Robinson
 
 * Updated for WordPress 2.1 Branch
+
+Version 2.2.18 by Matthew Robinson
+
+* BCCLIMIT typo corrected in Mail function
+* Call to translation files moved to avoid call to undefined function
+* Small typo and layout amendments
 
 Version 2.2.17 by Matthew Robinson
 
