@@ -1,7 +1,7 @@
 === Subscribe2 ===
-Tags: posts, subscription, email
 Contributors: MattyRob, Skippy, Ravan
 Donate link: http://subscribe2.wordpress.com/donate/
+Tags: posts, subscription, email
 Requires at least: 2.0.x
 Tested up to: 2.0.10
 Stable tag: 2.2.18
