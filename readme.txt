@@ -49,6 +49,8 @@ The current stable version for WordPress 2.1.x is Subscribe2 3.2. It is availabl
 If you are upgrading from any 2.1.x version of subscribe2, please delete both the /subscribe.php and /wp-content/plugins/subscribe2.php files before copying the new files into place.  Your subscriber list will remain intact, and your options should be preserved. Now create a WordPress Page as described above.
 
 = Some or all email notifications fail to send, why?  =
+In the first instance check this with your hosting provider, they have access to your server logs and will be able to tell you where and why emails are being blocked.
+
 Some hosting providers place a restriction on the maximum number of recipients in any one email message.  For example, the venerable Dreamhost (http://www.dreamhost.com/) does not allow any message to contain more than 30 recipients.
 
 Subscribe2 provides a facility to work around this restriction by sending batches of emails.  To enable this feature, edit subscribe2.php in a text editor and go to line 35:
