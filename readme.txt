@@ -6,7 +6,7 @@ Requires at least: 2.0.x
 Tested up to: 2.0.10
 Stable tag: 2.2.18
 
-Sends a list of subscribers an email when new posts are published to your blog
+Sends a list of subscribers an email notification when new posts are published to your blog
 
 == Description ==
 
