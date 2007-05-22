@@ -1,5 +1,4 @@
-=== Subscribe2 ===
-
+﻿=== Subscribe2 ===
 Contributors: MattyRob, Skippy, Ravan
 Donate link: http://subscribe2.wordpress.com/donate/
 Tags: posts, subscription, email
