@@ -10,6 +10,18 @@ if (!isset($this->subscribe2_options['autoformat'])) {
 	$this->subscribe2_options['autoformat'] = "text";
 } // option for default auto-subscription email format
 
+if (!isset($this->subscribe2_options['pages'])) {
+	$this->subscribe2_options['pages'] = "no";
+} // option for sending notifications for WordPress pages
+
+if (!isset($this->subscribe2_options['password'])) {
+	$this->subscribe2_options['password'] = "no";
+} // option for sending notifications for posts that are password protected
+
+if (!isset($this->subscribe2_options['email_freq'])) {
+	$this->subscribe2_options['email_freq'] = "never";
+} // option for sending emails per-post or as a digest email on a cron schedule
+
 if (!isset($this->subscribe2_options['exclude'])) {
 	$this->subscribe2_options['exclude'] = "";
 } // option for excluded categories
@@ -30,10 +42,6 @@ if (!isset($this->subscribe2_options['show_button'])) {
 if (!isset($this->subscribe2_options['barred'])) {
 	$this->subscribe2_options['barred'] = '';
 } // option containing domains barred from public registration
-
-if (!isset($this->subscribe2_options['email_freq'])) {
-	$this->subscribe2_options['email_freq'] = "never";
-} // option for sending emails periodically or per-post
 
 if (!isset($this->subscribe2_options['mailtext'])) {
 	$this->subscribe2_options['mailtext'] = "BLOGNAME has posted a new item, 'TITLE'\n\nPOST\n\nYou may view the latest post at\nPERMALINK\n\nYou received this e-mail because you asked to be notified when new updates are posted.\nBest regards,\nMYNAME\nEMAIL";
