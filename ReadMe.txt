@@ -3,6 +3,7 @@ Contributors: MattyRob, Skippy, Ravan
 Donate link: http://subscribe2.wordpress.com/donate/
 Tags: posts, subscription, email
 Requires at least: 2.0.x
+Tested up to: 2.2
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -37,6 +38,11 @@ This token will automatically be replaced by the subscription form, and will dis
 9. In the subscribe2.php file define S2PAGE to point at your WordPress page created in step 8.
 
 == Frequently Asked Questions ==
+
+= Which version should I be using, I'm on WordPress x.x.x? =
+WordPress 2.0.x will be supported until 2010. Subscribe2 will remain supported until WordPress 2.0.x is no longer supported. For WordPress 2.0.x use the Subscribe code from the 2.2.x stable.
+
+WordPress 2.1.x and 2.2.x are also supported. For the latest information visit http://subscribe2.wordpress.com. For versions of WordPress use  Subscribe2 code from the 2.3.x stable.
 
 = Is there a version for WordPress 2.1.x? =
 Yes, there is. Visit http://subscribe2.wordpress.com for information. The version of Subscribe2 here is for WordPress 2.0.x only and will remain like this until 2.0.x is no longer supported. WordPress 2.1.x will soon be replaced by 2.2.x!
