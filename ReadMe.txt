@@ -43,7 +43,7 @@ This token will automatically be replaced by the subscription form, and will dis
 = Is there a version for WordPress 2.1.x? =
 Yes, there is. Visit http://subscribe2.wordpress.com for information. The version of Subscribe2 here is for WordPress 2.0.x only and will remain like this until 2.0.x is no longer supported. WordPress 2.1.x will soon be replaced by 2.2.x!
 
-The current stable version for WordPress 2.1.x is Subscribe2 3.2. It is available at http://subscribe2.wordpress.com
+The current stable version for WordPress 2.1.x is Subscribe2 3.5. It is available at http://wordpress.org/extend/plugins/subscribe2/download/
 
 = How do I upgrade from a previous version? =
 If you are upgrading from any 2.1.x version of subscribe2, please delete both the /subscribe.php and /wp-content/plugins/subscribe2.php files before copying the new files into place.  Your subscriber list will remain intact, and your options should be preserved. Now create a WordPress Page as described above.
