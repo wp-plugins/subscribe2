@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.2.19
+Version: 2.19
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -45,7 +45,7 @@ define('S2DIGEST', false);
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '2.2.19');
+define('S2VERSION', '2.19');
 
 // use Owen's excellent ButtonSnap library
 require(ABSPATH . '/wp-content/plugins/buttonsnap.php');
@@ -238,13 +238,13 @@ class s2class {
 		$headers .= "Precedence: list\nList-Id: " . get_settings('blogname') . "\n";
 
 		if ('html' == $type) {
-				// To send HTML mail, the Content-type header must be set
+				// To send HTML mail, the Content-Type header must be set
 				$headers .= "MIME-Version: 1.0\n";
-				$headers .= "Content-type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
+				$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
 				$mailtext = "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>";
 		} else {
 				$headers .= "MIME-Version: 1.0\n";
-				$headers .= "Content-type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
+				$headers .= "Content-type: Text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 				$message = preg_replace('|&[^a][^m][^p].{0,3};|', '', $message);
 				$message = preg_replace('|&amp;|', '&', $message);
 				$mailtext = wordwrap(strip_tags($message), 80, "\n");
@@ -531,7 +531,7 @@ class s2class {
 		$mailheaders .= "X-Mailer:PHP" . phpversion() . "\n";
 		$mailheaders .= "Precedence: list\nList-Id: " . get_settings('blogname') . "\n";
 		$mailheaders .= "MIME-Version: 1.0\n";
-		$mailheaders .= "Content-type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
+		$mailheaders .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 
 		@wp_mail ($this->email, $subject, $body, $mailheaders);
 	} // end send_confirm()
