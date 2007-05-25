@@ -40,9 +40,9 @@ This token will automatically be replaced by the subscription form, and will dis
 == Frequently Asked Questions ==
 
 = Which version should I be using, I'm on WordPress x.x.x? =
-WordPress 2.0.x will be supported until 2010. Subscribe2 will remain supported until WordPress 2.0.x is no longer supported. For WordPress 2.0.x use the Subscribe code from the 2.2.x stable.
+WordPress 2.0.x will be supported until 2010. Subscribe2 will remain supported until WordPress 2.0.x is no longer supported. For WordPress 2.0.x use the Subscribe code from the 2.x stable.
 
-WordPress 2.1.x and 2.2.x are also supported. For the latest information visit http://subscribe2.wordpress.com. For versions of WordPress use  Subscribe2 code from the 2.3.x stable.
+WordPress 2.1.x and 2.2.x are also supported. For the latest information visit http://subscribe2.wordpress.com. For versions of WordPress use  Subscribe2 code from the 3.x stable.
 
 = Is there a version for WordPress 2.1.x? =
 Yes, there is. Visit http://subscribe2.wordpress.com for information. The version of Subscribe2 here is for WordPress 2.0.x only and will remain like this until 2.0.x is no longer supported. WordPress 2.1.x will soon be replaced by 2.2.x!
@@ -71,12 +71,12 @@ There are no screenshots of Subscribe2, the appearence will rely upon your theme
 
 == Version History ==
 
-Version 2.3.5 by Matthew Robinson
+Version 3.5 by Matthew Robinson
 
 * Fixed a bug in the upgrade function that was messing up the options settings
 * Updated the include.php file to preset recently introduced option settings
 
-Version 2.3.4 by Matthew Robinson
+Version 3.4 by Matthew Robinson
 
 * QuickTag button now displays a Marker! (HUGE thanks to Raven!)
 * Fix for excluded categories in User Menu
@@ -86,7 +86,7 @@ Version 2.3.4 by Matthew Robinson
 * Option added to display subscription checkbox in WordPress Register screen
 * Small typo and layout amendments
 
-Version 2.3.3 by Matthew Robinson
+Version 3.3 by Matthew Robinson
 
 * QuickTag button added! Works with Visual and Standard Editor. __Look in Code for token addition if using RTE.__
 * Current Server time displayed for Cron tasks
@@ -95,72 +95,77 @@ Version 2.3.3 by Matthew Robinson
 * Fixed a bug affecting Registered Users not appearing in the drop down list
 * Improved handling of the Subscribe2 option array
 
-Version 2.3.1 by Matthew Robinson
+Version 3.2 by Matthew Robinson
+
+* Fixed a bug affecting Registered Users not appearing in the drop down list
+* Improved handling of the Subscribe2 option array
+
+Version 3.1 by Matthew Robinson
 
 * Amended code to use core cron functionality for future posts and digest notifications, no longer need WP-Cron
 * Improved HTML code generated for admin pages
 * Removed sending of emails for WordPress Pages
 * Fixed display issues if S2PAGE is not defined
 
-Version 2.3.0 by Matthew Robinson
+Version 3.0 by Matthew Robinson
 
 * Updated for WordPress 2.1 Branch
 
-Version 2.2.19 by Matthew Robinson
+Version 2.19 by Matthew Robinson
 
 * Fixed a bug in the upgrade function that was messing up the options settings
 
-Version 2.2.18 by Matthew Robinson
+Version 2.18 by Matthew Robinson
 
 * BCCLIMIT typo corrected in Mail function
 * Call to translation files moved to avoid call to undefined function
 * Small typo and layout amendments
 
-Version 2.2.17 by Matthew Robinson
+Version 2.17 by Matthew Robinson
 
 * Current Server time displayed for Cron tasks
 * Fixed bug so Registered users now identified correctly
 * Upgrade function called via WordPress hook to prevent calls to undefined functions 
 
-Version 2.2.16 by Matthew Robinson
+Version 2.16 by Matthew Robinson
 
 * Fixed a bug affecting Registered Users not appearing in the drop down list
 * Improved handling of the Subscribe2 option array
 
-Version 2.2.15 by Matthew Robinson
+Version 2.15 by Matthew Robinson
 
 * Improved HTML code generated for admin pages
 * Fixed display issues if S2PAGE is not defined
 
-Version 2.2.14 by Matthew Robinson
+Version 2.14 by Matthew Robinson
 
 * Amended DREAMHOST setting to BCCLIMIT as more hosts are limiting emails
 * Fixed oversight in upgrade() function
 
-Version 2.2.13 by Matthew Robinson
+Version 2.13 by Matthew Robinson
 
 * Added WordPress nonce functionality to improve admin security
 
-Version 2.2.12 by Matthew Robinson
+Version 2.12 by Matthew Robinson
 
 * Fix for missing Quicktags (probably since version 2.2.10)
 * Fix for occasional email issue where excerpts are incomplete
 
-Version 2.2.11 by Matthew Robinson
+Version 2.11 by Matthew Robinson
 * Fixed bug that would cause all subscribers to get digest emails
 * Added Select All check box to category listing
 
-Version 2.2.10 by Matthew Robinson
+Version 2.10 by Matthew Robinson
 * Improved sign up process by double checking email address
 * Fix for submenu issues encountered in WP 2.0.6
 
-Version 2.2.9 by Matthew Robinson
+Version 2.9 by Matthew Robinson
 
 * Fixed get_userdata call issue
 * Added CSV export
 * Reworked options storage routines
 
-Version 2.2.8 by Matthew Robinson
+Version 2.8 by Matthew Robinson
 
 * Fixed missing line return in email headers that was causing failed emails
 * Added user feedback messages to profile area
@@ -169,29 +174,29 @@ Version 2.2.8 by Matthew Robinson
 * Fixed stripslashes issue in email subjects
 * Added new 'Action' token for confirmation emails
 
-Version 2.2.7 by Matthew Robinson
+Version 2.7 by Matthew Robinson
 
 * Link to post in HTML emails is now functional
 * Fixed bug in Bulk Management so it works when first loaded
 * Ability to auto subscribe newly registering users
 * Added additional email header information
 
-Version 2.2.6 by Matthew Robinson
+Version 2.6 by Matthew Robinson
 
 * Fixed email headers to comply with RFC2822 standard (after breaking them in the first place)
 * Impoved XHTML compliance of user feedback messages and subscription form when presented on a blog
 * Tidied up presentation of the code a little
 * Cached some additional variables
 
-Version 2.2.5 by Matthew Robinson
+Version 2.5 by Matthew Robinson
 
 * Added functionality to Bulk Manage registered users subscriptions
 
-Version 2.2.4 by Matthew Robinson
+Version 2.4 by Matthew Robinson
 
 * Added functionality to block user specified domains from public subscription
 
-Version 2.2.3 by Matthew Robinson
+Version 2.3 by Matthew Robinson
 
 * Added functionality to allow for Subscribe2 Sidebar Widget
 * Added functionality to block public email subscriptins from domains defined under Options
@@ -200,6 +205,6 @@ Version 2.2.3 by Matthew Robinson
 * Replaced spaces with tabs in Plugin format
 * Minor changes to admin layout to match WordPress admin function layout
 
-Version 2.2.2
+Version 2.2
 
 * By Scott Merrill, see http://www.skippy.net/blog/category/wordpress/plugins/subscribe2/
