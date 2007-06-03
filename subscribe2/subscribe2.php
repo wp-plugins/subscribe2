@@ -312,6 +312,7 @@ class s2class {
 		} else {
 			@wp_mail($this->myemail, $subject, $mailtext, $headers);
 		}
+		return;
 	} // end mail()
 
 	/**
