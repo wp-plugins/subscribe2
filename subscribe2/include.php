@@ -6,6 +6,10 @@ if (!isset($this->subscribe2_options['autosub'])) {
 	$this->subscribe2_options['autosub'] = "no"; 
 } // option to autosubscribe registered users to new categories
 
+if (!isset($this->subscribe2_options['wpregdef'])) {
+	$this->subscribe2_options['wpregdef'] = "no";
+} // option to 
+
 if (!isset($this->subscribe2_options['autoformat'])) {
 	$this->subscribe2_options['autoformat'] = "text";
 } // option for default auto-subscription email format

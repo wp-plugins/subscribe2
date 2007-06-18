@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted. Tested with WordPress 2.1.x and 2.2.x.
-Version: 3.6
+Version: 3.7
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -41,7 +41,7 @@ define('S2PAGE', '0');
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '3.6');
+define('S2VERSION', '3.7');
 
 // use Owen's excellent ButtonSnap library
 require(ABSPATH . '/wp-content/plugins/buttonsnap.php');
@@ -1304,9 +1304,11 @@ class s2class {
 
 				//automatic subscription
 				$autosub_option = $_POST['autosub'];
-				$this->subscribe2_options['autosub']= $autosub_option;
+				$this->subscribe2_options['autosub'] = $autosub_option;
+				$autosub_wpregdef_option = $_POST['wpregdef'];
+				$this->subscribe2_options['wpregdef'] = $autosub_wpregdef_option;
 				$autosub_format_option = $_POST['autoformat'];
-				$this->subscribe2_options['autoformat']= $autosub_format_option;
+				$this->subscribe2_options['autoformat'] = $autosub_format_option;
 				
 				//barred domains
 				$barred_option = $_POST['barred'];
@@ -1405,7 +1407,7 @@ class s2class {
 		
 		//Auto Subscription for new registrations
 		echo "<h2>" . __('Auto Subscribe', 'subscribe2') . "</h2>\r\n";
-		echo __('Subscribe new users registering with your blog.', 'subscribe2') . "<br />\r\n";
+		echo __('Subscribe new users registering with your blog', 'subscribe2') . ":<br />\r\n";
 		echo "<input type=\"radio\" name=\"autosub\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['autosub']) {
 			echo " checked=\"checked\"";
@@ -1421,6 +1423,17 @@ class s2class {
 			echo " checked=\"checked\"";
 		}
 		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
+		echo __('Registration Form option is checked by default', 'subscribe2') . ": &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"wpregdef\" value=\"yes\"";
+		if ('yes' == $this->subscribe2_options['wpregdef']) {
+			echo " checked=\"checked\"";
+		}
+		echo " />" . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"wpregdef\" value=\"no\"";
+		if ('no' == $this->subscribe2_options['wpregdef']) {
+			echo " checked=\"checked\"";
+		}
+		echo " />" . __('No', 'subscribe2') . "<br /><br />\r\n";
 		echo __('Auto-subscribe users to receive email as', 'subscribe2') . ": <br />\r\n";
 		echo "<input type=\"radio\" name=\"autoformat\" value=\"html\"";
 		if ('html' == $this->subscribe2_options['autoformat']) {
@@ -1804,7 +1817,11 @@ class s2class {
 		if ('wpreg' == $this->subscribe2_options['autosub']) {
 			echo "<p>\r\n<label>";
 			echo __('Check here to Subscribe to email notifications for new posts') . ":<br />\r\n";
-			echo "<input type=\"checkbox\" name=\"subscribe\" /></label>\r\n";
+			echo "<input type=\"checkbox\" name=\"subscribe\"";
+			if ('yes' == $this->subscribe2_options['wpregdef']) {
+				echo " checked=\"checked\"";
+			}
+			echo " /></label>\r\n";
 			echo "</p>\r\n";
 		} elseif ('yes' == $this->subscribe2_options['autosub']) {
 			echo "<p>\r\n<center>\r\n";
