@@ -34,6 +34,7 @@ So for each new post you make, you may receive up to three emails.
 7. Manually subscribe people as you see fit.
 8. Create a WordPress Page (http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the subscribe2 token.  Or, if you prefer, you may manually insert the subscribe2 token:
      <!--subscribe2-->
+     ***Ensure the token is on a line by itself and that it has a blank line above and below.***
 This token will automatically be replaced by the subscription form, and will display all messages as necessary.
 9. In the subscribe2.php file define S2PAGE to point at your WordPress page created in step 8.
 
