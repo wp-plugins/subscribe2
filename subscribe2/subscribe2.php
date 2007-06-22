@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted. Tested with WordPress 2.1.x and 2.2.x.
-Version: 3.7
+Version: 3.6
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -41,7 +41,7 @@ define('S2PAGE', '0');
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '3.7');
+define('S2VERSION', '3.6');
 
 // use Owen's excellent ButtonSnap library
 require(ABSPATH . '/wp-content/plugins/buttonsnap.php');
@@ -882,8 +882,26 @@ class s2class {
 		if (0 == $user_id) { return $user_id; }
 		$user = get_userdata($user_id);
 		$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
+
+		if (0 == $this->subscribe2_options['reg_override']) {
+			// registered users are not allowed to subscribe to
+			// excluded categories
+			$exclude = explode(',', $this->subscribe2_options['exclude']);
+			foreach ($all_cats as $cat => $cat_ID) {
+				if (in_array($all_cats[$cat]->cat_ID, $exclude)) {
+					$cat = (int)$cat;
+					unset($all_cats[$cat]);
+				}
+			}
+		}
+
 		foreach ($all_cats as $cat) {
 			('' == $cats) ? $cats = "$cat->cat_ID" : $cats .= ",$cat->cat_ID";
+		}
+
+		if ('' == $cats) {
+			// sanity check, might occur if all cats excluded and reg_override = 0
+			return $user_id;
 		}
 
 		// has this user previously signed up for email notification?
