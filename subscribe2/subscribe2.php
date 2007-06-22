@@ -735,7 +735,7 @@ class s2class {
 			$this->activate();
 			$this->message = $this->added;
 			$subject = '[' . get_settings('blogname') . '] ' . __('New subscriber', 'subscribe2');
-			$message = "$this->email " . __('subscribed to email notifications!', 'subscribe2');
+			$message = $this->email . ' ' . __('subscribed to email notifications!', 'subscribe2');
 			$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='wp_user_level' AND $wpdb->usermeta.meta_value='10'");
 			$this->mail($recipients, $subject, $message);
 			$this->filtered = 1;
