@@ -889,6 +889,7 @@ class s2class {
 		$user = get_userdata($user_id);
 
 		$all_cats = explode(',', $this->get_all_categories());
+		$cats = implode(',', $all_cats);
 
 		if (0 == $this->subscribe2_options['reg_override']) {
 			// registered users are not allowed to subscribe to
