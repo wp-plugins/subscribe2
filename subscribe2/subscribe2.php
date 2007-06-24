@@ -2,8 +2,8 @@
 /*
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
-Description: Notifies an email list when new entries are posted.
-Version: 2.19
+Description: Notifies an email list when new entries are posted. Tested with WordPress 2.1.x and 2.2.x.
+Version: 3.6
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -39,13 +39,9 @@ define('BCCLIMIT', '0');
 // You can override this by specifying a page ID on the line below.
 define('S2PAGE', '0');
 
-// change the value below to TRUE if you want a daily digest
-// of the days posts sent to your subscribers
-define('S2DIGEST', false);
-
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '2.19');
+define('S2VERSION', '3.6');
 
 // use Owen's excellent ButtonSnap library
 require(ABSPATH . '/wp-content/plugins/buttonsnap.php');
@@ -65,7 +61,9 @@ class s2class {
 
 		$this->please_log_in = "<p>" . __('To manage your subscription options please ', 'subscribe2') . "<a href=\"" . get_settings('siteurl') . "/wp-login.php\">login</a>.</p>";
 
-		$this->use_profile = "<p>" . __('You may manage your subscription options from your ', 'subscribe2') . "<a href=\"" . get_settings('siteurl') . "/wp-admin/profile.php?page=" . plugin_basename(__FILE__) . "\">profile</a>.</p>";
+		$this->use_profile_admin = "<p>" . __('You may manage your subscription options from your ', 'subscribe2') . "<a href=\"" . get_settings('siteurl') . "/wp-admin/users.php?page=" . plugin_basename(__FILE__) . "\">profile</a>.</p>";
+
+		$this->use_profile_users = "<p>" . __('You may manage your subscription options from your ', 'subscribe2') . "<a href=\"" . get_settings('siteurl') . "/wp-admin/profile.php?page=" . plugin_basename(__FILE__) . "\">profile</a>.</p>";
 
 		$this->confirmation_sent = "<p>" . __('A confirmation message is on its way!', 'subscribe2') . "</p>";
 
@@ -108,8 +106,12 @@ class s2class {
 	function admin_menu() {
 		add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'manage_menu'));
 		add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2','subscribe2'), "manage_options", __FILE__, array(&$this, 'options_menu'));
-		add_submenu_page('profile.php', __('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
-		add_submenu_page('post.php', __('Mail Subscribers','subscribe2'), __('Mail Subscribers', 'subscribe2'),"manage_options", __FILE__, array(&$this, 'write_menu'));
+		if (current_user_can('manage_options')) {
+			add_submenu_page('users.php', __('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
+		} else {
+			add_submenu_page('profile.php', __('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
+		}
+		add_submenu_page('post-new.php', __('Mail Subscribers','subscribe2'), __('Mail Subscribers', 'subscribe2'),"manage_options", __FILE__, array(&$this, 'write_menu'));
 		$s2nonce = md5('subscribe2');
 	}
 
@@ -129,6 +131,11 @@ class s2class {
 		echo "}\r\n";
 		echo "-->\r\n";
 		echo "</script>\r\n";
+	}
+
+	function add_weekly_sched($sched) {
+		$sched['weekly'] = array('interval' => 604800, 'display' => __('Once Weekly','subscribe2'));
+		return $sched;
 	}
 
 /* ===== Install, upgrade, reset ===== */
@@ -244,7 +251,7 @@ class s2class {
 				$mailtext = "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>";
 		} else {
 				$headers .= "MIME-Version: 1.0\n";
-				$headers .= "Content-type: Text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
+				$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 				$message = preg_replace('|&[^a][^m][^p].{0,3};|', '', $message);
 				$message = preg_replace('|&amp;|', '&', $message);
 				$mailtext = wordwrap(strip_tags($message), 80, "\n");
@@ -312,27 +319,23 @@ class s2class {
 		} else {
 			@wp_mail($this->myemail, $subject, $mailtext, $headers);
 		}
-		return;
 	} // end mail()
 
 	/**
 	Sends an email notification of a new post
 	*/
-	function publish($id = 0, $cron = 0) {
+	function publish($id = 0) {
 		if (!$id) { return $id; }
 
 		// are we doing daily digests? If so, don't send anything now
-		if ( (defined('S2DIGEST')) && (true == S2DIGEST) ) { return; }
+		if ($this->subscribe2_options['email_freq'] != 'never') { return; }
 
 		// we need to determine whether this is a new post, or an edit
-		if (0 == $cron) {
-			// we're not being called from WP-Cron
-			if ($this->private) {
-				// this post was published from draft status
-				// OR is an edit of an existing post
-				// so send no notification
-				return $id;
-			}
+		if ($this->private) {
+			// this post was published from draft status
+			// OR is an edit of an existing post
+			// so send no notification
+			return $id;
 		}
 
 		$post_cats = wp_get_post_cats('1', $id);
@@ -357,21 +360,11 @@ class s2class {
 
 		global $wpdb;
 		$post =& get_post($id);
+		// is the post password protected?
+		if ( ($this->subscribe2_options['password'] == "no") && ($post->post_password != '') ) {return $id; }
+
 		// is this post set in the future?
 		if ($post->post_date > current_time('mysql')) {
-			// is wp-cron installed?
-			if (function_exists('wp_cron_init')) {
-				// are we doing daily digests?
-				if ( (defined('S2DIGEST')) && (false == S2DIGEST) ) {
-					// not doing daily digests, so
-					// add this post to the list of
-					// future posts
-					$our_post = array('id' => $id, 'date' => $post->post_date);
-					$future_posts = get_option('s2_future_posts');
-					$future_posts[] = $our_post;
-					update_option('s2_future_posts', $future_posts);
-				}
-			}
 			// bail out
 			return $id;
 		}
@@ -536,24 +529,6 @@ class s2class {
 
 		@wp_mail ($this->email, $subject, $body, $mailheaders);
 	} // end send_confirm()
-
-/* ===== Category functions ===== */
-	/**
-	Return either a comma-separated list of all the category IDs in the blog or an array of cat_ID => cat_name
-	*/
-	function get_all_categories($select = 'id') {
-		global $wpdb;
-		if ('id' == $select) {
-			return implode(',', $wpdb->get_col("SELECT cat_ID FROM $wpdb->categories"));
-		} else {
-			$cats = array();
-			$result = $wpdb->get_results("SELECT cat_ID, cat_name FROM $wpdb->categories", ARRAY_N);
-			foreach ($result as $result) {
-				$cats[$result[0]] = $result[1];
-			}
-			return $cats;
-		}
-	} // end get_all_categories()
 
 /* ===== Subscriber functions ===== */
 	/**
@@ -883,18 +858,40 @@ class s2class {
 	Create the appropriate usermeta values when a user registers
 	If the registering user had previously subscribed to notifications, this function will delete them from the public subscriber list first
 	*/
-	function register ($user_id = 0) {
+	function register ($user_id = 0, $wpreg = '') {
 		global $wpdb;
 
 		if (0 == $user_id) { return $user_id; }
 		$user = get_userdata($user_id);
+		$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
+
+		if (0 == $this->subscribe2_options['reg_override']) {
+			// registered users are not allowed to subscribe to
+			// excluded categories
+			$exclude = explode(',', $this->subscribe2_options['exclude']);
+			foreach ($all_cats as $cat => $cat_ID) {
+				if (in_array($all_cats[$cat]->cat_ID, $exclude)) {
+					$cat = (int)$cat;
+					unset($all_cats[$cat]);
+				}
+			}
+		}
+
+		foreach ($all_cats as $cat) {
+			('' == $cats) ? $cats = "$cat->cat_ID" : $cats .= ",$cat->cat_ID";
+		}
+
+		if ('' == $cats) {
+			// sanity check, might occur if all cats excluded and reg_override = 0
+			return $user_id;
+		}
 
 		// has this user previously signed up for email notification?
 		if (false !== $this->is_public($user->user_email)) {
 			// delete this user from the public table, and subscribe them to all the categories
 			$this->delete($user->user_email);
-			update_usermeta($user_id, 's2_subscribed', $this->get_all_categories());
-			foreach(explode(',', $this->get_all_categories()) as $cat) {
+			update_usermeta($user_id, 's2_subscribed', $cats);
+			foreach(explode(',', $cats) as $cat) {
 				update_usermeta($user_id, 's2_cat' . $cat, "$cat");
 			}
 			update_usermeta($user_id, 's2_format', 'text');
@@ -904,10 +901,10 @@ class s2class {
 			$check = get_usermeta($user_id, 's2_subscribed');
 			// ensure existing subscriptions are not overwritten on upgrade
 			if (empty($check)) {
-				if ('yes' == $this->subscribe2_options['autosub']) {
+				if ( ('yes' == $this->subscribe2_options['autosub']) || (('wpreg' == $this->subscribe2_options['autosub']) && (1 == $wpreg)) ) {
 					// don't add entires by default if autosub is off, messes up daily digests
-					update_usermeta($user_id, 's2_subscribed', $this->get_all_categories());
-						foreach(explode(',', $this->get_all_categories()) as $cat) {
+					update_usermeta($user_id, 's2_subscribed', $cats);
+						foreach(explode(',', $cats) as $cat) {
 							update_usermeta($user_id, 's2_cat' . $cat, "$cat");
 						}
 					if ('html' == $this->subscribe2_options['autoformat']) {
@@ -940,9 +937,8 @@ class s2class {
 
 		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ('$useremails')";
 		$user_IDs = $wpdb->get_col($sql);
-		$cats = $_POST['category'];
 		if (!is_array($cats)) {
-		 	$cats = array($_POST['category']);
+		 	$cats = array($cats);
 		}
 		
 		foreach ($user_IDs as $user_ID) {	
@@ -974,9 +970,8 @@ class s2class {
 
 		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ('$useremails')";
 		$user_IDs = $wpdb->get_col($sql);
-		$cats = $_POST['category'];
 		if (!is_array($cats)) {
-		 	$cats = array($_POST['category']);
+		 	$cats = array($cats);
 		}
 		
 		foreach ($user_IDs as $user_ID) {	
@@ -1275,6 +1270,30 @@ class s2class {
 				}
 				$this->subscribe2_options['sender'] = $sender;
 
+				// send email for pages and password protected posts
+				$pages_option = $_POST['pages'];
+				$this->subscribe2_options['pages']= $pages_option;
+				$password_option = $_POST['password'];
+				$this->subscribe2_options['password']= $password_option;
+
+				// send per-post or digest emails
+				$email_freq = $_POST['email_freq'];
+				$this->subscribe2_options['email_freq'] = $email_freq;
+				wp_clear_scheduled_hook('s2_digest_cron');
+				$scheds = (array) wp_get_schedules();
+				$interval = ( isset($scheds[$email_freq]['interval']) ) ? (int) $scheds[$email_freq]['interval'] : 0;
+				if ($interval == 0) {
+					// if we are on per-post emails remove last_cron entry
+					unset($this->subscribe2_options['last_s2cron']);
+				} else {
+					if (!wp_next_scheduled('s2_digest_cron')) {
+						// if we are using digest schedule the event and prime last_cron as now
+						wp_schedule_event(time() + $interval, $email_freq, 's2_digest_cron');
+						$now = date('Y-m-d H:i:s', time());
+						$this->subscribe2_options['last_s2cron'] = $now;
+					}
+				}
+
 				// email templates
 				$mailtext = $_POST['mailtext'];
 				$this->subscribe2_options['mailtext'] = $mailtext;
@@ -1285,9 +1304,11 @@ class s2class {
 
 				//automatic subscription
 				$autosub_option = $_POST['autosub'];
-				$this->subscribe2_options['autosub']= $autosub_option;
+				$this->subscribe2_options['autosub'] = $autosub_option;
+				$autosub_wpregdef_option = $_POST['wpregdef'];
+				$this->subscribe2_options['wpregdef'] = $autosub_wpregdef_option;
 				$autosub_format_option = $_POST['autoformat'];
-				$this->subscribe2_options['autoformat']= $autosub_format_option;
+				$this->subscribe2_options['autoformat'] = $autosub_format_option;
 				
 				//barred domains
 				$barred_option = $_POST['barred'];
@@ -1304,6 +1325,28 @@ class s2class {
 		}
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"options\" />\r\n";
 		echo "<h2>" . __('Delivery Options', 'subscribe2') . ":</h2>\r\n";
+		echo __('Send Emails for Pages', 'subscribe2') . ': ';
+		echo "<input type=\"radio\" name=\"pages\" value=\"yes\"";
+		if ('yes' == $this->subscribe2_options['pages']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"pages\" value=\"no\"";
+		if ('no' == $this->subscribe2_options['pages']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
+		echo __('Send Emails for Password Protected Posts', 'subscribe2') . ': ';
+		echo "<input type=\"radio\" name=\"password\" value=\"yes\"";
+		if ('yes' == $this->subscribe2_options['password']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"password\" value=\"no\"";
+		if ('no' == $this->subscribe2_options['password']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
 		echo __('Send Email From', 'subscribe2') . ': ';
 		echo "<input type=\"radio\" name=\"sender\" value=\"author\"";
 		if ('author' == $this->subscribe2_options['sender']) {
@@ -1314,7 +1357,12 @@ class s2class {
 		if ('admin' == $this->subscribe2_options['sender']) {
 			echo "checked=\"checked\" ";
 		}
-		echo " /> " . __('Blog Admin', 'subscribe2') . "<br />\r\n";
+		echo " /> " . __('Blog Admin', 'subscribe2') . "<br /><br />\r\n";
+		if (function_exists('wp_schedule_event')) {
+			echo __('Send Email as Digest', 'subscribe2') . ": <br /><br />\r\n";
+			$this->display_digest_choices();
+			echo "<br />\r\n";
+		}
 		echo "<h2>" . __('Email Templates', 'subscribe2') . "</h2>\r\n";
 		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" class=\"editform\">\r\n";
 		echo "<tr><td>";
@@ -1359,17 +1407,33 @@ class s2class {
 		
 		//Auto Subscription for new registrations
 		echo "<h2>" . __('Auto Subscribe', 'subscribe2') . "</h2>\r\n";
-		echo __('Automatically subscribe new users registering with your blog.', 'subscribe2') . "<br />\r\n";
+		echo __('Subscribe new users registering with your blog', 'subscribe2') . ":<br />\r\n";
 		echo "<input type=\"radio\" name=\"autosub\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['autosub']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
+		echo " /> " . __('Automatically', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"autosub\" value=\"wpreg\"";
+		if ('wpreg' == $this->subscribe2_options['autosub']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Display option on Registration Form', 'subscribe2') . " &nbsp;&nbsp;";
 		echo "<input type=\"radio\" name=\"autosub\" value=\"no\"";
 		if ('no' == $this->subscribe2_options['autosub']) {
 			echo " checked=\"checked\"";
 		}
 		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
+		echo __('Registration Form option is checked by default', 'subscribe2') . ": &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"wpregdef\" value=\"yes\"";
+		if ('yes' == $this->subscribe2_options['wpregdef']) {
+			echo " checked=\"checked\"";
+		}
+		echo " />" . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"wpregdef\" value=\"no\"";
+		if ('no' == $this->subscribe2_options['wpregdef']) {
+			echo " checked=\"checked\"";
+		}
+		echo " />" . __('No', 'subscribe2') . "<br /><br />\r\n";
 		echo __('Auto-subscribe users to receive email as', 'subscribe2') . ": <br />\r\n";
 		echo "<input type=\"radio\" name=\"autoformat\" value=\"html\"";
 		if ('html' == $this->subscribe2_options['autoformat']) {
@@ -1479,7 +1543,7 @@ class s2class {
 			wp_nonce_field('subscribe2-user_subscribers' . $s2nonce);
 		}
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"user\" />";
-		if ( (defined('S2DIGEST')) && (FALSE == S2DIGEST) ) {
+		if ($this->subscribe2_options['email_freq'] == 'never') {
 			echo __('Receive email as', 'subscribe2') . ": &nbsp;&nbsp;";
 			echo "<input type=\"radio\" name=\"s2_format\" value=\"html\"";
 			if ('html' == get_usermeta($user_ID, 's2_format')) {
@@ -1606,40 +1670,43 @@ class s2class {
 	function display_category_form($selected = array(), $override = 1) {
 		global $wpdb;
 
-		$all_cats = $this->get_all_categories('array');
+		$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
+		$exclude = explode(',', $this->subscribe2_options['exclude']);
+
 		if (0 == $override) {
 			// registered users are not allowed to subscribe to
 			// excluded categories
-			foreach (explode(',', $this->subscribe2_options['exclude']) as $cat) {
-				$category = get_category($cat);
-				$excluded[$cat] = $category->cat_name;
+			foreach ($all_cats as $cat => $cat_ID) {
+				if (in_array($all_cats[$cat]->cat_ID, $exclude)) {
+					$cat = (int)$cat;
+					unset($all_cats[$cat]);
+				}
 			}
-			$all_cats = array_diff($all_cats, $excluded);
 		}
-
+		
 		$half = (count($all_cats) / 2);
 		$i = 0;
 		$j = 0;
 		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"5\" class=\"editform\">\r\n";
 		echo "<tr valign=\"top\"><td width=\"50%\" align=\"left\">\r\n";
-		foreach ($all_cats as $cat_ID => $cat_name) {
+		foreach ($all_cats as $cat) {
 			 if ( ($i >= $half) && (0 == $j) ){
 						echo "</td><td width=\"50%\" align=\"left\">\r\n";
 						$j++;
 				}
 				if (0 == $j) {
-						echo "<input type=\"checkbox\" name=\"category[]\" value=\"" . $cat_ID . "\"";
-						if (in_array($cat_ID, $selected)) {
+						echo "<input type=\"checkbox\" name=\"category[]\" value=\"" . $cat->cat_ID . "\"";
+						if (in_array($cat->cat_ID, $selected)) {
 								echo " checked=\"checked\" ";
 						}
-						echo " /> " . $cat_name . "<br />\r\n";
+						echo " /> " . $cat->cat_name . "<br />\r\n";
 					} else {
 
-						echo "<input type=\"checkbox\" name=\"category[]\" value=\"" . $cat_ID . "\"";
-						if (in_array($cat_ID, $selected)) {
+						echo "<input type=\"checkbox\" name=\"category[]\" value=\"" . $cat->cat_ID . "\"";
+						if (in_array($cat->cat_ID, $selected)) {
 									echo " checked=\"checked\" ";
 						}
-						echo " /> " . $cat_name . "<br />\r\n";
+						echo " /> " . $cat->cat_name . "<br />\r\n";
 				}
 				$i++;
 		}
@@ -1664,6 +1731,8 @@ class s2class {
 			'unconfirmed' => ' &nbsp;&nbsp;' . __('Unconfirmed', 'subscribe2'),
 			'registered' => __('Registered Subscribers', 'subscribe2'));
 
+		$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
+
 		// count the number of subscribers
 		$count['confirmed'] = $wpdb->get_var("SELECT COUNT(id) FROM $this->public WHERE active='1'");
 		$count['unconfirmed'] = $wpdb->get_var("SELECT COUNT(id) FROM $this->public WHERE active='0'");
@@ -1676,8 +1745,8 @@ class s2class {
 		}
 		$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='s2_subscribed'");
 		$count['all'] = ($count['confirmed'] + $count['unconfirmed'] + $count['registered']);
-		foreach ($this->get_all_categories('array') as $cat_ID => $cat_name) {
-			$count[$cat_name] = $wpdb->get_var("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key='s2_cat$cat_ID'");
+		foreach ($all_cats as $cat) {
+			$count[$cat->cat_name] = $wpdb->get_var("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key='s2_cat$cat->cat_ID'");
 		}
 
 		// do have actually have some subscribers?
@@ -1700,12 +1769,11 @@ class s2class {
 		}
 
 		if ($count['registered'] > 0) {
-			foreach ($this->get_all_categories('array') as $cat_ID => $cat_name) {
-				if (in_array($cat_ID, $exclude)) { continue; }
-				if (0 == $count[$cat_name]) { continue; }
-				echo "<option value=\"$cat_ID\"";
-				if ($cat_ID == $selected) { echo " selected=\"selected\" "; }
-				echo "> &nbsp;&nbsp;$cat_name (" . $count[$cat_name] . ") </option>\r\n";
+			foreach ($all_cats as $cat) {
+				if (in_array($cat->cat_ID, $exclude)) { continue; }
+				echo "<option value=\"" . $cat->cat_ID . "\"";
+				if ($cat->cat_ID == $selected) { echo " selected=\"selected\" "; }
+				echo "> &nbsp;&nbsp;" . $cat->cat_name . "&nbsp;(" . $count[$cat->cat_name] . ") </option>\r\n";
 			}
 		}
 		echo "</select>";
@@ -1713,6 +1781,71 @@ class s2class {
 			echo "<span class=\"submit\"><input type=\"submit\" value=\"$submit\" /></span></form>\r\n";
 		}
 	} // end display_subscriber_dropdown()
+
+	function display_digest_choices() {
+		global $wpdb;
+		$schedule = (array)wp_get_schedules();
+		$schedule = array_merge(array('never' => array('interval' => 0, 'display' => __('Per Post Email','subscribe2'))), $schedule);
+		$sort = array();
+		foreach ( (array)$schedule as $key => $value ) $sort[$key] = $value['interval'];
+		asort($sort);
+		$schedule_sorted = array();
+		foreach ($sort as $key => $value) {
+			$schedule_sorted[$key] = $schedule[$key];
+		}
+		foreach ($schedule_sorted as $key => $value) {
+			echo "<input type=\"radio\" name=\"email_freq\" value=\"" . $key . "\"";
+			if ($key == $this->subscribe2_options['email_freq']) {
+				echo " checked=\"checked\" ";
+			}
+			echo " /> " . $value['display'] . "<br />\r\n";
+		}
+		if (wp_next_scheduled('s2_digest_cron')) {
+			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
+			$now = time();
+			echo "<p>" . __('Current server time is', 'subscribe2') . ": \r\n";
+			echo "<strong>" . gmdate($datetime, $now+ (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
+			echo "<p>" . __('Next email notification will be sent', 'subscribe2') . ": \r\n";
+			echo "<strong>" . gmdate($datetime, wp_next_scheduled('s2_digest_cron') + (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
+		}
+	} // end display_digest_choices()
+
+	/**
+	Adds information to the WordPress registration screen for new users
+	*/
+	function register_form() {
+		if ('wpreg' == $this->subscribe2_options['autosub']) {
+			echo "<p>\r\n<label>";
+			echo __('Check here to Subscribe to email notifications for new posts') . ":<br />\r\n";
+			echo "<input type=\"checkbox\" name=\"subscribe\"";
+			if ('yes' == $this->subscribe2_options['wpregdef']) {
+				echo " checked=\"checked\"";
+			}
+			echo " /></label>\r\n";
+			echo "</p>\r\n";
+		} elseif ('yes' == $this->subscribe2_options['autosub']) {
+			echo "<p>\r\n<center>\r\n";
+			echo __('By Registering with this blog you are also agreeing to recieve email notifications for new posts') . "<br />\r\n";
+			echo "</center></p>\r\n";
+		}
+	}
+
+	/**
+	Process function to add action if user selects to subscribe to posts during registration
+	*/
+	function register_post() {
+		if ('on' == $_POST['subscribe']) {
+			add_action('user_register', array(&$this, 'register_action'));
+		}
+	}
+
+	/**
+	Action to process Subscribe2 registration from WordPress registration
+	*/
+	function register_action($user_id = 0) {
+		if (0 == $user_id) { return $user_id; }
+		$this->register($user_id, 1);
+	}
 
 /* ===== template and filter functions ===== */
 	/**
@@ -1725,7 +1858,11 @@ class s2class {
 		global $user_ID;
 		get_currentuserinfo();
 		if ($user_ID) {
-			$this->s2form = $this->use_profile;
+			if (current_user_can('manage_options')) {
+				$this->s2form = $this->use_profile_admin;
+			} else {
+				$this->s2form = $this->use_profile_users;
+			}
 		}
 		if (isset($_POST['s2_action'])) {
 			global $wpdb, $user_email;
@@ -1790,7 +1927,7 @@ class s2class {
 		if ( (defined('S2PAGE')) && (0 != S2PAGE) ) {
 			return "page_id=" . S2PAGE;
 		} else {
-			$id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_status='static' LIMIT 1");
+			$id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_type='page' LIMIT 1");
 			if ($id) {
 				return "page_id=$id";
 			} else {
@@ -1810,48 +1947,22 @@ class s2class {
 
 /* ===== wp-cron functions ===== */
 	/**
-	Send notifications for any posts that are now visible
-	*/
-	function subscribe2_hourly() {
-		$future_posts = get_option('s2_future_posts');
-
-		// if we have no future posts, bail out
-		if (!$future_posts) { return; }
-
-		// this will hold the posts that aren't yet visible
-		$not_yet = array();
-
-		foreach ($future_posts as $post) {
-			if ( (current_time('mysql')) > ($post['date']) ) {
-				// this post is now visible, so let's
-				// send a notification
-				$this->publish($post['id'], 1);
-			} else {
-				array_push($not_yet, $post);
-			}
-		}
-		// are the number of elements in $not_yet
-		// the same as in $future posts?
-		if ( (count($not_yet)) != (count($future_posts)) ) {
-			// if not, then some posts have been removed
-			// from $future_posts, and the remainder need
-			// to be recorded back to the database
-			update_option('s2_future_posts', $not_yet);
-		}
-	} // end subscribe2_hourly
-
-	/**
 	Send a daily digest of today's new posts
 	*/
-	function subscribe2_daily() {
+	function subscribe2_cron() {
 		global $wpdb;
 
-		// collect yesterday's posts
-		$yesterday = date('Y-m-d', (get_option('wp_cron_daily_lastrun')-60));
-		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content FROM $wpdb->posts WHERE post_date > '$yesterday 00:00:00' AND post_date < '$yesterday 23:59:59' AND post_status='publish'");
+		// collect posts
+		$now = date('Y-m-d H:i:s', time());
+		$prev = $this->subscribe2_options['last_s2cron'];
+		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status='publish' AND post_type='post'");
 
+		// update last_s2cron execution time before completing or bailing
+		$this->subscribe2_options['last_s2cron'] = $now;
+		update_option('subscribe2_options', $this->subscribe2_options);
+	
 		// do we have any posts?
-		if (!$posts) { return; }
+		if (empty($posts)) { return; }
 
 		// if we have posts, let's prepare the digest
 		foreach ($posts as $post) {
@@ -1905,41 +2016,18 @@ class s2class {
 		}
 		$this->myemail = $user->user_email;
 		$this->myname = $user->display_name;
-		
-		$subject = '[' . stripslashes(get_settings('blogname')) . '] ' . __('Daily Digest', 'subscribe2') . ' ' . $yesterday;
+
+		$scheds = (array) wp_get_schedules();
+		$email_freq = $this->subscribe2_options['email_freq'];
+		$display = $scheds[$email_freq]['display'];
+		$subject = '[' . stripslashes(get_settings('blogname')) . '] ' . $display . ' ' . __('Digest Email', 'subscribe2');
 		$public = $this->get_public();
 		$registered = $this->get_registered();
 		$recipients = array_merge((array)$public, (array)$registered);
 		$mailtext = $this->substitute(stripslashes($this->subscribe2_options['mailtext']));
 		$body = str_replace('POST', $message, $mailtext);
 		$this->mail($recipients, $subject, $body);
-	} // end subscribe2_daily
-
-	/**
-	If the to-be-deleted post was future-dated, remove it from the list of future-dated posts
-	*/
-	function delete_future($id = 0) {
-		if (0 == $id) { return $id; }
-
-		$future = get_settings('s2_future_posts');
-		// if we have no future-dated posts scheduled, bail out
-		if (!$future) {
-			return $id;
-		}
-		foreach ($future as $post) {
-			// is the deleted post in the list of future posts?
-			if ($id == $post['id']) {
-				// skip it
-				continue;
-			} else {
-				// add this to the new list of future posts
-				$new_future[] = $post;
-			}
-		}
-		if ($new_future != $future) {
-			update_option('s2_future_posts', $new_future);
-		}
-	} // end delete_future()
+	} // end subscribe2_cron
 
 /* ===== Our constructor ===== */
 	/**
@@ -1949,7 +2037,7 @@ class s2class {
 		// load the options
 		$this->subscribe2_options = array();
 		$this->subscribe2_options = get_option('subscribe2_options');
-
+		
 		add_action('init', array(&$this, 'subscribe2'));
 		if('1' == $this->subscribe2_options['show_button']) {
 			add_action('init', array(&$this, 'button_init'));
@@ -1976,19 +2064,40 @@ class s2class {
 			add_filter('the_content', array(&$this, 'confirm'));
 		}
 
+		//add regular actions and filters
 		add_action('admin_head', array(&$this, 'admin_head'));
 		add_action('admin_menu', array(&$this, 'admin_menu'));
-		add_action('publish_post', array(&$this, 'publish'));
-		add_action('edit_post', array(&$this, 'edit'));
-		add_action('private_to_published', array(&$this, 'private2publish'));
-		add_action('user_register', array(&$this, 'register'));
 		add_action('create_category', array(&$this, 'autosub_new_category'));
+		add_action('register_form', array(&$this, 'register_form'));
 		add_filter('the_content', array(&$this, 'filter'));
-		add_action('wp_cron_hourly', array(&$this, 'subscribe2_hourly'));
-		if ( (defined('S2DIGEST')) && (TRUE == S2DIGEST) ) {
-			add_action('wp_cron_daily', array(&$this, 'subscribe2_daily'));
+		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
+
+		// add action to display editor buttons if option is enabled
+		if ('1' == $this->subscribe2_options['show_button']) {
+			add_action('edit_page_form', array(&$this, 's2_edit_form'));
+			add_action('edit_form_advanced', array(&$this, 's2_edit_form'));
 		}
-		add_action('delete_post', array(&$this, 'delete_future'));
+
+		// add action for automatic subscription based on option settings
+		if ('yes' == $this->subscribe2_options['autosub']) {
+			add_action('user_register', array(&$this, 'register'));
+		} elseif ('wpreg' == $this->subscribe2_options['autosub']) {
+			add_action('register_post', array(&$this, 'register_post'));
+		}
+		
+		// add actions for processing posts based on per-post or cron email settings
+		if ($this->subscribe2_options['email_freq'] != 'never') {
+			add_action('s2_digest_cron', array(&$this, 'subscribe2_cron'));
+		} else {
+			add_action('publish_post', array(&$this, 'publish'));
+			add_action('edit_post', array(&$this, 'edit'));
+			add_action('private_to_published', array(&$this, 'private2publish'));
+		}
+		
+		// add action to email notification about pages if option is enabled
+		if ($this->subscribe2_options['pages'] == 'yes') {
+			add_action('publish_page', array(&$this, 'publish'));
+		}
 
 		// load our strings
 		$this->load_strings();
@@ -1999,16 +2108,25 @@ class s2class {
 	Register our button in the QuickTags bar
 	*/
 	function button_init() {
-		$url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_button.png';
-		buttonsnap_textbutton($url, 'Subscribe2', '<!--subscribe2-->');
-		buttonsnap_register_marker('subscribe2', 's2_marker');
+		if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) return;
+			if ( 'true' == get_user_option('rich_editing') ) {
+				// Load and append our TinyMCE external plugin
+				add_filter('mce_plugins', array(&$this, 'mce_plugins'));
+				add_filter('mce_buttons', array(&$this, 'mce_buttons'));
+				add_action('tinymce_before_init', array(&$this, 'tinymce_before_init'));
+				add_action('marker_css', array(&$this, 'button_css'));
+			} else {
+				buttonsnap_separator();
+				buttonsnap_jsbutton(get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
+			}
 	}
 
 	/**
-		Style a marker in the Rich Text Editor for our tag
-		By default, the RTE suppresses output of HTML comments, so this places a CSS style on our token 	in order to make it display
+	Style a marker in the Rich Text Editor for our tag
+	By default, the RTE suppresses output of HTML comments, so this
+	places a CSS style on our token in order to make it display
 	*/
-	function subscribe2_css() {
+	function button_css() { 
 		$marker_url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_marker.png';
 		echo "
 			.s2_marker {
@@ -2020,6 +2138,35 @@ class s2class {
 				background-position: center;
 			}
 		";
+	}
+
+	// Add buttons in WordPress v2.1+, thanks to An-archos
+	function mce_plugins($plugins) {
+		array_push($plugins, '-subscribe2quicktags');
+		return $plugins;
+	}
+
+	function mce_buttons($buttons) {
+		array_push($buttons, 'separator');
+		array_push($buttons, 'subscribe2quicktags');
+		return $buttons;
+	}
+
+	function tinymce_before_init() {
+		$this->fullpath = get_settings('siteurl') . '/wp-content/plugins/subscribe2/tinymce/';
+		echo "tinyMCE.loadPlugin('subscribe2quicktags', '" . $this->fullpath . "');\n"; 
+	}
+
+	function s2_edit_form() { 
+		echo "<!-- Start Subscribe2 Quicktags Javascript -->\r\n";
+		echo "<script type=\"text/javascript\">\r\n";
+		echo "//<![CDATA[\r\n";
+		echo "function s2_insert_token() {
+			buttonsnap_settext('<!--subscribe2-->');
+		}\r\n";
+		echo "//]]>\r\n";
+		echo "</script>\r\n";
+		echo "<!-- End Subscribe2 Quicktags Javascript -->\r\n";
 	}
 
 /* ===== our variables ===== */
