@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 2.2.19
+Version: 2.20
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -45,7 +45,7 @@ define('S2DIGEST', false);
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '2.2.19');
+define('S2VERSION', '2.20');
 
 // use Owen's excellent ButtonSnap library
 require(ABSPATH . '/wp-content/plugins/buttonsnap.php');
@@ -240,11 +240,11 @@ class s2class {
 		if ('html' == $type) {
 				// To send HTML mail, the Content-type header must be set
 				$headers .= "MIME-Version: 1.0\n";
-				$headers .= "Content-type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
+				$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
 				$mailtext = "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>";
 		} else {
 				$headers .= "MIME-Version: 1.0\n";
-				$headers .= "Content-type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
+				$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 				$message = preg_replace('|&[^a][^m][^p].{0,3};|', '', $message);
 				$message = preg_replace('|&amp;|', '&', $message);
 				$mailtext = wordwrap(strip_tags($message), 80, "\n");
@@ -531,7 +531,7 @@ class s2class {
 		$mailheaders .= "X-Mailer:PHP" . phpversion() . "\n";
 		$mailheaders .= "Precedence: list\nList-Id: " . get_settings('blogname') . "\n";
 		$mailheaders .= "MIME-Version: 1.0\n";
-		$mailheaders .= "Content-type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
+		$mailheaders .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 
 		@wp_mail ($this->email, $subject, $body, $mailheaders);
 	} // end send_confirm()
@@ -888,12 +888,27 @@ class s2class {
 		if (0 == $user_id) { return $user_id; }
 		$user = get_userdata($user_id);
 
+		$all_cats = explode(',', $this->get_all_categories());
+
+		if (0 == $this->subscribe2_options['reg_override']) {
+			// registered users are not allowed to subscribe to
+			// excluded categories
+			$excluded = explode(',', $this->subscribe2_options['exclude']);
+			$all_cats = array_diff($all_cats, $excluded);
+			$cats = implode(',', $all_cats);
+		}
+
+		if ('' == $cats) {
+			// sanity check, might occur if all cats excluded and reg_override = 0
+			return $user_id;
+		}
+
 		// has this user previously signed up for email notification?
 		if (false !== $this->is_public($user->user_email)) {
 			// delete this user from the public table, and subscribe them to all the categories
 			$this->delete($user->user_email);
-			update_usermeta($user_id, 's2_subscribed', $this->get_all_categories());
-			foreach(explode(',', $this->get_all_categories()) as $cat) {
+			update_usermeta($user_id, 's2_subscribed', $cats);
+			foreach($all_cats as $cat) {
 				update_usermeta($user_id, 's2_cat' . $cat, "$cat");
 			}
 			update_usermeta($user_id, 's2_format', 'text');
@@ -905,8 +920,8 @@ class s2class {
 			if (empty($check)) {
 				if ('yes' == $this->subscribe2_options['autosub']) {
 					// don't add entires by default if autosub is off, messes up daily digests
-					update_usermeta($user_id, 's2_subscribed', $this->get_all_categories());
-						foreach(explode(',', $this->get_all_categories()) as $cat) {
+					update_usermeta($user_id, 's2_subscribed', $cats);
+						foreach($all_cats as $cat) {
 							update_usermeta($user_id, 's2_cat' . $cat, "$cat");
 						}
 					if ('html' == $this->subscribe2_options['autoformat']) {
