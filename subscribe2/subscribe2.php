@@ -530,24 +530,6 @@ class s2class {
 		@wp_mail ($this->email, $subject, $body, $mailheaders);
 	} // end send_confirm()
 
-/* ===== Category functions ===== */
-	/**
-	Return either a comma-separated list of all the category IDs in the blog or an array of cat_ID => cat_name
-	*/
-	function get_all_categories($select = 'id') {
-		global $wpdb;
-		if ('id' == $select) {
-			return implode(',', $wpdb->get_col("SELECT cat_ID FROM $wpdb->categories"));
-		} else {
-			$cats = array();
-			$result = $wpdb->get_results("SELECT cat_ID, cat_name FROM $wpdb->categories", ARRAY_N);
-			foreach ($result as $result) {
-				$cats[$result[0]] = $result[1];
-			}
-			return $cats;
-		}
-	} // end get_all_categories()
-
 /* ===== Subscriber functions ===== */
 	/**
 	Given a public subscriber ID, returns the email address
@@ -887,8 +869,8 @@ class s2class {
 			// registered users are not allowed to subscribe to
 			// excluded categories
 			$exclude = explode(',', $this->subscribe2_options['exclude']);
-			foreach ($all_cats as $cat => $cat_ID) {
-				if (in_array($all_cats[$cat]->cat_ID, $exclude)) {
+			foreach ($all_cats as $cat => $term_id) {
+				if (in_array($all_cats[$cat]->term_id, $exclude)) {
 					$cat = (int)$cat;
 					unset($all_cats[$cat]);
 				}
@@ -896,7 +878,7 @@ class s2class {
 		}
 
 		foreach ($all_cats as $cat) {
-			('' == $cats) ? $cats = "$cat->cat_ID" : $cats .= ",$cat->cat_ID";
+			('' == $cats) ? $cats = "$cat->term_id" : $cats .= ",$cat->term_id";
 		}
 
 		if ('' == $cats) {
