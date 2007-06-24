@@ -530,24 +530,6 @@ class s2class {
 		@wp_mail ($this->email, $subject, $body, $mailheaders);
 	} // end send_confirm()
 
-/* ===== Category functions ===== */
-	/**
-	Return either a comma-separated list of all the category IDs in the blog or an array of cat_ID => cat_name
-	*/
-	function get_all_categories($select = 'id') {
-		global $wpdb;
-		if ('id' == $select) {
-			return implode(',', $wpdb->get_col("SELECT cat_ID FROM $wpdb->categories"));
-		} else {
-			$cats = array();
-			$result = $wpdb->get_results("SELECT cat_ID, cat_name FROM $wpdb->categories", ARRAY_N);
-			foreach ($result as $result) {
-				$cats[$result[0]] = $result[1];
-			}
-			return $cats;
-		}
-	} // end get_all_categories()
-
 /* ===== Subscriber functions ===== */
 	/**
 	Given a public subscriber ID, returns the email address
