@@ -6,9 +6,25 @@ if (!isset($this->subscribe2_options['autosub'])) {
 	$this->subscribe2_options['autosub'] = "no"; 
 } // option to autosubscribe registered users to new categories
 
+if (!isset($this->subscribe2_options['wpregdef'])) {
+	$this->subscribe2_options['wpregdef'] = "no";
+} // option to 
+
 if (!isset($this->subscribe2_options['autoformat'])) {
 	$this->subscribe2_options['autoformat'] = "text";
 } // option for default auto-subscription email format
+
+if (!isset($this->subscribe2_options['pages'])) {
+	$this->subscribe2_options['pages'] = "no";
+} // option for sending notifications for WordPress pages
+
+if (!isset($this->subscribe2_options['password'])) {
+	$this->subscribe2_options['password'] = "no";
+} // option for sending notifications for posts that are password protected
+
+if (!isset($this->subscribe2_options['email_freq'])) {
+	$this->subscribe2_options['email_freq'] = "never";
+} // option for sending emails per-post or as a digest email on a cron schedule
 
 if (!isset($this->subscribe2_options['exclude'])) {
 	$this->subscribe2_options['exclude'] = "";
