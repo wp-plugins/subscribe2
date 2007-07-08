@@ -59,11 +59,11 @@ class s2class {
 	function load_strings() {
 		// adjust the output of Subscribe2 here
 
-		$this->please_log_in = "<p>" . __('To manage your subscription options please ', 'subscribe2') . "<a href=\"" . get_settings('siteurl') . "/wp-login.php\">login</a>.</p>";
+		$this->please_log_in = "<p>" . __('To manage your subscription options please ', 'subscribe2') . "<a href=\"" . get_option('siteurl') . "/wp-login.php\">login</a>.</p>";
 
-		$this->use_profile_admin = "<p>" . __('You may manage your subscription options from your ', 'subscribe2') . "<a href=\"" . get_settings('siteurl') . "/wp-admin/users.php?page=" . plugin_basename(__FILE__) . "\">profile</a>.</p>";
+		$this->use_profile_admin = "<p>" . __('You may manage your subscription options from your ', 'subscribe2') . "<a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=" . plugin_basename(__FILE__) . "\">profile</a>.</p>";
 
-		$this->use_profile_users = "<p>" . __('You may manage your subscription options from your ', 'subscribe2') . "<a href=\"" . get_settings('siteurl') . "/wp-admin/profile.php?page=" . plugin_basename(__FILE__) . "\">profile</a>.</p>";
+		$this->use_profile_users = "<p>" . __('You may manage your subscription options from your ', 'subscribe2') . "<a href=\"" . get_option('siteurl') . "/wp-admin/profile.php?page=" . plugin_basename(__FILE__) . "\">profile</a>.</p>";
 
 		$this->confirmation_sent = "<p>" . __('A confirmation message is on its way!', 'subscribe2') . "</p>";
 
@@ -86,9 +86,9 @@ class s2class {
 
 		$this->deleted = "<p>" . __('You have successfully unsubscribed.', 'subscribe2') . "</p>";
 
-		$this->confirm_subject = "[" . get_settings('blogname') . "] " . __('Please confirm your request', 'subscribe2');
+		$this->confirm_subject = "[" . get_option('blogname') . "] " . __('Please confirm your request', 'subscribe2');
 
-		$this->remind_subject = "[" . get_settings('blogname') . "] " . __('Subscription Reminder', 'subscribe2');
+		$this->remind_subject = "[" . get_option('blogname') . "] " . __('Subscription Reminder', 'subscribe2');
 
 		$this->subscribe = __('subscribe', 'subscribe2'); //ACTION replacement in subscribing confirmation email
 
@@ -216,7 +216,7 @@ class s2class {
 		if ('' == $string) {
 			return;
 		}
-		$string = str_replace('BLOGNAME', get_settings('blogname'), $string);
+		$string = str_replace('BLOGNAME', get_option('blogname'), $string);
 		$string = str_replace('BLOGLINK', get_bloginfo('url'), $string);
 		$string = str_replace('TITLE', stripslashes($this->post_title), $string);
 		$string = str_replace('PERMALINK', $this->permalink, $string);
@@ -242,7 +242,7 @@ class s2class {
 		$headers .= "Return-Path: <" . $this->myemail . ">\n";
 		$headers .= "Reply-To: " . $this->myemail . "\n";
 		$headers .= "X-Mailer:PHP" . phpversion() . "\n";
-		$headers .= "Precedence: list\nList-Id: " . get_settings('blogname') . "\n";
+		$headers .= "Precedence: list\nList-Id: " . get_option('blogname') . "\n";
 
 		if ('html' == $type) {
 				// To send HTML mail, the Content-Type header must be set
@@ -492,7 +492,7 @@ class s2class {
 		// ACTION = 1 to subscribe, 0 to unsubscribe
 		// HASH = md5 hash of email address
 		// ID = user's ID in the subscribe2 table
-		$link = get_settings('siteurl') . "?s2=";
+		$link = get_option('siteurl') . "/?s2=";
 
 		if ('add' == $what) {
 			$link .= '1';
@@ -523,7 +523,7 @@ class s2class {
 		$mailheaders .= "From: $admin->display_name <$admin->user_email>\n";
 		$mailheaders .= "Return-Path: <$admin->user_email>\n";
 		$mailheaders .= "X-Mailer:PHP" . phpversion() . "\n";
-		$mailheaders .= "Precedence: list\nList-Id: " . get_settings('blogname') . "\n";
+		$mailheaders .= "Precedence: list\nList-Id: " . get_option('blogname') . "\n";
 		$mailheaders .= "MIME-Version: 1.0\n";
 		$mailheaders .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 
@@ -709,7 +709,7 @@ class s2class {
 			// make this subscription active
 			$this->activate();
 			$this->message = $this->added;
-			$subject = '[' . get_settings('blogname') . '] ' . __('New subscriber', 'subscribe2');
+			$subject = '[' . get_option('blogname') . '] ' . __('New subscriber', 'subscribe2');
 			$message = "$this->email " . __('subscribed to email notifications!', 'subscribe2');
 			$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='wp_user_level' AND $wpdb->usermeta.meta_value='10'");
 			$this->mail($recipients, $subject, $message);
@@ -1647,7 +1647,7 @@ class s2class {
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-write_subscribers' . $s2nonce);
 		}
-		echo __('Subject', 'subscribe2') . ": <input type=\"text\" size=\"69\" name=\"subject\" value=\"" . __('A message from ', 'subscribe2') . get_settings('blogname') . "\" /> <br />";
+		echo __('Subject', 'subscribe2') . ": <input type=\"text\" size=\"69\" name=\"subject\" value=\"" . __('A message from ', 'subscribe2') . get_option('blogname') . "\" /> <br />";
 		echo "<textarea rows=\"12\" cols=\"75\" name=\"message\"></textarea>";
 		echo "<br />\r\n";
 		echo __('Recipients: ', 'subscribe2');
@@ -2020,7 +2020,7 @@ class s2class {
 		$scheds = (array) wp_get_schedules();
 		$email_freq = $this->subscribe2_options['email_freq'];
 		$display = $scheds[$email_freq]['display'];
-		$subject = '[' . stripslashes(get_settings('blogname')) . '] ' . $display . ' ' . __('Digest Email', 'subscribe2');
+		$subject = '[' . stripslashes(get_option('blogname')) . '] ' . $display . ' ' . __('Digest Email', 'subscribe2');
 		$public = $this->get_public();
 		$registered = $this->get_registered();
 		$recipients = array_merge((array)$public, (array)$registered);
@@ -2117,7 +2117,7 @@ class s2class {
 				add_action('marker_css', array(&$this, 'button_css'));
 			} else {
 				buttonsnap_separator();
-				buttonsnap_jsbutton(get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
+				buttonsnap_jsbutton(get_option('siteurl') . '/wp-content/plugins/subscribe2/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
 			}
 	}
 
@@ -2127,7 +2127,7 @@ class s2class {
 	places a CSS style on our token in order to make it display
 	*/
 	function button_css() { 
-		$marker_url = get_settings('siteurl') . '/wp-content/plugins/subscribe2/s2_marker.png';
+		$marker_url = get_option('siteurl') . '/wp-content/plugins/subscribe2/s2_marker.png';
 		echo "
 			.s2_marker {
 				display: block;
@@ -2153,7 +2153,7 @@ class s2class {
 	}
 
 	function tinymce_before_init() {
-		$this->fullpath = get_settings('siteurl') . '/wp-content/plugins/subscribe2/tinymce/';
+		$this->fullpath = get_option('siteurl') . '/wp-content/plugins/subscribe2/tinymce/';
 		echo "tinyMCE.loadPlugin('subscribe2quicktags', '" . $this->fullpath . "');\n"; 
 	}
 
