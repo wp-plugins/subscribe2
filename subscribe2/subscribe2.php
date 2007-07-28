@@ -330,7 +330,7 @@ class s2class {
 		if (!$id) { return $id; }
 
 		// are we doing daily digests? If so, don't send anything now
-		if ($this->subscribe2_options['email_freq'] != 'never') { return; }
+		if ($this->subscribe2_options['email_freq'] != 'never') { return $id; }
 
 		// we need to determine whether this is a new post, or an edit
 		if ($this->private) {
@@ -1183,7 +1183,6 @@ class s2class {
 					echo "<input type=\"hidden\" name=\"email\" value=\"$subscriber\" />\r\n";
 					echo "<input type=\"hidden\" name=\"s2_admin\" value=\"toggle\" />\r\n";
 					echo "<input type=\"hidden\" name=\"what\" value=\"$what\" />\r\n";
-
 					if (in_array($subscriber, $unconfirmed)) {
 						$foo = '&lt;-';
 						$image = 'include/arrow_left.png';
@@ -1388,6 +1387,7 @@ class s2class {
 		echo "<dt><b>BLOGLINK</b></dt><dd>" . get_bloginfo('url') . "</dd>\r\n";
 		echo "<dt><b>TITLE</b></dt><dd>" . __("the post's title", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>POST</b></dt><dd>" . __("the excerpt or the entire post<br />(<i>based on the subscriber's preferences</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>TABLE</b></dt><dd>" . __("a list of post titles (for digest emails)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>PERMALINK</b></dt><dd>" . __("the post's permalink", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>MYNAME</b></dt><dd>" . __("the admin or post author's name", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>EMAIL</b></dt><dd>" . __("the admin or post author's email", 'subscribe2') . "</dd>\r\n";
@@ -1404,7 +1404,7 @@ class s2class {
 
 		// excluded categories
 		echo "<h2>" . __('Excluded Categories', 'subscribe2') . "</h2>\r\n";
-		echo "<strong><em style=\"color: red\">" . __('Excluding Categories does not apply if notifications are sent periodically', 'subscribe2') . "</em></strong><br />\r\n";
+		echo "<strong><em style=\"color: red\">" . __('Posts assigned to any Excluded Category do not generate notifications and are not included in digest notifications', 'subscribe2') . "</em></strong><br />\r\n";
 		$this->display_category_form(explode(',', $this->subscribe2_options['exclude']));
 		echo "<center><input type=\"checkbox\" name=\"reg_override\" value=\"1\"";
 		if ('1' == $this->subscribe2_options['reg_override']) {
@@ -1996,6 +1996,7 @@ class s2class {
 			if ($check) {
 				continue;
 			}
+			$table .= $post->post_title . "\r\n";
 			$message .= $post->post_title . "\r\n";
 			$message .= get_permalink($post->ID) . "\r\n";
 			$excerpt = $post->post_excerpt;
@@ -2040,6 +2041,7 @@ class s2class {
 		$registered = $this->get_registered();
 		$recipients = array_merge((array)$public, (array)$registered);
 		$mailtext = $this->substitute(stripslashes($this->subscribe2_options['mailtext']));
+		$body = str_replace('TABLE', $table, $mailtext);
 		$body = str_replace('POST', $message, $mailtext);
 		$this->mail($recipients, $subject, $body);
 	} // end subscribe2_cron
