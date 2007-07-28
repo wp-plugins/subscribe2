@@ -1891,7 +1891,7 @@ class s2class {
 			if ('' == $excerpt) {
 				 // no excerpt, is there a <!--more--> ?
 				 if (false !== strpos($post->post_content, '<!--more-->')) {
-				 	list($excerpt, $more) = explode('<!--more-->', $plaintext, 2);
+				 	list($excerpt, $more) = explode('<!--more-->', $post->post_content, 2);
 					// strip leading and trailing whitespace
 					$excerpt = trim($excerpt);
 				} else {
