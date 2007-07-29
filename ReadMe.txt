@@ -78,6 +78,16 @@ Batches will occur for each group of message as described above.  A site on Drea
 
 == Version History ==
 
+Version 3.7 by Matthew Robinson
+
+* Change from deprecated get_settings -> get_option
+* Fix for confirmation links not working for custom installs
+* Abandoned wp_mail due to core bugs
+* Added Digest Table feature (untested)
+* Added icons to manage window (Thanks to http://www.famfamfam.com/lab/icons/)
+* Fixed Bulk Manage bug when using i18n files
+* Fixed bug in cron emails if <!--more--> tag present
+
 Version 3.6 by Matthew Robinson
 
 * Fixed a typo in Content-Type mail headers
@@ -123,6 +133,11 @@ Version 3.1 by Matthew Robinson
 Version 3.0 by Matthew Robinson
 
 * Updated for WordPress 2.1 Branch
+
+Version 2.21 by Matthew Robinson
+
+* Change from deprecated get_settings -> get_option
+* Fixed bug in cron emails if <!--more--> tag present
 
 Version 2.20 by Matthew Robinson
 
