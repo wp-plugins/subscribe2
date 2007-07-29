@@ -45,7 +45,7 @@ define('S2VERSION', '3.7');
 define ('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // use Owen's excellent ButtonSnap library
-require(ABSPATH . '/wp-content/plugins/buttonsnap.php');
+require(ABSPATH . 'wp-content/plugins/buttonsnap.php');
 
 $mysubscribe2 = new s2class;
 $mysubscribe2->s2init();
@@ -146,7 +146,7 @@ class s2class {
 	function install() {
 		// include upgrade-functions for maybe_create_table;
 		if (!function_exists('maybe_create_table')) {
-			require_once(ABSPATH . '/wp-admin/upgrade-functions.php');
+			require_once(ABSPATH . 'wp-admin/upgrade-functions.php');
 		}
 		$date = date('Y-m-d');
 		$sql = "CREATE TABLE $this->public (
@@ -169,7 +169,7 @@ class s2class {
 
 		// include upgrade-functions for maybe_create_table;
 		if (!function_exists('maybe_create_table')) {
-			require_once(ABSPATH . '/wp-admin/upgrade-functions.php');
+			require_once(ABSPATH . 'wp-admin/upgrade-functions.php');
 		}
 		$date = date('Y-m-d');
 		maybe_add_column($this->public, 'date', "ALTER TABLE `$this->public` ADD `date` DATE DEFAULT '$date' NOT NULL AFTER `active`;");
@@ -665,7 +665,7 @@ class s2class {
 	function exportcsv($emails = '') {
 		if ('' == $emails) {return false; }
 
-		$f = fopen(ABSPATH . '/wp-content/email.csv', 'w');
+		$f = fopen(ABSPATH . 'wp-content/email.csv', 'w');
 		fwrite($f, $emails);
 		fclose($f);
 	} //end exportcsv
@@ -1148,7 +1148,7 @@ class s2class {
 		$alternate = 'alternate';
 		if (!empty($subscribers)) {
 			echo "<p align=\"center\"><b>" . __('Registered on the left, confirmed in the middle, unconfirmed on the right', 'subscribe2') . "</b></p>";
-			if (is_writable(ABSPATH . '/wp-content')) {
+			if (is_writable(ABSPATH . 'wp-content')) {
 				$exportcsv = implode(",", $subscribers);
 				echo "<form method=\"post\" action=\"\">\r\n";
 				if (function_exists('wp_nonce_field')) {
@@ -1241,7 +1241,7 @@ class s2class {
 		echo "</div>\r\n";
 		echo "<div style=\"clear: both;\"><p>&nbsp;</p></div>";
 
-		include(ABSPATH . '/wp-admin/admin-footer.php');
+		include(ABSPATH . 'wp-admin/admin-footer.php');
 		// just to be sure
 		die;
 	} // end manage_menu()
@@ -1489,7 +1489,7 @@ class s2class {
 		"\" />";
 		echo "</span></p></form></div>\r\n";
 
-		include(ABSPATH . '/wp-admin/admin-footer.php');
+		include(ABSPATH . 'wp-admin/admin-footer.php');
 		// just to be sure
 		die;
 	} // end options_menu()
@@ -1615,7 +1615,7 @@ class s2class {
 		echo "<p align=\"right\"><span class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __("Update Preferences &raquo;", 'subscribe2') . "\" /></span></p>";
 		echo "</form></div>\r\n";
 
-		include(ABSPATH . '/wp-admin/admin-footer.php');
+		include(ABSPATH . 'wp-admin/admin-footer.php');
 		// just to be sure
 		die;
 	} // end user_menu()
@@ -1672,7 +1672,7 @@ class s2class {
 		echo "</form></div>\r\n";
 		echo "<div style=\"clear: both;\"><p>&nbsp;</p></div>";
 
-		include(ABSPATH . '/wp-admin/admin-footer.php');
+		include(ABSPATH . 'wp-admin/admin-footer.php');
 		// just to be sure
 		die;
 	} // end write_menu()
