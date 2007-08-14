@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 3.7
+Version: 3.8
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -41,11 +41,11 @@ define('S2PAGE', '0');
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '3.7');
+define('S2VERSION', '3.8');
 define ('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // use Owen's excellent ButtonSnap library
-require(ABSPATH . '/wp-content/plugins/buttonsnap.php');
+require(ABSPATH . 'wp-content/plugins/buttonsnap.php');
 
 $mysubscribe2 = new s2class;
 $mysubscribe2->s2init();
@@ -146,7 +146,7 @@ class s2class {
 	function install() {
 		// include upgrade-functions for maybe_create_table;
 		if (!function_exists('maybe_create_table')) {
-			require_once(ABSPATH . '/wp-admin/upgrade-functions.php');
+			require_once(ABSPATH . 'wp-admin/upgrade-functions.php');
 		}
 		$date = date('Y-m-d');
 		$sql = "CREATE TABLE $this->public (
@@ -169,7 +169,7 @@ class s2class {
 
 		// include upgrade-functions for maybe_create_table;
 		if (!function_exists('maybe_create_table')) {
-			require_once(ABSPATH . '/wp-admin/upgrade-functions.php');
+			require_once(ABSPATH . 'wp-admin/upgrade-functions.php');
 		}
 		$date = date('Y-m-d');
 		maybe_add_column($this->public, 'date', "ALTER TABLE `$this->public` ADD `date` DATE DEFAULT '$date' NOT NULL AFTER `active`;");
@@ -225,7 +225,7 @@ class s2class {
 		$string = str_replace('EMAIL', $this->myemail, $string);
 		$string = str_replace('AUTHORNAME', $this->authorname, $string);
 		return $string;
-	} // end sustitute()
+	} // end substitute()
 
 	/**
 	Delivers email to recipients in HTML or plaintext
@@ -494,7 +494,8 @@ class s2class {
 		// ACTION = 1 to subscribe, 0 to unsubscribe
 		// HASH = md5 hash of email address
 		// ID = user's ID in the subscribe2 table
-		$link = get_option('siteurl') . "/?s2=";
+		//use home instead of siteurl incase index.php is not in core wordpress directory
+		$link = get_option('home') . "/?s2=";
 
 		if ('add' == $what) {
 			$link .= '1';
@@ -665,7 +666,7 @@ class s2class {
 	function exportcsv($emails = '') {
 		if ('' == $emails) {return false; }
 
-		$f = fopen(ABSPATH . '/wp-content/email.csv', 'w');
+		$f = fopen(ABSPATH . 'wp-content/email.csv', 'w');
 		fwrite($f, $emails);
 		fclose($f);
 	} //end exportcsv
@@ -1148,7 +1149,7 @@ class s2class {
 		$alternate = 'alternate';
 		if (!empty($subscribers)) {
 			echo "<p align=\"center\"><b>" . __('Registered on the left, confirmed in the middle, unconfirmed on the right', 'subscribe2') . "</b></p>";
-			if (is_writable(ABSPATH . '/wp-content')) {
+			if (is_writable(ABSPATH . 'wp-content')) {
 				$exportcsv = implode(",", $subscribers);
 				echo "<form method=\"post\" action=\"\">\r\n";
 				if (function_exists('wp_nonce_field')) {
@@ -1241,7 +1242,7 @@ class s2class {
 		echo "</div>\r\n";
 		echo "<div style=\"clear: both;\"><p>&nbsp;</p></div>";
 
-		include(ABSPATH . '/wp-admin/admin-footer.php');
+		include(ABSPATH . 'wp-admin/admin-footer.php');
 		// just to be sure
 		die;
 	} // end manage_menu()
@@ -1489,7 +1490,7 @@ class s2class {
 		"\" />";
 		echo "</span></p></form></div>\r\n";
 
-		include(ABSPATH . '/wp-admin/admin-footer.php');
+		include(ABSPATH . 'wp-admin/admin-footer.php');
 		// just to be sure
 		die;
 	} // end options_menu()
@@ -1519,7 +1520,7 @@ class s2class {
 			update_usermeta($user_ID, 's2_autosub', $_POST['new_category']);
 
 			$cats = $_POST['category'];
-			if (empty($cats)) {
+			if ( (empty($cats)) || ($cats == '-1') ) {
 				$cats = explode(',', get_usermeta($user_ID, 's2_subscribed'));
 				if ($cats) {
 					foreach ($cats as $cat) {
@@ -1527,6 +1528,13 @@ class s2class {
 					}
 				}
 				update_usermeta($user_ID, 's2_subscribed', '-1');
+			} elseif ($cats == 'digest') {
+				$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
+				foreach ($all_cats as $cat) {
+					('' == $catids) ? $catids = "$cat->cat_ID" : $catids .= ",$cat->cat_ID";
+					update_usermeta($user_ID, 's2_cat' . $cat->cat_ID, $cat->cat_ID);
+				}
+				update_usermeta($user_ID, 's2_subscribed', $catids);
 			} else {
 				 if (!is_array($cats)) {
 				 	$cats = array($_POST['category']);
@@ -1537,13 +1545,13 @@ class s2class {
 				if (!empty($remove)) {
 					// remove subscription to these cat IDs
 					foreach ($remove as $id) {
-						delete_usermeta($user_ID, "s2_cat" .$id);
+						delete_usermeta($user_ID, "s2_cat" . $id);
 					}
 				}
 				if (!empty($new)) {
 					// add subscription to these cat IDs
 					foreach ($new as $id) {
-						update_usermeta($user_ID, 's2_cat' . $id, "$id");
+						update_usermeta($user_ID, 's2_cat' . $id, $id);
 					}
 				}
 				update_usermeta($user_ID, 's2_subscribed', implode(',', $cats));
@@ -1600,12 +1608,12 @@ class s2class {
 			// we're doing daily digests, so just show
 			// subscribe / unnsubscribe
 			echo __('Receive daily summary of new posts?', 'subscribe2') . ': &nbsp;&nbsp;';
-			echo "<input type=\"radio\" name=\"category\" value=\"1\" ";
-			if (get_usermeta($user_ID, 's2_subscribed')) {
+			echo "<input type=\"radio\" name=\"category\" value=\"digest\" ";
+			if (get_usermeta($user_ID, 's2_subscribed') != '-1') {
 				echo "checked=\"yes\" ";
 			}
-			echo "/> Yes <input type=\"radio\" name=\"category\" value=\"\" ";
-			if (! get_usermeta($user_ID, 's2_subscribed')) {
+			echo "/> Yes <input type=\"radio\" name=\"category\" value=\"-1\" ";
+			if (get_usermeta($user_ID, 's2_subscribed') == '-1') {
 				echo "checked=\"yes\" ";
 			}
 			echo "/> No";
@@ -1615,7 +1623,7 @@ class s2class {
 		echo "<p align=\"right\"><span class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __("Update Preferences &raquo;", 'subscribe2') . "\" /></span></p>";
 		echo "</form></div>\r\n";
 
-		include(ABSPATH . '/wp-admin/admin-footer.php');
+		include(ABSPATH . 'wp-admin/admin-footer.php');
 		// just to be sure
 		die;
 	} // end user_menu()
@@ -1672,7 +1680,7 @@ class s2class {
 		echo "</form></div>\r\n";
 		echo "<div style=\"clear: both;\"><p>&nbsp;</p></div>";
 
-		include(ABSPATH . '/wp-admin/admin-footer.php');
+		include(ABSPATH . 'wp-admin/admin-footer.php');
 		// just to be sure
 		die;
 	} // end write_menu()
@@ -1744,7 +1752,7 @@ class s2class {
 			'public' => __('Public Subscribers', 'subscribe2'),
 			'confirmed' => ' &nbsp;&nbsp;' . __('Confirmed', 'subscribe2'),
 			'unconfirmed' => ' &nbsp;&nbsp;' . __('Unconfirmed', 'subscribe2'),
-			'registered' => __('Registered Subscribers', 'subscribe2'));
+			'registered' => __('Registered Users', 'subscribe2'));
 
 		$all_cats = get_categories('type=post&hide_empty=1&hierarchical=0');
 
