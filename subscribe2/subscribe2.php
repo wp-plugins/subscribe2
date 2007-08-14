@@ -498,7 +498,8 @@ class s2class {
 		// ACTION = 1 to subscribe, 0 to unsubscribe
 		// HASH = md5 hash of email address
 		// ID = user's ID in the subscribe2 table
-		$link = get_option('siteurl') . "/?s2=";
+		//use home instead of siteurl incase index.php is not in core wordpress directory
+		$link = get_option('home') . "/?s2=";
 
 		if ('add' == $what) {
 			$link .= '1';
@@ -1455,7 +1456,7 @@ class s2class {
 			update_usermeta($user_ID, 's2_autosub', $_POST['new_category']);
 
 			$cats = $_POST['category'];
-			if (empty($cats)) {
+			if ( (empty($cats)) || ($cats == '-1') ) {
 				$cats = explode(',', get_usermeta($user_ID, 's2_subscribed'));
 				if ($cats) {
 					foreach ($cats as $cat) {
@@ -1463,6 +1464,13 @@ class s2class {
 					}
 				}
 				update_usermeta($user_ID, 's2_subscribed', '-1');
+			} elseif ($cats == 'digest') {
+				$all_cats = $this->get_all_categories('array');
+				foreach ($all_cats as $cat_ID => $cat_name) {
+					('' == $catids) ? $catids = "$cat_ID" : $catids .= ",$cat_ID";
+					update_usermeta($user_ID, 's2_cat' . $cat_ID, $cat_ID);
+				}
+				update_usermeta($user_ID, 's2_subscribed', $catids);
 			} else {
 				 if (!is_array($cats)) {
 				 	$cats = array($_POST['category']);
@@ -1536,12 +1544,12 @@ class s2class {
 			// we're doing daily digests, so just show
 			// subscribe / unnsubscribe
 			echo __('Receive daily summary of new posts?', 'subscribe2') . ': &nbsp;&nbsp;';
-			echo "<input type=\"radio\" name=\"category\" value=\"1\" ";
-			if (get_usermeta($user_ID, 's2_subscribed')) {
+			echo "<input type=\"radio\" name=\"category\" value=\"digest\" ";
+			if (get_usermeta($user_ID, 's2_subscribed') != '-1') {
 				echo "checked=\"yes\" ";
 			}
-			echo "/> Yes <input type=\"radio\" name=\"category\" value=\"\" ";
-			if (! get_usermeta($user_ID, 's2_subscribed')) {
+			echo "/> Yes <input type=\"radio\" name=\"category\" value=\"-1\" ";
+			if (get_usermeta($user_ID, 's2_subscribed') == '-1') {
 				echo "checked=\"yes\" ";
 			}
 			echo "/> No";
@@ -1677,7 +1685,7 @@ class s2class {
 			'public' => __('Public Subscribers', 'subscribe2'),
 			'confirmed' => ' &nbsp;&nbsp;' . __('Confirmed', 'subscribe2'),
 			'unconfirmed' => ' &nbsp;&nbsp;' . __('Unconfirmed', 'subscribe2'),
-			'registered' => __('Registered Subscribers', 'subscribe2'));
+			'registered' => __('Registered Users', 'subscribe2'));
 
 		// count the number of subscribers
 		$count['confirmed'] = $wpdb->get_var("SELECT COUNT(id) FROM $this->public WHERE active='1'");
