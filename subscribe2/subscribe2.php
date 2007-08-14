@@ -1275,7 +1275,7 @@ class s2class {
 				($_POST['show_button'] == '1') ? $showbutton = '1' : $showbutton = '0';
 				$this->subscribe2_options['show_button'] = $showbutton;
 
-				// show widget
+				// show widget in Presentation->Widgets
 				($_POST['widget'] == '1') ? $showwidget = '1' : $showwidget = '0';
 				$this->subscribe2_options['widget'] = $showwidget;
 

@@ -43,6 +43,10 @@ if (!isset($this->subscribe2_options['show_button'])) {
 	$this->subscribe2_options['show_button'] = "1";
 } // option to show Subscribe2 button on Write page
 
+if (!isset($this->subscribe2_options['widget'])) {
+	$this->subscribe2_options['widget'] = "1";
+} // option to show Subscribe2 Widget in the Presentation->Widgets page
+
 if (!isset($this->subscribe2_options['barred'])) {
 	$this->subscribe2_options['barred'] = '';
 } // option containing domains barred from public registration
