@@ -2,7 +2,7 @@
 /*
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
-Description: Notifies an email list when new entries are posted. Tested with WordPress 2.1.x and 2.2.x.
+Description: Notifies an email list when new entries are posted.
 Version: 4.0
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
@@ -1274,6 +1274,10 @@ class s2class {
 				($_POST['show_button'] == '1') ? $showbutton = '1' : $showbutton = '0';
 				$this->subscribe2_options['show_button'] = $showbutton;
 
+				// show widget
+				($_POST['widget'] == '1') ? $showwidget = '1' : $showwidget = '0';
+				$this->subscribe2_options['widget'] = $showwidget;
+
 				// send as author or admin?
 				$sender = 'author';
 				if ('admin' == $_POST['sender']) {
@@ -1419,6 +1423,13 @@ class s2class {
 			echo " checked=\"checked\"";
 		}
 		echo " /> " . __('Show the Subscribe2 button on the Write toolbar?', 'subscribe2') . "<br /><br />\r\n";
+
+		// show Widget
+		echo "<input type=\"checkbox\" name=\"widget\" value=\"1\"";
+		if ('1' == $this->subscribe2_options['widget']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Enable Subscribe2 Widget?', 'subscribe2') . "<br /><br />\r\n";
 
 		//Auto Subscription for new registrations
 		echo "<h2>" . __('Auto Subscribe', 'subscribe2') . "</h2>\r\n";
@@ -1960,6 +1971,55 @@ class s2class {
 		return __('Subscription Confirmation', 'subscribe2');
 	} // end title_filter()
 
+/* ===== widget functions ===== */
+	/**
+	Registers our widget so it appears with the other available
+	widgets and can be dragged and dropped into any active sidebars
+	*/
+	function widget_subscribe2widget($args) {
+		extract($args);
+		$options = get_option('widget_subscribe2widget');
+		$title = empty($options['title']) ? __('Subscribe2') : $options['title'];
+		echo $before_widget;
+		echo $before_title . $title . $after_title;
+		echo "<div class=\"search\">";
+		$content = apply_filters('the_content', '<p><!--subscribe2--></p>');
+		echo $content;
+		echo "</div>";
+		echo $after_widget;
+	}
+
+	/**
+	Register the optional widget control form
+	*/
+	function widget_subscribe2widget_control() {
+		$options = $newoptions = get_option('widget_subscribe2widget');
+		if ($_POST["s2w-submit"]) {
+			$newoptions['title'] = strip_tags(stripslashes($_POST["s2w-title"]));
+		}
+		if ($options != $newoptions) {
+			$options = $newoptions;
+			update_option('widget_subscribe2widget', $options);
+		}
+		$title = htmlspecialchars($options['title'], ENT_QUOTES);
+		echo "<p><label for=\"s2w-title\">" . __('Title:');
+		echo "<input style=\"width: 250px;\" id=\"s2w-title\" name=\"s2w-title\" type=\"text\" value=\"" . $title . "\" /></label></p>";
+		echo "<input type=\"hidden\" id=\"s2w-submit\" name=\"s2w-submit\" value=\"1\" />";
+	}
+
+	/**
+	Actually register the Widget into the WordPress Widget API
+	*/
+	function register_subscribe2widget() {
+		//Check Sidebar Widget and Subscribe2 plugins are activated
+		if ( !function_exists('register_sidebar_widget') || !class_exists('s2class')) {
+			return;
+		} else {
+			register_sidebar_widget('Subscribe2Widget', array(&$this, 'widget_subscribe2widget'));
+			register_widget_control('Subscribe2Widget', array(&$this, 'widget_subscribe2widget_control'));
+		}
+	}
+
 /* ===== wp-cron functions ===== */
 	/**
 	Send a daily digest of today's new posts
@@ -2056,8 +2116,12 @@ class s2class {
 		$this->subscribe2_options = get_option('subscribe2_options');
 
 		add_action('init', array(&$this, 'subscribe2'));
-		if('1' == $this->subscribe2_options['show_button']) {
+		if ('1' == $this->subscribe2_options['show_button']) {
 			add_action('init', array(&$this, 'button_init'));
+		}
+		// add action to display widget if option is enabled
+		if ('1' == $this->subscribe2_options['widget']) {
+			add_action('plugins_loaded', array(&$this, 'register_subscribe2widget'));
 		}
 	}
 
@@ -2119,7 +2183,7 @@ class s2class {
 		// load our strings
 		$this->load_strings();
 	} // end subscribe2()
-	
+
 	/* ===== ButtonSnap configuration ===== */
 	/**
 	Register our button in the QuickTags bar
