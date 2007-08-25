@@ -260,8 +260,7 @@ class s2class {
 
 		// BCC all recipients
 		$bcc = '';
-		if ( (defined('BCCLIMIT') && (BCCLIMIT > 0) ) &&
-			(count($recipients) > BCCLIMIT) ) {
+		if ( (defined('BCCLIMIT')) && (BCCLIMIT > 0) && (count($recipients) > BCCLIMIT) ) {
 			// we're on Dreamhost, and have more than 30 susbcribers
 				$count = 1;
 				$batch = array();
@@ -1294,7 +1293,12 @@ class s2class {
 
 				// send per-post or digest emails
 				$email_freq = $_POST['email_freq'];
+				if ($email_freq != $this->subscribe2_options['email_freq']) {
+					//ensure $timestamp is used if cron period changes
+					$check = true;
+				}
 				$this->subscribe2_options['email_freq'] = $email_freq;
+				$previous_time = wp_next_scheduled('s2_digest_cron');
 				wp_clear_scheduled_hook('s2_digest_cron');
 				$scheds = (array) wp_get_schedules();
 				$interval = ( isset($scheds[$email_freq]['interval']) ) ? (int) $scheds[$email_freq]['interval'] : 0;
@@ -1304,8 +1308,20 @@ class s2class {
 				} else {
 					if (!wp_next_scheduled('s2_digest_cron')) {
 						// if we are using digest schedule the event and prime last_cron as now
-						wp_schedule_event(time() + $interval, $email_freq, 's2_digest_cron');
-						$now = date('Y-m-d H:i:s', time());
+						$time = time();
+						if ($interval < 86400) {
+							// Schedule CRON events occurring less than daily starting now and periodically thereafter
+							$timestamp = $time + $interval;
+						} else {
+							// Schedule other CRON events starting at midnight and periodically thereafter
+							$timestamp = mktime(0, 0, 0, date('m', $time), date('d', $time + $interval), date('Y', $time));
+						}
+						if ( ('on' == $_POST['reset_cron']) || $check ) {
+							wp_schedule_event($timestamp, $email_freq, 's2_digest_cron');
+						} else {
+							wp_schedule_event($previous_time, $email_freq, 's2_digest_cron');
+						}
+						$now = date('Y-m-d H:i:s', $time);
 						$this->subscribe2_options['last_s2cron'] = $now;
 					}
 				}
@@ -1377,7 +1393,6 @@ class s2class {
 		if (function_exists('wp_schedule_event')) {
 			echo __('Send Email as Digest', 'subscribe2') . ": <br /><br />\r\n";
 			$this->display_digest_choices();
-			echo "<br />\r\n";
 		}
 		echo "<h2>" . __('Email Templates', 'subscribe2') . "</h2>\r\n";
 		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" class=\"editform\">\r\n";
@@ -1835,12 +1850,15 @@ class s2class {
 			echo " /> " . $value['display'] . "<br />\r\n";
 		}
 		if (wp_next_scheduled('s2_digest_cron')) {
+			echo "<p><input type=\"checkbox\" name=\"reset_cron\" /> " . __('Reset the schedule time and date for periodic email notifications', 'subscribe2') . "</p>\r\n";
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 			$now = time();
 			echo "<p>" . __('Current server time is', 'subscribe2') . ": \r\n";
 			echo "<strong>" . gmdate($datetime, $now+ (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
 			echo "<p>" . __('Next email notification will be sent', 'subscribe2') . ": \r\n";
 			echo "<strong>" . gmdate($datetime, wp_next_scheduled('s2_digest_cron') + (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
+		} else {
+			echo "<br />";
 		}
 	} // end display_digest_choices()
 
