@@ -1308,13 +1308,13 @@ class s2class {
 				} else {
 					if (!wp_next_scheduled('s2_digest_cron')) {
 						// if we are using digest schedule the event and prime last_cron as now
-						$time = time();
+						$time = time() + $interval;
 						if ($interval < 86400) {
 							// Schedule CRON events occurring less than daily starting now and periodically thereafter
-							$timestamp = $time + $interval;
+							$timestamp = &$time;
 						} else {
 							// Schedule other CRON events starting at midnight and periodically thereafter
-							$timestamp = mktime(0, 0, 0, date('m', $time), date('d', $time + $interval), date('Y', $time));
+							$timestamp = mktime(0, 0, 0, date('m', $time), date('d', $time), date('Y', $time));
 						}
 						if ( ('on' == $_POST['reset_cron']) || $check ) {
 							wp_schedule_event($timestamp, $email_freq, 's2_digest_cron');
