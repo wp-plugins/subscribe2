@@ -209,15 +209,15 @@ class s2class {
 		if ('' == $string) {
 			return;
 		}
-		$string = str_replace('BLOGNAME', get_option('blogname'), $string);
-		$string = str_replace('BLOGLINK', get_bloginfo('url'), $string);
-		$string = str_replace('TITLE', stripslashes($this->post_title), $string);
-		$string = str_replace('PERMALINK', $this->permalink, $string);
-		$string = str_replace('MYNAME', stripslashes($this->myname), $string);
-		$string = str_replace('EMAIL', $this->myemail, $string);
-		$string = str_replace('AUTHORNAME', $this->authorname, $string);
+		$string = str_replace("BLOGNAME", get_option('blogname'), $string);
+		$string = str_replace("BLOGLINK", get_bloginfo('url'), $string);
+		$string = str_replace("TITLE", stripslashes($this->post_title), $string);
+		$string = str_replace("PERMALINK", $this->permalink, $string);
+		$string = str_replace("MYNAME", stripslashes($this->myname), $string);
+		$string = str_replace("EMAIL", $this->myemail, $string);
+		$string = str_replace("AUTHORNAME", $this->authorname, $string);
 		return $string;
-	} // end sustitute()
+	} // end substitute()
 
 	/**
 	Delivers email to recipients in HTML or plaintext
@@ -238,7 +238,7 @@ class s2class {
 		$headers .= "Precedence: list\nList-Id: " . get_option('blogname') . "\n";
 
 		if ('html' == $type) {
-				// To send HTML mail, the Content-type header must be set
+				// To send HTML mail, the Content-Type header must be set
 				$headers .= "MIME-Version: 1.0\n";
 				$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
 				$mailtext = "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>";
@@ -415,7 +415,7 @@ class s2class {
 
 		$plaintext = $post->post_content;
 		$content = apply_filters('the_content', $post->post_content);
-		$content = str_replace(']]>', ']]&gt', $content);
+		$content = str_replace("]]>", "]]&gt", $content);
 		$excerpt = $post->post_excerpt;
 		if ('' == $excerpt) {
 			// no excerpt, is there a <!--more--> ?
@@ -438,7 +438,7 @@ class s2class {
 		}
 
 		// first we send plaintext summary emails
-		$body = str_replace('POST', $excerpt, $mailtext);
+		$body = str_replace("POST", $excerpt, $mailtext);
 		$registered = $this->get_registered("cats=$post_cats_string&format=text&amount=excerpt");
 		if (empty($registered)) {
 			$recipients = (array)$public;
@@ -450,11 +450,11 @@ class s2class {
 		}
 		$this->mail($recipients, $subject, $body);
 		// next we send plaintext full content emails
-		$body = str_replace('POST', strip_tags($plaintext), $mailtext);
+		$body = str_replace("POST", strip_tags($plaintext), $mailtext);
 		$this->mail($this->get_registered("cats=$post_cats_string&format=text&amount=post"), $subject, $body);
 		// finally we send html full content emails
 		$body = str_replace("\r\n", "<br />\r\n", $mailtext);
-		$body = str_replace('POST', $content, $body);
+		$body = str_replace("POST", $content, $body);
 		$this->mail($this->get_registered("cats=$post_cats_string&format=html"), $subject, $body, 'html');
 
 		return $id;
@@ -1151,7 +1151,7 @@ class s2class {
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
 		}
-		echo "<span style=\"align:left\">" . __('Enter addresses, one per line or comma-seperated', 'subscribe2') . "</span><br />\r\n";
+		echo __('Enter addresses, one per line or comma-seperated', 'subscribe2') . "<br />\r\n";
 		echo "<textarea rows=\"2\" cols=\"80\" name=\"addresses\"></textarea><br />\r\n";
 		echo "<span class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Subscribe', 'subscribe2') . "\"/>\r\n";
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"subscribe\" /></span>";
@@ -1164,7 +1164,7 @@ class s2class {
 		// show the selected subscribers
 		$alternate = 'alternate';
 		if (!empty($subscribers)) {
-			echo "<p align=\"center\"><b>" . __('Registered on the left, confirmed in the middle, unconfirmed on the right', 'subscribe2') . "</b></p>";
+			echo "<p align=\"center\"><b>" . __('Registered on the left, confirmed in the middle, unconfirmed on the right', 'subscribe2') . "</b></p>\r\n";
 			if (is_writable(ABSPATH . '/wp-content')) {
 				$exportcsv = implode(",", $subscribers);
 				echo "<form method=\"post\" action=\"\">\r\n";
@@ -1185,9 +1185,9 @@ class s2class {
 				if (in_array($subscriber, $unconfirmed)) {
 					echo " align=\"right\">";
 				} elseif (in_array($subscriber, $confirmed)) {
-					echo "align=\"center\">";
+					echo " align=\"center\">";
 				} else {
-					echo "align=\"left\" colspan=\"3\">";
+					echo " align=\"left\" colspan=\"3\">";
 				}
 				echo "<a href=\"mailto:$subscriber\">$subscriber</a>\r\n";
 				if (in_array($subscriber, $unconfirmed) || in_array($subscriber, $confirmed) ) {
@@ -1323,14 +1323,14 @@ class s2class {
 		echo __('Send Email From', 'subscribe2') . ': ';
 		echo "<input type=\"radio\" name=\"sender\" value=\"author\"";
 		if ('author' == $this->subscribe2_options['sender']) {
-			echo "checked=\"checked\" ";
+			echo " checked=\"checked\" ";
 		}
 		echo " /> " . __('Author of the post', 'subscribe2') . " &nbsp;&nbsp;";
 		echo "<input type=\"radio\" name=\"sender\" value=\"admin\"";
 		if ('admin' == $this->subscribe2_options['sender']) {
-			echo "checked=\"checked\" ";
+			echo " checked=\"checked\" ";
 		}
-		echo " /> " . __('Blog Admin', 'subscribe2') . "<br />\r\n";
+		echo " /> " . __('Blog Admin', 'subscribe2') . "<br /><br />\r\n";
 		echo "<h2>" . __('Email Templates', 'subscribe2') . "</h2>\r\n";
 		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" class=\"editform\">\r\n";
 		echo "<tr><td>";
@@ -1481,13 +1481,13 @@ class s2class {
 				if (!empty($remove)) {
 					// remove subscription to these cat IDs
 					foreach ($remove as $id) {
-						delete_usermeta($user_ID, "s2_cat" .$id);
+						delete_usermeta($user_ID, "s2_cat" . $id);
 					}
 				}
 				if (!empty($new)) {
 					// add subscription to these cat IDs
 					foreach ($new as $id) {
-						update_usermeta($user_ID, 's2_cat' . $id, "$id");
+						update_usermeta($user_ID, 's2_cat' . $id, $id);
 					}
 				}
 				update_usermeta($user_ID, 's2_subscribed', implode(',', $cats));
@@ -1528,12 +1528,12 @@ class s2class {
 			echo __('Automatically subscribe me to newly created categories', 'subscribe2') . ': &nbsp;&nbsp;';
 			echo "<input type=\"radio\" name=\"new_category\" value=\"yes\" ";
 			if ('yes' == get_usermeta($user_ID, 's2_autosub')) {
-				echo "checked=\"yes\" ";
+				echo "checked=\"checked\" ";
 			}
 			echo "/> Yes &nbsp;&nbsp;";
 			echo "<input type=\"radio\" name=\"new_category\" value=\"no\" ";
 			if ('no' == get_usermeta($user_ID, 's2_autosub')) {
-				echo "checked=\"yes\" ";
+				echo "checked=\"checked\" ";
 			}
 			echo "/> No<br /><br />";
 
@@ -1934,7 +1934,7 @@ class s2class {
 		$registered = $this->get_registered();
 		$recipients = array_merge((array)$public, (array)$registered);
 		$mailtext = $this->substitute(stripslashes($this->subscribe2_options['mailtext']));
-		$body = str_replace('POST', $message, $mailtext);
+		$body = str_replace("POST", $message, $mailtext);
 		$this->mail($recipients, $subject, $body);
 	} // end subscribe2_daily
 
