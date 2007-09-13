@@ -217,13 +217,13 @@ class s2class {
 		if ('' == $string) {
 			return;
 		}
-		$string = str_replace('BLOGNAME', get_option('blogname'), $string);
-		$string = str_replace('BLOGLINK', get_bloginfo('url'), $string);
-		$string = str_replace('TITLE', stripslashes($this->post_title), $string);
-		$string = str_replace('PERMALINK', $this->permalink, $string);
-		$string = str_replace('MYNAME', stripslashes($this->myname), $string);
-		$string = str_replace('EMAIL', $this->myemail, $string);
-		$string = str_replace('AUTHORNAME', $this->authorname, $string);
+		$string = str_replace("BLOGNAME", get_option('blogname'), $string);
+		$string = str_replace("BLOGLINK", get_bloginfo('url'), $string);
+		$string = str_replace("TITLE", stripslashes($this->post_title), $string);
+		$string = str_replace("PERMALINK", $this->permalink, $string);
+		$string = str_replace("MYNAME", stripslashes($this->myname), $string);
+		$string = str_replace("EMAIL", $this->myemail, $string);
+		$string = str_replace("AUTHORNAME", $this->authorname, $string);
 		return $string;
 	} // end substitute()
 
@@ -410,7 +410,7 @@ class s2class {
 
 		$plaintext = $post->post_content;
 		$content = apply_filters('the_content', $post->post_content);
-		$content = str_replace(']]>', ']]&gt', $content);
+		$content = str_replace("]]>", "]]&gt", $content);
 		$excerpt = $post->post_excerpt;
 		if ('' == $excerpt) {
 			// no excerpt, is there a <!--more--> ?
@@ -433,7 +433,7 @@ class s2class {
 		}
 
 		// first we send plaintext summary emails
-		$body = str_replace('POST', $excerpt, $mailtext);
+		$body = str_replace("POST", $excerpt, $mailtext);
 		$registered = $this->get_registered("cats=$post_cats_string&format=text&amount=excerpt");
 		if (empty($registered)) {
 			$recipients = (array)$public;
@@ -445,11 +445,11 @@ class s2class {
 		}
 		$this->mail($recipients, $subject, $body);
 		// next we send plaintext full content emails
-		$body = str_replace('POST', strip_tags($plaintext), $mailtext);
+		$body = str_replace("POST", strip_tags($plaintext), $mailtext);
 		$this->mail($this->get_registered("cats=$post_cats_string&format=text&amount=post"), $subject, $body);
 		// finally we send html full content emails
 		$body = str_replace("\r\n", "<br />\r\n", $mailtext);
-		$body = str_replace('POST', $content, $body);
+		$body = str_replace("POST", $content, $body);
 		$this->mail($this->get_registered("cats=$post_cats_string&format=html"), $subject, $body, 'html');
 
 		return $id;
@@ -2127,8 +2127,8 @@ class s2class {
 		$registered = $this->get_registered();
 		$recipients = array_merge((array)$public, (array)$registered);
 		$mailtext = $this->substitute(stripslashes($this->subscribe2_options['mailtext']));
-		$body = str_replace('TABLE', $table, $mailtext);
-		$body = str_replace('POST', $message, $mailtext);
+		$body = str_replace("TABLE", $table, $mailtext);
+		$body = str_replace("POST", $message, $mailtext);
 		$this->mail($recipients, $subject, $body);
 	} // end subscribe2_cron
 
