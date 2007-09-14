@@ -4,7 +4,7 @@ Donate link: http://subscribe2.wordpress.com/donate/
 Tags: posts, subscription, email
 Requires at least: 2.0.x
 Tested up to: 2.2
-Stable tag: 3.7
+Stable tag: 3.8
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -78,6 +78,12 @@ Batches will occur for each group of message as described above.  A site on Drea
 
 == Version History ==
 
+Version 3.8 by Matthew Robinson
+
+* Fixed User Menu Settings when Digests enabled
+* Changed Registered Subscribers to Registered Users in drop down to avoid confusion
+* Minor code revisions for admin menu layout
+
 Version 3.7 by Matthew Robinson
 
 * Change from deprecated get_settings -> get_option
@@ -133,6 +139,12 @@ Version 3.1 by Matthew Robinson
 Version 3.0 by Matthew Robinson
 
 * Updated for WordPress 2.1 Branch
+
+Version 2.22 by Matthew Robinson
+
+* Fixed User Menu Settings when Digests enabled
+* Changed Registered Subscribers to Registered Users in drop down to avoid confusion
+* Minor code revisions for admin menu layout
 
 Version 2.21 by Matthew Robinson
 
