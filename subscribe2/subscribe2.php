@@ -1962,7 +1962,8 @@ class s2class {
 				}
 			}
 		}
-		return preg_replace('|(<p>)(\n)*<!--subscribe2-->(\n)*(</p>)|', $this->s2form, $content);
+		$content = preg_replace('|<!--subscribe2-->|', $this->s2form, $content);
+		return $content;
 	} // end filter()
 
 	/**
@@ -2009,7 +2010,7 @@ class s2class {
 		echo $before_widget;
 		echo $before_title . $title . $after_title;
 		echo "<div class=\"search\">";
-		$content = s2class::filter('<p><!--subscribe2--></p>');
+		$content = s2class::filter('<!--subscribe2-->');
 		echo $content;
 		echo "</div>";
 		echo $after_widget;
@@ -2176,7 +2177,7 @@ class s2class {
 		add_action('admin_menu', array(&$this, 'admin_menu'));
 		add_action('create_category', array(&$this, 'autosub_new_category'));
 		add_action('register_form', array(&$this, 'register_form'));
-		add_filter('the_content', array(&$this, 'filter'));
+		add_filter('the_content', array(&$this, 'filter'), 1);
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
 
 		// add action to display editor buttons if option is enabled
