@@ -865,7 +865,7 @@ class s2class {
 
 		if (0 == $user_id) { return $user_id; }
 		$user = get_userdata($user_id);
-		$all_cats = get_categories();
+		$all_cats = get_categories(array('hide_empty' => false));
 
 		if (0 == $this->subscribe2_options['reg_override']) {
 			// registered users are not allowed to subscribe to
@@ -1555,7 +1555,7 @@ class s2class {
 				}
 				update_usermeta($user_ID, 's2_subscribed', '-1');
 			} elseif ($cats == 'digest') {
-				$all_cats = get_categories();
+				$all_cats = get_categories(array('hide_empty' => false));
 				foreach ($all_cats as $cat) {
 					('' == $catids) ? $catids = "$cat->term_id" : $catids .= ",$cat->term_id";
 					update_usermeta($user_ID, 's2_cat' . $cat->term_id, $cat->term_id);
@@ -1719,7 +1719,7 @@ class s2class {
 	function display_category_form($selected = array(), $override = 1) {
 		global $wpdb;
 
-		$all_cats = get_categories();
+		$all_cats = get_categories(array('hide_empty' => false));
 		$exclude = explode(',', $this->subscribe2_options['exclude']);
 
 		if (0 == $override) {
@@ -1780,7 +1780,7 @@ class s2class {
 			'unconfirmed' => ' &nbsp;&nbsp;' . __('Unconfirmed', 'subscribe2'),
 			'registered' => __('Registered Users', 'subscribe2'));
 
-		$all_cats = get_categories();
+		$all_cats = get_categories(array('hide_empty' => false));
 
 		// count the number of subscribers
 		$count['confirmed'] = $wpdb->get_var("SELECT COUNT(id) FROM $this->public WHERE active='1'");
@@ -2177,7 +2177,7 @@ class s2class {
 		add_action('admin_menu', array(&$this, 'admin_menu'));
 		add_action('create_category', array(&$this, 'autosub_new_category'));
 		add_action('register_form', array(&$this, 'register_form'));
-		add_filter('the_content', array(&$this, 'filter'), 1);
+		add_filter('the_content', array(&$this, 'filter'), 10);
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
 
 		// add action to display editor buttons if option is enabled
