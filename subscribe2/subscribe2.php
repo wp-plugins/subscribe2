@@ -456,27 +456,6 @@ class s2class {
 	} // end publish()
 
 	/**
-	Sends a notification when a draft post is published
-	*/
-	function private2publish($id = 0) {
-		if (0 == $id) { return $id; }
-
-		$this->publish($id);
-		$this->private = TRUE;
-		return $id;
-	} // end private2publish()
-
-	/**
-	Prevents notifications from being sent when editing posts
-	*/
-	function edit($id = 0) {
-		if (0 == $id) { return; }
-
-		$this->private = TRUE;
-		return $id;
-	}
-
-	/**
 	Send confirmation email to the user
 	*/
 	function send_confirm($what = '', $is_remind = FALSE) {
@@ -2197,9 +2176,9 @@ class s2class {
 		if ($this->subscribe2_options['email_freq'] != 'never') {
 			add_action('s2_digest_cron', array(&$this, 'subscribe2_cron'));
 		} else {
-			add_action('publish_post', array(&$this, 'publish'));
-			add_action('edit_post', array(&$this, 'edit'));
-			add_action('private_to_published', array(&$this, 'private2publish'));
+			add_action('draft_to_publish', array(&$this, 'publish'));
+			add_action('pending_to_publish', array(&$this, 'publish'));
+			add_action('private_to_publish', array(&$this, 'publish'));
 		}
 		
 		// add action to email notification about pages if option is enabled
