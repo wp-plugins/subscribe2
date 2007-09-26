@@ -2176,6 +2176,7 @@ class s2class {
 		if ($this->subscribe2_options['email_freq'] != 'never') {
 			add_action('s2_digest_cron', array(&$this, 'subscribe2_cron'));
 		} else {
+			add_action('new_to_publish', array(&$this, 'publish'));
 			add_action('draft_to_publish', array(&$this, 'publish'));
 			add_action('pending_to_publish', array(&$this, 'publish'));
 			add_action('private_to_publish', array(&$this, 'publish'));
