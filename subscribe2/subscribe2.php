@@ -361,8 +361,6 @@ class s2class {
 
 		global $wpdb;
 		$post =& get_post($id);
-		// is the post password protected?
-		if ( ($this->subscribe2_options['password'] == "no") && ($post->post_password != '') ) {return $id; }
 
 		// is this post set in the future?
 		if ($post->post_date > current_time('mysql')) {
@@ -2057,6 +2055,11 @@ class s2class {
 					$check = true;
 				}
 			}
+			// is the current post private
+			// and should this not generate a notification email?
+			if ( ($this->subscribe2_options['password'] == "no") && ($post->post_password != '') ) {
+				$check = true;
+			}
 			// if this post is in an excluded category,
 			// don't include it in the digest
 			if ($check) {
@@ -2180,7 +2183,11 @@ class s2class {
 			add_action('draft_to_publish', array(&$this, 'publish'));
 			add_action('pending_to_publish', array(&$this, 'publish'));
 			add_action('private_to_publish', array(&$this, 'publish'));
-			*/
+			if ($this->subscribe2_options['password'] == "yes") {
+				add_action('new_to_private', array(&$this, 'publish'));
+				add_action('draft_to_private', array(&$this, 'publish'));
+				add_action('pending_to_private', array(&$this, 'publish'));
+			}
 		}
 		
 		// add action to email notification about pages if option is enabled
