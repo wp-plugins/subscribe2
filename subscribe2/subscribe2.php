@@ -325,21 +325,21 @@ class s2class {
 	/**
 	Sends an email notification of a new post
 	*/
-	function publish($id = 0) {
-		if (!$id) { return $id; }
+	function publish($post = 0) {
+		if (!$post) { return $post; }
 
 		// are we doing daily digests? If so, don't send anything now
-		if ($this->subscribe2_options['email_freq'] != 'never') { return $id; }
+		if ($this->subscribe2_options['email_freq'] != 'never') { return $post; }
 
 		// we need to determine whether this is a new post, or an edit
 		if ($this->private) {
 			// this post was published from draft status
 			// OR is an edit of an existing post
 			// so send no notification
-			return $id;
+			return $post;
 		}
 
-		$post_cats = wp_get_post_categories($id);
+		$post_cats = wp_get_post_categories($post->ID);
 		$post_cats_string = implode(',', $post_cats);
 		$check = false;
 		// is the current post assigned to any categories
@@ -355,17 +355,14 @@ class s2class {
 			// excluded categories?
 			if ('0' == $this->subscribe2_options['reg_override']) {
 				// nope? okay, let's leave
-				return $id;
+				return $post;
 			}
 		}
-
-		global $wpdb;
-		$post =& get_post($id);
 
 		// is this post set in the future?
 		if ($post->post_date > current_time('mysql')) {
 			// bail out
-			return $id;
+			return $post;
 		}
 
 		// lets collect our public subscribers
@@ -381,12 +378,12 @@ class s2class {
 		// do we have subscribers?
 		if ( (empty($public)) && (empty($registered)) ) {
 			// if not, no sense doing anything else
-			return $id;
+			return $post;
 		}
 		// we set these class variables so that we can avoid
 		// passing them in function calls a little later
 		$this->post_title = $post->post_title;
-		$this->permalink = "<a href=\"" . get_permalink($id) . "\">" . get_permalink($id) . "</a>";
+		$this->permalink = "<a href=\"" . get_permalink($post->ID) . "\">" . get_permalink($post->ID) . "</a>";
 		
 		$author = get_userdata($post->post_author);
 		$this->authorname = $author->display_name;
