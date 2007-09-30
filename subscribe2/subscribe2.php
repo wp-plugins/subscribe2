@@ -339,7 +339,7 @@ class s2class {
 			return $id;
 		}
 
-		$post_cats = wp_get_post_cats('1', $id);
+		$post_cats = wp_get_post_categories($id);
 		$post_cats_string = implode(',', $post_cats);
 		$check = false;
 		// is the current post assigned to any categories
@@ -2045,7 +2045,7 @@ class s2class {
 
 		// if we have posts, let's prepare the digest
 		foreach ($posts as $post) {
-			$post_cats = wp_get_post_cats('1', $post->ID);
+			$post_cats = wp_get_post_categories($post->ID);
 			$post_cats_string = implode(',', $post_cats);
 			$check = false;
 			// is the current post assigned to any categories
