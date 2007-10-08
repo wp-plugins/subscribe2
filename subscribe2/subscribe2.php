@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.0
+Version: 4.1
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -41,7 +41,7 @@ define('S2PAGE', '0');
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.0');
+define('S2VERSION', '4.1');
 define ('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // use Owen's excellent ButtonSnap library
@@ -331,11 +331,9 @@ class s2class {
 		// are we doing daily digests? If so, don't send anything now
 		if ($this->subscribe2_options['email_freq'] != 'never') { return $post; }
 
-		// we need to determine whether this is a new post, or an edit
-		if ($this->private) {
-			// this post was published from draft status
-			// OR is an edit of an existing post
-			// so send no notification
+		// is the current post a page
+		// and should this not generate a notification email?
+		if ( ($this->subscribe2_options['pages'] == 'no') && ($post->post_type == 'page') ) {
 			return $post;
 		}
 
@@ -2031,7 +2029,7 @@ class s2class {
 		// collect posts
 		$now = date('Y-m-d H:i:s', time());
 		$prev = $this->subscribe2_options['last_s2cron'];
-		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status='publish' AND post_type='post'");
+		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ('publish', 'private') AND post_type IN ('post', 'page')");
 
 		// update last_s2cron execution time before completing or bailing
 		$this->subscribe2_options['last_s2cron'] = $now;
@@ -2055,6 +2053,11 @@ class s2class {
 			// is the current post private
 			// and should this not generate a notification email?
 			if ( ($this->subscribe2_options['password'] == "no") && ($post->post_password != '') ) {
+				$check = true;
+			}
+			// is the current post a page
+			// and should this not generate a notification email?
+			if ( ($this->subscribe2_options['pages'] == 'no') && ($post->post_type == 'page') ) {
 				$check = true;
 			}
 			// if this post is in an excluded category,
@@ -2185,11 +2188,6 @@ class s2class {
 				add_action('draft_to_private', array(&$this, 'publish'));
 				add_action('pending_to_private', array(&$this, 'publish'));
 			}
-		}
-		
-		// add action to email notification about pages if option is enabled
-		if ($this->subscribe2_options['pages'] == 'yes') {
-			add_action('publish_page', array(&$this, 'publish'));
 		}
 
 		// load our strings
