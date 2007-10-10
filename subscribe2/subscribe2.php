@@ -494,14 +494,14 @@ class s2class {
 
 		$body = str_replace("LINK", $link, $body);
 
-		$mailheaders .= "From: $admin->display_name <$admin->user_email>\n";
-		$mailheaders .= "Return-Path: <$admin->user_email>\n";
+		$mailheaders .= "From: " . $admin->display_name . " <" . $admin->user_email . ">\n";
+		$mailheaders .= "Return-Path: " . $admin->user_email . "\n";
 		$mailheaders .= "X-Mailer:PHP" . phpversion() . "\n";
 		$mailheaders .= "Precedence: list\nList-Id: " . get_option('blogname') . "\n";
 		$mailheaders .= "MIME-Version: 1.0\n";
 		$mailheaders .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 
-		@wp_mail ($this->email, $subject, $body, $mailheaders);
+		@mail ($this->email, $subject, $body, $mailheaders);
 	} // end send_confirm()
 
 /* ===== Subscriber functions ===== */
