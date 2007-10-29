@@ -1001,8 +1001,7 @@ class s2class {
 		$admin = get_userdata(1);
 		if (empty($admin)) {
 			$sql = "SELECT DISTINCT(ID) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10' LIMIT 1";
-			$admin_id = $wpdb->get_var($sql);
-			$admin = get_userdata($admin_id);
+			$admin = get_userdata($wpdb->get_var($sql));
 		}
 		return $admin;
 	} //end get_userdata
