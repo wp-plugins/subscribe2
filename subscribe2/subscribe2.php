@@ -235,7 +235,7 @@ class s2class {
 		
 		// Set sender details
 		if ('' == $this->myname) {
-			$admin = get_userdata(1);
+			$admin = $this->get_userdata();
 			$this->myname = $admin->display_name;
 			$this->myemail = $admin->user_email;
 		}
@@ -392,7 +392,7 @@ class s2class {
 			$user =& $author;
 		} else {
 			// get admin details
-			$user = get_userdata(1);
+			$user = $this->get_userdata();
 		}
 		$this->myemail = $user->user_email;
 		$this->myname = $user->display_name;
@@ -476,7 +476,7 @@ class s2class {
 		$link .= md5($this->email);
 		$link .= $id;
 
-		$admin = get_userdata(1);
+		$admin = $this->get_userdata();
 		$this->myname = $admin->display_name;
 
 		if ($is_remind == TRUE) {
@@ -501,7 +501,7 @@ class s2class {
 		$mailheaders .= "MIME-Version: 1.0\n";
 		$mailheaders .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 
-		@mail ($this->email, $subject, $body, $mailheaders);
+		@mail($this->email, $subject, $body, $mailheaders);
 	} // end send_confirm()
 
 /* ===== Subscriber functions ===== */
@@ -620,7 +620,7 @@ class s2class {
 	function remind($emails = '') {
 		if ('' == $emails) { return false; }
 
-		$admin = get_userdata(1);
+		$admin = $this->get_userdata();
 		$this->myname = $admin->display_name;
 		
 		$recipients = explode(",", $emails);
@@ -684,7 +684,7 @@ class s2class {
 			$this->activate();
 			$this->message = $this->added;
 			$subject = '[' . get_option('blogname') . '] ' . __('New subscriber', 'subscribe2');
-			$message = "$this->email " . __('subscribed to email notifications!', 'subscribe2');
+			$message = $this->email . __('subscribed to email notifications!', 'subscribe2');
 			$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='wp_user_level' AND $wpdb->usermeta.meta_value='10'");
 			$this->mail($recipients, $subject, $message);
 			$this->filtered = 1;
@@ -992,6 +992,20 @@ class s2class {
 			update_usermeta($user_ID, 's2_subscribed', implode(',', $newcats));
 		}
 	} // end autosub_new_category
+
+	/**
+	Get admin data from record 1 or first user with admin rights
+	*/
+	function get_userdata() {
+		global $wpdb;
+		$admin = get_userdata(1);
+		if (empty($admin)) {
+			$sql = "SELECT DISTINCT(ID) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10' LIMIT 1";
+			$admin_id = $wpdb->get_var($sql);
+			$admin = get_userdata($admin_id);
+		}
+		return $admin;
+	} //end get_userdata
 	
 /* ===== Menus ===== */
 	/**
@@ -2097,7 +2111,7 @@ class s2class {
 			$user =& $author;
 		} else {
 			// get admin detailts
-			$user = get_userdata(1);
+			$user = $this->get_userdata();
 		}
 		$this->myemail = $user->user_email;
 		$this->myname = $user->display_name;
