@@ -78,7 +78,7 @@ Batches will occur for each group of message as described above.  A site on Drea
 
 == Version History ==
 
-Version 4.0 by Matthew Robinson
+Version 4.1 by Matthew Robinson
 
 * Fixed sending of notifications for Pages
 * Fixed password protected post bug for Digest email notifications
