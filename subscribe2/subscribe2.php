@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.1
+Version: 4.2
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -685,7 +685,7 @@ class s2class {
 			$this->message = $this->added;
 			$subject = '[' . get_option('blogname') . '] ' . __('New subscriber', 'subscribe2');
 			$message = $this->email . __('subscribed to email notifications!', 'subscribe2');
-			$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='wp_user_level' AND $wpdb->usermeta.meta_value='10'");
+			$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='$wpdb->prefix . user_level' AND $wpdb->usermeta.meta_value='10'");
 			$this->mail($recipients, $subject, $message);
 			$this->filtered = 1;
 		} elseif ('0' == $action) {
@@ -1000,7 +1000,7 @@ class s2class {
 		global $wpdb;
 		$admin = get_userdata(1);
 		if (empty($admin)) {
-			$sql = "SELECT DISTINCT(ID) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10' LIMIT 1";
+			$sql = "SELECT DISTINCT(ID) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='$wpdb->prefix . user_level' AND $wpdb->usermeta.meta_value='10' LIMIT 1";
 			$admin = get_userdata($wpdb->get_var($sql));
 		}
 		return $admin;
