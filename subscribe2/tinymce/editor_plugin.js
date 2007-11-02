@@ -13,7 +13,7 @@ var TinyMCE_Subscribe2Quicktags = {
 	getControlHTML : function(cn) {
 		switch (cn) {
 			case 'subscribe2quicktags':
-				buttons = tinyMCE.getButtonHTML('subscribe2', 'lang_subscribe2quicktags_subscribe2', '{$pluginurl}/../s2_button.png', 'subscribe2');
+				buttons = tinyMCE.getButtonHTML('subscribe2', 'lang_subscribe2quicktags_subscribe2', '{$pluginurl}/../include/s2_button.png', 'subscribe2');
 				return buttons;
 		}
 		return '';
@@ -41,10 +41,10 @@ var TinyMCE_Subscribe2Quicktags = {
 				}
 				
 				alt = "Placeholder for Subscribe2 form";
-				cssstyle = 'background:url(../wp-content/plugins/subscribe2/s2_marker.png) no-repeat 5px 5px;';
+				cssstyle = 'background:url(../wp-content/plugins/subscribe2/include/s2_marker.png) no-repeat 5px 5px;';
 
 				html = ''
-					+ '<img src="../wp-content/plugins/subscribe2/spacer.gif" '
+					+ '<img src="../wp-content/plugins/subscribe2/include/spacer.gif" '
 				  + 'width="210px" height="25px" '
 				  + 'alt="'+alt+'" title="'+alt+'" style="'+cssstyle+'" class="mce_plugin_s2_img" />';
 
@@ -64,7 +64,7 @@ var TinyMCE_Subscribe2Quicktags = {
 				// Parse all <!--subscribe2--> tags and replace them with images
 				var startPos = 0;
 				var alt = "Placeholder for Subscribe2 form";
-				var cssstyle = 'background:url(../wp-content/plugins/subscribe2/s2_marker.png) no-repeat 5px 5px;';
+				var cssstyle = 'background:url(../wp-content/plugins/subscribe2/include/s2_marker.png) no-repeat 5px 5px;';
 				while ((startPos = content.indexOf('<!--subscribe2', startPos)) != -1) {
 					var endPos = content.indexOf('-->', startPos) + 3;
 					// Insert image
