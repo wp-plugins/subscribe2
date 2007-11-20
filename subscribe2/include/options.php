@@ -8,7 +8,7 @@ if (!isset($this->subscribe2_options['autosub'])) {
 
 if (!isset($this->subscribe2_options['wpregdef'])) {
 	$this->subscribe2_options['wpregdef'] = "no";
-} // option to 
+} // option to check registration form box by default
 
 if (!isset($this->subscribe2_options['autoformat'])) {
 	$this->subscribe2_options['autoformat'] = "text";
@@ -44,8 +44,8 @@ if (!isset($this->subscribe2_options['show_button'])) {
 } // option to show Subscribe2 button on Write page
 
 if (!isset($this->subscribe2_options['widget'])) {
-	$this->subscribe2_options['widget'] = "1";
-} // option to show Subscribe2 Widget in the Presentation->Widgets page
+	$this->subscribe2_options['widget'] = "0";
+} // option to enable Subscribe2 Widget
 
 if (!isset($this->subscribe2_options['barred'])) {
 	$this->subscribe2_options['barred'] = '';
