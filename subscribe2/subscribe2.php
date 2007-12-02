@@ -1666,7 +1666,7 @@ class s2class {
 			get_currentuserinfo();
 			$this->myname = $user_identity;
 			$this->myemail = $user_email;
-			$subject = strip_tags($_POST['subject']);
+			$subject = stripslashes(strip_tags($_POST['subject']));
 			$message = stripslashes($_POST['message']);
 			$this->mail($recipients, $subject, $message, 'text');
 			$message = $this->mail_sent;
@@ -2055,6 +2055,8 @@ class s2class {
 		foreach ($posts as $post) {
 			$post_cats = wp_get_post_categories($post->ID);
 			$post_cats_string = implode(',', $post_cats);
+			$diff = array_diff($post_cats, $all_post_cats);
+			$all_post_cats = array_merge(array($all_post_cats), array($diff));
 			$check = false;
 			// is the current post assigned to any categories
 			// which should not generate a notification email?
@@ -2120,7 +2122,8 @@ class s2class {
 		$display = $scheds[$email_freq]['display'];
 		$subject = '[' . stripslashes(get_option('blogname')) . '] ' . $display . ' ' . __('Digest Email', 'subscribe2');
 		$public = $this->get_public();
-		$registered = $this->get_registered();
+		$all_post_cats_string = implode(',', $all_post_cats);
+		$registered = $this->get_registered("cats=$all_post_cats_string");
 		$recipients = array_merge((array)$public, (array)$registered);
 		$mailtext = $this->substitute(stripslashes($this->subscribe2_options['mailtext']));
 		$body = str_replace("TABLE", $table, $mailtext);
