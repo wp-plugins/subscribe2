@@ -52,14 +52,14 @@ if (!isset($this->subscribe2_options['barred'])) {
 } // option containing domains barred from public registration
 
 if (!isset($this->subscribe2_options['mailtext'])) {
-	$this->subscribe2_options['mailtext'] = "BLOGNAME has posted a new item, 'TITLE'\n\nPOST\n\nYou may view the latest post at\nPERMALINK\n\nYou received this e-mail because you asked to be notified when new updates are posted.\nBest regards,\nMYNAME\nEMAIL";
+	$this->subscribe2_options['mailtext'] = __("BLOGNAME has posted a new item, 'TITLE'\n\nPOST\n\nYou may view the latest post at\nPERMALINK\n\nYou received this e-mail because you asked to be notified when new updates are posted.\nBest regards,\nMYNAME\nEMAIL", "subscribe2");
 } // Default notification email text
 
 if (!isset($this->subscribe2_options['confirm_email'])) {
-	$this->subscribe2_options['confirm_email'] = "BLOGNAME has received a request to ACTION for this email address. To complete your request please click on the link below:\n\nLINK\n\nIf you did not request this, please feel free to disregard this notice!\n\nThank you,\nMYNAME.";
+	$this->subscribe2_options['confirm_email'] = __("BLOGNAME has received a request to ACTION for this email address. To complete your request please click on the link below:\n\nLINK\n\nIf you did not request this, please feel free to disregard this notice!\n\nThank you,\nMYNAME.", "subscribe2");
 } // Default confirmation email text
 
 if (!isset($this->subscribe2_options['remind_email'])) {
-	$this->subscribe2_options['remind_email'] = "This email address was subscribed for notifications at BLOGNAME (BLOGLINK) but the subscription remains incomplete.\n\nIf you wish to complete your subscription please click on the link below:\n\nLINK\n\nIf you do not wish to complete your subscription please ignore this email and your address will be removed from our database.\n\nRegards,\nMYNAME";
+	$this->subscribe2_options['remind_email'] = __("This email address was subscribed for notifications at BLOGNAME (BLOGLINK) but the subscription remains incomplete.\n\nIf you wish to complete your subscription please click on the link below:\n\nLINK\n\nIf you do not wish to complete your subscription please ignore this email and your address will be removed from our database.\n\nRegards,\nMYNAME", "subscribe2");
 } // Default reminder email text
 ?>

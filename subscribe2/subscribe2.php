@@ -1299,7 +1299,7 @@ class s2class {
 							$timestamp = &$time;
 						} else {
 							// Schedule other CRON events starting at midnight and periodically thereafter
-							$timestamp = mktime(0, 0, 0, date('m', $time), date('d', $time), date('Y', $time));
+							$timestamp = mktime($_POST['hour'], 0, 0, date('m', $time), date('d', $time), date('Y', $time));
 						}
 						if ( ('on' == $_POST['reset_cron']) || $check ) {
 							wp_schedule_event($timestamp, $email_freq, 's2_digest_cron');
@@ -1818,6 +1818,7 @@ class s2class {
 
 	function display_digest_choices() {
 		global $wpdb;
+		$scheduled_time = wp_next_scheduled('s2_digest_cron');
 		$schedule = (array)wp_get_schedules();
 		$schedule = array_merge(array('never' => array('interval' => 0, 'display' => __('Per Post Email','subscribe2'))), $schedule);
 		$sort = array();
@@ -1834,7 +1835,20 @@ class s2class {
 			}
 			echo " /> " . $value['display'] . "<br />\r\n";
 		}
-		if (wp_next_scheduled('s2_digest_cron')) {
+		echo "<br />" . __('Send Digest Notification at', 'subscribe2') . ": \r\n";
+		$hours = array('12am', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am' ,'10am' ,'11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm');
+		echo "<select name=\"hour\">\r\n";
+		while ($hour = current($hours)) {
+			echo "<option value=\"" . key($hours) . "\"";
+			if (key($hours) == date('H', $scheduled_time)) {
+				echo " selected=\"selected\"";
+			}
+			echo ">" . $hour . "</option>\r\n";
+			next($hours);
+		}
+		echo "</select>\r\n";
+		echo "<strong><em style=\"color: red\">" . __('This option will work for digest notification sent daily or less frequently', 'subscribe2') . "</em></strong>\r\n";
+		if ($scheduled_time) {
 			echo "<p><input type=\"checkbox\" name=\"reset_cron\" /> " . __('Reset the schedule time and date for periodic email notifications', 'subscribe2') . "</p>\r\n";
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 			$now = time();
