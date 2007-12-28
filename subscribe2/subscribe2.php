@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.2
+Version: 4.3
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -41,7 +41,7 @@ define('S2PAGE', '0');
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.2');
+define('S2VERSION', '4.3');
 define ('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // use Owen's excellent ButtonSnap library
@@ -204,6 +204,7 @@ class s2class {
 	*/
 	function reset() {
 		delete_option('subscribe2_options');
+		wp_clear_scheduled_hook('s2_digest_cron');
 		unset($this->subscribe2_options);
 		require(S2PATH . "include/options.php");
 		update_option('subscribe2_options', $this->subscribe2_options);
@@ -2151,7 +2152,6 @@ class s2class {
 	*/
 	function s2init() {
 		// load the options
-		$this->subscribe2_options = array();
 		$this->subscribe2_options = get_option('subscribe2_options');
 
 		add_action('init', array(&$this, 'subscribe2'));
@@ -2293,6 +2293,7 @@ class s2class {
 /* ===== our variables ===== */
 	// cache variables
 	var $version = '';
+	var $subscribe2_options = array();
 	var $all_public = '';
 	var $all_unconfirmed = '';
 	var $excluded_cats = '';
