@@ -1600,18 +1600,18 @@ class s2class {
 				}
 				echo " /> " . $value . "&nbsp;&nbsp;";
 			}
-			echo "<p style=\"color: red\">" . __('Note: HTML format will always deliver the full post.', 'subscribe2') . "</p>\r\n";
+			echo "<p style=\"color: red\">" . __('Note: HTML format will always deliver the full post', 'subscribe2') . ".</p>\r\n";
 			echo __('Automatically subscribe me to newly created categories', 'subscribe2') . ': &nbsp;&nbsp;';
 			echo "<input type=\"radio\" name=\"new_category\" value=\"yes\" ";
 			if ('yes' == get_usermeta($user_ID, 's2_autosub')) {
 				echo "checked=\"checked\" ";
 			}
-			echo "/> Yes &nbsp;&nbsp;";
+			echo "/> " . __('Yes', 'subscribe2') . "&nbsp;&nbsp;";
 			echo "<input type=\"radio\" name=\"new_category\" value=\"no\" ";
 			if ('no' == get_usermeta($user_ID, 's2_autosub')) {
 				echo "checked=\"checked\" ";
 			}
-			echo "/> No<br /><br />";
+			echo "/> " . __('No', 'subscribe2') . "<br /><br />";
 
 			// subscribed categories
 			echo "<h2>" . __('Subscribed Categories', 'subscribe2') . "</h2>\r\n";
@@ -1624,15 +1624,15 @@ class s2class {
 			if (get_usermeta($user_ID, 's2_subscribed') != '-1') {
 				echo "checked=\"yes\" ";
 			}
-			echo "/> Yes <input type=\"radio\" name=\"category\" value=\"-1\" ";
+			echo "/> " . __('Yes', 'subscribe2') . "<input type=\"radio\" name=\"category\" value=\"-1\" ";
 			if (get_usermeta($user_ID, 's2_subscribed') == '-1') {
 				echo "checked=\"yes\" ";
 			}
-			echo "/> No";
+			echo "/> " . __('No', 'subscribe2');
 		}
 
 		// submit
-		echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __("Update Preferences &raquo;", 'subscribe2') . "\" /></p>";
+		echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __("Update Preferences", 'subscribe2') . " &raquo;\" /></p>";
 		echo "</form></div>\r\n";
 
 		include(ABSPATH . 'wp-admin/admin-footer.php');
