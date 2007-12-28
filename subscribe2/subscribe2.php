@@ -1035,25 +1035,25 @@ class s2class {
 					}
 				}
 				$_POST['what'] = 'confirmed';
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('Address(es) subscribed!', 'subscribe2') . "</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) subscribed!', 'subscribe2') . "</strong></p></div>";
 			} elseif ('delete' == $_POST['s2_admin']) {
 				$this->delete($_POST['email']);
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . $_POST['email'] . ' ' . __('deleted!', 'subscribe2') . "</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('deleted!', 'subscribe2') . "</strong</p>></div>";
 			} elseif ('toggle' == $_POST['s2_admin']) {
 				$this->toggle($_POST['email']);
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . $_POST['email'] . ' ' . __('status changed!', 'subscribe2') . "</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('status changed!', 'subscribe2') . "</strong></p></div>";
 			} elseif ('remind' == $_POST['s2_admin']) {
 				$this->remind($_POST['reminderemails']);
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('Reminder Email(s) Sent!','subscribe2') . "</p></strong></div>"; 
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Reminder Email(s) Sent!','subscribe2') . "</strong></p></div>"; 
 			} elseif ('exportcsv' == $_POST['s2_admin']) {
 				$this->exportcsv($_POST['exportcsv']);
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('CSV File Created in wp-content','subscribe2') . "</p></strong></div>"; 
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('CSV File Created in wp-content','subscribe2') . "</strong></p></div>"; 
 			} elseif ( ('register' == $_POST['s2_admin']) && ('subscribe' == $_POST['manage']) ) {
 				$this->subscribe_registered_users($_POST['emails'], $_POST['category']);
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('Registered Users Subscribed!','subscribe2') . "</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Subscribed!','subscribe2') . "</strong></p></div>";
 			} elseif ( ('register' == $_POST['s2_admin']) && ('unsubscribe' == $_POST['manage']) ) {
 				$this->unsubscribe_registered_users($_POST['emails'], $_POST['category']);
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('Registered Users Unsubscribed!','subscribe2') . "</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Unsubscribed!','subscribe2') . "</strong></p></div>";
 			}
 		}
 
@@ -1243,7 +1243,7 @@ class s2class {
 			check_admin_referer('subscribe2-options_subscribers' . $s2nonce);
 			if ('RESET' == $_POST['s2_admin']) {
 				$this->reset();
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>$this->options_reset</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_reset</strong></p></div>";
 			} elseif ('options' == $_POST['s2_admin']) {
 				// excluded categories
 				if (!empty($_POST['category'])) {
@@ -1331,7 +1331,7 @@ class s2class {
 				//barred domains
 				$barred_option = $_POST['barred'];
 				$this->subscribe2_options['barred'] = $barred_option;
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>$this->options_saved</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_saved</strong></p></div>";
 				update_option('subscribe2_options', $this->subscribe2_options);
 			}
 		}
