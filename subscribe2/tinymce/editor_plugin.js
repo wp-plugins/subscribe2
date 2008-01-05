@@ -71,7 +71,7 @@ var TinyMCE_Subscribe2Quicktags = {
 					var moreText = content.substring(startPos + 14, endPos - 3);
 					var contentAfter = content.substring(endPos);
 					content = content.substring(0, startPos);
-					content += '<img src="../wp-content/plugins/subscribe2/spacer.gif" ';
+					content += '<img src="../wp-content/plugins/subscribe2/include/spacer.gif" ';
 					content += ' width="210px" height="25px" moretext="'+moreText+'" ';
 					content += 'alt="'+alt+'" title="'+alt+'" style="'+cssstyle+'" class="mce_plugin_s2_img" />';
 					content += contentAfter;
