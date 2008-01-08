@@ -360,15 +360,6 @@ class s2class {
 
 		// is this post set in the future?
 		if ($post->post_date > current_time('mysql')) {
-			// are we doing daily digests?
-			if (!wp_next_scheduled('s2_digest_cron')) {
-				// not doing daily digests, so add this
-				// post to the list of future posts
-				$our_post = array($post);
-				$future_posts = get_option('s2_future_posts');
-				$future_posts[] = $our_post;
-				update_option('s2_future_posts', $future_posts);
-			}
 			// bail out
 			return $post;
 		}
@@ -2058,63 +2049,6 @@ class s2class {
 
 /* ===== wp-cron functions ===== */
 	/**
-	Send notifications for any posts that are now visible
-	*/
-	function subscribe2_hourly() {
-		$future_posts = get_option('s2_future_posts');
-
-		// if we have no future posts, bail out
-		if (!$future_posts) { return; }
-
-		// this will hold the posts that aren't yet visible
-		$not_yet = array();
-
-		foreach ($future_posts as $post) {
-			if ( (current_time('mysql')) > ($post->post_date) ) {
-				// this post is now visible, so let's
-				// send a notification
-				$this->publish($post);
-			} else {
-				array_push($not_yet, $post);
-			}
-		}
-		// are the number of elements in $not_yet
-		// the same as in $future posts?
-		if ( (count($not_yet)) != (count($future_posts)) ) {
-			// if not, then some posts have been removed
-			// from $future_posts, and the remainder need
-			// to be recorded back to the database
-			update_option('s2_future_posts', $not_yet);
-		}
-	} // end subscribe2_hourly
-
-	/**
-	If the to-be-deleted post was future-dated, remove it from the list of future-dated posts
-	*/
-	function delete_future($id = 0) {
-		if (0 == $id) { return $id; }
-
-		$future = get_option('s2_future_posts');
-		// if we have no future-dated posts scheduled, bail out
-		if (!$future) {
-			return $id;
-		}
-		foreach ($future as $post) {
-			// is the deleted post in the list of future posts?
-			if ($id == $post->ID) {
-				// skip it
-				continue;
-			} else {
-				// add this to the new list of future posts
-				$new_future[] = $post;
-			}
-		}
-		if ($new_future != $future) {
-			update_option('s2_future_posts', $new_future);
-		}
-	} // end delete_future()
-
-	/**
 	Send a daily digest of today's new posts
 	*/
 	function subscribe2_cron() {
@@ -2279,16 +2213,12 @@ class s2class {
 			add_action('draft_to_publish', array(&$this, 'publish'));
 			add_action('pending_to_publish', array(&$this, 'publish'));
 			add_action('private_to_publish', array(&$this, 'publish'));
+			add_action('future_to_publish', array(&$this, 'publish'));
 			if ($this->subscribe2_options['password'] == "yes") {
 				add_action('new_to_private', array(&$this, 'publish'));
 				add_action('draft_to_private', array(&$this, 'publish'));
 				add_action('pending_to_private', array(&$this, 'publish'));
 			}
-			if (!wp_next_scheduled('s2_hourly_cron')) {
-				wp_schedule_event(time(), 'hourly', 's2_hourly_cron');
-			}
-			add_action('s2_hourly_cron', array(&$this, 'subscribe2_hourly'));
-			add_action('delete_post', array(&$this, 'delete_future'));
 		}
 
 		// load our strings
