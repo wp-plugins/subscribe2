@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.2
+Version: 4.4
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -41,7 +41,7 @@ define('S2PAGE', '0');
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.2');
+define('S2VERSION', '4.4');
 define ('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // use Owen's excellent ButtonSnap library
@@ -204,6 +204,7 @@ class s2class {
 	*/
 	function reset() {
 		delete_option('subscribe2_options');
+		wp_clear_scheduled_hook('s2_digest_cron');
 		unset($this->subscribe2_options);
 		require(S2PATH . "include/options.php");
 		update_option('subscribe2_options', $this->subscribe2_options);
@@ -876,7 +877,7 @@ class s2class {
 			// ensure existing subscriptions are not overwritten on upgrade
 			if (empty($check)) {
 				if ( ('yes' == $this->subscribe2_options['autosub']) || (('wpreg' == $this->subscribe2_options['autosub']) && (1 == $wpreg)) ) {
-					// don't add entires by default if autosub is off, messes up daily digests
+					// don't add entries by default if autosub is off, messes up daily digests
 					update_usermeta($user_id, 's2_subscribed', $cats);
 						foreach(explode(',', $cats) as $cat) {
 							update_usermeta($user_id, 's2_cat' . $cat, "$cat");
@@ -1034,25 +1035,25 @@ class s2class {
 					}
 				}
 				$_POST['what'] = 'confirmed';
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('Address(es) subscribed!', 'subscribe2') . "</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) subscribed!', 'subscribe2') . "</strong></p></div>";
 			} elseif ('delete' == $_POST['s2_admin']) {
 				$this->delete($_POST['email']);
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . $_POST['email'] . ' ' . __('deleted!', 'subscribe2') . "</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('deleted!', 'subscribe2') . "</strong</p>></div>";
 			} elseif ('toggle' == $_POST['s2_admin']) {
 				$this->toggle($_POST['email']);
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . $_POST['email'] . ' ' . __('status changed!', 'subscribe2') . "</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('status changed!', 'subscribe2') . "</strong></p></div>";
 			} elseif ('remind' == $_POST['s2_admin']) {
 				$this->remind($_POST['reminderemails']);
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('Reminder Email(s) Sent!','subscribe2') . "</p></strong></div>"; 
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Reminder Email(s) Sent!','subscribe2') . "</strong></p></div>"; 
 			} elseif ('exportcsv' == $_POST['s2_admin']) {
 				$this->exportcsv($_POST['exportcsv']);
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('CSV File Created in wp-content','subscribe2') . "</p></strong></div>"; 
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('CSV File Created in wp-content','subscribe2') . "</strong></p></div>"; 
 			} elseif ( ('register' == $_POST['s2_admin']) && ('subscribe' == $_POST['manage']) ) {
 				$this->subscribe_registered_users($_POST['emails'], $_POST['category']);
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('Registered Users Subscribed!','subscribe2') . "</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Subscribed!','subscribe2') . "</strong></p></div>";
 			} elseif ( ('register' == $_POST['s2_admin']) && ('unsubscribe' == $_POST['manage']) ) {
 				$this->unsubscribe_registered_users($_POST['emails'], $_POST['category']);
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>" . __('Registered Users Unsubscribed!','subscribe2') . "</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Unsubscribed!','subscribe2') . "</strong></p></div>";
 			}
 		}
 
@@ -1242,7 +1243,7 @@ class s2class {
 			check_admin_referer('subscribe2-options_subscribers' . $s2nonce);
 			if ('RESET' == $_POST['s2_admin']) {
 				$this->reset();
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>$this->options_reset</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_reset</strong></p></div>";
 			} elseif ('options' == $_POST['s2_admin']) {
 				// excluded categories
 				if (!empty($_POST['category'])) {
@@ -1299,7 +1300,7 @@ class s2class {
 							$timestamp = &$time;
 						} else {
 							// Schedule other CRON events starting at midnight and periodically thereafter
-							$timestamp = mktime(0, 0, 0, date('m', $time), date('d', $time), date('Y', $time));
+							$timestamp = mktime($_POST['hour'], 0, 0, date('m', $time), date('d', $time), date('Y', $time));
 						}
 						if ( ('on' == $_POST['reset_cron']) || $check ) {
 							wp_schedule_event($timestamp, $email_freq, 's2_digest_cron');
@@ -1330,7 +1331,7 @@ class s2class {
 				//barred domains
 				$barred_option = $_POST['barred'];
 				$this->subscribe2_options['barred'] = $barred_option;
-				echo "<div id=\"message\" class=\"updated fade\"><strong><p>$this->options_saved</p></strong></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_saved</strong></p></div>";
 				update_option('subscribe2_options', $this->subscribe2_options);
 			}
 		}
@@ -1599,18 +1600,18 @@ class s2class {
 				}
 				echo " /> " . $value . "&nbsp;&nbsp;";
 			}
-			echo "<p style=\"color: red\">" . __('Note: HTML format will always deliver the full post.', 'subscribe2') . "</p>\r\n";
+			echo "<p style=\"color: red\">" . __('Note: HTML format will always deliver the full post', 'subscribe2') . ".</p>\r\n";
 			echo __('Automatically subscribe me to newly created categories', 'subscribe2') . ': &nbsp;&nbsp;';
 			echo "<input type=\"radio\" name=\"new_category\" value=\"yes\" ";
 			if ('yes' == get_usermeta($user_ID, 's2_autosub')) {
 				echo "checked=\"checked\" ";
 			}
-			echo "/> Yes &nbsp;&nbsp;";
+			echo "/> " . __('Yes', 'subscribe2') . "&nbsp;&nbsp;";
 			echo "<input type=\"radio\" name=\"new_category\" value=\"no\" ";
 			if ('no' == get_usermeta($user_ID, 's2_autosub')) {
 				echo "checked=\"checked\" ";
 			}
-			echo "/> No<br /><br />";
+			echo "/> " . __('No', 'subscribe2') . "<br /><br />";
 
 			// subscribed categories
 			echo "<h2>" . __('Subscribed Categories', 'subscribe2') . "</h2>\r\n";
@@ -1623,15 +1624,15 @@ class s2class {
 			if (get_usermeta($user_ID, 's2_subscribed') != '-1') {
 				echo "checked=\"yes\" ";
 			}
-			echo "/> Yes <input type=\"radio\" name=\"category\" value=\"-1\" ";
+			echo "/> " . __('Yes', 'subscribe2') . "<input type=\"radio\" name=\"category\" value=\"-1\" ";
 			if (get_usermeta($user_ID, 's2_subscribed') == '-1') {
 				echo "checked=\"yes\" ";
 			}
-			echo "/> No";
+			echo "/> " . __('No', 'subscribe2');
 		}
 
 		// submit
-		echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __("Update Preferences &raquo;", 'subscribe2') . "\" /></p>";
+		echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __("Update Preferences", 'subscribe2') . " &raquo;\" /></p>";
 		echo "</form></div>\r\n";
 
 		include(ABSPATH . 'wp-admin/admin-footer.php');
@@ -1818,6 +1819,7 @@ class s2class {
 
 	function display_digest_choices() {
 		global $wpdb;
+		$scheduled_time = wp_next_scheduled('s2_digest_cron');
 		$schedule = (array)wp_get_schedules();
 		$schedule = array_merge(array('never' => array('interval' => 0, 'display' => __('Per Post Email','subscribe2'))), $schedule);
 		$sort = array();
@@ -1834,7 +1836,20 @@ class s2class {
 			}
 			echo " /> " . $value['display'] . "<br />\r\n";
 		}
-		if (wp_next_scheduled('s2_digest_cron')) {
+		echo "<br />" . __('Send Digest Notification at', 'subscribe2') . ": \r\n";
+		$hours = array('12am', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am' ,'10am' ,'11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm');
+		echo "<select name=\"hour\">\r\n";
+		while ($hour = current($hours)) {
+			echo "<option value=\"" . key($hours) . "\"";
+			if (key($hours) == date('H', $scheduled_time)) {
+				echo " selected=\"selected\"";
+			}
+			echo ">" . $hour . "</option>\r\n";
+			next($hours);
+		}
+		echo "</select>\r\n";
+		echo "<strong><em style=\"color: red\">" . __('This option will work for digest notification sent daily or less frequently', 'subscribe2') . "</em></strong>\r\n";
+		if ($scheduled_time) {
 			echo "<p><input type=\"checkbox\" name=\"reset_cron\" /> " . __('Reset the schedule time and date for periodic email notifications', 'subscribe2') . "</p>\r\n";
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 			$now = time();
@@ -2137,7 +2152,6 @@ class s2class {
 	*/
 	function s2init() {
 		// load the options
-		$this->subscribe2_options = array();
 		$this->subscribe2_options = get_option('subscribe2_options');
 
 		add_action('init', array(&$this, 'subscribe2'));
@@ -2199,6 +2213,7 @@ class s2class {
 			add_action('draft_to_publish', array(&$this, 'publish'));
 			add_action('pending_to_publish', array(&$this, 'publish'));
 			add_action('private_to_publish', array(&$this, 'publish'));
+			add_action('future_to_publish', array(&$this, 'publish'));
 			if ($this->subscribe2_options['password'] == "yes") {
 				add_action('new_to_private', array(&$this, 'publish'));
 				add_action('draft_to_private', array(&$this, 'publish'));
@@ -2279,6 +2294,7 @@ class s2class {
 /* ===== our variables ===== */
 	// cache variables
 	var $version = '';
+	var $subscribe2_options = array();
 	var $all_public = '';
 	var $all_unconfirmed = '';
 	var $excluded_cats = '';
