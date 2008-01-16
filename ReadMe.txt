@@ -84,6 +84,7 @@ Version 4.4 by Matthew Robinson
 * Fixed bug in usermeta update calls in unsubscribe_registered_users function
 * Fixed bug in array handling in cron function that may have stopped emails sending
 * Improved array handling in the Digest function
+* Added an Un-installer to completely removed Subscribe2 from your WordPress install
 
 Version 4.3 by Matthew Robinson
 
