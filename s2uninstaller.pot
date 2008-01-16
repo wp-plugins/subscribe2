@@ -1,0 +1,69 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-01-16 20:13+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: s2uninstaller.php:39
+msgid "Subscribe2 has been uninstalled."
+msgstr ""
+
+#: s2uninstaller.php:44
+msgid "Subscribe2 Uninstaller"
+msgstr ""
+
+#: s2uninstaller.php:46
+msgid ""
+"The Subscribe2 plugin is still active on your system. Please deactivate the "
+"plugin before completing the uninstall process."
+msgstr ""
+
+#: s2uninstaller.php:47
+msgid "You can deactivate the plugin by using the "
+msgstr ""
+
+#: s2uninstaller.php:47
+msgid "WordPress Plugin Page"
+msgstr ""
+
+#: s2uninstaller.php:57
+msgid ""
+"Clicking on UNINSTALL will remove the following items from your WordPress "
+"install (these were installed by Subscribe2)."
+msgstr ""
+
+#: s2uninstaller.php:59
+msgid "Options Table Entries"
+msgstr ""
+
+#: s2uninstaller.php:60
+msgid "Usermeta Table Entries"
+msgstr ""
+
+#: s2uninstaller.php:61
+msgid "Subscribe2 Table"
+msgstr ""
+
+#: s2uninstaller.php:62
+msgid "Events Schedules by Subscribe2"
+msgstr ""
+
+#: s2uninstaller.php:66
+msgid "UNINSTALL"
+msgstr ""
+
+#: s2uninstaller.php:108
+msgid "S2 Uninstaller"
+msgstr ""
