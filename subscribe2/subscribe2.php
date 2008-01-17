@@ -1038,7 +1038,7 @@ class s2class {
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) subscribed!', 'subscribe2') . "</strong></p></div>";
 			} elseif ('delete' == $_POST['s2_admin']) {
 				$this->delete($_POST['email']);
-				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('deleted!', 'subscribe2') . "</strong</p>></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('deleted!', 'subscribe2') . "</strong></p></div>";
 			} elseif ('toggle' == $_POST['s2_admin']) {
 				$this->toggle($_POST['email']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('status changed!', 'subscribe2') . "</strong></p></div>";
