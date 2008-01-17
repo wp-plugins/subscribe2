@@ -958,13 +958,13 @@ class s2class {
 			if (!empty($remain)) {
 				// remove subscription to these cat IDs and update s2_subscribed
 				foreach ($cats as $id) {
-					delete_usermeta($user_ID, 's2_cat' . $id, "$id");
+					delete_usermeta($user_ID, 's2_cat' . $id);
 				}
 				update_usermeta($user_ID, 's2_subscribed', implode(',', $remain));
 			} else {
 				// remove subscription to these cat IDs and update s2_subscribed to ''
 				foreach ($cats as $id) {
-					delete_usermeta($user_ID, 's2_cat' . $id, "$id");
+					delete_usermeta($user_ID, 's2_cat' . $id);
 				}
 				update_usermeta($user_ID, 's2_subscribed', '-1');
 			}
@@ -1038,7 +1038,7 @@ class s2class {
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) subscribed!', 'subscribe2') . "</strong></p></div>";
 			} elseif ('delete' == $_POST['s2_admin']) {
 				$this->delete($_POST['email']);
-				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('deleted!', 'subscribe2') . "</strong</p>></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('deleted!', 'subscribe2') . "</strong></p></div>";
 			} elseif ('toggle' == $_POST['s2_admin']) {
 				$this->toggle($_POST['email']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('status changed!', 'subscribe2') . "</strong></p></div>";
@@ -2062,16 +2062,16 @@ class s2class {
 		// update last_s2cron execution time before completing or bailing
 		$this->subscribe2_options['last_s2cron'] = $now;
 		update_option('subscribe2_options', $this->subscribe2_options);
-	
+
 		// do we have any posts?
 		if (empty($posts)) { return; }
 
 		// if we have posts, let's prepare the digest
+		$all_post_cats = array();
 		foreach ($posts as $post) {
 			$post_cats = wp_get_post_categories($post->ID);
 			$post_cats_string = implode(',', $post_cats);
-			$diff = array_diff($post_cats, $all_post_cats);
-			$all_post_cats = array_merge(array($all_post_cats), array($diff));
+			$all_post_cats = array_unique(array_merge($all_post_cats, $post_cats));
 			$check = false;
 			// is the current post assigned to any categories
 			// which should not generate a notification email?
@@ -2141,9 +2141,9 @@ class s2class {
 		$registered = $this->get_registered("cats=$all_post_cats_string");
 		$recipients = array_merge((array)$public, (array)$registered);
 		$mailtext = $this->substitute(stripslashes($this->subscribe2_options['mailtext']));
-		$body = str_replace("TABLE", $table, $mailtext);
-		$body = str_replace("POST", $message, $mailtext);
-		$this->mail($recipients, $subject, $body);
+		$mailtext = str_replace("TABLE", $table, $mailtext);
+		$mailtext = str_replace("POST", $message, $mailtext);
+		$this->mail($recipients, $subject, $mailtext);
 	} // end subscribe2_cron
 
 /* ===== Our constructor ===== */
