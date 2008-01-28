@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.4
+Version: 4.5
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -41,7 +41,7 @@ define('S2PAGE', '0');
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.4');
+define('S2VERSION', '4.5');
 define ('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // use Owen's excellent ButtonSnap library
@@ -1294,7 +1294,7 @@ class s2class {
 				} else {
 					if (!wp_next_scheduled('s2_digest_cron')) {
 						// if we are using digest schedule the event and prime last_cron as now
-						$time = time() + $interval;
+						$time =  current_time('timestamp', 1) + $interval;
 						if ($interval < 86400) {
 							// Schedule CRON events occurring less than daily starting now and periodically thereafter
 							$timestamp = &$time;
@@ -1391,10 +1391,10 @@ class s2class {
 		echo "<dl>";
 		echo "<dt><b>BLOGNAME</b></dt><dd>" . get_bloginfo('name') . "</dd>\r\n";
 		echo "<dt><b>BLOGLINK</b></dt><dd>" . get_bloginfo('url') . "</dd>\r\n";
-		echo "<dt><b>TITLE</b></dt><dd>" . __("the post's title", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>TITLE</b></dt><dd>" . __("the post's title<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>POST</b></dt><dd>" . __("the excerpt or the entire post<br />(<i>based on the subscriber's preferences</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>TABLE</b></dt><dd>" . __("a list of post titles (for digest emails)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>PERMALINK</b></dt><dd>" . __("the post's permalink", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>TABLE</b></dt><dd>" . __("a list of post titles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>PERMALINK</b></dt><dd>" . __("the post's permalink<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>MYNAME</b></dt><dd>" . __("the admin or post author's name", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>EMAIL</b></dt><dd>" . __("the admin or post author's email", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>AUTHORNAME</b></dt><dd>" . __("the post author's name", 'subscribe2') . "</dd>\r\n";
@@ -1852,11 +1852,13 @@ class s2class {
 		if ($scheduled_time) {
 			echo "<p><input type=\"checkbox\" name=\"reset_cron\" /> " . __('Reset the schedule time and date for periodic email notifications', 'subscribe2') . "</p>\r\n";
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
-			$now = time();
+			$now = current_time('timestamp', 1);
 			echo "<p>" . __('Current server time is', 'subscribe2') . ": \r\n";
-			echo "<strong>" . gmdate($datetime, $now+ (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
-			echo "<p>" . __('Next email notification will be sent', 'subscribe2') . ": \r\n";
-			echo "<strong>" . gmdate($datetime, wp_next_scheduled('s2_digest_cron') + (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
+			echo "<strong>" . date($datetime, $now) . "</strong></p>\r\n";
+			echo "<p>" . __('Current blog time is', 'subscribe2') . ": \r\n";
+			echo "<strong>" . date($datetime, $now + (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
+			echo "<p>" . __('Next email notification will be sent when server time is after', 'subscribe2') . ": \r\n";
+			echo "<strong>" . date($datetime, wp_next_scheduled('s2_digest_cron')) . "</strong></p>\r\n";
 		} else {
 			echo "<br />";
 		}
@@ -2055,7 +2057,7 @@ class s2class {
 		global $wpdb;
 
 		// collect posts
-		$now = date('Y-m-d H:i:s', time());
+		$now =  current_time('mysql');
 		$prev = $this->subscribe2_options['last_s2cron'];
 		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ('publish', 'private') AND post_type IN ('post', 'page')");
 
