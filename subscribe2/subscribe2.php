@@ -1854,9 +1854,9 @@ class s2class {
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 			$now = time();
 			echo "<p>" . __('Current server time is', 'subscribe2') . ": \r\n";
-			echo "<strong>" . gmdate($datetime, $now+ (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
+			echo "<strong>" . gmdate($datetime, $now) . "</strong></p>\r\n";
 			echo "<p>" . __('Next email notification will be sent', 'subscribe2') . ": \r\n";
-			echo "<strong>" . gmdate($datetime, wp_next_scheduled('s2_digest_cron') + (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
+			echo "<strong>" . gmdate($datetime, wp_next_scheduled('s2_digest_cron')) . "</strong></p>\r\n";
 		} else {
 			echo "<br />";
 		}
