@@ -36,11 +36,12 @@ function debug_menu() {
 	global $wp_filter;
 	 echo "<div class=\"wrap\">";
 	$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
-	$now = time();
 	echo "<p>Current Server time is: \r\n";
-	echo "<strong>" . gmdate($datetime, $now) . "</strong></p>\r\n";
+	echo "<strong>" . gmdate($datetime, current_time('timestamp', 1)) . "</strong></p>\r\n";
 	echo "<p>Current Blog time is: \r\n";
-	echo "<strong>" . gmdate($datetime, $now+ (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
+	echo "<strong>" . gmdate($datetime, current_time('timestamp')) . "</strong></p>\r\n";
+	echo "<p>Current Blog offset is: \r\n";
+	echo get_option('gmt_offset') . "\r\n";
 	echo "<pre>";
 	cron_jobs();
 	echo "</pre>";

@@ -1294,7 +1294,7 @@ class s2class {
 				} else {
 					if (!wp_next_scheduled('s2_digest_cron')) {
 						// if we are using digest schedule the event and prime last_cron as now
-						$time =  current_time('timestamp', 1) + $interval;
+						$time =  current_time('timestamp') + $interval;
 						if ($interval < 86400) {
 							// Schedule CRON events occurring less than daily starting now and periodically thereafter
 							$timestamp = &$time;
@@ -1852,12 +1852,11 @@ class s2class {
 		if ($scheduled_time) {
 			echo "<p><input type=\"checkbox\" name=\"reset_cron\" /> " . __('Reset the schedule time and date for periodic email notifications', 'subscribe2') . "</p>\r\n";
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
-			$now = current_time('timestamp', 1);
 			echo "<p>" . __('Current server time is', 'subscribe2') . ": \r\n";
-			echo "<strong>" . date($datetime, $now) . "</strong></p>\r\n";
+			echo "<strong>" . date($datetime, current_time('timestamp', 1)) . "</strong></p>\r\n";
 			echo "<p>" . __('Current blog time is', 'subscribe2') . ": \r\n";
-			echo "<strong>" . date($datetime, $now + (get_option('gmt_offset') * 3600)) . "</strong></p>\r\n";
-			echo "<p>" . __('Next email notification will be sent when server time is after', 'subscribe2') . ": \r\n";
+			echo "<strong>" . date($datetime, current_time('timestamp')) . "</strong></p>\r\n";
+			echo "<p>" . __('Next email notification will be sent when your blog time is after', 'subscribe2') . ": \r\n";
 			echo "<strong>" . date($datetime, wp_next_scheduled('s2_digest_cron')) . "</strong></p>\r\n";
 		} else {
 			echo "<br />";
