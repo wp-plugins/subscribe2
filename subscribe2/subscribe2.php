@@ -1905,7 +1905,7 @@ class s2class {
 	Display our form; also handles (un)subscribe requests
 	*/
 	function filter($content = '') {
-		if ( ('' == $content) || (! preg_match('|<!--subscribe2-->|', $content)) ) { return $content; }
+		if ( ('' == $content) || (! strstr($content, '<!--subscribe2-->')) ) { return $content; }
 		$this->s2form = $this->form;
 
 		global $user_ID;
@@ -1963,8 +1963,7 @@ class s2class {
 				}
 			}
 		}
-		$content = preg_replace('|<!--subscribe2-->|', $this->s2form, $content);
-		return $content;
+		return preg_replace('|(<p>)?(\n)*<!--subscribe2-->(\n)*(</p>)?|', $this->s2form, $content);
 	} // end filter()
 
 	/**
