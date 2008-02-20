@@ -1022,8 +1022,15 @@ class s2class {
 
 		$what = '';
 		$reminderform = false;
+		$action = get_option('siteurl') . remove_query_arg(array('what', 's2page'));
+		$this->action = attribute_escape($action);
 		$urlpath = str_replace("\\","/",S2PATH);
 		$urlpath = trailingslashit(get_option('siteurl')) . substr($urlpath,strpos($urlpath,"wp-content/"));
+		if ( isset( $_GET['s2page'] ) ) {
+			$page = (int) $_GET['s2page'];
+		} else {
+			$page = 1;
+		}
 
 		// was anything POSTed ?
 		if (isset($_POST['s2_admin'])) {
@@ -1057,7 +1064,8 @@ class s2class {
 			}
 		}
 
-		if (isset($_POST['what'])) {
+		if ( (isset($_POST['what'])) && ($_POST['what'] != $_GET['what']) ) {
+			$page = 1;
 			if ('all' == $_POST['what']) {
 				$what = 'all';
 				$confirmed = $this->get_public();
@@ -1070,20 +1078,50 @@ class s2class {
 				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed);
 			} elseif ('confirmed' == $_POST['what']) {
 				$what = 'confirmed';
-				$confirmed = $this->get_public();				
+				$confirmed = $this->get_public();
 				$subscribers = $confirmed;
 			} elseif ('unconfirmed' == $_POST['what']) {
 				$what = 'unconfirmed';
-				$unconfirmed = $this->get_public(0);				
+				$unconfirmed = $this->get_public(0);
 				$subscribers = $unconfirmed;
-				if (!empty($unconfirmed)) {
-					$reminderemails = implode(",", $unconfirmed);
+				if (!empty($subscribers)) {
+					$reminderemails = implode(",", $subscribers);
 					$reminderform = true;
 				}
 			} elseif (is_numeric($_POST['what'])) {
 				$what = intval($_POST['what']);
 				$subscribers = $this->get_registered("cats=$what");
 			} elseif ('registered' == $_POST['what']) {
+				$what = 'registered';
+				$subscribers = $registered;
+			}
+		} elseif (isset($_GET['what'])) {
+			if ('all' == $_GET['what']) {
+				$what = 'all';
+				$confirmed = $this->get_public();
+				$unconfirmed = $this->get_public(0);
+				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$registered);
+			} elseif ('public' == $_GET['what']) {
+				$what = 'public';
+				$confirmed = $this->get_public();
+				$unconfirmed = $this->get_public(0);
+				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed);
+			} elseif ('confirmed' == $_GET['what']) {
+				$what = 'confirmed';
+				$confirmed = $this->get_public();
+				$subscribers = $confirmed;
+			} elseif ('unconfirmed' == $_GET['what']) {
+				$what = 'unconfirmed';
+				$unconfirmed = $this->get_public(0);
+				$subscribers = $unconfirmed;				
+				if (!empty($subscribers)) {
+					$reminderemails = implode(",", $subscribers);
+					$reminderform = true;
+				}
+			} elseif (is_numeric($_GET['what'])) {
+				$what = intval($_GET['what']);
+				$subscribers = $this->get_registered("cats=$what");
+			} elseif ('registered' == $_GET['what']) {
 				$what = 'registered';
 				$subscribers = $registered;
 			}
@@ -1107,6 +1145,34 @@ class s2class {
 		}
 		if (!empty($subscribers)) {
 			natcasesort($subscribers);
+			$args['what'] = $what;
+			$total_subscribers = count($subscribers);
+			$total_pages = ceil($total_subscribers / 50);
+			$r = '';
+			if ( $page > 1 ) {
+				$args['s2page'] = ( 1 == $page - 1 ) ? 1 : $page - 1;
+				$r .=  '<a class="prev" href="' . clean_url(add_query_arg( $args )) . '">'. __('&laquo; Previous Page') .'</a>' . "\n";
+			}
+			if ( $total_pages > 1 ) {
+				for ( $page_num = 1; $page_num <= $total_pages; $page_num++ ) :
+					if ( $page == $page_num ) :
+						$r .=  "<strong>$page_num</strong>\n";
+					else :
+						if ( $page_num < 3 || ( $page_num >= $page - 3 && $page_num <= $page + 3 ) || $page_num > $total_pages - 3 ) :
+							$args['s2page'] = ( 1 == $page_num ) ? 1 : $page_num;
+							$r .= '<a class="page-numbers" href="' . clean_url(add_query_arg($args)) . '">' . ( $page_num ) . "</a>\n";
+							$trunc = true;
+						elseif ( $trunc == true ) :
+							$r .= "...\n";
+							$trunc = false;
+						endif;
+					endif;
+				endfor;
+			}
+			if ( ( $page ) * 50 < $total_subscribers ) {
+				$args['s2page'] = $page + 1;
+				$r .=  '<a class="next" href="' . clean_url(add_query_arg($args)) . '">'. __('Next Page &raquo;') .'</a>' . "\n";
+			}
 		}
 		// safety check for our arrays
 		if ('' == $confirmed) { $confirmed = array(); }
@@ -1116,7 +1182,7 @@ class s2class {
 		// show our form
 		echo "<div class=\"wrap\">";
 		echo "<h2>" . __('Subscribe Addresses', 'subscribe2') . "</h2>\r\n";
-		echo "<form method=\"post\" action=\"\">\r\n";
+		echo "<form method=\"post\" action=\"$this->action\">\r\n";
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
 		}
@@ -1136,7 +1202,7 @@ class s2class {
 			echo "<p align=\"center\"><b>" . __('Registered on the left, confirmed in the middle, unconfirmed on the right', 'subscribe2') . "</b></p>\r\n";
 			if (is_writable(ABSPATH . 'wp-content')) {
 				$exportcsv = implode(",", $subscribers);
-				echo "<form method=\"post\" action=\"\">\r\n";
+				echo "<form method=\"post\" action=\"$this->action\">\r\n";
 				if (function_exists('wp_nonce_field')) {
 					wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
 				}
@@ -1146,8 +1212,12 @@ class s2class {
 				echo "</form>\r\n";
 			}
 		}
+		echo "<p>" . $r . "</p>";
 		echo "<table cellpadding=\"2\" cellspacing=\"2\">";
 		if (!empty($subscribers)) {
+			$subscriber_chunks = array_chunk($subscribers, 50);
+			$chunk = $page - 1;
+			$subscribers = $subscriber_chunks[$chunk];
 			foreach ($subscribers as $subscriber) {
 				echo "<tr class=\"$alternate\">";
 				echo "<td width=\"75%\"";
@@ -1162,7 +1232,7 @@ class s2class {
 				if (in_array($subscriber, $unconfirmed) || in_array($subscriber, $confirmed) ) {
 					echo "(" . $this->signup_date($subscriber) . ")</td>\r\n";
 					echo "<td width=\"5%\" align=\"center\">\r\n";
-					echo "<form method=\"post\" action=\"\">";
+					echo "<form method=\"post\" action=\"$this->action\">";
 					if (function_exists('wp_nonce_field')) {
 						wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
 					}
@@ -1186,7 +1256,7 @@ class s2class {
 					echo "<input type=\"hidden\" name=\"email\" value=\"$subscriber\" />\r\n";
 					echo "<input type=\"hidden\" name=\"s2_admin\" value=\"delete\" />\r\n";
 					echo "<input type=\"hidden\" name=\"what\" value=\"$what\" />\r\n";
-					echo "<input type=\"image\" src=\"" . $urlpath . "include/cross.png\"name=\"submit\" value=\"X\" />\r\n";
+					echo "<input type=\"image\" src=\"" . $urlpath . "include/cross.png\" name=\"submit\" value=\"X\" />\r\n";
 					echo "</span></form>";
 				}
 				echo "</td></tr>\r\n";
@@ -1196,8 +1266,9 @@ class s2class {
 			echo "<tr><td align=\"center\"><b>" . __('NONE', 'subscribe2') . "</b></td></tr>\r\n";
 		}
 		echo "</table>";
+		echo "<p>" . $r . "</p>";
 		if ($reminderform) {
-			echo "<form method=\"post\" action=\"\">\r\n";
+			echo "<form method=\"post\" action=\"$this->action\">\r\n";
 			if (function_exists('wp_nonce_field')) {
 				wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
 			}
@@ -1791,7 +1862,7 @@ class s2class {
 		}
 
 		if (false !== $submit) {
-			echo "<form method=\"post\" action=\"\">";
+			echo "<form method=\"post\" action=\"$this->action\">";
 		}
 		echo "<select name=\"what\">\r\n";
 		foreach ($who as $whom => $display) {
@@ -2118,17 +2189,8 @@ class s2class {
 			$message .= $excerpt . "\r\n\r\n";
 		}
 
-		$author = get_userdata($post->post_author);
-		$this->authorname = $author->display_name;
-
-		// do we send as admin, or post author?
-		if ('author' == $this->subscribe2_options['sender']) {
-			// get author details
-			$user =& $author;
-		} else {
-			// get admin detailts
-			$user = $this->get_userdata();
-		}
+		// get admin detailts
+		$user = $this->get_userdata();
 		$this->myemail = $user->user_email;
 		$this->myname = $user->display_name;
 
