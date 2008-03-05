@@ -1022,7 +1022,7 @@ class s2class {
 
 		$what = '';
 		$reminderform = false;
-		$action = get_option('siteurl') . remove_query_arg(array('what', 's2page'));
+		$action = remove_query_arg(array('what', 's2page'));
 		$this->action = attribute_escape($action);
 		$urlpath = str_replace("\\","/",S2PATH);
 		$urlpath = trailingslashit(get_option('siteurl')) . substr($urlpath,strpos($urlpath,"wp-content/"));
@@ -1189,10 +1189,9 @@ class s2class {
 			wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
 		}
 		echo __('Enter addresses, one per line or comma-seperated', 'subscribe2') . "<br />\r\n";
-		echo "<textarea rows=\"2\" cols=\"80\" name=\"addresses\"></textarea><br />\r\n";
-		echo "<span class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Subscribe', 'subscribe2') . "\"/>\r\n";
-		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"subscribe\" /></span>";
-		echo "</p>";
+		echo "<textarea rows=\"2\" cols=\"80\" name=\"addresses\"></textarea></p>\r\n";
+		echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Subscribe', 'subscribe2') . "\"/>\r\n";
+		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"subscribe\" /></p>";
 		echo "</form></div>";
 
 		// subscriber lists
@@ -1255,12 +1254,12 @@ class s2class {
 					if (function_exists('wp_nonce_field')) {
 						wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
 					}
-					echo "<span class=\"delete\">\r\n";
 					echo "<input type=\"hidden\" name=\"email\" value=\"$subscriber\" />\r\n";
 					echo "<input type=\"hidden\" name=\"s2_admin\" value=\"delete\" />\r\n";
 					echo "<input type=\"hidden\" name=\"what\" value=\"$what\" />\r\n";
+					echo "<p class=\"delete\">\r\n";					
 					echo "<input type=\"image\" src=\"" . $urlpath . "include/cross.png\" name=\"submit\" value=\"X\" />\r\n";
-					echo "</span></form>";
+					echo "</p></form>";
 				}
 				echo "</td></tr>\r\n";
 				('alternate' == $alternate) ? $alternate = '' : $alternate = 'alternate';
@@ -1572,7 +1571,7 @@ class s2class {
 		echo"</p>";
 
 		// submit
-		echo "<p align=\"center\"><span class=\"submit\"><input type=\"submit\" id=\"save\" name=\"submit\" value=\"" . __('Submit', 'subscribe2') . "\" /></span></p>";
+		echo "<p class=\"submit\" align=\"center\"><input type=\"submit\" id=\"save\" name=\"submit\" value=\"" . __('Submit', 'subscribe2') . "\" /></p>";
 		echo "</form>\r\n";
 		echo "</div><div class=\"wrap\">";
 
@@ -1583,11 +1582,11 @@ class s2class {
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-options_subscribers' . $s2nonce);
 		}
-		echo "<p align=\"center\"><span class=\"submit\">";
+		echo "<p class=\"submit\" align=\"center\">";
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"RESET\" />";
 		echo "<input type=\"submit\" id=\"deletepost\" name=\"submit\" value=\"" . __('RESET', 'subscribe2') .
 		"\" />";
-		echo "</span></p></form></div>\r\n";
+		echo "</p></form></div>\r\n";
 
 		include(ABSPATH . 'wp-admin/admin-footer.php');
 		// just to be sure
@@ -1782,7 +1781,7 @@ class s2class {
 		$this->display_subscriber_dropdown('registered', false, array('all'));
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"mail\" />";
 		echo "</p>";
-		echo "&nbsp;&nbsp;<span class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></span>&nbsp;";
+		echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></p>";
 		echo "</form></div>\r\n";
 		echo "<div style=\"clear: both;\"><p>&nbsp;</p></div>";
 
@@ -1907,7 +1906,7 @@ class s2class {
 		}
 		echo "</select>";
 		if (false !== $submit) {
-			echo "<span class=\"submit\"><input type=\"submit\" value=\"$submit\" /></span></form>\r\n";
+			echo "<p class=\"submit\"><input type=\"submit\" value=\"$submit\" /></p></form>\r\n";
 		}
 	} // end display_subscriber_dropdown()
 
@@ -2314,14 +2313,32 @@ class s2class {
 	/**
 	Register our button in the QuickTags bar
 	*/
+	function add_mce3_plugin($arr) {
+		$path = get_option('siteurl') . '/wp-content/plugins/subscribe2/tinymce3/editor_plugin.js';
+		$arr['subscribe2'] = $path;
+		return $arr;
+	}
+	
+	function add_mce3_button($arr) {
+		$arr[] = 'subscribe2';
+		return $arr;
+	}
+	
 	function button_init() {
 		if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) return;
 			if ( 'true' == get_user_option('rich_editing') ) {
-				// Load and append our TinyMCE external plugin
-				add_filter('mce_plugins', array(&$this, 'mce_plugins'));
-				add_filter('mce_buttons', array(&$this, 'mce_buttons'));
-				add_action('tinymce_before_init', array(&$this, 'tinymce_before_init'));
-				add_action('marker_css', array(&$this, 'button_css'));
+				global $wp_db_version;
+				if ($wp_db_version >= 7098) {
+					//check if we are using WordPress 2.5+
+					add_filter('mce_external_plugins', array(&$this, 'add_mce3_plugin'));
+					add_filter('mce_buttons', array(&$this, 'add_mce3_button'));
+				} else {
+					// Load and append our TinyMCE external plugin
+					add_filter('mce_plugins', array(&$this, 'mce_plugins'));
+					add_filter('mce_buttons', array(&$this, 'mce_buttons'));
+					add_filter('tiny_mce_before_init', array(&$this, 'tiny_mce_before_init'));
+					add_action('marker_css', array(&$this, 'button_css'));
+				}
 			} else {
 				buttonsnap_separator();
 				buttonsnap_jsbutton(get_option('siteurl') . '/wp-content/plugins/subscribe2/include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
