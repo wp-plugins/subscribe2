@@ -9,7 +9,7 @@ Author URI: http://subscribe2.wordpress.com
 */
 
 /*
-Copyright (C) 2006-7 Matthew Robinson
+Copyright (C) 2006-8 Matthew Robinson
 Based on the Original Subscribe2 plugin by 
 Copyright (C) 2005 Scott Merrill (skippy@skippy.net)
 
@@ -240,9 +240,9 @@ class s2class {
 			$this->myname = $admin->display_name;
 			$this->myemail = $admin->user_email;
 		}
-		$headers = "From: " . $this->myname . " <" . $this->myemail . ">\n";
+		$headers = "From: \"" . $this->myname . "\" <" . $this->myemail . ">\n";
 		$headers .= "Return-path: <" . $this->myemail . ">\n";
-		$headers .= "Reply-To: " . $this->myemail . "\n";
+		$headers .= "Reply-To: \"" . $this->myname . "\" <" . $this->myemail . ">\n";
 		$headers .= "X-Mailer:PHP" . phpversion() . "\n";
 		$headers .= "Precedence: list\nList-Id: " . get_option('blogname') . "\n";
 
@@ -328,6 +328,8 @@ class s2class {
 	*/
 	function publish($post = 0) {
 		if (!$post) { return $post; }
+		$s2mail = get_post_meta($post->ID, 's2mail', true);
+		if (strtolower(trim($s2mail)) == 'no') { return $post; }
 
 		// are we doing daily digests? If so, don't send anything now
 		if ($this->subscribe2_options['email_freq'] != 'never') { return $post; }
@@ -495,8 +497,9 @@ class s2class {
 
 		$body = str_replace("LINK", $link, $body);
 
-		$mailheaders .= "From: " . $admin->display_name . " <" . $admin->user_email . ">\n";
-		$mailheaders .= "Return-Path: <" . $admin->user_email . ">\n";
+		$mailheaders .= "From: \"" . $admin->display_name . "\" <" . $admin->user_email . ">\n";
+		$mailheaders .= "Reply-To: \"" . $admin->display_name . "\" <" . $admin->user_email . ">\n";
+		$mailheaders .= "Return-path: <" . $admin->user_email . ">\n";
 		$mailheaders .= "X-Mailer:PHP" . phpversion() . "\n";
 		$mailheaders .= "Precedence: list\nList-Id: " . get_option('blogname') . "\n";
 		$mailheaders .= "MIME-Version: 1.0\n";
@@ -2140,6 +2143,95 @@ class s2class {
 		}
 	}
 
+/* ===== Write Toolbar Button Functions ===== */
+
+	/**
+	Register our button in the QuickTags bar
+	*/
+	function button_init() {
+		if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) return;
+			if ( 'true' == get_user_option('rich_editing') ) {
+				global $wp_db_version;
+				if ($wp_db_version >= 7098) {
+					//check if we are using WordPress 2.5+
+					add_filter('mce_external_plugins', array(&$this, 'add_mce3_plugin'));
+					add_filter('mce_buttons', array(&$this, 'add_mce3_button'));
+				} else {
+					// Load and append our TinyMCE external plugin
+					add_filter('mce_plugins', array(&$this, 'mce_plugins'));
+					add_filter('mce_buttons', array(&$this, 'mce_buttons'));
+					add_filter('tiny_mce_before_init', array(&$this, 'tiny_mce_before_init'));
+					add_action('marker_css', array(&$this, 'button_css'));
+				}
+			} else {
+				//use buttonsnap to add button is not using RTE
+				buttonsnap_separator();
+				buttonsnap_jsbutton(get_option('siteurl') . '/wp-content/plugins/subscribe2/include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
+			}
+	}
+
+	/**
+	Add buttons for WordPress 2.5+ using built in hooks
+	*/
+	function add_mce3_plugin($arr) {
+		$path = get_option('siteurl') . '/wp-content/plugins/subscribe2/tinymce3/editor_plugin.js';
+		$arr['subscribe2'] = $path;
+		return $arr;
+	}
+	
+	function add_mce3_button($arr) {
+		$arr[] = 'subscribe2';
+		return $arr;
+	}
+
+	// Add buttons in WordPress v2.1+, thanks to An-archos
+	function mce_plugins($plugins) {
+		array_push($plugins, '-subscribe2quicktags');
+		return $plugins;
+	}
+
+	function mce_buttons($buttons) {
+		array_push($buttons, 'separator');
+		array_push($buttons, 'subscribe2quicktags');
+		return $buttons;
+	}	
+
+	function tinymce_before_init() {
+		$this->fullpath = get_option('siteurl') . '/wp-content/plugins/subscribe2/tinymce/';
+		echo "tinyMCE.loadPlugin('subscribe2quicktags', '" . $this->fullpath . "');\n"; 
+	}
+	
+	/**
+	Style a marker in the Rich Text Editor for our tag
+	By default, the RTE suppresses output of HTML comments, so this
+	places a CSS style on our token in order to make it display
+	*/
+	function button_css() { 
+		$marker_url = get_option('siteurl') . '/wp-content/plugins/subscribe2/include/s2_marker.png';
+		echo "
+			.s2_marker {
+				display: block;
+				height: 45px;
+				margin-top: 5px;
+				background-image: url({$marker_url});
+				background-repeat: no-repeat;
+				background-position: center;
+			}
+		";
+	}
+
+	function s2_edit_form() { 
+		echo "<!-- Start Subscribe2 Quicktags Javascript -->\r\n";
+		echo "<script type=\"text/javascript\">\r\n";
+		echo "//<![CDATA[\r\n";
+		echo "function s2_insert_token() {
+			buttonsnap_settext('<!--subscribe2-->');
+		}\r\n";
+		echo "//]]>\r\n";
+		echo "</script>\r\n";
+		echo "<!-- End Subscribe2 Quicktags Javascript -->\r\n";
+	}
+
 /* ===== wp-cron functions ===== */
 	/**
 	Send a daily digest of today's new posts
@@ -2172,6 +2264,12 @@ class s2class {
 				if (in_array($cat, $post_cats)) {
 					$check = true;
 				}
+			}
+			//is the current post set by the user to
+			// not generate a notification email?
+			$s2mail = get_post_meta($post->ID, 's2mail', true);
+			if (strtolower(trim($s2mail)) == 'no') {
+				$check = true;
 			}
 			// is the current post private
 			// and should this not generate a notification email?
@@ -2309,93 +2407,8 @@ class s2class {
 		$this->load_strings();
 	} // end subscribe2()
 
-	/* ===== ButtonSnap configuration ===== */
-	/**
-	Register our button in the QuickTags bar
-	*/
-	function add_mce3_plugin($arr) {
-		$path = get_option('siteurl') . '/wp-content/plugins/subscribe2/tinymce3/editor_plugin.js';
-		$arr['subscribe2'] = $path;
-		return $arr;
-	}
-	
-	function add_mce3_button($arr) {
-		$arr[] = 'subscribe2';
-		return $arr;
-	}
-	
-	function button_init() {
-		if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) return;
-			if ( 'true' == get_user_option('rich_editing') ) {
-				global $wp_db_version;
-				if ($wp_db_version >= 7098) {
-					//check if we are using WordPress 2.5+
-					add_filter('mce_external_plugins', array(&$this, 'add_mce3_plugin'));
-					add_filter('mce_buttons', array(&$this, 'add_mce3_button'));
-				} else {
-					// Load and append our TinyMCE external plugin
-					add_filter('mce_plugins', array(&$this, 'mce_plugins'));
-					add_filter('mce_buttons', array(&$this, 'mce_buttons'));
-					add_filter('tiny_mce_before_init', array(&$this, 'tiny_mce_before_init'));
-					add_action('marker_css', array(&$this, 'button_css'));
-				}
-			} else {
-				buttonsnap_separator();
-				buttonsnap_jsbutton(get_option('siteurl') . '/wp-content/plugins/subscribe2/include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
-			}
-	}
-
-	/**
-	Style a marker in the Rich Text Editor for our tag
-	By default, the RTE suppresses output of HTML comments, so this
-	places a CSS style on our token in order to make it display
-	*/
-	function button_css() { 
-		$marker_url = get_option('siteurl') . '/wp-content/plugins/subscribe2/include/s2_marker.png';
-		echo "
-			.s2_marker {
-				display: block;
-				height: 45px;
-				margin-top: 5px;
-				background-image: url({$marker_url});
-				background-repeat: no-repeat;
-				background-position: center;
-			}
-		";
-	}
-
-	// Add buttons in WordPress v2.1+, thanks to An-archos
-	function mce_plugins($plugins) {
-		array_push($plugins, '-subscribe2quicktags');
-		return $plugins;
-	}
-
-	function mce_buttons($buttons) {
-		array_push($buttons, 'separator');
-		array_push($buttons, 'subscribe2quicktags');
-		return $buttons;
-	}
-
-	function tinymce_before_init() {
-		$this->fullpath = get_option('siteurl') . '/wp-content/plugins/subscribe2/tinymce/';
-		echo "tinyMCE.loadPlugin('subscribe2quicktags', '" . $this->fullpath . "');\n"; 
-	}
-
-	function s2_edit_form() { 
-		echo "<!-- Start Subscribe2 Quicktags Javascript -->\r\n";
-		echo "<script type=\"text/javascript\">\r\n";
-		echo "//<![CDATA[\r\n";
-		echo "function s2_insert_token() {
-			buttonsnap_settext('<!--subscribe2-->');
-		}\r\n";
-		echo "//]]>\r\n";
-		echo "</script>\r\n";
-		echo "<!-- End Subscribe2 Quicktags Javascript -->\r\n";
-	}
-
 /* ===== our variables ===== */
 	// cache variables
-	var $version = '';
 	var $subscribe2_options = array();
 	var $all_public = '';
 	var $all_unconfirmed = '';
