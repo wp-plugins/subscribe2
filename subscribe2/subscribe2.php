@@ -2154,14 +2154,13 @@ class s2class {
 				global $wp_db_version;
 				if ($wp_db_version >= 7098) {
 					//check if we are using WordPress 2.5+
-					add_filter('mce_external_plugins', array(&$this, 'add_mce3_plugin'));
-					add_filter('mce_buttons', array(&$this, 'add_mce3_button'));
+					add_filter('mce_external_plugins', array(&$this, 'mce3_plugin'));
+					add_filter('mce_buttons', array(&$this, 'mce3_button'));
 				} else {
 					// Load and append our TinyMCE external plugin
-					add_filter('mce_plugins', array(&$this, 'mce_plugins'));
-					add_filter('mce_buttons', array(&$this, 'mce_buttons'));
-					add_filter('tiny_mce_before_init', array(&$this, 'tiny_mce_before_init'));
-					add_action('marker_css', array(&$this, 'button_css'));
+					add_filter('mce_plugins', array(&$this, 'mce2_plugin'));
+					add_filter('mce_buttons', array(&$this, 'mce2_button'));
+					add_filter('tinymce_before_init', array(&$this, 'tinymce2_before_init'));
 				}
 			} else {
 				//use buttonsnap to add button is not using RTE
@@ -2173,51 +2172,32 @@ class s2class {
 	/**
 	Add buttons for WordPress 2.5+ using built in hooks
 	*/
-	function add_mce3_plugin($arr) {
+	function mce3_plugin($arr) {
 		$path = get_option('siteurl') . '/wp-content/plugins/subscribe2/tinymce3/editor_plugin.js';
 		$arr['subscribe2'] = $path;
 		return $arr;
 	}
 	
-	function add_mce3_button($arr) {
+	function mce3_button($arr) {
 		$arr[] = 'subscribe2';
 		return $arr;
 	}
 
 	// Add buttons in WordPress v2.1+, thanks to An-archos
-	function mce_plugins($plugins) {
+	function mce2_plugin($plugins) {
 		array_push($plugins, '-subscribe2quicktags');
 		return $plugins;
 	}
 
-	function mce_buttons($buttons) {
+	function mce2_button($buttons) {
 		array_push($buttons, 'separator');
 		array_push($buttons, 'subscribe2quicktags');
 		return $buttons;
-	}	
+	}
 
-	function tinymce_before_init() {
+	function tinymce2_before_init() {
 		$this->fullpath = get_option('siteurl') . '/wp-content/plugins/subscribe2/tinymce/';
 		echo "tinyMCE.loadPlugin('subscribe2quicktags', '" . $this->fullpath . "');\n"; 
-	}
-	
-	/**
-	Style a marker in the Rich Text Editor for our tag
-	By default, the RTE suppresses output of HTML comments, so this
-	places a CSS style on our token in order to make it display
-	*/
-	function button_css() { 
-		$marker_url = get_option('siteurl') . '/wp-content/plugins/subscribe2/include/s2_marker.png';
-		echo "
-			.s2_marker {
-				display: block;
-				height: 45px;
-				margin-top: 5px;
-				background-image: url({$marker_url});
-				background-repeat: no-repeat;
-				background-position: center;
-			}
-		";
 	}
 
 	function s2_edit_form() { 
