@@ -44,6 +44,9 @@ define('S2PAGE', '0');
 define('S2VERSION', '4.5');
 define ('S2PATH', trailingslashit(dirname(__FILE__)));
 
+// Is this WordPressMU or not?
+define('S2_MU', (isset($wpmu_version) || (strpos($wp_version, 'wordpress-mu') !== false)));
+
 // use Owen's excellent ButtonSnap library
 require(ABSPATH . 'wp-content/plugins/buttonsnap.php');
 
@@ -636,17 +639,6 @@ class s2class {
 	} //end remind()
 
 	/**
-	Export email list to CSV download
-	*/
-	function exportcsv($emails = '') {
-		if ('' == $emails) {return false; }
-
-		$f = fopen(ABSPATH . 'wp-content/email.csv', 'w');
-		fwrite($f, $emails);
-		fclose($f);
-	} //end exportcsv
-
-	/**
 	Check email is not from a barred domain
 	*/
 	function is_barred($email='') {
@@ -806,7 +798,11 @@ class s2class {
 			$AND .= "AND ($and)";
 		}
 
-		$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . " WHERE a.meta_key='s2_subscribed'" . $AND;
+		if ((defined(S2_MU)) && S2_MU) {
+			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . " WHERE a.meta_key='".$wpdb->prefix."capabilities'" . $AND;
+		} else {
+			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . " WHERE a.meta_key='s2_subscribed'" . $AND;
+		}
 		$result = $wpdb->get_col($sql);
 		if ($result) {
 			$ids = implode(',', $result);
@@ -1055,9 +1051,6 @@ class s2class {
 			} elseif ('remind' == $_POST['s2_admin']) {
 				$this->remind($_POST['reminderemails']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Reminder Email(s) Sent!','subscribe2') . "</strong></p></div>"; 
-			} elseif ('exportcsv' == $_POST['s2_admin']) {
-				$this->exportcsv($_POST['exportcsv']);
-				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('CSV File Created in wp-content','subscribe2') . "</strong></p></div>"; 
 			} elseif ( ('register' == $_POST['s2_admin']) && ('subscribe' == $_POST['manage']) ) {
 				$this->subscribe_registered_users($_POST['emails'], $_POST['category']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Subscribed!','subscribe2') . "</strong></p></div>";
@@ -1205,17 +1198,15 @@ class s2class {
 		$alternate = 'alternate';
 		if (!empty($subscribers)) {
 			echo "<p align=\"center\"><b>" . __('Registered on the left, confirmed in the middle, unconfirmed on the right', 'subscribe2') . "</b></p>\r\n";
-			if (is_writable(ABSPATH . 'wp-content')) {
-				$exportcsv = implode(",", $subscribers);
-				echo "<form method=\"post\" action=\"$this->action\">\r\n";
-				if (function_exists('wp_nonce_field')) {
-					wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
-				}
-				echo "<input type=\"hidden\" name=\"exportcsv\" value=\"$exportcsv\" />\r\n";
-				echo "<input type=\"hidden\" name=\"s2_admin\" value=\"exportcsv\" />\r\n";
-				echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Save Emails to CSV File','subscribe2') . "\" /></p>\r\n";
-				echo "</form>\r\n";
+			$exportcsv = implode(",", $subscribers);
+			echo "<form method=\"post\" action=\"\">\r\n";
+			if (function_exists('wp_nonce_field')) {
+				wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
 			}
+			echo "<input type=\"hidden\" name=\"exportcsv\" value=\"$exportcsv\" />\r\n";
+			echo "<input type=\"hidden\" name=\"s2_admin\" value=\"exportcsv\" />\r\n";
+			echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Save Emails to CSV File','subscribe2') . "\" /></p>\r\n";
+			echo "</form>\r\n";
 		}
 		echo "<p>" . $strip . "</p>";
 		echo "<table cellpadding=\"2\" cellspacing=\"2\">";
@@ -2345,7 +2336,19 @@ class s2class {
 			add_filter('the_title', array(&$this, 'title_filter'));
 			add_filter('the_content', array(&$this, 'confirm'));
 		}
+		
+		if ( (isset($_POST['s2_admin'])) && ('exportcsv' == $_POST['s2_admin']) ) {
+			$date = date('Y-m-d');
+			header('Content-Description: File Transfer');
+			header("Content-type: application/octet-stream");
+			header("Content-Disposition: attachment; filename=subscribe2_users_$date.csv");
+			header("Pragma: no-cache");
+			header("Expires: 0");
+			echo $_POST['exportcsv'];
 
+			exit(0);
+		}
+		
 		//add regular actions and filters
 		add_action('admin_head', array(&$this, 'admin_head'));
 		add_action('admin_menu', array(&$this, 'admin_menu'));
