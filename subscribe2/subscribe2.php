@@ -79,6 +79,8 @@ class s2class {
 
 		$this->barred_domain = "<p>" . __('Sorry, email addresses at that domain are currently barred due to spam, please use an alternative email address.', 'subscribe2') . "</p>";
 
+		$this->error = "<p>" . __('Sorry, there seems to be an error on the server. Please try again later.', 'subscribe2') . "</p>";
+
 		$this->mail_sent = "<p>" . __('Message sent!', 'subscribe2') . "</p>";
 
 		$this->form = "<form method=\"post\" action=\"\">" . __('Your email:', 'subscribe2') . "&#160;<input type=\"text\" name=\"email\" value=\"\" size=\"20\" />&#160;<br /><input type=\"radio\" name=\"s2_action\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . " <input type=\"radio\" name=\"s2_action\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . " &#160;<input type=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></form>\r\n";
@@ -508,7 +510,7 @@ class s2class {
 		$mailheaders .= "MIME-Version: 1.0\n";
 		$mailheaders .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 
-		@wp_mail($this->email, $subject, $body, $mailheaders);
+		return @wp_mail($this->email, $subject, $body, $mailheaders);
 	} // end send_confirm()
 
 /* ===== Subscriber functions ===== */
@@ -2026,10 +2028,14 @@ class s2class {
 						if ('1' !== $this->is_public($this->email)) {
 							// the user is unknown or inactive
 							$this->add();
-							$this->send_confirm('add');
+							$status = $this->send_confirm('add');
 							// set a variable to denote that we've already run, and shouldn't run again
 							$this->filtered = 1; //set this to not send duplicate emails
-							$this->s2form = $this->confirmation_sent;
+							if ($status) {
+								$this->s2form = $this->confirmation_sent;
+							} else {
+								$this->s2form = $this->error;
+							}
 						} else {
 							// they're already subscribed
 							$this->s2form = $this->already_subscribed;
@@ -2043,7 +2049,11 @@ class s2class {
 							$this->send_confirm('del');
 							// set a variable to denote that we've already run, and shouldn't run again
 							$this->filtered = 1;
-							$this->s2form = $this->confirmation_sent;
+							if ($status) {
+								$this->s2form = $this->confirmation_sent;
+							} else {
+								$this->s2form = $this->error;
+							}
 						}
 						$this->action='unsubscribe';
 					}
