@@ -48,7 +48,7 @@ define ('S2PATH', trailingslashit(dirname(__FILE__)));
 define('S2_MU', (isset($wpmu_version) || (strpos($wp_version, 'wordpress-mu') !== false)));
 
 // use Owen's excellent ButtonSnap library
-require(ABSPATH . 'wp-content/plugins/buttonsnap.php');
+require(ABSPATH . 'wp-content/plugins/subscribe2/include/buttonsnap.php');
 
 $mysubscribe2 = new s2class;
 $mysubscribe2->s2init();
