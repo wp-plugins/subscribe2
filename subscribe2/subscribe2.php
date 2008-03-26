@@ -345,6 +345,12 @@ class s2class {
 			return $post;
 		}
 
+		// is this post set in the future?
+		if ($post->post_date > current_time('mysql')) {
+			// bail out
+			return $post;
+		}
+
 		$post_cats = wp_get_post_categories($post->ID);
 		$post_cats_string = implode(',', $post_cats);
 		$check = false;
@@ -365,10 +371,9 @@ class s2class {
 			}
 		}
 
-		// is this post set in the future?
-		if ($post->post_date > current_time('mysql')) {
-			// bail out
-			return $post;
+		// if post is password protected don't send notification to public users
+		if ( ($this->subscribe2_options['password'] == "yes") && ($post->post_password != '') ) {
+			$check = true;
 		}
 
 		// lets collect our public subscribers
