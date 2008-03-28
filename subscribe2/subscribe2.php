@@ -351,6 +351,11 @@ class s2class {
 			return $post;
 		}
 
+		//Are we sending notifications for password protected posts?
+		if ( ($this->subscribe2_options['password'] == "no") && ($post->post_password != '') ) {
+				return $post;
+		}
+
 		$post_cats = wp_get_post_categories($post->ID);
 		$post_cats_string = implode(',', $post_cats);
 		$check = false;
@@ -371,8 +376,9 @@ class s2class {
 			}
 		}
 
-		// if post is password protected don't send notification to public users
-		if ( ($this->subscribe2_options['password'] == "yes") && ($post->post_password != '') ) {
+		// Are we sending notifications for Private posts?
+		if ($this->subscribe2_options['private'] == "yes") {
+			// don't send notification to public users
 			$check = true;
 		}
 
@@ -1347,11 +1353,13 @@ class s2class {
 				}
 				$this->subscribe2_options['sender'] = $sender;
 
-				// send email for pages and password protected posts
+				// send email for pages, private and password protected posts
 				$pages_option = $_POST['pages'];
 				$this->subscribe2_options['pages']= $pages_option;
 				$password_option = $_POST['password'];
 				$this->subscribe2_options['password']= $password_option;
+				$private_option = $_POST['private'];
+				$this->subscribe2_options['private'] = $private_option;
 
 				// send per-post or digest emails
 				$email_freq = $_POST['email_freq'];
@@ -1439,6 +1447,17 @@ class s2class {
 		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
 		echo "<input type=\"radio\" name=\"password\" value=\"no\"";
 		if ('no' == $this->subscribe2_options['password']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
+		echo __('Send Emails for Private Posts', 'subscribe2') . ': ';
+		echo "<input type=\"radio\" name=\"private\" value=\"yes\"";
+		if ('yes' == $this->subscribe2_options['private']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"private\" value=\"no\"";
+		if ('no' == $this->subscribe2_options['private']) {
 			echo " checked=\"checked\"";
 		}
 		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
@@ -2394,7 +2413,7 @@ class s2class {
 			add_action('pending_to_publish', array(&$this, 'publish'));
 			add_action('private_to_publish', array(&$this, 'publish'));
 			add_action('future_to_publish', array(&$this, 'publish'));
-			if ($this->subscribe2_options['password'] == "yes") {
+			if ($this->subscribe2_options['private'] == "yes") {
 				add_action('new_to_private', array(&$this, 'publish'));
 				add_action('draft_to_private', array(&$this, 'publish'));
 				add_action('pending_to_private', array(&$this, 'publish'));
