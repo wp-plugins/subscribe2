@@ -4,7 +4,7 @@ Donate link: http://subscribe2.wordpress.com/donate/
 Tags: posts, subscription, email
 Requires at least: 2.0.x
 Tested up to: 2.5
-Stable tag: 4.4
+Stable tag: 4.5
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
