@@ -64,7 +64,7 @@ Subscribe2 provides a facility to work around this restriction by sending batche
      define('BCCLIMIT', 0);
 Change the 0 to the number of allowed outgoing email recipients as set by your host.
 
-Reminder: because subscribe2 places all recipients in BCC fields, and places the blog admin in the TO field, the blog admin will receive one email per batched delivery.  So if you have 90 subscribers, the blog admin should receive three post notification emails, one for eah set of 30 BCC recipients.
+Reminder: because subscribe2 places all recipients in BCC fields, and places the blog admin in the TO field, the blog admin will receive one email per batched delivery.  So if you have 90 subscribers, the blog admin should receive three post notification emails, one for each set of 30 BCC recipients.
 
 Batches will occur for each group of message as described above.  A site on Dreamhost with many public and registered subscribers could conceivably generate a lot of email for your own inbox.
 
@@ -89,11 +89,13 @@ Version 4.5 by Matthew Robinson
 * Improved admin menu layout for compliance with WordPress 2.5
 * Reverted to using wp_mail instead of mail to ensure proper header encoding
 * Improved mail header formatting - thanks to Chris Carlson
-* Add ability to skip email notification using a Custom Field (s2mail set as ‘no’)
+* Add ability to skip email notification using a Custom Field (s2mail set as "no")
 * Improved CSV export - thanks to Aaron Axelsen
 * Added some compatibility for WPMU - thanks to Aaron Axelsen
 * Added some error feedback to blog users if mails fail to send
 * Moved Buttonsnap due to far to many fatal error complaints
+* Added option to send notifications for Private posts
+* Improved handling of notification for Password Protected Posts
 
 Version 4.4 by Matthew Robinson
 
