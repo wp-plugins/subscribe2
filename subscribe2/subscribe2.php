@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.5
+Version: 4.6
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -41,7 +41,7 @@ define('S2PAGE', '0');
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.5');
+define('S2VERSION', '4.6');
 define ('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // Is this WordPressMU or not?
@@ -2070,7 +2070,7 @@ class s2class {
 						if (false == $this->is_public($this->email)) {
 							$this->s2form = $this->form . $this->not_subscribed;
 						} else {
-							$this->send_confirm('del');
+							$status = $this->send_confirm('del');
 							// set a variable to denote that we've already run, and shouldn't run again
 							$this->filtered = 1;
 							if ($status) {
