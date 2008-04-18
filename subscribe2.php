@@ -115,11 +115,7 @@ class s2class {
 		global $wp_db_version;
 		add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'manage_menu'));
 		add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2','subscribe2'), "manage_options", __FILE__, array(&$this, 'options_menu'));
-		if (current_user_can('manage_options')) {
-			add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
-		} elseif ($wp_db_version >= 7098) {
-			add_menu_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), 'read', __FILE__, array(&$this, 'user_menu'));
-		}
+		add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
 		add_submenu_page('post-new.php', __('Mail Subscribers','subscribe2'), __('Mail Subscribers', 'subscribe2'),"manage_options", __FILE__, array(&$this, 'write_menu'));
 		$s2nonce = md5('subscribe2');
 	}
@@ -2108,7 +2104,7 @@ class s2class {
 		if ( (defined('S2PAGE')) && (0 != S2PAGE) ) {
 			return "page_id=" . S2PAGE;
 		} else {
-			$id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_type='page' LIMIT 1");
+			$id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_type='page' AND post_status='publish' LIMIT 1");
 			if ($id) {
 				return "page_id=$id";
 			} else {
