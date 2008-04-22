@@ -48,7 +48,9 @@ define ('S2PATH', trailingslashit(dirname(__FILE__)));
 define('S2_MU', (isset($wpmu_version) || (strpos($wp_version, 'wordpress-mu') !== false)));
 
 // use Owen's excellent ButtonSnap library
-require(ABSPATH . 'wp-content/plugins/subscribe2/include/buttonsnap.php');
+if (!function_exists(buttonsnap_textbutton)) {
+	require(ABSPATH . 'wp-content/plugins/subscribe2/include/buttonsnap.php');
+}
 
 $mysubscribe2 = new s2class;
 $mysubscribe2->s2init();
@@ -112,11 +114,7 @@ class s2class {
 	function admin_menu() {
 		add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'manage_menu'));
 		add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2','subscribe2'), "manage_options", __FILE__, array(&$this, 'options_menu'));
-		if (current_user_can('manage_options')) {
-			add_submenu_page('users.php', __('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
-		} else {
-			add_submenu_page('profile.php', __('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
-		}
+		add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
 		add_submenu_page('post-new.php', __('Mail Subscribers','subscribe2'), __('Mail Subscribers', 'subscribe2'),"manage_options", __FILE__, array(&$this, 'write_menu'));
 		$s2nonce = md5('subscribe2');
 	}
@@ -884,9 +882,23 @@ class s2class {
 			update_usermeta($user_id, 's2_format', 'text');
 			update_usermeta($user_id, 's2_excerpt', 'excerpt');
 		} else {
-			// add the usermeta for new registrations, but don't subscribe them
-			$check = get_usermeta($user_id, 's2_subscribed');
+			// create post format entries for all users
+			$check = get_usermeta($user_id, 's2_format');
+			if (empty($check)) {
+				if ('html' == $this->subscribe2_options['autoformat']) {
+					update_usermeta($user_id, 's2_format', 'html');
+					update_usermeta($user_id, 's2_excerpt', 'post');
+				} elseif ('fulltext' == $this->subscribe2_options['autoformat']) {
+					update_usermeta($user_id, 's2_format', 'text');
+					update_usermeta($user_id, 's2_excerpt', 'post');
+				} else {
+					update_usermeta($user_id, 's2_format', 'text');
+					update_usermeta($user_id, 's2_excerpt', 'excerpt');
+				}
+			}
 			// ensure existing subscriptions are not overwritten on upgrade
+			$check = get_usermeta($user_id, 's2_subscribed');
+			// if the are no existing subscriptions, create them based on admin options
 			if (empty($check)) {
 				if ( ('yes' == $this->subscribe2_options['autosub']) || (('wpreg' == $this->subscribe2_options['autosub']) && (1 == $wpreg)) ) {
 					// don't add entries by default if autosub is off, messes up daily digests
@@ -894,16 +906,6 @@ class s2class {
 						foreach(explode(',', $cats) as $cat) {
 							update_usermeta($user_id, 's2_cat' . $cat, "$cat");
 						}
-					if ('html' == $this->subscribe2_options['autoformat']) {
-						update_usermeta($user_id, 's2_format', 'html');
-						update_usermeta($user_id, 's2_excerpt', 'post');
-					} elseif ('fulltext' == $this->subscribe2_options['autoformat']) {
-						update_usermeta($user_id, 's2_format', 'text');
-						update_usermeta($user_id, 's2_excerpt', 'post');
-					} else {
-						update_usermeta($user_id, 's2_format', 'text');
-						update_usermeta($user_id, 's2_excerpt', 'excerpt');
-					}
 				} else {
 					update_usermeta($user_id, 's2_subscribed', '-1');
 				}
@@ -2101,7 +2103,7 @@ class s2class {
 		if ( (defined('S2PAGE')) && (0 != S2PAGE) ) {
 			return "page_id=" . S2PAGE;
 		} else {
-			$id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_type='page' LIMIT 1");
+			$id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_type='page' AND post_status='publish' LIMIT 1");
 			if ($id) {
 				return "page_id=$id";
 			} else {
