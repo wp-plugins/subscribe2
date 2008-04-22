@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2 Debug
 Plugin URI: http://subscribe2.wordpress.com
 Description: Produces Debug Information for the Subscribe2 plugin.
-Version: 4.6
+Version: 4.7
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */

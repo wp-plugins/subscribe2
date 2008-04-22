@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.6
+Version: 4.7
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -112,7 +112,6 @@ class s2class {
 	Hook the menu
 	*/
 	function admin_menu() {
-		global $wp_db_version;
 		add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'manage_menu'));
 		add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2','subscribe2'), "manage_options", __FILE__, array(&$this, 'options_menu'));
 		add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
