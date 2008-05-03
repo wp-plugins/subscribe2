@@ -41,7 +41,7 @@ define('S2PAGE', '0');
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.6');
+define('S2VERSION', '4.7');
 define ('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // Is this WordPressMU or not?
@@ -278,8 +278,8 @@ class s2class {
 					// and NOT the sender's email, since they'll
 					// get a copy anyway
 					if ( (! empty($recipient)) && ($this->myemail != $recipient) ) {
-						('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ",\r\n $recipient";
-						// Headers constructed as per definition at http://www.ietf.org/rfc/rfc2822.txt
+						('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ", $recipient";
+						// Bcc Headers now constructed by phpmailer class
 					}
 					if (BCCLIMIT == $count) {
 						$count = 1;
@@ -308,8 +308,8 @@ class s2class {
 					// and NOT the sender's email, since they'll
 					// get a copy anyway
 					 if ( (!empty($recipient)) && ($this->myemail != $recipient) ) {
-						('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ",\r\n $recipient";
-						// Headers constructed as per definition at http://www.ietf.org/rfc/rfc2822.txt
+						('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ", $recipient";
+						// Bcc Headers now constructed by phpmailer class
 						}
 			}
 			$headers .= "$bcc\r\n";
@@ -881,6 +881,7 @@ class s2class {
 			}
 			update_usermeta($user_id, 's2_format', 'text');
 			update_usermeta($user_id, 's2_excerpt', 'excerpt');
+			update_usermeta($user_id, 's2_autosub', $this->subscribe2_options['autosub_def']);
 		} else {
 			// create post format entries for all users
 			$check = get_usermeta($user_id, 's2_format');
@@ -895,6 +896,7 @@ class s2class {
 					update_usermeta($user_id, 's2_format', 'text');
 					update_usermeta($user_id, 's2_excerpt', 'excerpt');
 				}
+				update_usermeta($user_id, 's2_autosub', $this->subscribe2_options['autosub_def']);
 			}
 			// ensure existing subscriptions are not overwritten on upgrade
 			$check = get_usermeta($user_id, 's2_subscribed');
@@ -909,6 +911,8 @@ class s2class {
 				} else {
 					update_usermeta($user_id, 's2_subscribed', '-1');
 				}
+			} else {
+				update_usermeta($user_id, 's2_autosub', 'no');
 			}
 		}
 		return $user_id;
@@ -1385,16 +1389,15 @@ class s2class {
 							// Schedule CRON events occurring less than daily starting now and periodically thereafter
 							$timestamp = &$time;
 						} else {
-							// Schedule other CRON events starting at midnight and periodically thereafter
-							$timestamp = mktime($_POST['hour'], 0, 0, date('m', $time), date('d', $time), date('Y', $time));
+							// Schedule other CRON events starting at user defined hour and periodically thereafter
+							$timestamp = gmmktime($_POST['hour'], 0, 0, date('m', $time), date('d', $time), date('Y', $time));
 						}
 						if ( ('on' == $_POST['reset_cron']) || $check ) {
 							wp_schedule_event($timestamp, $email_freq, 's2_digest_cron');
 						} else {
 							wp_schedule_event($previous_time, $email_freq, 's2_digest_cron');
 						}
-						$now = date('Y-m-d H:i:s', $time);
-						$this->subscribe2_options['last_s2cron'] = $now;
+						$this->subscribe2_options['last_s2cron'] = current_time('mysql');
 					}
 				}
 
@@ -1413,6 +1416,8 @@ class s2class {
 				$this->subscribe2_options['wpregdef'] = $autosub_wpregdef_option;
 				$autosub_format_option = $_POST['autoformat'];
 				$this->subscribe2_options['autoformat'] = $autosub_format_option;
+				$autosub_newcat_option = $_POST['autosub_def'];
+				$this->subscribe2_options['autosub_def'] = $autosub_newcat_option;
 				
 				//barred domains
 				$barred_option = $_POST['barred'];
@@ -1583,6 +1588,17 @@ class s2class {
 			echo "checked=\"checked\" ";
 		}
 		echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . " <br /><br />";
+		echo __('Auto Subscribe me to new categories is checked by default', 'subscribe2') . ": <br />\r\n";
+		echo "<input type=\"radio\" name=\"autosub_def\" value=\"yes\"";
+		if ('yes' == $this->subscribe2_options['autosub_def']) {
+			echo " checked=\"checked\"";
+		}
+		echo " />" . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"autosub_def\" value=\"no\"";
+		if ('no' == $this->subscribe2_options['autosub_def']) {
+			echo " checked=\"checked\"";
+		}
+		echo " />" . __('No', 'subscribe2');
 		echo"</p>";
 
 		//barred domains
@@ -1776,10 +1792,6 @@ class s2class {
 			} else {
 				$recipients = $this->get_registered();
 			}
-			global $user_identity, $user_email;
-			get_currentuserinfo();
-			$this->myname = $user_identity;
-			$this->myemail = $user_email;
 			$subject = stripslashes(strip_tags($_POST['subject']));
 			$message = stripslashes($_POST['message']);
 			$this->mail($recipients, $subject, $message, 'text');
@@ -1956,7 +1968,7 @@ class s2class {
 		echo "<select name=\"hour\">\r\n";
 		while ($hour = current($hours)) {
 			echo "<option value=\"" . key($hours) . "\"";
-			if (key($hours) == date('H', $scheduled_time)) {
+			if (key($hours) == gmdate('H', $scheduled_time)) {
 				echo " selected=\"selected\"";
 			}
 			echo ">" . $hour . "</option>\r\n";
@@ -1967,12 +1979,12 @@ class s2class {
 		if ($scheduled_time) {
 			echo "<p><input type=\"checkbox\" name=\"reset_cron\" /> " . __('Reset the schedule time and date for periodic email notifications', 'subscribe2') . "</p>\r\n";
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
-			echo "<p>" . __('Current server time is', 'subscribe2') . ": \r\n";
-			echo "<strong>" . date($datetime, current_time('timestamp', 1)) . "</strong></p>\r\n";
+			echo "<p>" . __('Current UTC time is', 'subscribe2') . ": \r\n";
+			echo "<strong>" . gmdate($datetime, current_time('timestamp', 1)) . "</strong></p>\r\n";
 			echo "<p>" . __('Current blog time is', 'subscribe2') . ": \r\n";
-			echo "<strong>" . date($datetime, current_time('timestamp')) . "</strong></p>\r\n";
+			echo "<strong>" . gmdate($datetime, current_time('timestamp')) . "</strong></p>\r\n";
 			echo "<p>" . __('Next email notification will be sent when your blog time is after', 'subscribe2') . ": \r\n";
-			echo "<strong>" . date($datetime, wp_next_scheduled('s2_digest_cron')) . "</strong></p>\r\n";
+			echo "<strong>" . gmdate($datetime, wp_next_scheduled('s2_digest_cron')) . "</strong></p>\r\n";
 		} else {
 			echo "<br />";
 		}
@@ -1993,7 +2005,7 @@ class s2class {
 			echo "</p>\r\n";
 		} elseif ('yes' == $this->subscribe2_options['autosub']) {
 			echo "<p>\r\n<center>\r\n";
-			echo __('By Registering with this blog you are also agreeing to recieve email notifications for new posts') . "<br />\r\n";
+			echo __('By Registering with this blog you are also agreeing to recieve email notifications for new posts', 'subscribe2') . "<br />\r\n";
 			echo "</center></p>\r\n";
 		}
 	}
@@ -2246,14 +2258,14 @@ class s2class {
 	function subscribe2_cron() {
 		global $wpdb;
 
-		// collect posts
-		$now =  current_time('mysql');
+		//Êupdate last_s2cron execution time before completing or bailing
+		$now = Êcurrent_time('mysql');
 		$prev = $this->subscribe2_options['last_s2cron'];
-		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ('publish', 'private') AND post_type IN ('post', 'page')");
-
-		// update last_s2cron execution time before completing or bailing
 		$this->subscribe2_options['last_s2cron'] = $now;
 		update_option('subscribe2_options', $this->subscribe2_options);
+
+		// collect posts
+		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ('publish', 'private') AND post_type IN ('post', 'page')");
 
 		// do we have any posts?
 		if (empty($posts)) { return; }
@@ -2400,9 +2412,8 @@ class s2class {
 		}
 
 		// add action for automatic subscription based on option settings
-		if ('yes' == $this->subscribe2_options['autosub']) {
-			add_action('user_register', array(&$this, 'register'));
-		} elseif ('wpreg' == $this->subscribe2_options['autosub']) {
+		add_action('user_register', array(&$this, 'register'));
+		if ('wpreg' == $this->subscribe2_options['autosub']) {
 			add_action('register_post', array(&$this, 'register_post'));
 		}
 		

@@ -14,6 +14,10 @@ if (!isset($this->subscribe2_options['autoformat'])) {
 	$this->subscribe2_options['autoformat'] = "text";
 } // option for default auto-subscription email format
 
+if (!isset($this->subscribe2_options['autosub_def'])) {
+	$this->subscribe2_options['autosub_def'] = "yes";
+} // option for user default auto-subscription to new categories
+
 if (!isset($this->subscribe2_options['pages'])) {
 	$this->subscribe2_options['pages'] = "no";
 } // option for sending notifications for WordPress pages
