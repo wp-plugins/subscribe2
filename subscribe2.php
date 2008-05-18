@@ -44,9 +44,6 @@ define('S2PAGE', '0');
 define('S2VERSION', '4.7');
 define ('S2PATH', trailingslashit(dirname(__FILE__)));
 
-// Is this WordPressMU or not?
-define('S2_MU', (isset($wpmu_version) || (strpos($wp_version, 'wordpress-mu') !== false)));
-
 // use Owen's excellent ButtonSnap library
 if (!function_exists(buttonsnap_textbutton)) {
 	require(ABSPATH . 'wp-content/plugins/subscribe2/include/buttonsnap.php');
@@ -762,7 +759,12 @@ class s2class {
 	Collect all the registered users of the blog who are subscribed to the specified categories
 	*/
 	function get_registered ($args = '') {
-		global $wpdb;
+		global $wpdb, $wp_version, $wpmu_version;
+
+		// Is this WordPressMU or not?
+		if  ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
+			$s2_mu = true;
+		}
 
 		$format = '';
 		$amount = '';
@@ -806,13 +808,13 @@ class s2class {
 			foreach (explode(',', $r['cats']) as $cat) {
 				('' == $and) ? $and = "d.meta_key='s2_cat$cat'" : $and .= " OR d.meta_key='s2_cat$cat'";
 			}
-			$AND .= "AND ($and)";
+			$AND .= " AND ($and)";
 		}
 
-		if ((defined(S2_MU)) && S2_MU) {
-			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . " WHERE a.meta_key='".$wpdb->prefix."capabilities'" . $AND;
+		if ($s2_mu) {
+			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities'" . $AND;
 		} else {
-			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . " WHERE a.meta_key='s2_subscribed'" . $AND;
+			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='s2_subscribed'" . $AND;
 		}
 		$result = $wpdb->get_col($sql);
 		if ($result) {
@@ -1217,7 +1219,7 @@ class s2class {
 		$alternate = 'alternate';
 		if (!empty($subscribers)) {
 			echo "<p align=\"center\"><b>" . __('Registered on the left, confirmed in the middle, unconfirmed on the right', 'subscribe2') . "</b></p>\r\n";
-			$exportcsv = implode(",", $subscribers);
+			$exportcsv = implode(",\r\n", $subscribers);
 			echo "<form method=\"post\" action=\"\">\r\n";
 			if (function_exists('wp_nonce_field')) {
 				wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
@@ -1885,7 +1887,12 @@ class s2class {
 	$submit is the text to use on the Submit button
 	*/
 	function display_subscriber_dropdown ($selected = 'registered', $submit = '', $exclude = array()) {
-		global $wpdb;
+		global $wpdb, $wp_version, $wpmu_version;
+
+		// Is this WordPressMU or not?
+		if  ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
+			$s2_mu = true;
+		}
 
 		$who = array('all' => __('All Subscribers', 'subscribe2'),
 			'public' => __('Public Subscribers', 'subscribe2'),
@@ -1905,10 +1912,20 @@ class s2class {
 		} else {
 			$count['public'] = ($count['confirmed'] + $count['unconfirmed']);
 		}
-		$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='s2_subscribed'");
+		if ($s2_mu) {
+			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
+		} else {
+			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='s2_subscribed'");
+		}
 		$count['all'] = ($count['confirmed'] + $count['unconfirmed'] + $count['registered']);
-		foreach ($all_cats as $cat) {
-			$count[$cat->name] = $wpdb->get_var("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key='s2_cat$cat->term_id'");
+		if ($s2_mu) {
+			foreach ($all_cats as $cat) {
+				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(a.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key=('s2_cat$cat->term_id')");
+			}
+		} else {
+			foreach ($all_cats as $cat) {
+				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key='s2_cat$cat->term_id'");
+			}
 		}
 
 		// do have actually have some subscribers?
