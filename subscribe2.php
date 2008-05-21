@@ -1637,13 +1637,19 @@ class s2class {
 	Our profile menu
 	*/
 	function user_menu() {
-		global $user_ID, $s2nonce;
+		global $user_ID, $s2nonce, $wp_version, $wpmu_version;
 
 		get_currentuserinfo();
 
 		// was anything POSTed?
 		if ( (isset($_POST['s2_admin'])) && ('user' == $_POST['s2_admin']) ) {
 			check_admin_referer('subscribe2-user_subscribers' . $s2nonce);
+
+			// Is this WordPressMU or not?
+			if  ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
+				$s2_mu = true;
+			}
+
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Subscription preferences updated.', 'subscribe2') . "</strong></p></div>\n";
 			$format = 'text';
 			$post = 'post';
@@ -1657,7 +1663,14 @@ class s2class {
 			update_usermeta($user_ID, 's2_format', $format);
 			update_usermeta($user_ID, 's2_autosub', $_POST['new_category']);
 
-			$cats = $_POST['category'];
+			if ($s2_mu) {
+				$posted_cats = $_POST['category'];
+				$other_blogs = array_diff(explode(',', get_usermeta($user_ID, 's2_subscribed')), get_all_category_ids());
+				$cats = array_merge($posted_cats, $other_blogs);
+			} else {
+				$cats = $_POST['category'];
+			}
+
 			if ( (empty($cats)) || ($cats == '-1') ) {
 				$cats = explode(',', get_usermeta($user_ID, 's2_subscribed'));
 				if ($cats) {
@@ -2275,8 +2288,8 @@ class s2class {
 	function subscribe2_cron() {
 		global $wpdb;
 
-		//Êupdate last_s2cron execution time before completing or bailing
-		$now = Êcurrent_time('mysql');
+		//?update last_s2cron execution time before completing or bailing
+		$now = ?current_time('mysql');
 		$prev = $this->subscribe2_options['last_s2cron'];
 		$this->subscribe2_options['last_s2cron'] = $now;
 		update_option('subscribe2_options', $this->subscribe2_options);
