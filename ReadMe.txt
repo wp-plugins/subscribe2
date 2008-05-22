@@ -86,6 +86,7 @@ Version 4.7 by Matthew Robinson
 * Fixed a string that was missed from the translation files
 * Improved time variable handling for cron functions, especially when UTC is different from both server time and blog time
 * Completed code changes to allow WPMU compatibility
+* Fixed some issues with the email headers now that Subscribe2 is using wp_mail() again
 
 Version 4.6 by Matthew Robinson
 
