@@ -458,8 +458,6 @@ class s2class {
 		$body = str_replace("\r\n", "<br />\r\n", $mailtext);
 		$body = str_replace("POST", $content, $body);
 		$this->mail($this->get_registered("cats=$post_cats_string&format=html"), $subject, $body, 'html');
-
-		return $id;
 	} // end publish()
 
 	/**
