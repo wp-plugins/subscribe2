@@ -2288,8 +2288,8 @@ class s2class {
 	function subscribe2_cron() {
 		global $wpdb;
 
-		//Êupdate last_s2cron execution time before completing or bailing
-		$now = Êcurrent_time('mysql');
+		// update last_s2cron execution time before completing or bailing
+		$now = current_time('mysql');
 		$prev = $this->subscribe2_options['last_s2cron'];
 		$this->subscribe2_options['last_s2cron'] = $now;
 		update_option('subscribe2_options', $this->subscribe2_options);
