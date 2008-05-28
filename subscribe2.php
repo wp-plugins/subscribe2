@@ -1369,20 +1369,15 @@ class s2class {
 
 				// send per-post or digest emails
 				$email_freq = $_POST['email_freq'];
-				if ($email_freq != $this->subscribe2_options['email_freq']) {
-					//ensure $timestamp is used if cron period changes
-					$check = true;
-				}
-				$this->subscribe2_options['email_freq'] = $email_freq;
-				$previous_time = wp_next_scheduled('s2_digest_cron');
-				wp_clear_scheduled_hook('s2_digest_cron');
-				$scheds = (array) wp_get_schedules();
-				$interval = ( isset($scheds[$email_freq]['interval']) ) ? (int) $scheds[$email_freq]['interval'] : 0;
-				if ($interval == 0) {
-					// if we are on per-post emails remove last_cron entry
-					unset($this->subscribe2_options['last_s2cron']);
-				} else {
-					if (!wp_next_scheduled('s2_digest_cron')) {
+				if ( ($email_freq != $this->subscribe2_options['email_freq']) || ($_POST['hour'] != gmdate('H', $scheduled_time)) ) {
+					$this->subscribe2_options['email_freq'] = $email_freq;
+					wp_clear_scheduled_hook('s2_digest_cron');
+					$scheds = (array) wp_get_schedules();
+					$interval = ( isset($scheds[$email_freq]['interval']) ) ? (int) $scheds[$email_freq]['interval'] : 0;
+					if ($interval == 0) {
+						// if we are on per-post emails remove last_cron entry
+						unset($this->subscribe2_options['last_s2cron']);
+					} else {
 						// if we are using digest schedule the event and prime last_cron as now
 						$time =  current_time('timestamp') + $interval;
 						if ($interval < 86400) {
@@ -1390,14 +1385,12 @@ class s2class {
 							$timestamp = &$time;
 						} else {
 							// Schedule other CRON events starting at user defined hour and periodically thereafter
-							$timestamp = gmmktime($_POST['hour'], 0, 0, date('m', $time), date('d', $time), date('Y', $time));
+							$timestamp = gmmktime($_POST['hour'], 0, 0, gmdate('m', $time), gmdate('d', $time), gmdate('Y', $time));
 						}
-						if ( ('on' == $_POST['reset_cron']) || $check ) {
-							wp_schedule_event($timestamp, $email_freq, 's2_digest_cron');
-						} else {
-							wp_schedule_event($previous_time, $email_freq, 's2_digest_cron');
+						wp_schedule_event($timestamp, $email_freq, 's2_digest_cron');
+						if (!isset($this->subscribe2_options['last_s2cron'])) {
+							$this->subscribe2_options['last_s2cron'] = current_time('mysql');
 						}
-						$this->subscribe2_options['last_s2cron'] = current_time('mysql');
 					}
 				}
 
@@ -2005,7 +1998,6 @@ class s2class {
 		echo "</select>\r\n";
 		echo "<strong><em style=\"color: red\">" . __('This option will work for digest notification sent daily or less frequently', 'subscribe2') . "</em></strong>\r\n";
 		if ($scheduled_time) {
-			echo "<p><input type=\"checkbox\" name=\"reset_cron\" /> " . __('Reset the schedule time and date for periodic email notifications', 'subscribe2') . "</p>\r\n";
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 			echo "<p>" . __('Current UTC time is', 'subscribe2') . ": \r\n";
 			echo "<strong>" . gmdate($datetime, current_time('timestamp', 1)) . "</strong></p>\r\n";
@@ -2293,7 +2285,7 @@ class s2class {
 		update_option('subscribe2_options', $this->subscribe2_options);
 
 		// collect posts
-		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ('publish', 'private') AND post_type IN ('post', 'page')");
+		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ('publish', 'private') AND post_type IN ('post', 'page') ORDER BY post_date");
 
 		// do we have any posts?
 		if (empty($posts)) { return; }
