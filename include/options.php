@@ -19,6 +19,10 @@ if (!isset($this->subscribe2_options['autosub_def'])) {
 } // option for user default auto-subscription to new categories
 
 if (!isset($this->subscribe2_options['pages'])) {
+	$this->subscribe2_options['bcclimit'] = "0";
+} // option for restricting the number of recipients per email notification
+
+if (!isset($this->subscribe2_options['pages'])) {
 	$this->subscribe2_options['pages'] = "no";
 } // option for sending notifications for WordPress pages
 

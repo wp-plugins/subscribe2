@@ -29,16 +29,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 http://www.gnu.org/licenses/gpl.html
 */
 
-// If you are on a host that limits the number of recipients
-// permitted on each outgoing email message
-// change the value on the line below to your hosts limit
-define('BCCLIMIT', '0');
-
-// by default, Subscribe2 grabs the first page from your database for use
-// when displaying the confirmation screen to public subscribers.
-// You can override this by specifying a page ID on the line below.
-define('S2PAGE', '0');
-
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
 define('S2VERSION', '4.8');
@@ -109,18 +99,26 @@ class s2class {
 	Hook the menu
 	*/
 	function admin_menu() {
-		add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'manage_menu'));
-		add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2','subscribe2'), "manage_options", __FILE__, array(&$this, 'options_menu'));
-		add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
+		$s2management = add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'manage_menu'));
+		add_action("admin_print_scripts-$s2management", array(&$this, 'category_form_js'));
+
+		$s2options = add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2','subscribe2'), "manage_options", __FILE__, array(&$this, 'options_menu'));
+		add_action("admin_print_scripts-$s2options", array(&$this, 'category_form_js'));
+		add_action("admin_print_scripts-$s2options", array(&$this, 'option_form_js'));
+
+		$s2user = add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
+		add_action("admin_print_scripts-$s2user", array(&$this, 'category_form_js'));
+
 		add_submenu_page('post-new.php', __('Mail Subscribers','subscribe2'), __('Mail Subscribers', 'subscribe2'),"manage_options", __FILE__, array(&$this, 'write_menu'));
+
 		$s2nonce = md5('subscribe2');
 	}
 
 	/**
 	Insert Javascript into admin_header
 	*/
-	function admin_head() {
-		echo "<script type=\"text/javascript\">\r\n";
+	function category_form_js() {
+		echo "<script type='text/javascript'>\r\n";
 		echo "<!--\r\n";
 		echo "function setAll(theElement) {\r\n";
 		echo "	var theForm = theElement.form, z = 0;\r\n";
@@ -132,6 +130,10 @@ class s2class {
 		echo "}\r\n";
 		echo "-->\r\n";
 		echo "</script>\r\n";
+	}
+
+	function option_form_js() {
+		wp_enqueue_script('s2_edit', get_bloginfo( 'wpurl' ) . '/wp-content/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_edit.js', array('jquery'), '1.0');
 	}
 
 	function add_weekly_sched($sched) {
@@ -261,7 +263,7 @@ class s2class {
 
 		// BCC all recipients
 		$bcc = '';
-		if ( (defined('BCCLIMIT')) && (BCCLIMIT > 0) && (count($recipients) > BCCLIMIT) ) {
+		if ( ($this->subscribe2_options['bcclimit'] > 0) && (count($recipients) > $this->subscribe2_options['bcclimit']) ) {
 			// we're on Dreamhost, and have more than 30 susbcribers
 				$count = 1;
 				$batch = array();
@@ -278,7 +280,7 @@ class s2class {
 						('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ", $recipient";
 						// Bcc Headers now constructed by phpmailer class
 					}
-					if (BCCLIMIT == $count) {
+					if ($this->subscribe2_options['bcclimit'] == $count) {
 						$count = 1;
 						$batch[] = $bcc;
 						$bcc = '';
@@ -312,7 +314,7 @@ class s2class {
 			$headers .= "$bcc\r\n";
 		}
 		// actually send mail
-		if ( (defined('BCCLIMIT')) && (BCCLIMIT > 0) && (isset($batch)) ) {
+		if ( ($this->subscribe2_options['bcclimit'] > 0) && (isset($batch)) ) {
 			foreach ($batch as $bcc) {
 					$newheaders = $headers . "$bcc\r\n";
 					@wp_mail($this->myemail, $subject, $mailtext, $newheaders);
@@ -1328,11 +1330,12 @@ class s2class {
 
 		// was anything POSTed?
 		if (isset($_POST['s2_admin'])) {
-			check_admin_referer('subscribe2-options_subscribers' . $s2nonce);
 			if ('RESET' == $_POST['s2_admin']) {
+				check_admin_referer('subscribe2-options_reset' . $s2nonce);
 				$this->reset();
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_reset</strong></p></div>";
 			} elseif ('options' == $_POST['s2_admin']) {
+				check_admin_referer('subscribe2-options_subscribers' . $s2nonce);
 				// excluded categories
 				if (!empty($_POST['category'])) {
 					$exclude_cats = implode(',', $_POST['category']);
@@ -1352,6 +1355,10 @@ class s2class {
 				($_POST['widget'] == '1') ? $showwidget = '1' : $showwidget = '0';
 				$this->subscribe2_options['widget'] = $showwidget;
 
+				// BCClimit
+				$this->subscribe2_options['bcclimit'] = $_POST['bcc'];
+				$this->subscribe2_options['s2page'] = $_POST['page'];
+
 				// send as author or admin?
 				$sender = 'author';
 				if ('admin' == $_POST['sender']) {
@@ -1360,12 +1367,9 @@ class s2class {
 				$this->subscribe2_options['sender'] = $sender;
 
 				// send email for pages, private and password protected posts
-				$pages_option = $_POST['pages'];
-				$this->subscribe2_options['pages']= $pages_option;
-				$password_option = $_POST['password'];
-				$this->subscribe2_options['password']= $password_option;
-				$private_option = $_POST['private'];
-				$this->subscribe2_options['private'] = $private_option;
+				$this->subscribe2_options['pages']= $_POST['pages'];
+				$this->subscribe2_options['password']= $_POST['password'];
+				$this->subscribe2_options['private'] = $_POST['private'];
 
 				// send per-post or digest emails
 				$email_freq = $_POST['email_freq'];
@@ -1395,26 +1399,19 @@ class s2class {
 				}
 
 				// email templates
-				$mailtext = $_POST['mailtext'];
-				$this->subscribe2_options['mailtext'] = $mailtext;
-				$confirm_email = $_POST['confirm_email'];
-				$this->subscribe2_options['confirm_email'] = $confirm_email;
-				$remind_email = $_POST['remind_email'];
-				$this->subscribe2_options['remind_email'] = $remind_email;
+				$this->subscribe2_options['mailtext'] = $_POST['mailtext'];
+				$this->subscribe2_options['confirm_email'] = $_POST['confirm_email'];
+				$this->subscribe2_options['remind_email'] = $_POST['remind_email'];
 
 				//automatic subscription
-				$autosub_option = $_POST['autosub'];
-				$this->subscribe2_options['autosub'] = $autosub_option;
-				$autosub_wpregdef_option = $_POST['wpregdef'];
-				$this->subscribe2_options['wpregdef'] = $autosub_wpregdef_option;
-				$autosub_format_option = $_POST['autoformat'];
-				$this->subscribe2_options['autoformat'] = $autosub_format_option;
-				$autosub_newcat_option = $_POST['autosub_def'];
-				$this->subscribe2_options['autosub_def'] = $autosub_newcat_option;
+				$this->subscribe2_options['autosub'] = $_POST['autosub'];
+				$this->subscribe2_options['wpregdef'] = $_POST['wpregdef'];
+				$this->subscribe2_options['autoformat'] = $_POST['autoformat'];
+				$this->subscribe2_options['autosub_def'] = $_POST['autosub_def'];
 				
 				//barred domains
-				$barred_option = $_POST['barred'];
-				$this->subscribe2_options['barred'] = $barred_option;
+				$this->subscribe2_options['barred'] = $_POST['barred'];
+
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_saved</strong></p></div>";
 				update_option('subscribe2_options', $this->subscribe2_options);
 			}
@@ -1428,7 +1425,26 @@ class s2class {
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"options\" />\r\n";
 		echo "<h2>" . __('Delivery Options', 'subscribe2') . ":</h2>\r\n";
 		echo "<p>";
-		echo __('Send Emails for Pages', 'subscribe2') . ': ';
+		echo "<input type=\"hidden\" id=\"jsbcc\" value=\"" . $this->subscribe2_options['bcclimit'] . "\" />";
+		echo "<input type=\"hidden\" id=\"jspage\" value=\"" . $this->subscribe2_options['s2page'] . "\" />";
+
+		echo __('Restrict the number of recpients per email to (0 for unlimited)', 'subscribe2') . ': ';
+		echo "<span id=\"s2bcc_1\"><span id=\"s2bcc\" style=\"background-color: #FFFBCC\">" . $this->subscribe2_options['bcclimit'] . "</span> ";
+		echo "<a href=\"#\" onclick=\"s2_show('bcc')\">" . __('Edit', 'subscribe2') . "</a></span>\n";
+		echo "<span id=\"s2bcc_2\">\r\n";
+		echo "<input type=\"text\" name=\"bcc\" value=\"" . $this->subscribe2_options['bcclimit'] . "\" size=\"3\" />\r\n";
+		echo "<a href=\"#\" onclick=\"s2_update('bcc');\">". __('Update', 'subscribe2') . "</a>\n";
+		echo "<a href=\"#\" onclick=\"s2_revert('bcc');\">". __('Revert', 'subscribe2') . "</a></span>\n";
+
+		echo "<br /><br />" . __('Set default Subscribe2 page as ID', 'subscribe2') . ': ';
+		echo "<span id=\"s2page_1\"><span id=\"s2page\" style=\"background-color: #FFFBCC\">" . $this->subscribe2_options['s2page'] . "</span> ";
+		echo "<a href=\"#\" onclick=\"s2_show('page')\">" . __('Edit', 'subscribe2') . "</a></span>\n";
+		echo "<span id=\"s2page_2\">\r\n";
+		echo "<input type=\"text\" name=\"page\" value=\"" . $this->subscribe2_options['s2page'] . "\" size=\"3\" />\r\n";
+		echo "<a href=\"#\" onclick=\"s2_update('page');\">". __('Update', 'subscribe2') . "</a>\n";
+		echo "<a href=\"#\" onclick=\"s2_revert('page');\">". __('Revert', 'subscribe2') . "</a></span>\n";
+
+		echo "<br /><br />" . __('Send Emails for Pages', 'subscribe2') . ': ';
 		echo "<input type=\"radio\" name=\"pages\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['pages']) {
 			echo " checked=\"checked\"";
@@ -1611,7 +1627,7 @@ class s2class {
 		echo "<p>" . __('Use this to reset all options to their defaults. This <strong><em>will not</em></strong> modify your list of subscribers.', 'subscribe2') . "</p>\r\n";
 		echo "<form method=\"post\" action=\"\">";
 		if (function_exists('wp_nonce_field')) {
-			wp_nonce_field('subscribe2-options_subscribers' . $s2nonce);
+			wp_nonce_field('subscribe2-options_reset' . $s2nonce);
 		}
 		echo "<p class=\"submit\" align=\"center\">";
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"RESET\" />";
@@ -2132,8 +2148,8 @@ class s2class {
 
 		global $wpdb;
 
-		if ( (defined('S2PAGE')) && (0 != S2PAGE) ) {
-			return "page_id=" . S2PAGE;
+		if ( 0 != $this->subscribe2_options['s2page'] ) {
+			return "page_id=" . $this->subscribe2_options['s2page'];
 		} else {
 			$id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_type='page' AND post_status='publish' LIMIT 1");
 			if ($id) {
@@ -2418,7 +2434,6 @@ class s2class {
 		}
 		
 		//add regular actions and filters
-		add_action('admin_head', array(&$this, 'admin_head'));
 		add_action('admin_menu', array(&$this, 'admin_menu'));
 		add_action('create_category', array(&$this, 'autosub_new_category'));
 		add_action('register_form', array(&$this, 'register_form'));
