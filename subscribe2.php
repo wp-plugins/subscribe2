@@ -133,7 +133,7 @@ class s2class {
 	}
 
 	function option_form_js() {
-		wp_enqueue_script('s2_edit', get_bloginfo( 'wpurl' ) . '/wp-content/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_edit.js', array('jquery'), '1.0');
+		wp_enqueue_script('s2_edit', get_option('home') . '/wp-content/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_edit.js', array('jquery'), '1.0');
 	}
 
 	function add_weekly_sched($sched) {

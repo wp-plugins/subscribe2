@@ -10,21 +10,19 @@ Sends a list of subscribers an email notification when new posts are published t
 
 == Description ==
 
-Subscribe2 provides a comprehensive subscription management system for WordPress blogs that sends email notifications to a list of subscribers when you publish new content to your blog. The plugin also handles subscription requests allowing users to publically subscribe by submitting their email address in an easy to use form or to register with your blog which enables greater flexibility for email content for the subscriber. Admins are given control over the presentation of the email notifications, can bulk manage subscriptions for users and manually send email notices to subscribers.
+Subscribe2 provides a comprehensive subscription management and email notification system for WordPress blogs that sends email notifications to a list of subscribers when you publish new content to your blog.
 
-Email Notifications can be sent on a per-post basis or periodically in a Digest email. Additionally, certain categories can be excluded from inclusion in the notification and post can be excluded on an individual basis by setting a custom field of 's2mail' to 'no'.
-
-Subscribe2 supports two classes of subscribers: the general public, and registered users of the blog.  The general public may subscribe and unsubscribe.  They will receive a limited email notification when new post is made or periodically (unless that post is assigned to one of the excluded categories you defined).  The general public will receive a plaintext email with an excerpt of the post: either the excerpt you created when making the post, the portion of text before a <!--more--> tag (if present), or the first 55 words of the post.
-
-Registered users of the blog can elect to receive email notifications for specific categories (unless Digest email are select, then it is an opt in or out decision).  The Users->Subscription menu item will allow them to select the delivery format (plaintext or HTML), amount of message (excerpt or full post), and the categories to which they want to subscribe.  You, the blog owner, have the option (Options->Subscribe2) to allow registered users to subscribe to your excluded categories or not.
-
-When you post a new item, subscribe2 will generate (at least) one email for each of the following combinations of subscribers:
+Email Notifications can be sent on a per-post basis or periodically in a Digest email. Additionally, certain categories can be excluded from inclusion in the notification and post can be excluded on an individual basis by setting a custom field of 's2mail' to 'no'. The format of the email can also be customised for per-post notifications, subscribe2 can generate emails for each of the following formats:
 
 * plaintext excerpt
 * plaintext full post
 * HTML full post
 
-So for each new post you make, you may receive up to three emails.
+The plugin also handles subscription requests allowing users to publically subscribe by submitting their email address in an easy to use form or to register with your blog which enables greater flexibility over the email content for per-post notifications for the subscriber. Admins are given control over the presentation of the email notifications, can bulk manage subscriptions for users and manually send email notices to subscribers.
+
+Subscribe2 supports two classes of subscribers: the general public, and registered users of the blog.  The general public may subscribe and unsubscribe.  They will receive a limited email notification when new post is made or periodically (unless that post is assigned to one of the excluded categories you defined).  The general public will receive a plaintext email with an excerpt of the post: either the excerpt you created when making the post, the portion of text before a <!--more--> tag (if present), or the first 55 words of the post.
+
+Registered users of the blog can elect to receive email notifications for specific categories (unless Digest email are select, then it is an opt in or out decision).  The Users->Subscription menu item will allow them to select the delivery format (plaintext or HTML), amount of message (excerpt or full post), and the categories to which they want to subscribe.  You, the blog owner, have the option (Options->Subscribe2) to allow registered users to subscribe to your excluded categories or not.
 
 == Installation ==
 
@@ -53,7 +51,7 @@ Finally, WordPress 2.3 and 2.5 are supported. Again, for the latest information 
 If you are upgrading from any 2.1.x version of subscribe2, please delete both the /subscribe.php and /wp-content/plugins/subscribe2.php files before copying the new files into place.  Your subscriber list will remain intact, and your options should be preserved. Now create a WordPress Page as described above.
 
 = Why doesn't the form appear in my WordPress page? =
-This is usually caused by one of two things. Firstly, it is possible that the form is there but as you haven't logged out of WordPress yourself you are seeing a message about managing your profile instead. Try logging out and see if it appears.
+This is usually caused by one of two things. Firstly, it is possible that the form is there but because you haven't logged out of WordPress yourself you are seeing a message about managing your profile instead. Try logging out and see if it appears.
 
 Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in your page with a blank line above and below. The easient way to do this is to deactivate the plugin, visit your WordPress page and view the source. The token should be contained in the source code of the page. If it is not there you either have not correctly entered the token or you have another plguin that is stripping the token from the page code.
 
@@ -69,6 +67,14 @@ Change the 0 to the number of allowed outgoing email recipients as set by your h
 Reminder: because subscribe2 places all recipients in BCC fields, and places the blog admin in the TO field, the blog admin will receive one email per batched delivery.  So if you have 90 subscribers, the blog admin should receive three post notification emails, one for each set of 30 BCC recipients.
 
 Batches will occur for each group of message as described above.  A site on Dreamhost with many public and registered subscribers could conceivably generate a lot of email for your own inbox.
+
+= Why is my admin address getting emails from Subscribe2? =
+
+This plugin sends emails to your subscribers using the BCC (Blind Cardon Copy) header in email messages. Each email is sent TO: the admin address. There may be emails for a plain text excerpt notification, palin text full text and HTML format emails and additionally if the BCCLIMIT has been set due to hosting restrictions duplicate copies of these emails will be sent to the admin address.
+
+= I can't find or insert the Subscribe2 token, help! =
+
+If, for some reason the Subscribe2 button does not appear in your browser window try refreshing your browser and cache (Shift and Reload in Firefox). If this still fails then insert the token manually. In the Rich Text Editor (TinyMCE) make sure you switch to the "code" view and type in <!--subscribe2-->. 
 
 == Screenshots ==
 
