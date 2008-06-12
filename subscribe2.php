@@ -32,7 +32,7 @@ http://www.gnu.org/licenses/gpl.html
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
 define('S2VERSION', '4.8');
-define ('S2PATH', trailingslashit(dirname(__FILE__)));
+define('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // use Owen's excellent ButtonSnap library
 if (!function_exists(buttonsnap_textbutton)) {
@@ -102,14 +102,14 @@ class s2class {
 		$s2management = add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'manage_menu'));
 		add_action("admin_print_scripts-$s2management", array(&$this, 'category_form_js'));
 
-		$s2options = add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2','subscribe2'), "manage_options", __FILE__, array(&$this, 'options_menu'));
+		$s2options = add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'options_menu'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'category_form_js'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'option_form_js'));
 
 		$s2user = add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
 		add_action("admin_print_scripts-$s2user", array(&$this, 'category_form_js'));
 
-		add_submenu_page('post-new.php', __('Mail Subscribers','subscribe2'), __('Mail Subscribers', 'subscribe2'),"manage_options", __FILE__, array(&$this, 'write_menu'));
+		add_submenu_page('post-new.php', __('Mail Subscribers', 'subscribe2'), __('Mail Subscribers', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'write_menu'));
 
 		$s2nonce = md5('subscribe2');
 	}
@@ -137,7 +137,7 @@ class s2class {
 	}
 
 	function add_weekly_sched($sched) {
-		$sched['weekly'] = array('interval' => 604800, 'display' => __('Once Weekly','subscribe2'));
+		$sched['weekly'] = array('interval' => 604800, 'display' => __('Once Weekly', 'subscribe2'));
 		return $sched;
 	}
 
@@ -1044,8 +1044,8 @@ class s2class {
 		$reminderform = false;
 		$action = remove_query_arg(array('what', 's2page'));
 		$this->action = attribute_escape($action);
-		$urlpath = str_replace("\\","/",S2PATH);
-		$urlpath = trailingslashit(get_option('siteurl')) . substr($urlpath,strpos($urlpath,"wp-content/"));
+		$urlpath = str_replace("\\", "/", S2PATH);
+		$urlpath = trailingslashit(get_option('siteurl')) . substr($urlpath,strpos($urlpath, "wp-content/"));
 		if ( isset( $_GET['s2page'] ) ) {
 			$page = (int) $_GET['s2page'];
 		} else {
@@ -1071,13 +1071,13 @@ class s2class {
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('status changed!', 'subscribe2') . "</strong></p></div>";
 			} elseif ('remind' == $_POST['s2_admin']) {
 				$this->remind($_POST['reminderemails']);
-				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Reminder Email(s) Sent!','subscribe2') . "</strong></p></div>"; 
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Reminder Email(s) Sent!', 'subscribe2') . "</strong></p></div>"; 
 			} elseif ( ('register' == $_POST['s2_admin']) && ('subscribe' == $_POST['manage']) ) {
 				$this->subscribe_registered_users($_POST['emails'], $_POST['category']);
-				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Subscribed!','subscribe2') . "</strong></p></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Subscribed!', 'subscribe2') . "</strong></p></div>";
 			} elseif ( ('register' == $_POST['s2_admin']) && ('unsubscribe' == $_POST['manage']) ) {
 				$this->unsubscribe_registered_users($_POST['emails'], $_POST['category']);
-				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Unsubscribed!','subscribe2') . "</strong></p></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Unsubscribed!', 'subscribe2') . "</strong></p></div>";
 			}
 		}
 
@@ -1226,7 +1226,7 @@ class s2class {
 			}
 			echo "<input type=\"hidden\" name=\"exportcsv\" value=\"$exportcsv\" />\r\n";
 			echo "<input type=\"hidden\" name=\"s2_admin\" value=\"exportcsv\" />\r\n";
-			echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Save Emails to CSV File','subscribe2') . "\" /></p>\r\n";
+			echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" /></p>\r\n";
 			echo "</form>\r\n";
 		}
 		echo "<p>" . $strip . "</p>";
@@ -1291,7 +1291,7 @@ class s2class {
 			}
 			echo "<input type=\"hidden\" name=\"reminderemails\" value=\"$reminderemails\" />\r\n";
 			echo "<input type=\"hidden\" name=\"s2_admin\" value=\"remind\" />\r\n";
-			echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Send Reminder Email','subscribe2') . "\" /></p>\r\n";
+			echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" /></p>\r\n";
 			echo "</form>";
 		}
 		echo "</div>\r\n";
@@ -1896,7 +1896,7 @@ class s2class {
 		}
 		echo "</td></tr>\r\n";
 		echo "<tr><td align=\"left\" colspan=\"2\">\r\n";
-		echo "<input type=\"checkbox\" name=\"checkall\" onclick=\"setAll(this)\" /> " . __('Select / Unselect All' ,'subscribe2') . "\r\n";
+		echo "<input type=\"checkbox\" name=\"checkall\" onclick=\"setAll(this)\" /> " . __('Select / Unselect All', 'subscribe2') . "\r\n";
 		echo "</td></tr>\r\n";
 		echo "</table>\r\n";
 	} // end display_category_form()
@@ -1985,7 +1985,7 @@ class s2class {
 		global $wpdb;
 		$scheduled_time = wp_next_scheduled('s2_digest_cron');
 		$schedule = (array)wp_get_schedules();
-		$schedule = array_merge(array('never' => array('interval' => 0, 'display' => __('Per Post Email','subscribe2'))), $schedule);
+		$schedule = array_merge(array('never' => array('interval' => 0, 'display' => __('Per Post Email', 'subscribe2'))), $schedule);
 		$sort = array();
 		foreach ( (array)$schedule as $key => $value ) $sort[$key] = $value['interval'];
 		asort($sort);
@@ -2001,7 +2001,7 @@ class s2class {
 			echo " /> " . $value['display'] . "<br />\r\n";
 		}
 		echo "<br />" . __('Send Digest Notification at', 'subscribe2') . ": \r\n";
-		$hours = array('12am', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am' ,'10am' ,'11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm');
+		$hours = array('12am', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm');
 		echo "<select name=\"hour\">\r\n";
 		while ($hour = current($hours)) {
 			echo "<option value=\"" . key($hours) . "\"";
