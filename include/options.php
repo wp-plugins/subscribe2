@@ -18,6 +18,14 @@ if (!isset($this->subscribe2_options['autosub_def'])) {
 	$this->subscribe2_options['autosub_def'] = "yes";
 } // option for user default auto-subscription to new categories
 
+if(!isset($this->subscribe2_options['bcclimit'])) {
+	$this->subscribe2_options['bcclimit'] = 0;
+} // option for default bcc limit on email notifications
+
+if(!isset($this->subscribe2_options['s2page'])) {
+	$this->subscribe2_options['s2page'] = 0;
+} // option for default WordPress page for Subscribe2 to use
+
 if (!isset($this->subscribe2_options['pages'])) {
 	$this->subscribe2_options['bcclimit'] = "0";
 } // option for restricting the number of recipients per email notification

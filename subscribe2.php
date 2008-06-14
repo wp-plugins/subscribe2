@@ -1055,7 +1055,7 @@ class s2class {
 		// was anything POSTed ?
 		if (isset($_POST['s2_admin'])) {
 			check_admin_referer('subscribe2-manage_subscribers' . $s2nonce);
-			if ('subscribe' == $_POST['s2_admin']) {
+			if ($_POST['subscribe']) {
 				foreach (preg_split ("/[\s,]+/", $_POST['addresses']) as $email) {
 						if (is_email($email)) {
 						$this->activate($email);
@@ -1063,19 +1063,19 @@ class s2class {
 				}
 				$_POST['what'] = 'confirmed';
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) subscribed!', 'subscribe2') . "</strong></p></div>";
-			} elseif ('delete' == $_POST['s2_admin']) {
-				$this->delete($_POST['email']);
+			} elseif ($_POST['delete']) {
+				$this->delete($_POST['delete']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('deleted!', 'subscribe2') . "</strong></p></div>";
-			} elseif ('toggle' == $_POST['s2_admin']) {
-				$this->toggle($_POST['email']);
+			} elseif ($_POST['toggle']) {
+				$this->toggle($_POST['toggle']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('status changed!', 'subscribe2') . "</strong></p></div>";
-			} elseif ('remind' == $_POST['s2_admin']) {
+			} elseif ($_POST['remind']) {
 				$this->remind($_POST['reminderemails']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Reminder Email(s) Sent!', 'subscribe2') . "</strong></p></div>"; 
-			} elseif ( ('register' == $_POST['s2_admin']) && ('subscribe' == $_POST['manage']) ) {
+			} elseif ( ($_POST['register']) && ('subscribe' == $_POST['manage']) ) {
 				$this->subscribe_registered_users($_POST['emails'], $_POST['category']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Subscribed!', 'subscribe2') . "</strong></p></div>";
-			} elseif ( ('register' == $_POST['s2_admin']) && ('unsubscribe' == $_POST['manage']) ) {
+			} elseif ( ($_POST['register']) && ('unsubscribe' == $_POST['manage']) ) {
 				$this->unsubscribe_registered_users($_POST['emails'], $_POST['category']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Unsubscribed!', 'subscribe2') . "</strong></p></div>";
 			}
@@ -1198,21 +1198,19 @@ class s2class {
 		if ('' == $registered) { $registered = array(); }
 
 		// show our form
+		echo "<form method=\"post\" action=\"$this->action\">\r\n";
 		echo "<div class=\"wrap\">";
 		echo "<h2>" . __('Subscribe Addresses', 'subscribe2') . "</h2>\r\n";
-		echo "<form method=\"post\" action=\"$this->action\">\r\n";
-		echo "<p>";
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
 		}
-		echo __('Enter addresses, one per line or comma-seperated', 'subscribe2') . "<br />\r\n";
+		echo "<p>" . __('Enter addresses, one per line or comma-seperated', 'subscribe2') . "<br />\r\n";
 		echo "<textarea rows=\"2\" cols=\"80\" name=\"addresses\"></textarea></p>\r\n";
-		echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Subscribe', 'subscribe2') . "\"/>\r\n";
-		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"subscribe\" /></p>";
-		echo "</form></div>";
+		echo "<input type=\"hidden\" name=\"s2_admin\" />\r\n";
+		echo "<p class=\"submit\"><input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\"/></p>\r\n";
 
 		// subscriber lists
-		echo "<div class=\"wrap\"><h2>" . __('Subscribers', 'subscribe2') . "</h2>\r\n";
+		echo "<h2>" . __('Subscribers', 'subscribe2') . "</h2>\r\n";
 		echo "<br />";
 		$this->display_subscriber_dropdown($what, __('Filter', 'subscribe2'));
 		// show the selected subscribers
@@ -1220,14 +1218,8 @@ class s2class {
 		if (!empty($subscribers)) {
 			echo "<p align=\"center\"><b>" . __('Registered on the left, confirmed in the middle, unconfirmed on the right', 'subscribe2') . "</b></p>\r\n";
 			$exportcsv = implode(",\r\n", $subscribers);
-			echo "<form method=\"post\" action=\"\">\r\n";
-			if (function_exists('wp_nonce_field')) {
-				wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
-			}
 			echo "<input type=\"hidden\" name=\"exportcsv\" value=\"$exportcsv\" />\r\n";
-			echo "<input type=\"hidden\" name=\"s2_admin\" value=\"exportcsv\" />\r\n";
-			echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" /></p>\r\n";
-			echo "</form>\r\n";
+			echo "<p class=\"submit\"><input type=\"submit\" name=\"csv\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" /></p>\r\n";
 		}
 		echo "<p>" . $strip . "</p>";
 		echo "<table cellpadding=\"2\" cellspacing=\"2\">";
@@ -1249,13 +1241,6 @@ class s2class {
 				if (in_array($subscriber, $unconfirmed) || in_array($subscriber, $confirmed) ) {
 					echo "(" . $this->signup_date($subscriber) . ")</td>\r\n";
 					echo "<td width=\"5%\" align=\"center\">\r\n";
-					echo "<form method=\"post\" action=\"$this->action\">";
-					if (function_exists('wp_nonce_field')) {
-						wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
-					}
-					echo "<input type=\"hidden\" name=\"email\" value=\"$subscriber\" />\r\n";
-					echo "<input type=\"hidden\" name=\"s2_admin\" value=\"toggle\" />\r\n";
-					echo "<input type=\"hidden\" name=\"what\" value=\"$what\" />\r\n";
 					if (in_array($subscriber, $unconfirmed)) {
 						$foo = '&lt;-';
 						$image = 'include/arrow_left.png';
@@ -1263,18 +1248,11 @@ class s2class {
 						$foo = '-&gt;';
 						$image = 'include/arrow_right.png';
 					}
-					echo "<input type=\"image\" src=\"" . $urlpath . $image . "\" name=\"submit\" value=\"$foo\" /></form></td>\r\n";
+					echo "<input type=\"image\" src=\"" . $urlpath . $image . "\" name=\"toggle\" value=\"$subscriber\" alt=\"$foo\" /></td>\r\n";
 					echo "<td width=\"2%\" align=\"center\">\r\n";
-					echo "<form method=\"post\" action=\"\">\r\n";
-					if (function_exists('wp_nonce_field')) {
-						wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
-					}
-					echo "<input type=\"hidden\" name=\"email\" value=\"$subscriber\" />\r\n";
-					echo "<input type=\"hidden\" name=\"s2_admin\" value=\"delete\" />\r\n";
-					echo "<input type=\"hidden\" name=\"what\" value=\"$what\" />\r\n";
 					echo "<p class=\"delete\">\r\n";					
-					echo "<input type=\"image\" src=\"" . $urlpath . "include/cross.png\" name=\"submit\" value=\"X\" />\r\n";
-					echo "</p></form>";
+					echo "<input type=\"image\" src=\"" . $urlpath . "include/cross.png\" name=\"delete\" value=\"$subscriber\" alt=\"X\" />\r\n";
+					echo "</p>";
 				}
 				echo "</td></tr>\r\n";
 				('alternate' == $alternate) ? $alternate = '' : $alternate = 'alternate';
@@ -1285,37 +1263,23 @@ class s2class {
 		echo "</table>";
 		echo "<p>" . $strip . "</p>";
 		if ($reminderform) {
-			echo "<form method=\"post\" action=\"$this->action\">\r\n";
-			if (function_exists('wp_nonce_field')) {
-				wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
-			}
 			echo "<input type=\"hidden\" name=\"reminderemails\" value=\"$reminderemails\" />\r\n";
-			echo "<input type=\"hidden\" name=\"s2_admin\" value=\"remind\" />\r\n";
-			echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" /></p>\r\n";
-			echo "</form>";
+			echo "<p class=\"submit\"><input type=\"submit\" name=\"reminder\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" /></p>\r\n";
 		}
-		echo "</div>\r\n";
 
 		//show bulk managment form
-		echo "<div class=\"wrap\">";
 		echo "<h2>" . __('Categories', 'subscribe2') . "</h2>\r\n";
 		echo "<p>";
 		echo __('Existing Registered Users can be automatically (un)subscribed to categories using this section.', 'subscribe2') . "<br />\r\n";
 		echo "<strong><em style=\"color: red\">" . __('Consider User Privacy as changes cannot be undone', 'subscribe2') . "</em></strong><br />\r\n";
 		echo "</p>";
-		echo "<form method=\"post\" action=\"\">\r\n";
-		if (function_exists('wp_nonce_field')) {
-			wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
-		}
 		echo "<br />" . __('Action to perform', 'subscribe2') . ":\r\n";
 		echo "<input type=\"radio\" name=\"manage\" value=\"subscribe\" checked=\"checked\" />" . __('Subscribe', 'subscribe2') . "\r\n";
 		echo "<input type=\"radio\" name=\"manage\" value=\"unsubscribe\" />" . __('Unsubscribe', 'subscribe2') . "<br /><br />\r\n";
-		echo "<input type=\"hidden\" name=\"emails\" value=\"$emails\" /><input type=\"hidden\" name=\"s2_admin\" value=\"register\" />\r\n";
+		echo "<input type=\"hidden\" name=\"emails\" value=\"$emails\" />\r\n";
 		$this->display_category_form();
-		echo "<p class=\"submit\"><input type=\"submit\" id=\"deletepost\" name=\"submit\" value=\"" . __('Submit', 'subscribe2') . "\" /></p></form>";
-
-		echo "</div>\r\n";
-		echo "<div style=\"clear: both;\"><p>&nbsp;</p></div>";
+		echo "<p class=\"submit\"><input type=\"submit\" id=\"deletepost\" name=\"register\" value=\"" . __('Submit', 'subscribe2') . "\" /></p>";
+		echo "</div></form>\r\n";
 
 		include(ABSPATH . 'wp-admin/admin-footer.php');
 		// just to be sure
@@ -1330,12 +1294,11 @@ class s2class {
 
 		// was anything POSTed?
 		if (isset($_POST['s2_admin'])) {
-			if ('RESET' == $_POST['s2_admin']) {
-				check_admin_referer('subscribe2-options_reset' . $s2nonce);
+			check_admin_referer('subscribe2-options_subscribers' . $s2nonce);
+			if ($_POST['reset']) {
 				$this->reset();
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_reset</strong></p></div>";
-			} elseif ('options' == $_POST['s2_admin']) {
-				check_admin_referer('subscribe2-options_subscribers' . $s2nonce);
+			} elseif ($_POST['submit']) {
 				// excluded categories
 				if (!empty($_POST['category'])) {
 					$exclude_cats = implode(',', $_POST['category']);
@@ -1619,19 +1582,12 @@ class s2class {
 
 		// submit
 		echo "<p class=\"submit\" align=\"center\"><input type=\"submit\" id=\"save\" name=\"submit\" value=\"" . __('Submit', 'subscribe2') . "\" /></p>";
-		echo "</form>\r\n";
-		echo "</div><div class=\"wrap\">";
 
 		// reset
 		echo "<h2>" . __('Reset Default', 'subscribe2') . "</h2>\r\n";
 		echo "<p>" . __('Use this to reset all options to their defaults. This <strong><em>will not</em></strong> modify your list of subscribers.', 'subscribe2') . "</p>\r\n";
-		echo "<form method=\"post\" action=\"\">";
-		if (function_exists('wp_nonce_field')) {
-			wp_nonce_field('subscribe2-options_reset' . $s2nonce);
-		}
 		echo "<p class=\"submit\" align=\"center\">";
-		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"RESET\" />";
-		echo "<input type=\"submit\" id=\"deletepost\" name=\"submit\" value=\"" . __('RESET', 'subscribe2') .
+		echo "<input type=\"submit\" id=\"deletepost\" name=\"reset\" value=\"" . __('RESET', 'subscribe2') .
 		"\" />";
 		echo "</p></form></div>\r\n";
 
@@ -2421,7 +2377,7 @@ class s2class {
 			add_filter('the_content', array(&$this, 'confirm'));
 		}
 		
-		if ( (isset($_POST['s2_admin'])) && ('exportcsv' == $_POST['s2_admin']) ) {
+		if ( (isset($_POST['s2_admin'])) && ($_POST['csv']) ) {
 			$date = date('Y-m-d');
 			header('Content-Description: File Transfer');
 			header("Content-type: application/octet-stream");
