@@ -261,6 +261,9 @@ class s2class {
 				$mailtext = wordwrap(strip_tags($message), 80, "\n");
 		}
 
+		// Replace any escaped html symbols in subject
+		$subject = html_entity_decode($subject);
+
 		// BCC all recipients
 		$bcc = '';
 		if ( ($this->subscribe2_options['bcclimit'] > 0) && (count($recipients) > $this->subscribe2_options['bcclimit']) ) {
@@ -413,9 +416,9 @@ class s2class {
 		$this->myemail = $user->user_email;
 		$this->myname = $user->display_name;
 		// Get email subject
-		$subject = $this->substitute(stripslashes($this->s2_subject));
+		$subject = stripslashes($this->substitute($this->s2_subject));
 		// Get the message template
-		$mailtext = $this->substitute(stripslashes($this->subscribe2_options['mailtext']));
+		$mailtext = stripslashes($this->substitute($this->subscribe2_options['mailtext']));
 
 		$plaintext = $post->post_content;
 		$content = apply_filters('the_content', $post->post_content);
