@@ -1068,10 +1068,10 @@ class s2class {
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) subscribed!', 'subscribe2') . "</strong></p></div>";
 			} elseif ($_POST['delete']) {
 				$this->delete($_POST['delete']);
-				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('deleted!', 'subscribe2') . "</strong></p></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['delete'] . ' ' . __('deleted!', 'subscribe2') . "</strong></p></div>";
 			} elseif ($_POST['toggle']) {
 				$this->toggle($_POST['toggle']);
-				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['email'] . ' ' . __('status changed!', 'subscribe2') . "</strong></p></div>";
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['toggle'] . ' ' . __('status changed!', 'subscribe2') . "</strong></p></div>";
 			} elseif ($_POST['remind']) {
 				$this->remind($_POST['reminderemails']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Reminder Email(s) Sent!', 'subscribe2') . "</strong></p></div>"; 
