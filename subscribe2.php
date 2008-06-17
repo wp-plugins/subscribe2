@@ -2363,7 +2363,7 @@ class s2class {
 	function subscribe2() {
 		global $table_prefix;
 
-		load_plugin_textdomain('subscribe2', 'wp-content/plugins/subscribe2');
+		load_plugin_textdomain('subscribe2', PLUGINDIR . '/' . dirname(plugin_basename(__FILE__)));
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
