@@ -1021,8 +1021,8 @@ class s2class {
 	Get admin data from record 1 or first user with admin rights
 	*/
 	function get_userdata() {
-		global $wpdb;
-		$admin = get_userdata(1);
+		global $wpdb, $userdata;
+		$admin = get_userdata($userdata->ID);
 		if (empty($admin)) {
 			$sql = "SELECT DISTINCT(ID) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10' LIMIT 1";
 			$admin = get_userdata($wpdb->get_var($sql));
