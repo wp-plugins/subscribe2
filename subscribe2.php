@@ -1022,7 +1022,16 @@ class s2class {
 	*/
 	function get_userdata() {
 		global $wpdb, $userdata;
-		$admin = get_userdata($userdata->ID);
+
+		// get details of current user
+		$admin = &$userdata;
+
+		// if current under is empty or isn't an administrator get user record 1
+		if ( (empty($admin)) || $userdata->{$wpdb->prefix . "user_level"} != 10) {
+			$admin = get_userdata(1);
+		}
+
+		// if user record 1 is empty grab the first admin from the database
 		if (empty($admin)) {
 			$sql = "SELECT DISTINCT(ID) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10' LIMIT 1";
 			$admin = get_userdata($wpdb->get_var($sql));
