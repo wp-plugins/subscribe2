@@ -466,6 +466,17 @@ class s2class {
 	} // end publish()
 
 	/**
+	Hook Subscribe2 into posts published via email
+	*/
+	function publish_phone($id) {
+		if (!$id) { return; }
+
+		$post = get_post($id);
+		$this->publish($post);
+		return $post;
+	}
+
+	/**
 	Send confirmation email to the user
 	*/
 	function send_confirm($what = '', $is_remind = FALSE) {
@@ -2429,6 +2440,7 @@ class s2class {
 			add_action('pending_to_publish', array(&$this, 'publish'));
 			add_action('private_to_publish', array(&$this, 'publish'));
 			add_action('future_to_publish', array(&$this, 'publish'));
+			add_action('publish_phone', array(&$this, 'publish_phone'));
 			if ($this->subscribe2_options['private'] == "yes") {
 				add_action('new_to_private', array(&$this, 'publish'));
 				add_action('draft_to_private', array(&$this, 'publish'));
