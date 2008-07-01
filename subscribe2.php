@@ -2343,7 +2343,7 @@ class s2class {
 			$message .= $excerpt . "\r\n\r\n";
 		}
 
-		// get admin detailts
+		// get admin details
 		$user = $this->get_userdata();
 		$this->myemail = $user->user_email;
 		$this->myname = $user->display_name;
