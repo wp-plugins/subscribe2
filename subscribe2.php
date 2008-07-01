@@ -2145,7 +2145,12 @@ class s2class {
 	function title_filter() {
 		// don't interfere if we've already done our thing
 		if (1 == $this->filtered) { return; }
-		return __('Subscription Confirmation', 'subscribe2');
+		global $post;
+		if (in_the_loop()) {
+			return __('Subscription Confirmation', 'subscribe2');
+		} else {
+			return $post->post_title;
+		}
 	} // end title_filter()
 
 /* ===== widget functions ===== */
