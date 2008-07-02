@@ -2142,10 +2142,14 @@ class s2class {
 	/**
 	Overrides the page title
 	*/
-	function title_filter() {
+	function title_filter($title) {
 		// don't interfere if we've already done our thing
 		if (1 == $this->filtered) { return; }
-		return __('Subscription Confirmation', 'subscribe2');
+		if (in_the_loop()) {
+			return __('Subscription Confirmation', 'subscribe2');
+		} else {
+			return $title;
+		}
 	} // end title_filter()
 
 /* ===== widget functions ===== */
@@ -2343,7 +2347,7 @@ class s2class {
 			$message .= $excerpt . "\r\n\r\n";
 		}
 
-		// get admin detailts
+		// get admin details
 		$user = $this->get_userdata();
 		$this->myemail = $user->user_email;
 		$this->myname = $user->display_name;
