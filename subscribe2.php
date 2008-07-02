@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.8
+Version: 4.9
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -31,7 +31,7 @@ http://www.gnu.org/licenses/gpl.html
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.8');
+define('S2VERSION', '4.9');
 define('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // use Owen's excellent ButtonSnap library
@@ -2142,14 +2142,13 @@ class s2class {
 	/**
 	Overrides the page title
 	*/
-	function title_filter() {
+	function title_filter($title) {
 		// don't interfere if we've already done our thing
 		if (1 == $this->filtered) { return; }
-		global $post;
 		if (in_the_loop()) {
 			return __('Subscription Confirmation', 'subscribe2');
 		} else {
-			return $post->post_title;
+			return $title;
 		}
 	} // end title_filter()
 
