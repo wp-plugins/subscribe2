@@ -36,7 +36,7 @@ Registered users of the blog can elect to receive email notifications for specif
      <!--subscribe2-->
      ***Ensure the token is on a line by itself and that it has a blank line above and below.***
 This token will automatically be replaced by the subscription form, and will display all messages as necessary.
-8. In the Subscribe2 "Options" admin link set the default age ID to the ID of the WordPress page created in step 8.
+8. In the Subscribe2 "Options" admin link set the default page ID to the ID of the WordPress page created in step 8.
 
 == Frequently Asked Questions ==
 
