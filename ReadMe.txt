@@ -51,7 +51,7 @@ Finally, WordPress 2.3 and 2.5 are supported. Again, for the latest information 
 If you are upgrading from any 2.1.x version of subscribe2, please delete both the /subscribe.php and /wp-content/plugins/subscribe2.php files before copying the new files into place.  Your subscriber list will remain intact, and your options should be preserved. Now create a WordPress Page as described above.
 
 = Why doesn't the form appear in my WordPress page? =
-This is usually caused by one of two things. Firstly, it is possible that the form is there but because you haven't logged out of WordPress yourself you are seeing a message about managing your profile instead. Try logging out and see if it appears.
+This is usually caused by one of two things. Firstly, it is possible that the form is there but because you haven't logged out of WordPress yourself you are seeing a message about managing your profile instead. Log out of WordPress and it will appear as the subscription form you are probably expecting.
 
 Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in your page with a blank line above and below. The easient way to do this is to deactivate the plugin, visit your WordPress page and view the source. The token should be contained in the source code of the page. If it is not there you either have not correctly entered the token or you have another plguin that is stripping the token from the page code.
 
