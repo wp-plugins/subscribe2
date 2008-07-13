@@ -266,13 +266,18 @@ class s2class {
 
 		// BCC all recipients
 		$bcc = '';
-		if ( ($this->subscribe2_options['bcclimit'] > 0) && (count($recipients) > $this->subscribe2_options['bcclimit']) ) {
-			// we're on Dreamhost, and have more than 30 susbcribers
+		if ($this->subscribe2_options['bcclimit'] > 0) {
+			if ($this->subscribe2_options['bcclimit'] == 1) {
+				$this->myemail = trim(implode($recipients));
+				// sanity check -- make sure we have a valid email
+				if (!is_email($this->myemail)) { continue; }
+			} elseif (count($recipients) > $this->subscribe2_options['bcclimit']) {
+				// we're using BCCLimit, and have more susbcribers than the limit
 				$count = 1;
 				$batch = array();
 				foreach ($recipients as $recipient) {
-				// advance the array pointer by one, for use down below
-				// the array pointer _is not_ advanced by the foreach() loop itself
+					// advance the array pointer by one, for use down below
+					// the array pointer _is not_ advanced by the foreach() loop itself
 					next($recipients);
 					$recipient = trim($recipient);
 					// sanity check -- make sure we have a valid email
@@ -289,8 +294,8 @@ class s2class {
 						$bcc = '';
 					} else {
 						if (false == current($recipients)) {
-						// we've reached the end of the subscriber list
-						// add what we have to the batch, and move on
+							// we've reached the end of the subscriber list
+							// add what we have to the batch, and move on
 							$batch[] = $bcc;
 							break;
 						} else {
@@ -298,11 +303,12 @@ class s2class {
 						}
 					}
 				}
+			}
 			// rewind the array, just to be safe
 			reset($recipients);
 		} else {
-			// we're not on dreamhost, or have less than 30
-			// subscribers, so do it normal
+			// we're not using BCCLimit, or have fewer
+			// subscribers than the limit, so do it normal
 			foreach ($recipients as $recipient) {
 				$recipient = trim($recipient);
 				// sanity check -- make sure we have a valid email
