@@ -268,9 +268,13 @@ class s2class {
 		$bcc = '';
 		if ($this->subscribe2_options['bcclimit'] > 0) {
 			if ($this->subscribe2_options['bcclimit'] == 1) {
-				$this->myemail = trim(implode($recipients));
-				// sanity check -- make sure we have a valid email
-				if (!is_email($this->myemail)) { continue; }
+				foreach ($recipients as $recipient) {
+					$this->myemail = trim($recipient);
+					// sanity check -- make sure we have a valid email
+					if (!is_email($this->myemail)) { continue; }
+					@wp_mail($this->myemail, $subject, $mailtext, $headers);
+				}
+				return;
 			} elseif (count($recipients) > $this->subscribe2_options['bcclimit']) {
 				// we're using BCCLimit, and have more susbcribers than the limit
 				$count = 1;
@@ -312,13 +316,13 @@ class s2class {
 			foreach ($recipients as $recipient) {
 				$recipient = trim($recipient);
 				// sanity check -- make sure we have a valid email
-					if (!is_email($recipient)) { continue; }
-					// and NOT the sender's email, since they'll
-					// get a copy anyway
-					 if ( (!empty($recipient)) && ($this->myemail != $recipient) ) {
-						('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ", $recipient";
-						// Bcc Headers now constructed by phpmailer class
-						}
+				if (!is_email($recipient)) { continue; }
+				// and NOT the sender's email, since they'll
+				// get a copy anyway
+				 if ( (!empty($recipient)) && ($this->myemail != $recipient) ) {
+					('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ", $recipient";
+					// Bcc Headers now constructed by phpmailer class
+				}
 			}
 			$headers .= "$bcc\r\n";
 		}
