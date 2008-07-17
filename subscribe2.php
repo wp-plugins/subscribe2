@@ -118,18 +118,7 @@ class s2class {
 	Insert Javascript into admin_header
 	*/
 	function category_form_js() {
-		echo "<script type='text/javascript'>\r\n";
-		echo "<!--\r\n";
-		echo "function setAll(theElement) {\r\n";
-		echo "	var theForm = theElement.form, z = 0;\r\n";
-		echo "	for(z=0; z<theForm.length;z++){\r\n";
-		echo "		if(theForm[z].type == 'checkbox' && theForm[z].name == 'category[]'){\r\n";
-		echo "			theForm[z].checked = theElement.checked;\r\n";
-		echo "		}\r\n";
-		echo "	}\r\n";
-		echo "}\r\n";
-		echo "-->\r\n";
-		echo "</script>\r\n";
+		wp_enqueue_script('s2_catform', get_option('home') . '/wp-content/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_catform.js', array('jquery'), '1.0');
 	}
 
 	function option_form_js() {
@@ -1231,7 +1220,7 @@ class s2class {
 		if ('' == $registered) { $registered = array(); }
 
 		// show our form
-		echo "<form method=\"post\" action=\"$this->action\">\r\n";
+		echo "<form method=\"post\" action=\"\">\r\n";
 		echo "<div class=\"wrap\">";
 		echo "<h2>" . __('Subscribe Addresses', 'subscribe2') . "</h2>\r\n";
 		if (function_exists('wp_nonce_field')) {
@@ -1868,14 +1857,14 @@ class s2class {
 						$j++;
 				}
 				if (0 == $j) {
-						echo "<input type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
+						echo "<input class=\"check_me\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 						if (in_array($cat->term_id, $selected)) {
 								echo " checked=\"checked\" ";
 						}
 						echo " /> " . $cat->name . "<br />\r\n";
 					} else {
 
-						echo "<input type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
+						echo "<input class=\"check_me\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 						if (in_array($cat->term_id, $selected)) {
 									echo " checked=\"checked\" ";
 						}
@@ -1885,7 +1874,7 @@ class s2class {
 		}
 		echo "</td></tr>\r\n";
 		echo "<tr><td align=\"left\" colspan=\"2\">\r\n";
-		echo "<input type=\"checkbox\" name=\"checkall\" onclick=\"setAll(this)\" /> " . __('Select / Unselect All', 'subscribe2') . "\r\n";
+		echo "<input type=\"checkbox\" name=\"checkall\" value=\"1\"/> " . __('Select / Unselect All', 'subscribe2') . "\r\n";
 		echo "</td></tr>\r\n";
 		echo "</table>\r\n";
 	} // end display_category_form()
@@ -2416,7 +2405,7 @@ class s2class {
 		
 		if ( (isset($_POST['s2_admin'])) && ($_POST['csv']) ) {
 			$date = date('Y-m-d');
-			header('Content-Description: File Transfer');
+			header("Content-Description: File Transfer");
 			header("Content-type: application/octet-stream");
 			header("Content-Disposition: attachment; filename=subscribe2_users_$date.csv");
 			header("Pragma: no-cache");
