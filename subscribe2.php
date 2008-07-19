@@ -1064,8 +1064,6 @@ class s2class {
 
 		$what = '';
 		$reminderform = false;
-		$action = remove_query_arg(array('what', 's2page'));
-		$this->action = attribute_escape($action);
 		$urlpath = str_replace("\\", "/", S2PATH);
 		$urlpath = trailingslashit(get_option('siteurl')) . substr($urlpath,strpos($urlpath, "wp-content/"));
 		if ( isset( $_GET['s2page'] ) ) {
@@ -1240,7 +1238,7 @@ class s2class {
 		if (!empty($subscribers)) {
 			echo "<p align=\"center\"><b>" . __('Registered on the left, confirmed in the middle, unconfirmed on the right', 'subscribe2') . "</b></p>\r\n";
 			$exportcsv = implode(",\r\n", $subscribers);
-			echo "<input type=\"hidden\" name=\"exportcsv\" value=\"$exportcsv\" />\r\n";
+			echo "<input type=\"hidden\" name=\"exportcsv\" value=\"" . $exportcsv . "\" />\r\n";
 			echo "<p class=\"submit\"><input type=\"submit\" name=\"csv\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" /></p>\r\n";
 		}
 		echo "<p>" . $strip . "</p>";
@@ -1259,7 +1257,7 @@ class s2class {
 				} else {
 					echo " align=\"left\" colspan=\"3\">";
 				}
-				echo "<a href=\"mailto:$subscriber\">$subscriber</a>\r\n";
+				echo "<a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
 				if (in_array($subscriber, $unconfirmed) || in_array($subscriber, $confirmed) ) {
 					echo "(" . $this->signup_date($subscriber) . ")</td>\r\n";
 					echo "<td width=\"5%\" align=\"center\">\r\n";
@@ -1270,10 +1268,10 @@ class s2class {
 						$foo = '-&gt;';
 						$image = 'include/arrow_right.png';
 					}
-					echo "<input type=\"image\" src=\"" . $urlpath . $image . "\" name=\"toggle\" value=\"$subscriber\" alt=\"$foo\" /></td>\r\n";
+					echo "<input type=\"image\" src=\"" . $urlpath . $image . "\" name=\"toggle\" value=\"" . $subscriber . "\" alt=\"" . $foo . "\" /></td>\r\n";
 					echo "<td width=\"2%\" align=\"center\">\r\n";
 					echo "<p class=\"delete\">\r\n";					
-					echo "<input type=\"image\" src=\"" . $urlpath . "include/cross.png\" name=\"delete\" value=\"$subscriber\" alt=\"X\" />\r\n";
+					echo "<input type=\"image\" src=\"" . $urlpath . "include/cross.png\" name=\"delete\" value=\"" . $subscriber . "\" alt=\"X\" />\r\n";
 					echo "</p>";
 				}
 				echo "</td></tr>\r\n";
@@ -1285,7 +1283,7 @@ class s2class {
 		echo "</table>";
 		echo "<p>" . $strip . "</p>";
 		if ($reminderform) {
-			echo "<input type=\"hidden\" name=\"reminderemails\" value=\"$reminderemails\" />\r\n";
+			echo "<input type=\"hidden\" name=\"reminderemails\" value=\"" . $reminderemails . "\" />\r\n";
 			echo "<p class=\"submit\"><input type=\"submit\" name=\"reminder\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" /></p>\r\n";
 		}
 
@@ -1932,9 +1930,6 @@ class s2class {
 			return;
 		}
 
-		if (false !== $submit) {
-			echo "<form method=\"post\" action=\"$this->action\">";
-		}
 		echo "<select name=\"what\">\r\n";
 		foreach ($who as $whom => $display) {
 			if (in_array($whom, $exclude)) { continue; }
@@ -1955,7 +1950,7 @@ class s2class {
 		}
 		echo "</select>";
 		if (false !== $submit) {
-			echo "<p class=\"submit\"><input type=\"submit\" value=\"$submit\" /></p></form>\r\n";
+			echo "<p class=\"submit\"><input type=\"submit\" value=\"$submit\" /></p>\r\n";
 		}
 	} // end display_subscriber_dropdown()
 
