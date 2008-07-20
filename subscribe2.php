@@ -419,7 +419,7 @@ class s2class {
 		// Get the message template
 		$mailtext = stripslashes($this->substitute($this->subscribe2_options['mailtext']));
 
-		$plaintext = $post->post_content;
+		$plaintext = strip_shortcodes($post->post_content);
 		$content = apply_filters('the_content', $post->post_content);
 		$content = str_replace("]]>", "]]&gt", $content);
 		$excerpt = $post->post_excerpt;
@@ -2325,11 +2325,14 @@ class s2class {
 			if ('' == $excerpt) {
 				 // no excerpt, is there a <!--more--> ?
 				 if (false !== strpos($post->post_content, '<!--more-->')) {
-				 	list($excerpt, $more) = explode('<!--more-->', $plaintext, 2);
+				 	list($excerpt, $more) = explode('<!--more-->', $post->post_content, 2);
+				 	$excerpt = strip_tags($excerpt);
+				 	$excerpt = strip_shortcodes($excerpt);
 					// strip leading and trailing whitespace
 					$excerpt = trim($excerpt);
 				} else {
 					$excerpt = strip_tags($post->post_content);
+					$excerpt = strip_shortcodes($excerpt);
 					$words = explode(' ', $excerpt, 56);
 					if (count($words) > 55) {
 						array_pop($words);
