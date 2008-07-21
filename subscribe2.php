@@ -419,7 +419,10 @@ class s2class {
 		// Get the message template
 		$mailtext = stripslashes($this->substitute($this->subscribe2_options['mailtext']));
 
-		$plaintext = strip_shortcodes($post->post_content);
+		$plaintext = $post->post_content;
+		if (function_exists('strip_shortcodes')) {
+			$plaintext = strip_shortcodes($plaintext);
+		}
 		$content = apply_filters('the_content', $post->post_content);
 		$content = str_replace("]]>", "]]&gt", $content);
 		$excerpt = $post->post_excerpt;
@@ -432,14 +435,14 @@ class s2class {
 				$excerpt = trim($excerpt);
 			} else {
 				// no <!--more-->, so grab the first 55 words
-						$excerpt = strip_tags($plaintext);
-						$excerpt_length = 55;
-						$words = explode(' ', $excerpt, $excerpt_length + 1);
-						if (count($words) > $excerpt_length) {
-								array_pop($words);
-								array_push($words, '[...]');
-								$excerpt = implode(' ', $words);
-						}
+				$excerpt = strip_tags($plaintext);
+				$excerpt_length = 55;
+				$words = explode(' ', $excerpt, $excerpt_length + 1);
+				if (count($words) > $excerpt_length) {
+					array_pop($words);
+					array_push($words, '[...]');
+					$excerpt = implode(' ', $words);
+				}
 			}
 		}
 
@@ -2327,12 +2330,16 @@ class s2class {
 				 if (false !== strpos($post->post_content, '<!--more-->')) {
 				 	list($excerpt, $more) = explode('<!--more-->', $post->post_content, 2);
 				 	$excerpt = strip_tags($excerpt);
-				 	$excerpt = strip_shortcodes($excerpt);
+				 	if (function_exists('strip_shortcodes')) {
+						$excerpt = strip_shortcodes($excerpt);
+					}
 					// strip leading and trailing whitespace
 					$excerpt = trim($excerpt);
 				} else {
 					$excerpt = strip_tags($post->post_content);
-					$excerpt = strip_shortcodes($excerpt);
+					if (function_exists('strip_shortcodes')) {
+						$excerpt = strip_shortcodes($excerpt);
+					}
 					$words = explode(' ', $excerpt, 56);
 					if (count($words) > 55) {
 						array_pop($words);
