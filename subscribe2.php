@@ -105,6 +105,7 @@ class s2class {
 		$s2options = add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'options_menu'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'category_form_js'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'option_form_js'));
+		add_filter('plugin_action_links', array(&$this, 'plugin_action'), -10, 2);
 
 		$s2user = add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
 		add_action("admin_print_scripts-$s2user", array(&$this, 'category_form_js'));
@@ -1086,12 +1087,23 @@ class s2class {
 				}
 				$_POST['what'] = 'confirmed';
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) subscribed!', 'subscribe2') . "</strong></p></div>";
-			} elseif ($_POST['delete']) {
-				$this->delete($_POST['delete']);
-				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['delete'] . ' ' . __('deleted!', 'subscribe2') . "</strong></p></div>";
-			} elseif ($_POST['toggle']) {
-				$this->toggle($_POST['toggle']);
-				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $_POST['toggle'] . ' ' . __('status changed!', 'subscribe2') . "</strong></p></div>";
+			} elseif ($_POST['process']) {
+				if ($_POST['delete']) {
+					foreach ($_POST['delete'] as $address) {
+						$this->delete($address);
+					}
+					echo "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Address(es) deleted!', 'subscribe2') . "</strong></p></div>";
+				} elseif ($_POST['confirm']) {
+					foreach ($_POST['confirm'] as $address) {
+						$this->toggle($address);
+					}
+					echo "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Status changed!', 'subscribe2') . "</strong></p></div>";
+				} elseif ($_POST['unconfirm']) {
+					foreach ($_POST['unconfirm'] as $address) {
+						$this->toggle($address);
+					}
+					echo "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Status changed!', 'subscribe2') . "</strong></p></div>";
+				}
 			} elseif ($_POST['remind']) {
 				$this->remind($_POST['reminderemails']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Reminder Email(s) Sent!', 'subscribe2') . "</strong></p></div>"; 
@@ -1188,7 +1200,7 @@ class s2class {
 			// Displays a page number strip - adapted from code in Akismet
 			$args['what'] = $what;
 			$total_subscribers = count($subscribers);
-			$total_pages = ceil($total_subscribers / 50);
+			$total_pages = ceil($total_subscribers / 25);
 			$strip = '';
 			if ( $page > 1 ) {
 				$args['s2page'] = $page - 1;
@@ -1210,7 +1222,7 @@ class s2class {
 					}
 				}
 			}
-			if ( ( $page ) * 50 < $total_subscribers ) {
+			if ( ( $page ) * 25 < $total_subscribers ) {
 				$args['s2page'] = $page + 1;
 				$strip .=  "<a class=\"next\" href=\"" . clean_url(add_query_arg($args)) . "\">". __('Next Page', 'subscribe2') . " &raquo;</a>\n";
 			}
@@ -1243,38 +1255,47 @@ class s2class {
 			$exportcsv = implode(",\r\n", $subscribers);
 			echo "<input type=\"hidden\" name=\"exportcsv\" value=\"" . $exportcsv . "\" />\r\n";
 			echo "<p class=\"submit\"><input type=\"submit\" name=\"csv\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" /></p>\r\n";
+			echo "<table width=\"100%\"><tr><td valign=\"bottom\">" . $strip . "</td>\r\n";
+			echo "<td align=\"right\"><p class=\"submit\" align=\"right\" style=\"border-top: none;\"><input type=\"submit\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" /></p>\r\n";
+			echo "</td></tr></table>\r\n";
 		}
-		echo "<p>" . $strip . "</p>";
-		echo "<table cellpadding=\"2\" cellspacing=\"2\">";
+		echo "<table cellpadding=\"2\" cellspacing=\"2\" width=\"100%\">";
 		if (!empty($subscribers)) {
-			$subscriber_chunks = array_chunk($subscribers, 50);
+			$subscriber_chunks = array_chunk($subscribers, 25);
 			$chunk = $page - 1;
 			$subscribers = $subscriber_chunks[$chunk];
+			echo "<tr class=\"$alternate\">\r\n";
+			echo "<td width=\"88%\"></td>\r\n";
+			echo "<td width=\"4%\" align=\"center\">";
+			echo "<img src=\"" . $urlpath . "include/arrow_left.png\" alt=\"&lt;\" /></td>\r\n";
+			echo "<td width=\"4%\" align=\"center\">";
+			echo "<img src=\"" . $urlpath . "include/arrow_right.png\" alt=\"&gt;\" /></td>\r\n";
+			echo "<td width=\"4%\" align=\"center\">";
+			echo "<img src=\"" . $urlpath . "include/cross.png\" alt=\"X\" /></td></tr>\r\n";
 			foreach ($subscribers as $subscriber) {
-				echo "<tr class=\"$alternate\">";
-				echo "<td width=\"75%\"";
+				echo "<tr class=\"$alternate\" style=\"height:50px;\">";
+				echo "<td";
 				if (in_array($subscriber, $unconfirmed)) {
 					echo " align=\"right\">";
 				} elseif (in_array($subscriber, $confirmed)) {
 					echo " align=\"center\">";
 				} else {
-					echo " align=\"left\" colspan=\"3\">";
+					echo " align=\"left\" colspan=\"4\">";
 				}
 				echo "<a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
 				if (in_array($subscriber, $unconfirmed) || in_array($subscriber, $confirmed) ) {
 					echo "(" . $this->signup_date($subscriber) . ")</td>\r\n";
-					echo "<td width=\"5%\" align=\"center\">\r\n";
-					if (in_array($subscriber, $unconfirmed)) {
-						$foo = '&lt;-';
-						$image = 'include/arrow_left.png';
-					} else {
-						$foo = '-&gt;';
-						$image = 'include/arrow_right.png';
+					echo "<td align=\"center\">\r\n";
+					if (in_array($subscriber, $confirmed)) {
+						echo "</td><td align=\"center\">\r\n";
+						echo "<input type=\"checkbox\" name=\"unconfirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
+					} elseif (in_array($subscriber, $unconfirmed)) {
+						echo "</td><td align=\"center\">\r\n";
+						echo "<input type=\"checkbox\" name=\"confirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
 					}
-					echo "<input type=\"image\" src=\"" . $urlpath . $image . "\" name=\"toggle\" value=\"" . $subscriber . "\" alt=\"" . $foo . "\" /></td>\r\n";
-					echo "<td width=\"2%\" align=\"center\">\r\n";
+					echo "<td align=\"center\">\r\n";
 					echo "<p class=\"delete\">\r\n";					
-					echo "<input type=\"image\" src=\"" . $urlpath . "include/cross.png\" name=\"delete\" value=\"" . $subscriber . "\" alt=\"X\" />\r\n";
+					echo "<input type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
 					echo "</p>";
 				}
 				echo "</td></tr>\r\n";
@@ -1283,8 +1304,12 @@ class s2class {
 		} else {
 			echo "<tr><td align=\"center\"><b>" . __('NONE', 'subscribe2') . "</b></td></tr>\r\n";
 		}
-		echo "</table>";
-		echo "<p>" . $strip . "</p>";
+		echo "</table>\r\n";
+		if (!empty($subscribers)) {
+			echo "<table width=\"100%\"><tr><td valign=\"bottom\">" . $strip . "</td>\r\n";
+			echo "<td align=\"right\"><p class=\"submit\" align=\"right\" style=\"border-top: none;\"><input type=\"submit\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" /></p>\r\n";
+			echo "</td></tr></table>\r\n";
+		}
 		if ($reminderform) {
 			echo "<input type=\"hidden\" name=\"reminderemails\" value=\"" . $reminderemails . "\" />\r\n";
 			echo "<p class=\"submit\"><input type=\"submit\" name=\"reminder\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" /></p>\r\n";
@@ -2198,6 +2223,12 @@ class s2class {
 		}
 	}
 
+	function plugin_action($links, $file) {
+		if ($file == plugin_basename(dirname(__FILE__).'/subscribe2.php'))
+			$links[] = "<a href='options-general.php?page=subscribe2/subscribe2.php'><b>" . __('Settings', 'subscribe2') . "</b></a>";
+		return $links;
+	}
+
 /* ===== Write Toolbar Button Functions ===== */
 
 	/**
@@ -2391,7 +2422,7 @@ class s2class {
 	function subscribe2() {
 		global $table_prefix;
 
-		load_plugin_textdomain('subscribe2', PLUGINDIR . '/' . dirname(plugin_basename(__FILE__)));
+		load_plugin_textdomain('subscribe2', PLUGINDIR . '/' . dirname(plugin_basename(__FILE__)), dirname(plugin_basename(__FILE__)));
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
