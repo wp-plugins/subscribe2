@@ -85,6 +85,14 @@ If, for some reason the Subscribe2 button does not appear in your browser window
 
 == Version History ==
 
+Version 4.9 by Matthew Robinson
+
+* Send email direct to recipient if BCC is set as 1
+* Fix issue where WordPress shortcodes were not stripped out of emails
+* Amended Manage page to resolve issues with IE and Opera not passing form information correctly
+* Amended Manage page to allow for bulk management of public users
+* Amended WordPress API usage for translation files to 2.6 compatible syntax
+
 Version 4.8 by Matthew Robinson
 
 * Removed unnecessary return statement at end of publish() function
