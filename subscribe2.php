@@ -110,7 +110,7 @@ class s2class {
 		$s2user = add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
 		add_action("admin_print_scripts-$s2user", array(&$this, 'category_form_js'));
 
-		add_submenu_page('post-new.php', __('Mail Subscribers', 'subscribe2'), __('Mail Subscribers', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'write_menu'));
+		add_submenu_page('post-new.php', __('Mail Subscribers', 'subscribe2'), __('Mail Subscribers', 'subscribe2'), "publish_posts", __FILE__, array(&$this, 'write_menu'));
 
 		$s2nonce = md5('subscribe2');
 	}
