@@ -2311,8 +2311,21 @@ class s2class {
 		$this->subscribe2_options['last_s2cron'] = $now;
 		update_option('subscribe2_options', $this->subscribe2_options);
 
+		//set up SQL query based on options
+		if ($this->subscribe2_options['private'] == 'yes' ) {
+			$status	= "'publish', 'private'";
+		} else {
+			$status = "'publish'";
+		}
+
+		if ($this->subscribe2_options['page'] == 'yes' ) {
+			$type	= "'post', 'page'";
+		} else {
+			$type = "'post'";
+		}
+
 		// collect posts
-		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ('publish', 'private') AND post_type IN ('post', 'page') ORDER BY post_date");
+		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date");
 
 		// do we have any posts?
 		if (empty($posts)) { return; }
@@ -2342,12 +2355,7 @@ class s2class {
 			if ( ($this->subscribe2_options['password'] == "no") && ($post->post_password != '') ) {
 				$check = true;
 			}
-			// is the current post a page
-			// and should this not generate a notification email?
-			if ( ($this->subscribe2_options['pages'] == 'no') && ($post->post_type == 'page') ) {
-				$check = true;
-			}
-			// if this post is in an excluded category,
+			// if this post is excluded
 			// don't include it in the digest
 			if ($check) {
 				continue;
@@ -2380,6 +2388,11 @@ class s2class {
 				}
 			}
 			$message .= $excerpt . "\r\n\r\n";
+		}
+
+		//sanity check - don't send a mail if the content is empty
+		if (!$message && !$table) {
+			return;
 		}
 
 		// get admin details
