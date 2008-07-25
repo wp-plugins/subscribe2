@@ -1267,11 +1267,11 @@ class s2class {
 			echo "<tr class=\"$alternate\">\r\n";
 			echo "<td width=\"88%\"></td>\r\n";
 			echo "<td width=\"4%\" align=\"center\">";
-			echo "<img src=\"" . $urlpath . "include/arrow_left.png\" alt=\"&lt;\" /></td>\r\n";
+			echo "<img src=\"" . $urlpath . "include/arrow_left.png\" alt=\"&lt;\" title=\"" . __('Confirm this email address', 'subscribe2') . "\" /></td>\r\n";
 			echo "<td width=\"4%\" align=\"center\">";
-			echo "<img src=\"" . $urlpath . "include/arrow_right.png\" alt=\"&gt;\" /></td>\r\n";
+			echo "<img src=\"" . $urlpath . "include/arrow_right.png\" alt=\"&gt;\" title=\"" . __('Unconfirm this email address', 'subscribe2') . "\" /></td>\r\n";
 			echo "<td width=\"4%\" align=\"center\">";
-			echo "<img src=\"" . $urlpath . "include/cross.png\" alt=\"X\" /></td></tr>\r\n";
+			echo "<img src=\"" . $urlpath . "include/cross.png\" alt=\"X\" title=\"" . __('Delete this email address', 'subscribe2') . "\" /></td></tr>\r\n";
 			foreach ($subscribers as $subscriber) {
 				echo "<tr class=\"$alternate\" style=\"height:50px;\">";
 				echo "<td";
@@ -1288,14 +1288,14 @@ class s2class {
 					echo "<td align=\"center\">\r\n";
 					if (in_array($subscriber, $confirmed)) {
 						echo "</td><td align=\"center\">\r\n";
-						echo "<input type=\"checkbox\" name=\"unconfirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
+						echo "<input title=\"" . __('Unconfirm this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"unconfirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
 					} elseif (in_array($subscriber, $unconfirmed)) {
-						echo "</td><td align=\"center\">\r\n";
-						echo "<input type=\"checkbox\" name=\"confirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
+						echo "<input title=\"" . __('Confirm this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"confirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
+						echo "<td align=\"center\"></td>\r\n";
 					}
 					echo "<td align=\"center\">\r\n";
 					echo "<p class=\"delete\">\r\n";					
-					echo "<input type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
+					echo "<input title=\"" . __('Delete this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
 					echo "</p>";
 				}
 				echo "</td></tr>\r\n";
