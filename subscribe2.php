@@ -118,8 +118,8 @@ class s2class {
 	/**
 	Insert Javascript into admin_header
 	*/
-	function category_form_js() {
-		wp_enqueue_script('s2_catform', get_option('home') . '/wp-content/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_catform.js', array('jquery'), '1.0');
+	function checkbox_form_js() {
+		wp_enqueue_script('s2_checkbox', get_option('home') . '/wp-content/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_checkbox.js', array('jquery'), '1.0');
 	}
 
 	function option_form_js() {
@@ -1272,6 +1272,10 @@ class s2class {
 			echo "<img src=\"" . $urlpath . "include/arrow_right.png\" alt=\"&gt;\" title=\"" . __('Unconfirm this email address', 'subscribe2') . "\" /></td>\r\n";
 			echo "<td width=\"4%\" align=\"center\">";
 			echo "<img src=\"" . $urlpath . "include/cross.png\" alt=\"X\" title=\"" . __('Delete this email address', 'subscribe2') . "\" /></td></tr>\r\n";
+			echo "<td align=\"right\"><strong>Check All</strong></td>\r\n";
+			echo "<td align=\"center\"><input type=\"checkbox\" name=\"checkall\" value=\"confirm_checkall\" /></td>\r\n";
+			echo "<td align=\"center\"><input type=\"checkbox\" name=\"checkall\" value=\"unconfirm_checkall\" /></td>\r\n";
+			echo "<td align=\"center\"><input type=\"checkbox\" name=\"checkall\" value=\"delete_checkall\" /></td>\r\n";
 			foreach ($subscribers as $subscriber) {
 				echo "<tr class=\"$alternate\" style=\"height:50px;\">";
 				echo "<td";
@@ -1288,14 +1292,14 @@ class s2class {
 					echo "<td align=\"center\">\r\n";
 					if (in_array($subscriber, $confirmed)) {
 						echo "</td><td align=\"center\">\r\n";
-						echo "<input title=\"" . __('Unconfirm this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"unconfirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
+						echo "<input class=\"unconfirm_checkall\" title=\"" . __('Unconfirm this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"unconfirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
 					} elseif (in_array($subscriber, $unconfirmed)) {
-						echo "<input title=\"" . __('Confirm this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"confirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
+						echo "<input class=\"confirm_checkall\" title=\"" . __('Confirm this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"confirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
 						echo "<td align=\"center\"></td>\r\n";
 					}
 					echo "<td align=\"center\">\r\n";
 					echo "<p class=\"delete\">\r\n";					
-					echo "<input title=\"" . __('Delete this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
+					echo "<input  class=\"delete_checkall\" title=\"" . __('Delete this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
 					echo "</p>";
 				}
 				echo "</td></tr>\r\n";
@@ -1883,14 +1887,14 @@ class s2class {
 						$j++;
 				}
 				if (0 == $j) {
-						echo "<input class=\"check_me\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
+						echo "<input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 						if (in_array($cat->term_id, $selected)) {
 								echo " checked=\"checked\" ";
 						}
 						echo " /> " . $cat->name . "<br />\r\n";
 					} else {
 
-						echo "<input class=\"check_me\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
+						echo "<input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 						if (in_array($cat->term_id, $selected)) {
 									echo " checked=\"checked\" ";
 						}
@@ -1900,7 +1904,7 @@ class s2class {
 		}
 		echo "</td></tr>\r\n";
 		echo "<tr><td align=\"left\" colspan=\"2\">\r\n";
-		echo "<input type=\"checkbox\" name=\"checkall\" value=\"1\"/> " . __('Select / Unselect All', 'subscribe2') . "\r\n";
+		echo "<input type=\"checkbox\" name=\"checkall\" value=\"cat_checkall\" /> " . __('Select / Unselect All', 'subscribe2') . "\r\n";
 		echo "</td></tr>\r\n";
 		echo "</table>\r\n";
 	} // end display_category_form()
