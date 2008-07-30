@@ -836,7 +836,7 @@ class s2class {
 		$result = $wpdb->get_col($sql);
 		if ($result) {
 			$ids = implode(',', $result);
-			return $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN ($ids)");
+			return $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN ($ids) AND user_activation_key = ''");
 		}
 	} // end get_registered()
 
@@ -1104,6 +1104,15 @@ class s2class {
 					}
 					echo "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Status changed!', 'subscribe2') . "</strong></p></div>";
 				}
+			} elseif ($_POST['search'] ) {
+				$confirmed = $this->get_public();
+				$unconfirmed = $this->get_public(0);
+				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$registered);
+				foreach ($subscribers as $subscriber) {
+					if (stripos($subscriber, $_POST['searchterm'])) {
+						$result[] = $subscriber;
+					}
+				}
 			} elseif ($_POST['remind']) {
 				$this->remind($_POST['reminderemails']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Reminder Email(s) Sent!', 'subscribe2') . "</strong></p></div>"; 
@@ -1195,6 +1204,10 @@ class s2class {
 				}
 			}
 		}
+		if (!empty($result)) {
+			$subscribers = &$result;
+		}
+
 		if (!empty($subscribers)) {
 			natcasesort($subscribers);
 			// Displays a page number strip - adapted from code in Akismet
@@ -1253,8 +1266,11 @@ class s2class {
 		if (!empty($subscribers)) {
 			echo "<p align=\"center\"><b>" . __('Registered on the left, confirmed in the middle, unconfirmed on the right', 'subscribe2') . "</b></p>\r\n";
 			$exportcsv = implode(",\r\n", $subscribers);
-			echo "<input type=\"hidden\" name=\"exportcsv\" value=\"" . $exportcsv . "\" />\r\n";
-			echo "<p class=\"submit\"><input type=\"submit\" name=\"csv\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" /></p>\r\n";
+			echo "<table cellpadding=\"2\" cellspacing=\"2\" width=\"100%\">";
+			echo "<tr><td width=\"50%\"><input type=\"text\" name=\"searchterm\" value=\"\" />&nbsp;\r\n";
+			echo "<input type=\"submit\" name=\"search\" value=\"" . __('Search Subscribers', 'subscribe2') . "\" class=\"button\" /></td>\r\n";
+			echo "<td width=\"50%\" align=\"right\"><input type=\"hidden\" name=\"exportcsv\" value=\"" . $exportcsv . "\" />\r\n";
+			echo "<input type=\"submit\" name=\"csv\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" class=\"button\" /></td></tr></table>\r\n";
 			echo "<table width=\"100%\"><tr><td valign=\"bottom\">" . $strip . "</td>\r\n";
 			echo "<td align=\"right\"><p class=\"submit\" align=\"right\" style=\"border-top: none;\"><input type=\"submit\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" /></p>\r\n";
 			echo "</td></tr></table>\r\n";
@@ -1982,7 +1998,7 @@ class s2class {
 		}
 		echo "</select>";
 		if (false !== $submit) {
-			echo "<p class=\"submit\"><input type=\"submit\" value=\"$submit\" /></p>\r\n";
+			echo "&nbsp;<input type=\"submit\" value=\"$submit\" class=\"button\"/>\r\n";
 		}
 	} // end display_subscriber_dropdown()
 
