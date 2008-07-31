@@ -1079,7 +1079,7 @@ class s2class {
 		// was anything POSTed ?
 		if (isset($_POST['s2_admin'])) {
 			check_admin_referer('subscribe2-manage_subscribers' . $s2nonce);
-			if ($_POST['subscribe']) {
+			if ($_POST['addresses']) {
 				foreach (preg_split ("/[\s,]+/", $_POST['addresses']) as $email) {
 						if (is_email($email)) {
 						$this->activate($email);
@@ -1104,7 +1104,7 @@ class s2class {
 					}
 					echo "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Status changed!', 'subscribe2') . "</strong></p></div>";
 				}
-			} elseif ($_POST['search']) {
+			} elseif ($_POST['searchterm']) {
 				$confirmed = $this->get_public();
 				$unconfirmed = $this->get_public(0);
 				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$registered);
@@ -1204,7 +1204,7 @@ class s2class {
 				}
 			}
 		}
-		if ($_POST['search']) {
+		if ($_POST['searchterm']) {
 			$subscribers = &$result;
 		}
 
