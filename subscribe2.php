@@ -1104,7 +1104,7 @@ class s2class {
 					}
 					echo "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Status changed!', 'subscribe2') . "</strong></p></div>";
 				}
-			} elseif ($_POST['search'] ) {
+			} elseif ($_POST['search']) {
 				$confirmed = $this->get_public();
 				$unconfirmed = $this->get_public(0);
 				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$registered);
@@ -1204,7 +1204,7 @@ class s2class {
 				}
 			}
 		}
-		if (!empty($result)) {
+		if ($_POST['search']) {
 			$subscribers = &$result;
 		}
 
@@ -1322,7 +1322,11 @@ class s2class {
 				('alternate' == $alternate) ? $alternate = '' : $alternate = 'alternate';
 			}
 		} else {
-			echo "<tr><td align=\"center\"><b>" . __('NONE', 'subscribe2') . "</b></td></tr>\r\n";
+			if ($_POST['search']) {
+				echo "<tr><td align=\"center\"><b>" . __('No matching subscribers found', 'subscribe2') . "</b></td></tr>\r\n";
+			} else {
+				echo "<tr><td align=\"center\"><b>" . __('NONE', 'subscribe2') . "</b></td></tr>\r\n";
+			}
 		}
 		echo "</table>\r\n";
 		if (!empty($subscribers)) {
