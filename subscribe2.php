@@ -1109,7 +1109,7 @@ class s2class {
 				$unconfirmed = $this->get_public(0);
 				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$registered);
 				foreach ($subscribers as $subscriber) {
-					if (stripos($subscriber, $_POST['searchterm'])) {
+					if (is_numeric(stripos($subscriber, $_POST['searchterm']))) {
 						$result[] = $subscriber;
 					}
 				}
