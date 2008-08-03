@@ -416,7 +416,7 @@ class s2class {
 		$this->myemail = $user->user_email;
 		$this->myname = $user->display_name;
 		// Get email subject
-		$subject = stripslashes($this->substitute($this->s2_subject));
+		$subject = stripslashes(strip_tags($this->substitute($this->s2_subject)));
 		// Get the message template
 		$mailtext = stripslashes($this->substitute($this->subscribe2_options['mailtext']));
 
