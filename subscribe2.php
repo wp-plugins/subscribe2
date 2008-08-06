@@ -72,6 +72,8 @@ class s2class {
 
 		$this->mail_sent = "<p>" . __('Message sent!', 'subscribe2') . "</p>";
 
+		$this->mail_failed = "<p>" . __('Message failed! Check your settings and check with your hosting provider', 'subscribe2') . "</p>";
+
 		$this->form = "<form method=\"post\" action=\"\">" . __('Your email:', 'subscribe2') . "&#160;<input type=\"text\" name=\"email\" value=\"\" size=\"20\" />&#160;<br /><input type=\"radio\" name=\"s2_action\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . " <input type=\"radio\" name=\"s2_action\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . " &#160;<input type=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></form>\r\n";
 
 		// confirmation messages
@@ -1844,8 +1846,12 @@ class s2class {
 			}
 			$subject = stripslashes(strip_tags($_POST['subject']));
 			$message = stripslashes($_POST['message']);
-			$this->mail($recipients, $subject, $message, 'text');
-			$message = $this->mail_sent;
+			$status = $this->mail($recipients, $subject, $message, 'text');
+			if ($status) {
+				$message = $this->mail_sent;
+			} else {
+				$message = $this->mail_failed;
+			}
 		}
 
 		if ('' != $message) {
