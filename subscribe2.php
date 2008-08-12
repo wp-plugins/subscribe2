@@ -231,7 +231,7 @@ class s2class {
 		// Set sender details
 		if ('' == $this->myname) {
 			$admin = $this->get_userdata();
-			$this->myname = $admin->display_name;
+			$this->myname = html_entity_decode($admin->display_name);
 			$this->myemail = $admin->user_email;
 		}
 		$headers = "From: \"" . $this->myname . "\" <" . $this->myemail . ">\n";
@@ -261,10 +261,10 @@ class s2class {
 		if ($this->subscribe2_options['bcclimit'] > 0) {
 			if ($this->subscribe2_options['bcclimit'] == 1) {
 				foreach ($recipients as $recipient) {
-					$this->myemail = trim($recipient);
+					$recipient = trim($recipient);
 					// sanity check -- make sure we have a valid email
-					if (!is_email($this->myemail)) { continue; }
-					@wp_mail($this->myemail, $subject, $mailtext, $headers);
+					if (!is_email($recipient)) { continue; }
+					$status = @wp_mail($recipient, $subject, $mailtext, $headers);
 				}
 				return;
 			} elseif (count($recipients) > $this->subscribe2_options['bcclimit']) {
@@ -322,12 +322,12 @@ class s2class {
 		if ( ($this->subscribe2_options['bcclimit'] > 0) && (isset($batch)) ) {
 			foreach ($batch as $bcc) {
 					$newheaders = $headers . "$bcc\r\n";
-					@wp_mail($this->myemail, $subject, $mailtext, $newheaders);
+					$status = @wp_mail($this->myemail, $subject, $mailtext, $newheaders);
 			}
 		} else {
-			@wp_mail($this->myemail, $subject, $mailtext, $headers);
+			$status = @wp_mail($this->myemail, $subject, $mailtext, $headers);
 		}
-		return;
+		return $status;
 	} // end mail()
 
 	/**
@@ -1254,7 +1254,7 @@ class s2class {
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
 		}
-		echo "<p>" . __('Enter addresses, one per line or comma-seperated', 'subscribe2') . "<br />\r\n";
+		echo "<p>" . __('Enter addresses, one per line or comma-separated', 'subscribe2') . "<br />\r\n";
 		echo "<textarea rows=\"2\" cols=\"80\" name=\"addresses\"></textarea></p>\r\n";
 		echo "<input type=\"hidden\" name=\"s2_admin\" />\r\n";
 		echo "<p class=\"submit\"><input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\"/></p>\r\n";
@@ -1845,12 +1845,13 @@ class s2class {
 				$recipients = $this->get_registered();
 			}
 			$subject = stripslashes(strip_tags($_POST['subject']));
-			$message = stripslashes($_POST['message']);
-			$status = $this->mail($recipients, $subject, $message, 'text');
+			$body = stripslashes($_POST['message']);
+			$status = $this->mail($recipients, $subject, $body, 'text');
 			if ($status) {
 				$message = $this->mail_sent;
 			} else {
-				$message = $this->mail_failed;
+				global $phpmailer;
+				$message = $this->mail_failed . $phpmailer->ErrorInfo;
 			}
 		}
 
