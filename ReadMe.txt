@@ -4,7 +4,7 @@ Donate link: http://subscribe2.wordpress.com/donate/
 Tags: posts, subscription, email
 Requires at least: 2.0.x
 Tested up to: 2.5
-Stable tag: 4.8
+Stable tag: 4.9
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -92,6 +92,16 @@ Version 4.9 by Matthew Robinson
 * Amended Manage page to resolve issues with IE and Opera not passing form information correctly
 * Amended Manage page to allow for bulk management of public users
 * Amended WordPress API usage for translation files to 2.6 compatible syntax
+* Allow Editor and Author users to send emails from Write->Mail Subscribers
+* Post collection for CRON function is more dynamic
+* CRON function sanity to checks for post content before sending a notification
+* Fixed get_register() function to allow for user_activation field
+* Corrected typos in options.php
+* Added a search box to the Manage->Subscribers window
+* Strip tags and HTML entities from email subjects
+* Improved message feedback in Write->Mail
+* Added html_entity_decode to sender name fields
+* Change Menu string for User menu to make it clearer whose preferences are being edited
 
 Version 4.8 by Matthew Robinson
 
