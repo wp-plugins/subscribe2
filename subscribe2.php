@@ -34,9 +34,17 @@ along with Subscribe2.  If not, see <http://www.gnu.org/licenses/>.
 define('S2VERSION', '4.10');
 define('S2PATH', trailingslashit(dirname(__FILE__)));
 
+// Pre-2.6 compatibility
+if (!defined('WP_CONTENT_URL')) {
+	define('WP_CONTENT_URL', get_option('siteurl') . '/wp-content');
+}
+if (!defined('WP_CONTENT_DIR')) {
+	define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
+}
+
 // use Owen's excellent ButtonSnap library
 if (!function_exists(buttonsnap_textbutton)) {
-	require(ABSPATH . 'wp-content/plugins/subscribe2/include/buttonsnap.php');
+	require(WP_CONTENT_DIR . '/plugins/subscribe2/include/buttonsnap.php');
 }
 
 $mysubscribe2 = new s2class;
@@ -121,11 +129,11 @@ class s2class {
 	Insert Javascript into admin_header
 	*/
 	function checkbox_form_js() {
-		wp_enqueue_script('s2_checkbox', get_option('home') . '/wp-content/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_checkbox.js', array('jquery'), '1.0');
+		wp_enqueue_script('s2_checkbox', WP_CONTENT_URL . '/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_checkbox.js', array('jquery'), '1.0');
 	}
 
 	function option_form_js() {
-		wp_enqueue_script('s2_edit', get_option('home') . '/wp-content/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_edit.js', array('jquery'), '1.0');
+		wp_enqueue_script('s2_edit', WP_CONTENT_URL . '/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_edit.js', array('jquery'), '1.0');
 	}
 
 	function add_weekly_sched($sched) {
@@ -2282,7 +2290,7 @@ class s2class {
 			} else {
 				//use buttonsnap to add button is not using RTE
 				buttonsnap_separator();
-				buttonsnap_jsbutton(get_option('siteurl') . '/wp-content/plugins/subscribe2/include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
+				buttonsnap_jsbutton(WP_CONTENT_URL . '/plugins/subscribe2/include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
 			}
 	}
 
@@ -2290,7 +2298,7 @@ class s2class {
 	Add buttons for WordPress 2.5+ using built in hooks
 	*/
 	function mce3_plugin($arr) {
-		$path = get_option('siteurl') . '/wp-content/plugins/subscribe2/tinymce3/editor_plugin.js';
+		$path = WP_CONTENT_URL . '/plugins/subscribe2/tinymce3/editor_plugin.js';
 		$arr['subscribe2'] = $path;
 		return $arr;
 	}
@@ -2313,7 +2321,7 @@ class s2class {
 	}
 
 	function tinymce2_before_init() {
-		$this->fullpath = get_option('siteurl') . '/wp-content/plugins/subscribe2/tinymce/';
+		$this->fullpath = WP_CONTENT_URL . '/plugins/subscribe2/tinymce/';
 		echo "tinyMCE.loadPlugin('subscribe2quicktags', '" . $this->fullpath . "');\n"; 
 	}
 
