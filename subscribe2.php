@@ -126,6 +126,17 @@ class s2class {
 	}
 
 	/**
+	Hook for Admin Drop Down Icons
+	*/
+	function ozh_s2_icon($hook) {
+		if ($hook == plugin_basename(__FILE__)) {
+			return WP_CONTENT_URL . '/plugins/subscribe2/include/email_edit.png';
+		} else {
+			return $hook;
+		}
+	}
+
+	/**
 	Insert Javascript into admin_header
 	*/
 	function checkbox_form_js() {
@@ -424,7 +435,7 @@ class s2class {
 			$user = $this->get_userdata();
 		}
 		$this->myemail = $user->user_email;
-		$this->myname = $user->display_name;
+		$this->myname = html_entity_decode($user->display_name);
 		// Get email subject
 		$subject = stripslashes(strip_tags($this->substitute($this->s2_subject)));
 		// Get the message template
@@ -1281,10 +1292,15 @@ class s2class {
 			echo "<input type=\"submit\" name=\"search\" value=\"" . __('Search Subscribers', 'subscribe2') . "\" class=\"button\" /></td>\r\n";
 			echo "<td width=\"50%\" align=\"right\"><input type=\"hidden\" name=\"exportcsv\" value=\"" . $exportcsv . "\" />\r\n";
 			echo "<input type=\"submit\" name=\"csv\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" class=\"button\" /></td></tr></table>\r\n";
+			if ($reminderform) {
+				echo "<input type=\"hidden\" name=\"reminderemails\" value=\"" . $reminderemails . "\" />\r\n";
+				echo "<p class=\"submit\" align=\"right\" style=\"border-top:none;\"><input type=\"submit\" name=\"reminder\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" /></p>\r\n";
+			}
 			echo "<table width=\"100%\"><tr><td valign=\"bottom\">" . $strip . "</td>\r\n";
 			echo "<td align=\"right\"><p class=\"submit\" align=\"right\" style=\"border-top: none;\"><input type=\"submit\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" /></p>\r\n";
 			echo "</td></tr></table>\r\n";
 		}
+
 		echo "<table cellpadding=\"2\" cellspacing=\"2\" width=\"100%\">";
 		if (!empty($subscribers)) {
 			$subscriber_chunks = array_chunk($subscribers, 25);
@@ -1343,10 +1359,6 @@ class s2class {
 			echo "<table width=\"100%\"><tr><td valign=\"bottom\">" . $strip . "</td>\r\n";
 			echo "<td align=\"right\"><p class=\"submit\" align=\"right\" style=\"border-top: none;\"><input type=\"submit\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" /></p>\r\n";
 			echo "</td></tr></table>\r\n";
-		}
-		if ($reminderform) {
-			echo "<input type=\"hidden\" name=\"reminderemails\" value=\"" . $reminderemails . "\" />\r\n";
-			echo "<p class=\"submit\"><input type=\"submit\" name=\"reminder\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" /></p>\r\n";
 		}
 
 		//show bulk managment form
@@ -2108,7 +2120,7 @@ class s2class {
 	Display our form; also handles (un)subscribe requests
 	*/
 	function filter($content = '') {
-		if ( ('' == $content) || (! strstr($content, '<!--subscribe2-->')) ) { return $content; }
+		if ( ('' == $content) || (1 == $this->filtered) || (!strstr($content, '<!--subscribe2-->')) ) { return $content; }
 		$this->s2form = $this->form;
 
 		global $user_ID;
@@ -2437,7 +2449,7 @@ class s2class {
 		// get admin details
 		$user = $this->get_userdata();
 		$this->myemail = $user->user_email;
-		$this->myname = $user->display_name;
+		$this->myname = html_entity_decode($user->display_name);
 
 		$scheds = (array) wp_get_schedules();
 		$email_freq = $this->subscribe2_options['email_freq'];
@@ -2505,6 +2517,7 @@ class s2class {
 		
 		//add regular actions and filters
 		add_action('admin_menu', array(&$this, 'admin_menu'));
+		add_filter('ozh_adminmenu_icon', array(&$this, 'ozh_s2_icon'));
 		add_action('create_category', array(&$this, 'autosub_new_category'));
 		add_action('register_form', array(&$this, 'register_form'));
 		add_filter('the_content', array(&$this, 'filter'), 10);
