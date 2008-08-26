@@ -1087,16 +1087,6 @@ class s2class {
 			$emails = implode(",", $registered);
 		}
 
-		$what = '';
-		$reminderform = false;
-		$urlpath = str_replace("\\", "/", S2PATH);
-		$urlpath = trailingslashit(get_option('siteurl')) . substr($urlpath,strpos($urlpath, "wp-content/"));
-		if ( isset( $_GET['s2page'] ) ) {
-			$page = (int) $_GET['s2page'];
-		} else {
-			$page = 1;
-		}
-
 		// was anything POSTed ?
 		if (isset($_POST['s2_admin'])) {
 			check_admin_referer('subscribe2-manage_subscribers' . $s2nonce);
@@ -1114,17 +1104,20 @@ class s2class {
 						$this->delete($address);
 					}
 					echo "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Address(es) deleted!', 'subscribe2') . "</strong></p></div>";
-				} elseif ($_POST['confirm']) {
+				}
+				if ($_POST['confirm']) {
 					foreach ($_POST['confirm'] as $address) {
 						$this->toggle($address);
 					}
-					echo "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Status changed!', 'subscribe2') . "</strong></p></div>";
-				} elseif ($_POST['unconfirm']) {
+					$message =  "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Status changed!', 'subscribe2') . "</strong></p></div>";
+				}
+				if ($_POST['unconfirm']) {
 					foreach ($_POST['unconfirm'] as $address) {
 						$this->toggle($address);
 					}
-					echo "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Status changed!', 'subscribe2') . "</strong></p></div>";
+					$message =  "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Status changed!', 'subscribe2') . "</strong></p></div>";
 				}
+				echo $message;
 			} elseif ($_POST['searchterm']) {
 				$confirmed = $this->get_public();
 				$unconfirmed = $this->get_public(0);
@@ -1146,25 +1139,36 @@ class s2class {
 			}
 		}
 
+		//Get Public Subscribers once for filter
+		$confirmed = $this->get_public();
+		$unconfirmed = $this->get_public(0);
+		// safety check for our arrays
+		if ('' == $confirmed) { $confirmed = array(); }
+		if ('' == $unconfirmed) { $unconfirmed = array(); }
+		if ('' == $registered) { $registered = array(); }
+
+		$reminderform = false;
+		$urlpath = str_replace("\\", "/", S2PATH);
+		$urlpath = trailingslashit(get_option('siteurl')) . substr($urlpath,strpos($urlpath, "wp-content/"));
+		if (isset($_GET['s2page'])) {
+			$page = (int) $_GET['s2page'];
+		} else {
+			$page = 1;
+		}
+
 		if (isset($_POST['what'])) {
 			$page = 1;
 			if ('all' == $_POST['what']) {
 				$what = 'all';
-				$confirmed = $this->get_public();
-				$unconfirmed = $this->get_public(0);
 				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$registered);
 			} elseif ('public' == $_POST['what']) {
 				$what = 'public';
-				$confirmed = $this->get_public();
-				$unconfirmed = $this->get_public(0);
 				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed);
 			} elseif ('confirmed' == $_POST['what']) {
 				$what = 'confirmed';
-				$confirmed = $this->get_public();
 				$subscribers = $confirmed;
 			} elseif ('unconfirmed' == $_POST['what']) {
 				$what = 'unconfirmed';
-				$unconfirmed = $this->get_public(0);
 				$subscribers = $unconfirmed;
 				if (!empty($subscribers)) {
 					$reminderemails = implode(",", $subscribers);
@@ -1180,21 +1184,15 @@ class s2class {
 		} elseif (isset($_GET['what'])) {
 			if ('all' == $_GET['what']) {
 				$what = 'all';
-				$confirmed = $this->get_public();
-				$unconfirmed = $this->get_public(0);
 				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$registered);
 			} elseif ('public' == $_GET['what']) {
 				$what = 'public';
-				$confirmed = $this->get_public();
-				$unconfirmed = $this->get_public(0);
 				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed);
 			} elseif ('confirmed' == $_GET['what']) {
 				$what = 'confirmed';
-				$confirmed = $this->get_public();
 				$subscribers = $confirmed;
 			} elseif ('unconfirmed' == $_GET['what']) {
 				$what = 'unconfirmed';
-				$unconfirmed = $this->get_public(0);
 				$subscribers = $unconfirmed;				
 				if (!empty($subscribers)) {
 					$reminderemails = implode(",", $subscribers);
@@ -1207,16 +1205,13 @@ class s2class {
 				$what = 'registered';
 				$subscribers = $registered;
 			}
-		} elseif ('' == $what) {
+		} else {
 			$what = 'registered';
 			$subscribers = $registered;
-			$registermessage = '';
 			if (empty($subscribers)) {
-				$confirmed = $this->get_public();
 				$subscribers = $confirmed;
 				$what = 'confirmed';
 				if (empty($subscribers)) {
-					$unconfirmed = $this->get_public(0);
 					$subscribers = $unconfirmed;
 					$what = 'unconfirmed';
 					if (empty($subscribers)) {
@@ -1261,10 +1256,6 @@ class s2class {
 				$strip .=  "<a class=\"next\" href=\"" . clean_url(add_query_arg($args)) . "\">". __('Next Page', 'subscribe2') . " &raquo;</a>\n";
 			}
 		}
-		// safety check for our arrays
-		if ('' == $confirmed) { $confirmed = array(); }
-		if ('' == $unconfirmed) { $unconfirmed = array(); }
-		if ('' == $registered) { $registered = array(); }
 
 		// show our form
 		echo "<form method=\"post\" action=\"\">\r\n";
