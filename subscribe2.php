@@ -1421,6 +1421,7 @@ class s2class {
 
 				// send per-post or digest emails
 				$email_freq = $_POST['email_freq'];
+				$scheduled_time = wp_next_scheduled('s2_digest_cron');
 				if ( ($email_freq != $this->subscribe2_options['email_freq']) || ($_POST['hour'] != gmdate('H', $scheduled_time)) ) {
 					$this->subscribe2_options['email_freq'] = $email_freq;
 					wp_clear_scheduled_hook('s2_digest_cron');
@@ -2057,6 +2058,7 @@ class s2class {
 		echo "</select>\r\n";
 		echo "<strong><em style=\"color: red\">" . __('This option will work for digest notification sent daily or less frequently', 'subscribe2') . "</em></strong>\r\n";
 		if ($scheduled_time) {
+			echo "<p><input type=\"checkbox\" name=\"reset_cron\" /> " . __('Reset the schedule time and date for periodic email notifications', 'subscribe2') . "</p>\r\n";
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 			echo "<p>" . __('Current UTC time is', 'subscribe2') . ": \r\n";
 			echo "<strong>" . gmdate($datetime, current_time('timestamp', 1)) . "</strong></p>\r\n";
