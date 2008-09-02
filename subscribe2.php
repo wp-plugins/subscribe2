@@ -82,7 +82,7 @@ class s2class {
 
 		$this->mail_failed = "<p>" . __('Message failed! Check your settings and check with your hosting provider', 'subscribe2') . "</p>";
 
-		$this->form = "<form method=\"post\" action=\"\">" . __('Your email:', 'subscribe2') . "&#160;<input type=\"text\" name=\"email\" value=\"\" size=\"20\" />&#160;<br /><input type=\"radio\" name=\"s2_action\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . " <input type=\"radio\" name=\"s2_action\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . " &#160;<input type=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></form>\r\n";
+		$this->form = "<form method=\"post\" action=\"\"><p>" . __('Your email:', 'subscribe2') . "&#160;<input type=\"text\" name=\"email\" value=\"\" size=\"20\" />&#160;<br /><input type=\"radio\" name=\"s2_action\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . " <input type=\"radio\" name=\"s2_action\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . " &#160;<input type=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></p></form>\r\n";
 
 		// confirmation messages
 		$this->no_such_email = "<p>" . __('No such email address is registered.', 'subscribe2') . "</p>";
@@ -2103,9 +2103,10 @@ class s2class {
 	/**
 	Action to process Subscribe2 registration from WordPress registration
 	*/
-	function register_action($user_id = 0) {
-		if (0 == $user_id) { return $user_id; }
-		$this->register($user_id, 1);
+	function register_action() {
+		$user_id = get_userdatabylogin($_POST['user_login']);
+		if (0 == $user_id->ID) { return; }
+		$this->register($user_id->ID, 1);
 	}
 
 /* ===== template and filter functions ===== */
@@ -2512,7 +2513,6 @@ class s2class {
 		add_action('admin_menu', array(&$this, 'admin_menu'));
 		add_filter('ozh_adminmenu_icon', array(&$this, 'ozh_s2_icon'));
 		add_action('create_category', array(&$this, 'autosub_new_category'));
-		add_action('register_form', array(&$this, 'register_form'));
 		add_filter('the_content', array(&$this, 'filter'), 10);
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
 
@@ -2522,8 +2522,11 @@ class s2class {
 			add_action('edit_form_advanced', array(&$this, 's2_edit_form'));
 		}
 
-		// add action for automatic subscription based on option settings
-		add_action('user_register', array(&$this, 'register'));
+		// add actions for automatic subscription based on option settings
+		add_action('register_form', array(&$this, 'register_form'));
+		if ('yes' == $this->subscribe2_options['autosub']) {
+			add_action('user_register', array(&$this, 'register'));
+		}
 		if ('wpreg' == $this->subscribe2_options['autosub']) {
 			add_action('register_post', array(&$this, 'register_post'));
 		}
