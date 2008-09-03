@@ -2086,7 +2086,7 @@ class s2class {
 			echo "</p>\r\n";
 		} elseif ('yes' == $this->subscribe2_options['autosub']) {
 			echo "<p>\r\n<center>\r\n";
-			echo __('By Registering with this blog you are also agreeing to recieve email notifications for new posts', 'subscribe2') . "<br />\r\n";
+			echo __('By Registering with this blog you are also agreeing to recieve email notifications for new posts but you can unsubscribe at anytime', 'subscribe2') . "<br />\r\n";
 			echo "</center></p>\r\n";
 		}
 	}
@@ -2370,7 +2370,7 @@ class s2class {
 		}
 
 		// collect posts
-		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date");
+		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date");
 
 		// do we have any posts?
 		if (empty($posts)) { return; }
@@ -2407,6 +2407,7 @@ class s2class {
 			}
 			$table .= $post->post_title . "\r\n";
 			$message .= $post->post_title . "\r\n";
+			$message .= __('Posted on', 'subscribe2') . ":" . gmdate(get_option('date_format'), $post->post_date) . "\r\n";
 			$message .= get_permalink($post->ID) . "\r\n";
 			$excerpt = $post->post_excerpt;
 			if ('' == $excerpt) {
