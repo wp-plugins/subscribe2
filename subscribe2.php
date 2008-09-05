@@ -2058,7 +2058,6 @@ class s2class {
 		echo "</select>\r\n";
 		echo "<strong><em style=\"color: red\">" . __('This option will work for digest notification sent daily or less frequently', 'subscribe2') . "</em></strong>\r\n";
 		if ($scheduled_time) {
-			echo "<p><input type=\"checkbox\" name=\"reset_cron\" /> " . __('Reset the schedule time and date for periodic email notifications', 'subscribe2') . "</p>\r\n";
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 			echo "<p>" . __('Current UTC time is', 'subscribe2') . ": \r\n";
 			echo "<strong>" . gmdate($datetime, current_time('timestamp', 1)) . "</strong></p>\r\n";
@@ -2376,6 +2375,7 @@ class s2class {
 		if (empty($posts)) { return; }
 
 		// if we have posts, let's prepare the digest
+		$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 		$all_post_cats = array();
 		foreach ($posts as $post) {
 			$post_cats = wp_get_post_categories($post->ID);
@@ -2407,7 +2407,7 @@ class s2class {
 			}
 			$table .= $post->post_title . "\r\n";
 			$message .= $post->post_title . "\r\n";
-			$message .= __('Posted on', 'subscribe2') . ":" . gmdate(get_option('date_format'), $post->post_date) . "\r\n";
+			$message .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
 			$message .= get_permalink($post->ID) . "\r\n";
 			$excerpt = $post->post_excerpt;
 			if ('' == $excerpt) {
