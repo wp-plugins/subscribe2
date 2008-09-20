@@ -82,7 +82,7 @@ class s2class {
 
 		$this->mail_failed = "<p>" . __('Message failed! Check your settings and check with your hosting provider', 'subscribe2') . "</p>";
 
-		$this->form = "<form method=\"post\" action=\"\">" . __('Your email:', 'subscribe2') . "&#160;<input type=\"text\" name=\"email\" value=\"\" size=\"20\" />&#160;<br /><input type=\"radio\" name=\"s2_action\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . " <input type=\"radio\" name=\"s2_action\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . " &#160;<input type=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></form>\r\n";
+		$this->form = "<form method=\"post\" action=\"\"><p>" . __('Your email:', 'subscribe2') . "&#160;<input type=\"text\" name=\"email\" value=\"\" size=\"20\" />&#160;<br /><input type=\"radio\" name=\"s2_action\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . " <input type=\"radio\" name=\"s2_action\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . " &#160;<input type=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></p></form>\r\n";
 
 		// confirmation messages
 		$this->no_such_email = "<p>" . __('No such email address is registered.', 'subscribe2') . "</p>";
@@ -2058,7 +2058,6 @@ class s2class {
 		echo "</select>\r\n";
 		echo "<strong><em style=\"color: red\">" . __('This option will work for digest notification sent daily or less frequently', 'subscribe2') . "</em></strong>\r\n";
 		if ($scheduled_time) {
-			echo "<p><input type=\"checkbox\" name=\"reset_cron\" /> " . __('Reset the schedule time and date for periodic email notifications', 'subscribe2') . "</p>\r\n";
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 			echo "<p>" . __('Current UTC time is', 'subscribe2') . ": \r\n";
 			echo "<strong>" . gmdate($datetime, current_time('timestamp', 1)) . "</strong></p>\r\n";
@@ -2086,7 +2085,7 @@ class s2class {
 			echo "</p>\r\n";
 		} elseif ('yes' == $this->subscribe2_options['autosub']) {
 			echo "<p>\r\n<center>\r\n";
-			echo __('By Registering with this blog you are also agreeing to recieve email notifications for new posts', 'subscribe2') . "<br />\r\n";
+			echo __('By Registering with this blog you are also agreeing to recieve email notifications for new posts but you can unsubscribe at anytime', 'subscribe2') . "<br />\r\n";
 			echo "</center></p>\r\n";
 		}
 	}
@@ -2103,9 +2102,10 @@ class s2class {
 	/**
 	Action to process Subscribe2 registration from WordPress registration
 	*/
-	function register_action($user_id = 0) {
-		if (0 == $user_id) { return $user_id; }
-		$this->register($user_id, 1);
+	function register_action() {
+		$user_id = get_userdatabylogin($_POST['user_login']);
+		if (0 == $user_id->ID) { return; }
+		$this->register($user_id->ID, 1);
 	}
 
 /* ===== template and filter functions ===== */
@@ -2369,12 +2369,13 @@ class s2class {
 		}
 
 		// collect posts
-		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date");
+		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date");
 
 		// do we have any posts?
 		if (empty($posts)) { return; }
 
 		// if we have posts, let's prepare the digest
+		$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 		$all_post_cats = array();
 		foreach ($posts as $post) {
 			$post_cats = wp_get_post_categories($post->ID);
@@ -2406,6 +2407,7 @@ class s2class {
 			}
 			$table .= $post->post_title . "\r\n";
 			$message .= $post->post_title . "\r\n";
+			$message .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
 			$message .= get_permalink($post->ID) . "\r\n";
 			$excerpt = $post->post_excerpt;
 			if ('' == $excerpt) {
@@ -2512,7 +2514,6 @@ class s2class {
 		add_action('admin_menu', array(&$this, 'admin_menu'));
 		add_filter('ozh_adminmenu_icon', array(&$this, 'ozh_s2_icon'));
 		add_action('create_category', array(&$this, 'autosub_new_category'));
-		add_action('register_form', array(&$this, 'register_form'));
 		add_filter('the_content', array(&$this, 'filter'), 10);
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
 
@@ -2522,8 +2523,11 @@ class s2class {
 			add_action('edit_form_advanced', array(&$this, 's2_edit_form'));
 		}
 
-		// add action for automatic subscription based on option settings
-		add_action('user_register', array(&$this, 'register'));
+		// add actions for automatic subscription based on option settings
+		add_action('register_form', array(&$this, 'register_form'));
+		if ('yes' == $this->subscribe2_options['autosub']) {
+			add_action('user_register', array(&$this, 'register'));
+		}
 		if ('wpreg' == $this->subscribe2_options['autosub']) {
 			add_action('register_post', array(&$this, 'register_post'));
 		}
