@@ -942,8 +942,8 @@ class s2class {
 			$check = get_usermeta($user_id, 's2_subscribed');
 			// if the are no existing subscriptions, create them based on admin options
 			if (empty($check)) {
+				// add entries by default if autosub is on
 				if ( ('yes' == $this->subscribe2_options['autosub']) || (('wpreg' == $this->subscribe2_options['autosub']) && (1 == $wpreg)) ) {
-					// don't add entries by default if autosub is off, messes up daily digests
 					update_usermeta($user_id, 's2_subscribed', $cats);
 						foreach(explode(',', $cats) as $cat) {
 							update_usermeta($user_id, 's2_cat' . $cat, "$cat");
@@ -1714,16 +1714,25 @@ class s2class {
 
 			if ($s2_mu) {
 				$posted_cats = $_POST['category'];
-				$other_blogs = array_diff(explode(',', get_usermeta($user_ID, 's2_subscribed')), get_all_category_ids());
-				$cats = array_merge($posted_cats, $other_blogs);
+				$other_blogs = get_usermeta($user_ID, 's2_subscribed');
+				if ($other_blogs == '-1') {
+					$other_blogs = array();
+				} else {
+					$other_blogs = array_diff(explode(',', $other_blogs), get_all_category_ids());
+				}
+				if (empty($posted_cats)) {
+					$cats = $other_blogs;
+				} else {
+					$cats = array_merge($posted_cats, $other_blogs);
+				}
 			} else {
 				$cats = $_POST['category'];
 			}
 
 			if ( (empty($cats)) || ($cats == '-1') ) {
-				$cats = explode(',', get_usermeta($user_ID, 's2_subscribed'));
-				if ($cats) {
-					foreach ($cats as $cat) {
+				$oldcats = explode(',', get_usermeta($user_ID, 's2_subscribed'));
+				if ($oldcats) {
+					foreach ($oldcats as $cat) {
 						delete_usermeta($user_ID, "s2_cat" . $cat);
 					}
 				}
@@ -2226,7 +2235,7 @@ class s2class {
 	function widget_subscribe2widget($args) {
 		extract($args);
 		$options = get_option('widget_subscribe2widget');
-		$title = empty($options['title']) ? __('Subscribe2') : $options['title'];
+		$title = empty($options['title']) ? __('Subscribe2', 'subscribe2') : $options['title'];
 		echo $before_widget;
 		echo $before_title . $title . $after_title;
 		echo "<div class=\"search\">";
@@ -2262,8 +2271,8 @@ class s2class {
 		if ( !function_exists('register_sidebar_widget') || !class_exists('s2class')) {
 			return;
 		} else {
-			register_sidebar_widget('Subscribe2Widget', array(&$this, 'widget_subscribe2widget'));
-			register_widget_control('Subscribe2Widget', array(&$this, 'widget_subscribe2widget_control'));
+			register_sidebar_widget('Subscribe2 Widget', array(&$this, 'widget_subscribe2widget'));
+			register_widget_control('Subscribe2 Widget', array(&$this, 'widget_subscribe2widget_control'));
 		}
 	}
 
