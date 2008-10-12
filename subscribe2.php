@@ -850,7 +850,7 @@ class s2class {
 		}
 
 		if ($s2_mu) {
-			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities'" . $AND;
+			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND a.meta_key='s2_subscribed'" . $AND;
 		} else {
 			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='s2_subscribed'" . $AND;
 		}
@@ -975,7 +975,12 @@ class s2class {
 		}
 		
 		foreach ($user_IDs as $user_ID) {	
-			$old_cats = explode(',', get_usermeta($user_ID, 's2_subscribed'));
+			$old_cats = get_usermeta($user_ID, 's2_subscribed');
+			if ($old_cats == '-1') {
+				$old_cats = array();
+			} else {
+				$old_cats = explode(',', $old_cats);
+			}
 			if (!is_array($old_cats)) {
 				$old_cats = array($old_cats);
 			}
