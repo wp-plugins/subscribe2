@@ -850,7 +850,7 @@ class s2class {
 		}
 
 		if ($s2_mu) {
-			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND a.meta_key='s2_subscribed'" . $AND;
+			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS e ON a.user_id = e.user_id " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND e.meta_key='s2_subscribed'" . $AND;
 		} else {
 			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='s2_subscribed'" . $AND;
 		}
