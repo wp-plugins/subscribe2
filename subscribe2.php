@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.10
+Version: 4.11
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -31,7 +31,7 @@ along with Subscribe2.  If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.10');
+define('S2VERSION', '4.11');
 define('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // Pre-2.6 compatibility
@@ -677,7 +677,7 @@ class s2class {
 		$this->myname = $admin->display_name;
 		
 		$recipients = explode(",", $emails);
-		if (!is_array($recipients)) { $recipients = array(); }
+		if (!is_array($recipients)) { $recipients = (array)$recipients; }
 		foreach ($recipients as $recipient) {
 			$this->email = $recipient;
 			$this->send_confirm('add', TRUE);
@@ -1430,7 +1430,7 @@ class s2class {
 				if ( ($email_freq != $this->subscribe2_options['email_freq']) || ($_POST['hour'] != gmdate('H', $scheduled_time)) ) {
 					$this->subscribe2_options['email_freq'] = $email_freq;
 					wp_clear_scheduled_hook('s2_digest_cron');
-					$scheds = (array) wp_get_schedules();
+					$scheds = (array)wp_get_schedules();
 					$interval = ( isset($scheds[$email_freq]['interval']) ) ? (int) $scheds[$email_freq]['interval'] : 0;
 					if ($interval == 0) {
 						// if we are on per-post emails remove last_cron entry
@@ -1795,7 +1795,7 @@ class s2class {
 			echo "/> " . __('Plain Text', 'subscribe2') . "<br /><br />\r\n";
 
 			echo __('Email contains', 'subscribe2') . ": &nbsp;&nbsp;";
-			$amount = array ('excerpt' => __('Excerpt Only', 'subscribe2'), 'post' => __('Full Post', 'subscribe2'));
+			$amount = array('excerpt' => __('Excerpt Only', 'subscribe2'), 'post' => __('Full Post', 'subscribe2'));
 			foreach ($amount as $key => $value) {
 				echo "<input type=\"radio\" name=\"s2_excerpt\" value=\"" . $key . "\"";
 				if ($key == get_usermeta($user_ID, 's2_excerpt')) {
@@ -2460,7 +2460,7 @@ class s2class {
 		$this->myemail = $user->user_email;
 		$this->myname = html_entity_decode($user->display_name);
 
-		$scheds = (array) wp_get_schedules();
+		$scheds = (array)wp_get_schedules();
 		$email_freq = $this->subscribe2_options['email_freq'];
 		$display = $scheds[$email_freq]['display'];
 		$subject = '[' . stripslashes(get_option('blogname')) . '] ' . $display . ' ' . __('Digest Email', 'subscribe2');
