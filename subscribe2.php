@@ -91,9 +91,9 @@ class s2class {
 
 		$this->deleted = "<p>" . __('You have successfully unsubscribed.', 'subscribe2') . "</p>";
 
-		$this->confirm_subject = "[" . get_option('blogname') . "] " . __('Please confirm your request', 'subscribe2');
+		$this->confirm_subject = "[" . html_entity_decode(get_option('blogname')) . "] " . __('Please confirm your request', 'subscribe2');
 
-		$this->remind_subject = "[" . get_option('blogname') . "] " . __('Subscription Reminder', 'subscribe2');
+		$this->remind_subject = "[" . html_entity_decode(get_option('blogname')) . "] " . __('Subscription Reminder', 'subscribe2');
 
 		$this->subscribe = __('subscribe', 'subscribe2'); //ACTION replacement in subscribing confirmation email
 
@@ -527,7 +527,7 @@ class s2class {
 		$link .= $id;
 
 		$admin = $this->get_userdata();
-		$this->myname = $admin->display_name;
+		$this->myname = html_entity_decode($admin->display_name);
 
 		if ($is_remind == TRUE) {
 			$body = $this->substitute(stripslashes($this->subscribe2_options['remind_email']));
@@ -2097,7 +2097,7 @@ class s2class {
 			echo "</p>\r\n";
 		} elseif ('yes' == $this->subscribe2_options['autosub']) {
 			echo "<p>\r\n<center>\r\n";
-			echo __('By Registering with this blog you are also agreeing to recieve email notifications for new posts but you can unsubscribe at anytime', 'subscribe2') . "<br />\r\n";
+			echo __('By registering with this blog you are also agreeing to receive email notifications for new posts but you can unsubscribe at anytime', 'subscribe2') . ".<br />\r\n";
 			echo "</center></p>\r\n";
 		}
 	}
@@ -2274,8 +2274,8 @@ class s2class {
 		if ( !function_exists('register_sidebar_widget') || !class_exists('s2class')) {
 			return;
 		} else {
-			register_sidebar_widget('Subscribe2 Widget', array(&$this, 'widget_subscribe2widget'));
-			register_widget_control('Subscribe2 Widget', array(&$this, 'widget_subscribe2widget_control'));
+			register_sidebar_widget('Subscribe2', array(&$this, 'widget_subscribe2widget'));
+			register_widget_control('Subscribe2', array(&$this, 'widget_subscribe2widget_control'));
 		}
 	}
 

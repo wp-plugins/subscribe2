@@ -85,6 +85,13 @@ If, for some reason the Subscribe2 button does not appear in your browser window
 
 == Version History ==
 
+Version 4.11 by Matthew Robinson
+
+* Fixed a bug in the mail() function that meant emails were not sent to recipients if the BCCLimit setting was greater than the total number of recipients for that mail type
+* Ensured that the array of recipients was cast correctly in the reminder function
+* Fixed display of html entities in the reminder emails
+* Several layout and inline comment changes
+
 Version 4.10 by Matthew Robinson
 
 * Fixed Registration form action from WordPress registrations
