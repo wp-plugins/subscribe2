@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.10
+Version: 4.11
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -31,7 +31,7 @@ along with Subscribe2.  If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.10');
+define('S2VERSION', '4.11');
 define('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // Pre-2.6 compatibility
@@ -82,7 +82,7 @@ class s2class {
 
 		$this->mail_failed = "<p>" . __('Message failed! Check your settings and check with your hosting provider', 'subscribe2') . "</p>";
 
-		$this->form = "<form method=\"post\" action=\"\">" . __('Your email:', 'subscribe2') . "&#160;<input type=\"text\" name=\"email\" value=\"\" size=\"20\" />&#160;<br /><input type=\"radio\" name=\"s2_action\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . " <input type=\"radio\" name=\"s2_action\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . " &#160;<input type=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></form>\r\n";
+		$this->form = "<form method=\"post\" action=\"\"><p>" . __('Your email:', 'subscribe2') . "&#160;<input type=\"text\" name=\"email\" value=\"\" size=\"20\" />&#160;<br /><input type=\"radio\" name=\"s2_action\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . " <input type=\"radio\" name=\"s2_action\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . " &#160;<input type=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></p></form>\r\n";
 
 		// confirmation messages
 		$this->no_such_email = "<p>" . __('No such email address is registered.', 'subscribe2') . "</p>";
@@ -91,9 +91,9 @@ class s2class {
 
 		$this->deleted = "<p>" . __('You have successfully unsubscribed.', 'subscribe2') . "</p>";
 
-		$this->confirm_subject = "[" . get_option('blogname') . "] " . __('Please confirm your request', 'subscribe2');
+		$this->confirm_subject = "[" . html_entity_decode(get_option('blogname')) . "] " . __('Please confirm your request', 'subscribe2');
 
-		$this->remind_subject = "[" . get_option('blogname') . "] " . __('Subscription Reminder', 'subscribe2');
+		$this->remind_subject = "[" . html_entity_decode(get_option('blogname')) . "] " . __('Subscription Reminder', 'subscribe2');
 
 		$this->subscribe = __('subscribe', 'subscribe2'); //ACTION replacement in subscribing confirmation email
 
@@ -275,70 +275,68 @@ class s2class {
 		// Replace any escaped html symbols in subject
 		$subject = html_entity_decode($subject);
 
-		// BCC all recipients
+		//  Construct BCC headers for sending or send individual emails
 		$bcc = '';
-		if ($this->subscribe2_options['bcclimit'] > 0) {
-			if ($this->subscribe2_options['bcclimit'] == 1) {
-				foreach ($recipients as $recipient) {
-					$recipient = trim($recipient);
-					// sanity check -- make sure we have a valid email
-					if (!is_email($recipient)) { continue; }
-					$status = @wp_mail($recipient, $subject, $mailtext, $headers);
-				}
-				return;
-			} elseif (count($recipients) > $this->subscribe2_options['bcclimit']) {
-				// we're using BCCLimit, and have more susbcribers than the limit
-				$count = 1;
-				$batch = array();
-				foreach ($recipients as $recipient) {
-					// advance the array pointer by one, for use down below
-					// the array pointer _is not_ advanced by the foreach() loop itself
-					next($recipients);
-					$recipient = trim($recipient);
-					// sanity check -- make sure we have a valid email
-					if (!is_email($recipient)) { continue; }
-					// and NOT the sender's email, since they'll
-					// get a copy anyway
-					if ( (! empty($recipient)) && ($this->myemail != $recipient) ) {
-						('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ", $recipient";
-						// Bcc Headers now constructed by phpmailer class
-					}
-					if ($this->subscribe2_options['bcclimit'] == $count) {
-						$count = 1;
-						$batch[] = $bcc;
-						$bcc = '';
-					} else {
-						if (false == current($recipients)) {
-							// we've reached the end of the subscriber list
-							// add what we have to the batch, and move on
-							$batch[] = $bcc;
-							break;
-						} else {
-							$count++;
-						}
-					}
-				}
-			}
-			// rewind the array, just to be safe
-			reset($recipients);
-		} else {
-			// we're not using BCCLimit, or have fewer
-			// subscribers than the limit, so do it normal
+		if ($this->subscribe2_options['bcclimit'] == 1) {
+			// BCCLimit is 1 so send individual emails
 			foreach ($recipients as $recipient) {
 				$recipient = trim($recipient);
 				// sanity check -- make sure we have a valid email
 				if (!is_email($recipient)) { continue; }
-				// and NOT the sender's email, since they'll
-				// get a copy anyway
-				 if ( (!empty($recipient)) && ($this->myemail != $recipient) ) {
+				$status = @wp_mail($recipient, $subject, $mailtext, $headers);
+			}
+			// Sending completed so return $status
+			return $status;
+		} elseif ($this->subscribe2_options['bcclimit'] == 0) {
+			// we're not using BCCLimit
+			foreach ($recipients as $recipient) {
+				$recipient = trim($recipient);
+				// sanity check -- make sure we have a valid email
+				if (!is_email($recipient)) { continue; }
+				// and NOT the sender's email, since they'll get a copy anyway
+				if ( (!empty($recipient)) && ($this->myemail != $recipient) ) {
 					('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ", $recipient";
 					// Bcc Headers now constructed by phpmailer class
 				}
 			}
 			$headers .= "$bcc\r\n";
+		} else {
+			// we're using BCCLimit
+			$count = 1;
+			$batch = array();
+			foreach ($recipients as $recipient) {
+				// advance the array pointer by one, for use down below
+				// the array pointer _is not_ advanced by the foreach() loop itself
+				next($recipients);
+				$recipient = trim($recipient);
+				// sanity check -- make sure we have a valid email
+				if (!is_email($recipient)) { continue; }
+				// and NOT the sender's email, since they'll get a copy anyway
+				if ( (! empty($recipient)) && ($this->myemail != $recipient) ) {
+					('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ", $recipient";
+					// Bcc Headers now constructed by phpmailer class
+				}
+				if ($this->subscribe2_options['bcclimit'] == $count) {
+					$count = 1;
+					$batch[] = $bcc;
+					$bcc = '';
+				} else {
+					if (false == current($recipients)) {
+						// we've reached the end of the subscriber list
+						// add what we have to the batch, and move on
+						$batch[] = $bcc;
+						break;
+					} else {
+						$count++;
+					}
+				}
+			}
 		}
+		// rewind the array, just to be safe
+		reset($recipients);
+
 		// actually send mail
-		if ( ($this->subscribe2_options['bcclimit'] > 0) && (isset($batch)) ) {
+		if (isset($batch)) {
 			foreach ($batch as $bcc) {
 					$newheaders = $headers . "$bcc\r\n";
 					$status = @wp_mail($this->myemail, $subject, $mailtext, $newheaders);
@@ -529,7 +527,7 @@ class s2class {
 		$link .= $id;
 
 		$admin = $this->get_userdata();
-		$this->myname = $admin->display_name;
+		$this->myname = html_entity_decode($admin->display_name);
 
 		if ($is_remind == TRUE) {
 			$body = $this->substitute(stripslashes($this->subscribe2_options['remind_email']));
@@ -677,7 +675,7 @@ class s2class {
 		$this->myname = $admin->display_name;
 		
 		$recipients = explode(",", $emails);
-		if (!is_array($recipients)) { $recipients = array(); }
+		if (!is_array($recipients)) { $recipients = (array)$recipients; }
 		foreach ($recipients as $recipient) {
 			$this->email = $recipient;
 			$this->send_confirm('add', TRUE);
@@ -850,7 +848,7 @@ class s2class {
 		}
 
 		if ($s2_mu) {
-			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities'" . $AND;
+			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS e ON a.user_id = e.user_id " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND e.meta_key='s2_subscribed'" . $AND;
 		} else {
 			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='s2_subscribed'" . $AND;
 		}
@@ -942,8 +940,8 @@ class s2class {
 			$check = get_usermeta($user_id, 's2_subscribed');
 			// if the are no existing subscriptions, create them based on admin options
 			if (empty($check)) {
+				// add entries by default if autosub is on
 				if ( ('yes' == $this->subscribe2_options['autosub']) || (('wpreg' == $this->subscribe2_options['autosub']) && (1 == $wpreg)) ) {
-					// don't add entries by default if autosub is off, messes up daily digests
 					update_usermeta($user_id, 's2_subscribed', $cats);
 						foreach(explode(',', $cats) as $cat) {
 							update_usermeta($user_id, 's2_cat' . $cat, "$cat");
@@ -975,7 +973,12 @@ class s2class {
 		}
 		
 		foreach ($user_IDs as $user_ID) {	
-			$old_cats = explode(',', get_usermeta($user_ID, 's2_subscribed'));
+			$old_cats = get_usermeta($user_ID, 's2_subscribed');
+			if ($old_cats == '-1') {
+				$old_cats = array();
+			} else {
+				$old_cats = explode(',', $old_cats);
+			}
 			if (!is_array($old_cats)) {
 				$old_cats = array($old_cats);
 			}
@@ -1425,7 +1428,7 @@ class s2class {
 				if ( ($email_freq != $this->subscribe2_options['email_freq']) || ($_POST['hour'] != gmdate('H', $scheduled_time)) ) {
 					$this->subscribe2_options['email_freq'] = $email_freq;
 					wp_clear_scheduled_hook('s2_digest_cron');
-					$scheds = (array) wp_get_schedules();
+					$scheds = (array)wp_get_schedules();
 					$interval = ( isset($scheds[$email_freq]['interval']) ) ? (int) $scheds[$email_freq]['interval'] : 0;
 					if ($interval == 0) {
 						// if we are on per-post emails remove last_cron entry
@@ -1714,16 +1717,25 @@ class s2class {
 
 			if ($s2_mu) {
 				$posted_cats = $_POST['category'];
-				$other_blogs = array_diff(explode(',', get_usermeta($user_ID, 's2_subscribed')), get_all_category_ids());
-				$cats = array_merge($posted_cats, $other_blogs);
+				$other_blogs = get_usermeta($user_ID, 's2_subscribed');
+				if ($other_blogs == '-1') {
+					$other_blogs = array();
+				} else {
+					$other_blogs = array_diff(explode(',', $other_blogs), get_all_category_ids());
+				}
+				if (empty($posted_cats)) {
+					$cats = $other_blogs;
+				} else {
+					$cats = array_merge($posted_cats, $other_blogs);
+				}
 			} else {
 				$cats = $_POST['category'];
 			}
 
 			if ( (empty($cats)) || ($cats == '-1') ) {
-				$cats = explode(',', get_usermeta($user_ID, 's2_subscribed'));
-				if ($cats) {
-					foreach ($cats as $cat) {
+				$oldcats = explode(',', get_usermeta($user_ID, 's2_subscribed'));
+				if ($oldcats) {
+					foreach ($oldcats as $cat) {
 						delete_usermeta($user_ID, "s2_cat" . $cat);
 					}
 				}
@@ -1781,7 +1793,7 @@ class s2class {
 			echo "/> " . __('Plain Text', 'subscribe2') . "<br /><br />\r\n";
 
 			echo __('Email contains', 'subscribe2') . ": &nbsp;&nbsp;";
-			$amount = array ('excerpt' => __('Excerpt Only', 'subscribe2'), 'post' => __('Full Post', 'subscribe2'));
+			$amount = array('excerpt' => __('Excerpt Only', 'subscribe2'), 'post' => __('Full Post', 'subscribe2'));
 			foreach ($amount as $key => $value) {
 				echo "<input type=\"radio\" name=\"s2_excerpt\" value=\"" . $key . "\"";
 				if ($key == get_usermeta($user_ID, 's2_excerpt')) {
@@ -2058,7 +2070,6 @@ class s2class {
 		echo "</select>\r\n";
 		echo "<strong><em style=\"color: red\">" . __('This option will work for digest notification sent daily or less frequently', 'subscribe2') . "</em></strong>\r\n";
 		if ($scheduled_time) {
-			echo "<p><input type=\"checkbox\" name=\"reset_cron\" /> " . __('Reset the schedule time and date for periodic email notifications', 'subscribe2') . "</p>\r\n";
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 			echo "<p>" . __('Current UTC time is', 'subscribe2') . ": \r\n";
 			echo "<strong>" . gmdate($datetime, current_time('timestamp', 1)) . "</strong></p>\r\n";
@@ -2086,7 +2097,7 @@ class s2class {
 			echo "</p>\r\n";
 		} elseif ('yes' == $this->subscribe2_options['autosub']) {
 			echo "<p>\r\n<center>\r\n";
-			echo __('By Registering with this blog you are also agreeing to recieve email notifications for new posts', 'subscribe2') . "<br />\r\n";
+			echo __('By registering with this blog you are also agreeing to receive email notifications for new posts but you can unsubscribe at anytime', 'subscribe2') . ".<br />\r\n";
 			echo "</center></p>\r\n";
 		}
 	}
@@ -2103,9 +2114,10 @@ class s2class {
 	/**
 	Action to process Subscribe2 registration from WordPress registration
 	*/
-	function register_action($user_id = 0) {
-		if (0 == $user_id) { return $user_id; }
-		$this->register($user_id, 1);
+	function register_action() {
+		$user_id = get_userdatabylogin($_POST['user_login']);
+		if (0 == $user_id->ID) { return; }
+		$this->register($user_id->ID, 1);
 	}
 
 /* ===== template and filter functions ===== */
@@ -2226,7 +2238,7 @@ class s2class {
 	function widget_subscribe2widget($args) {
 		extract($args);
 		$options = get_option('widget_subscribe2widget');
-		$title = empty($options['title']) ? __('Subscribe2') : $options['title'];
+		$title = empty($options['title']) ? __('Subscribe2', 'subscribe2') : $options['title'];
 		echo $before_widget;
 		echo $before_title . $title . $after_title;
 		echo "<div class=\"search\">";
@@ -2262,8 +2274,8 @@ class s2class {
 		if ( !function_exists('register_sidebar_widget') || !class_exists('s2class')) {
 			return;
 		} else {
-			register_sidebar_widget('Subscribe2Widget', array(&$this, 'widget_subscribe2widget'));
-			register_widget_control('Subscribe2Widget', array(&$this, 'widget_subscribe2widget_control'));
+			register_sidebar_widget('Subscribe2', array(&$this, 'widget_subscribe2widget'));
+			register_widget_control('Subscribe2', array(&$this, 'widget_subscribe2widget_control'));
 		}
 	}
 
@@ -2369,12 +2381,13 @@ class s2class {
 		}
 
 		// collect posts
-		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date");
+		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date");
 
 		// do we have any posts?
 		if (empty($posts)) { return; }
 
 		// if we have posts, let's prepare the digest
+		$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 		$all_post_cats = array();
 		foreach ($posts as $post) {
 			$post_cats = wp_get_post_categories($post->ID);
@@ -2406,6 +2419,7 @@ class s2class {
 			}
 			$table .= $post->post_title . "\r\n";
 			$message .= $post->post_title . "\r\n";
+			$message .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
 			$message .= get_permalink($post->ID) . "\r\n";
 			$excerpt = $post->post_excerpt;
 			if ('' == $excerpt) {
@@ -2444,7 +2458,7 @@ class s2class {
 		$this->myemail = $user->user_email;
 		$this->myname = html_entity_decode($user->display_name);
 
-		$scheds = (array) wp_get_schedules();
+		$scheds = (array)wp_get_schedules();
 		$email_freq = $this->subscribe2_options['email_freq'];
 		$display = $scheds[$email_freq]['display'];
 		$subject = '[' . stripslashes(get_option('blogname')) . '] ' . $display . ' ' . __('Digest Email', 'subscribe2');
@@ -2512,7 +2526,6 @@ class s2class {
 		add_action('admin_menu', array(&$this, 'admin_menu'));
 		add_filter('ozh_adminmenu_icon', array(&$this, 'ozh_s2_icon'));
 		add_action('create_category', array(&$this, 'autosub_new_category'));
-		add_action('register_form', array(&$this, 'register_form'));
 		add_filter('the_content', array(&$this, 'filter'), 10);
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
 
@@ -2522,8 +2535,11 @@ class s2class {
 			add_action('edit_form_advanced', array(&$this, 's2_edit_form'));
 		}
 
-		// add action for automatic subscription based on option settings
-		add_action('user_register', array(&$this, 'register'));
+		// add actions for automatic subscription based on option settings
+		add_action('register_form', array(&$this, 'register_form'));
+		if ('yes' == $this->subscribe2_options['autosub']) {
+			add_action('user_register', array(&$this, 'register'));
+		}
 		if ('wpreg' == $this->subscribe2_options['autosub']) {
 			add_action('register_post', array(&$this, 'register_post'));
 		}
