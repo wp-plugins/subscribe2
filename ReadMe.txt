@@ -4,7 +4,7 @@ Donate link: http://subscribe2.wordpress.com/donate/
 Tags: posts, subscription, email
 Requires at least: 2.0.x
 Tested up to: 2.5
-Stable tag: 4.10
+Stable tag: 4.11
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -87,9 +87,12 @@ If, for some reason the Subscribe2 button does not appear in your browser window
 
 Version 4.11 by Matthew Robinson
 
+* Works in WordPress 2.7-almost-beta!
 * Fixed a bug in the mail() function that meant emails were not sent to recipients if the BCCLimit setting was greater than the total number of recipients for that mail type
 * Ensured that the array of recipients was cast correctly in the reminder function
 * Fixed display of html entities in the reminder emails
+* Fixed a bug in the SQL statements for WordPress MU installations
+* Corrected a typo in the message displayed on the WordPress registration page if subscriptions are automatic
 * Several layout and inline comment changes
 
 Version 4.10 by Matthew Robinson
