@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2 Uninstaller
 Plugin URI: http://subscribe2.wordpress.com
 Description: Uninstalls the Subscribe2 plugin from Manage->S2 Uninstaller.
-Version: 4.10
+Version: 4.11
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
