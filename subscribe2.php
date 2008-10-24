@@ -1459,6 +1459,7 @@ class s2class {
 				$this->subscribe2_options['autosub'] = $_POST['autosub'];
 				$this->subscribe2_options['wpregdef'] = $_POST['wpregdef'];
 				$this->subscribe2_options['autoformat'] = $_POST['autoformat'];
+				$this->subscribe2_options['show_autosub'] = $_POST['show_autosub'];
 				$this->subscribe2_options['autosub_def'] = $_POST['autosub_def'];
 				
 				//barred domains
@@ -1649,6 +1650,17 @@ class s2class {
 			echo "checked=\"checked\" ";
 		}
 		echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . " <br /><br />";
+		echo __('Show Auto Subscribe option on Users page', 'subscribe2') . ": <br />\r\n";
+		echo "<input type=\"radio\" name=\"show_autosub\" value=\"yes\"";
+		if ('yes' == $this->subscribe2_options['show_autosub']) {
+			echo " checked=\"checked\"";
+		}
+		echo " />" . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"show_autosub\" value=\"no\"";
+		if ('no' == $this->subscribe2_options['show_autosub']) {
+			echo " checked=\"checked\"";
+		}
+		echo " />" . __('No', 'subscribe2') . "<br /><br />";
 		echo __('Auto Subscribe me to new categories is checked by default', 'subscribe2') . ": <br />\r\n";
 		echo "<input type=\"radio\" name=\"autosub_def\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['autosub_def']) {
@@ -1802,18 +1814,20 @@ class s2class {
 				echo " /> " . $value . "&nbsp;&nbsp;";
 			}
 			echo "<br /><span style=\"color: red;line-height: 300%;\">" . __('Note: HTML format will always deliver the full post', 'subscribe2') . ".</span><br />\r\n";
-			echo __('Automatically subscribe me to newly created categories', 'subscribe2') . ': &nbsp;&nbsp;';
-			echo "<input type=\"radio\" name=\"new_category\" value=\"yes\" ";
-			if ('yes' == get_usermeta($user_ID, 's2_autosub')) {
-				echo "checked=\"checked\" ";
+			if ($this->subscribe2_options['show_autosub'] == 'yes') {
+				echo __('Automatically subscribe me to newly created categories', 'subscribe2') . ': &nbsp;&nbsp;';
+				echo "<input type=\"radio\" name=\"new_category\" value=\"yes\" ";
+				if ('yes' == get_usermeta($user_ID, 's2_autosub')) {
+					echo "checked=\"checked\" ";
+				}
+				echo "/> " . __('Yes', 'subscribe2') . "&nbsp;&nbsp;";
+				echo "<input type=\"radio\" name=\"new_category\" value=\"no\" ";
+				if ('no' == get_usermeta($user_ID, 's2_autosub')) {
+					echo "checked=\"checked\" ";
+				}
+				echo "/> " . __('No', 'subscribe2') . "<br /><br />";
+				echo "</p>";
 			}
-			echo "/> " . __('Yes', 'subscribe2') . "&nbsp;&nbsp;";
-			echo "<input type=\"radio\" name=\"new_category\" value=\"no\" ";
-			if ('no' == get_usermeta($user_ID, 's2_autosub')) {
-				echo "checked=\"checked\" ";
-			}
-			echo "/> " . __('No', 'subscribe2') . "<br /><br />";
-			echo "</p>";
 
 			// subscribed categories
 			echo "<h2>" . __('Subscribed Categories', 'subscribe2') . "</h2>\r\n";

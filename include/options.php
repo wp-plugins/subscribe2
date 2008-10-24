@@ -14,6 +14,10 @@ if (!isset($this->subscribe2_options['autoformat'])) {
 	$this->subscribe2_options['autoformat'] = "text";
 } // option for default auto-subscription email format
 
+if (!isset($this->subscribe2_options['show_autosub'])) {
+	$this->subscribe2_options['show_autosub'] = "yes";
+} // option to display auto-subscription option to registered users
+
 if (!isset($this->subscribe2_options['autosub_def'])) {
 	$this->subscribe2_options['autosub_def'] = "yes";
 } // option for user default auto-subscription to new categories
@@ -25,6 +29,10 @@ if(!isset($this->subscribe2_options['bcclimit'])) {
 if(!isset($this->subscribe2_options['s2page'])) {
 	$this->subscribe2_options['s2page'] = 0;
 } // option for default WordPress page for Subscribe2 to use
+
+if (!isset($this->subscribe2_options['pages'])) {
+	$this->subscribe2_options['bcclimit'] = "0";
+} // option for restricting the number of recipients per email notification
 
 if (!isset($this->subscribe2_options['pages'])) {
 	$this->subscribe2_options['pages'] = "no";
