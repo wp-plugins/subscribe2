@@ -1560,6 +1560,7 @@ class s2class {
 		echo "<dt><b>BLOGLINK</b></dt><dd>" . get_bloginfo('url') . "</dd>\r\n";
 		echo "<dt><b>TITLE</b></dt><dd>" . __("the post's title<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>POST</b></dt><dd>" . __("the excerpt or the entire post<br />(<i>based on the subscriber's preferences</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>POSTTIME</b></dt><dd>" . __("the excerpt of the post and the time it was posted<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>TABLE</b></dt><dd>" . __("a list of post titles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>PERMALINK</b></dt><dd>" . __("the post's permalink<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>MYNAME</b></dt><dd>" . __("the admin or post author's name", 'subscribe2') . "</dd>\r\n";
@@ -1883,7 +1884,7 @@ class s2class {
 				$recipients = $this->get_registered();
 			}
 			$subject = stripslashes(strip_tags($_POST['subject']));
-			$body = stripslashes($_POST['message']);
+			$body = stripslashes($_POST['content']);
 			$status = $this->mail($recipients, $subject, $body, 'text');
 			if ($status) {
 				$message = $this->mail_sent;
@@ -1904,7 +1905,7 @@ class s2class {
 			wp_nonce_field('subscribe2-write_subscribers' . $s2nonce);
 		}
 		echo __('Subject', 'subscribe2') . ": <input type=\"text\" size=\"69\" name=\"subject\" value=\"" . __('A message from ', 'subscribe2') . get_option('blogname') . "\" /> <br /><br />";
-		echo "<textarea rows=\"12\" cols=\"75\" name=\"message\"></textarea>";
+		echo "<textarea rows=\"12\" cols=\"75\" name=\"content\"></textarea>";
 		echo "<br /><br />\r\n";
 		echo __('Recipients: ', 'subscribe2');
 		$this->display_subscriber_dropdown('registered', false, array('all'));
@@ -2432,9 +2433,11 @@ class s2class {
 				continue;
 			}
 			$table .= $post->post_title . "\r\n";
-			$message .= $post->post_title . "\r\n";
-			$message .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
-			$message .= get_permalink($post->ID) . "\r\n";
+			$message_posttime .= $post->post_title . "\r\n";
+			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
+			$message_posttime .= get_permalink($post->ID) . "\r\n";
+			$message_post .= $post->post_title . "\r\n";
+			$message_post .= get_permalink($post->ID) . "\r\n";
 			$excerpt = $post->post_excerpt;
 			if ('' == $excerpt) {
 				 // no excerpt, is there a <!--more--> ?
@@ -2459,11 +2462,12 @@ class s2class {
 					}
 				}
 			}
-			$message .= $excerpt . "\r\n\r\n";
+			$message_post .= $excerpt . "\r\n\r\n";
+			$message_posttime .= $excerpt . "\r\n\r\n";
 		}
 
 		//sanity check - don't send a mail if the content is empty
-		if (!$message && !$table) {
+		if (!$message_post && !$message_posttime && !$table) {
 			return;
 		}
 
@@ -2482,7 +2486,8 @@ class s2class {
 		$recipients = array_merge((array)$public, (array)$registered);
 		$mailtext = $this->substitute(stripslashes($this->subscribe2_options['mailtext']));
 		$mailtext = str_replace("TABLE", $table, $mailtext);
-		$mailtext = str_replace("POST", $message, $mailtext);
+		$mailtext = str_replace("POST", $message_post, $mailtext);
+		$mailtext = str_replace("POSTTIME", $message_posttime, $mailtext);
 		$this->mail($recipients, $subject, $mailtext);
 	} // end subscribe2_cron
 
