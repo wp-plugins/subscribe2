@@ -1904,8 +1904,13 @@ class s2class {
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-write_subscribers' . $s2nonce);
 		}
-		echo __('Subject', 'subscribe2') . ": <input type=\"text\" size=\"69\" name=\"subject\" value=\"" . __('A message from ', 'subscribe2') . get_option('blogname') . "\" /> <br /><br />";
-		echo "<textarea rows=\"12\" cols=\"75\" name=\"content\"></textarea>";
+		if (isset($_POST['subject'])) {
+			$subject = $_POST['subject'];
+		} else {
+			$subject = __('A message from ', 'subscribe2') . get_option('blogname');
+		}
+		echo __('Subject', 'subscribe2') . ": <input type=\"text\" size=\"69\" name=\"subject\" value=\"" . $subject . "\" /> <br /><br />";
+		echo "<textarea rows=\"12\" cols=\"75\" name=\"content\">" . $body . "</textarea>";
 		echo "<br /><br />\r\n";
 		echo __('Recipients: ', 'subscribe2');
 		$this->display_subscriber_dropdown('registered', false, array('all'));
