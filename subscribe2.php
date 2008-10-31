@@ -117,7 +117,7 @@ class s2class {
 		add_action("admin_print_scripts-$s2options", array(&$this, 'option_form_js'));
 		add_filter('plugin_action_links', array(&$this, 'plugin_action'), -10, 2);
 
-		$s2user = add_users_page(__('Your Subscriptions', 'subscribe2'), __('Your Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
+		$s2user = add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
 		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
 
 		add_submenu_page('post-new.php', __('Mail Subscribers', 'subscribe2'), __('Mail Subscribers', 'subscribe2'), "publish_posts", __FILE__, array(&$this, 'write_menu'));
@@ -1236,7 +1236,7 @@ class s2class {
 			$strip = '';
 			if ( $page > 1 ) {
 				$args['s2page'] = $page - 1;
-				$strip .=  '<a class="prev" href="' . clean_url(add_query_arg( $args )) . '">&laquo; '. __('Previous Page', 'subscribe2') .'</a>' . "\n";
+				$strip .=  '<a class="prev" href="' . clean_url(add_query_arg($args)) . '">&laquo; '. __('Previous Page', 'subscribe2') .'</a>' . "\n";
 			}
 			if ( $total_pages > 1 ) {
 				for ( $page_num = 1; $page_num <= $total_pages; $page_num++ ) {
@@ -1323,6 +1323,9 @@ class s2class {
 					echo " align=\"left\" colspan=\"4\">";
 				}
 				echo "<a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
+				if (in_array($subscriber, $registered)) {
+					echo "(<a href=\"" . get_option('home') . "/wp-admin/users.php?page=subscribe2/subscribe2.php&email=$subscriber\">" . __('edit', 'subscribe2') . "</a>)\r\n";
+				}
 				if (in_array($subscriber, $unconfirmed) || in_array($subscriber, $confirmed) ) {
 					echo "(" . $this->signup_date($subscriber) . ")</td>\r\n";
 					echo "<td align=\"center\">\r\n";
@@ -1704,7 +1707,12 @@ class s2class {
 	function user_menu() {
 		global $user_ID, $s2nonce, $wp_version, $wpmu_version;
 
-		get_currentuserinfo();
+		if (isset($_GET['email'])) {
+			global $wpdb;
+			$user_ID = $wpdb->get_var("SELECT ID FROM $wpdb->users WHERE user_email = '" . $_GET['email'] . "'");
+		} else {
+			get_currentuserinfo();
+		}
 
 		// was anything POSTed?
 		if ( (isset($_POST['s2_admin'])) && ('user' == $_POST['s2_admin']) ) {
@@ -1786,6 +1794,10 @@ class s2class {
 		// show our form
 		echo "<div class=\"wrap\">";
 		echo "<h2>" . __('Notification Settings', 'subscribe2') . "</h2>\r\n";
+		if (isset($_GET['email'])) {
+			$user = get_userdata($user_ID);
+			echo "<span style=\"color: red;line-height: 300%;\">" . __('Editing Subscribe2 preferences for user', 'subscribe2') . ": " . $user->display_name . "</span>";
+		}
 		echo "<form method=\"post\" action=\"\">";
 		echo "<p>";
 		if (function_exists('wp_nonce_field')) {
