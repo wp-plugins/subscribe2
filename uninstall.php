@@ -4,7 +4,7 @@ if(!defined( 'ABSPATH') && !defined('WP_UNINSTALL_PLUGIN')) {
 } else {
 	global $wpdb, $table_prefix;
 	// get name of subscribe2 table
-	$this->public = $table_prefix . "subscribe2";
+	$public = $table_prefix . "subscribe2";
 	// delete entry from wp_options table
 	delete_option('subscribe2_options');
 	// delete legacy entry from wp-options table
@@ -25,7 +25,7 @@ if(!defined( 'ABSPATH') && !defined('WP_UNINSTALL_PLUGIN')) {
 		}
 	}
 	// drop the subscribe2 table
-	$sql = "DROP TABLE IF EXISTS `" . $this->public . "`";
+	$sql = "DROP TABLE IF EXISTS `" . $public . "`";
 	mysql_query($sql);
 }
 ?>
