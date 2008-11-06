@@ -2503,8 +2503,8 @@ class s2class {
 		$recipients = array_merge((array)$public, (array)$registered);
 		$mailtext = $this->substitute(stripslashes($this->subscribe2_options['mailtext']));
 		$mailtext = str_replace("TABLE", $table, $mailtext);
-		$mailtext = str_replace("POST", $message_post, $mailtext);
 		$mailtext = str_replace("POSTTIME", $message_posttime, $mailtext);
+		$mailtext = str_replace("POST", $message_post, $mailtext);
 		$this->mail($recipients, $subject, $mailtext);
 	} // end subscribe2_cron
 
