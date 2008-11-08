@@ -246,7 +246,9 @@ class s2class {
 	*/
 	function mail ($recipients = array(), $subject = '', $message = '', $type='text') {
 		if ( (empty($recipients)) || ('' == $message) ) { return; }
-		
+
+		natcasesort($recipients);
+
 		// Set sender details
 		if ('' == $this->myname) {
 			$admin = $this->get_userdata();
@@ -2311,6 +2313,18 @@ class s2class {
 		}
 	}
 
+	/**
+	Add hook for Minimeta Widget plugin
+	*/
+	function add_minimeta() {
+		if ($this->subscribe2_options['s2page'] != 0) {
+			echo "<li><a href=\"" . get_option('siteurl') . "/?p=" . $this->subscribe2_options['s2page'] . "\">" . __('[Un]Subscribe to Posts', 'subscribe2') . "</a></li>\r\n";
+		}
+	}
+
+	/**
+	Adds a link directly to the settings page from the plugin page
+	*/
 	function plugin_action($links, $file) {
 		if ($file == plugin_basename(dirname(__FILE__).'/subscribe2.php'))
 			$links[] = "<a href='options-general.php?page=subscribe2/subscribe2.php'><b>" . __('Settings', 'subscribe2') . "</b></a>";
@@ -2560,10 +2574,13 @@ class s2class {
 		
 		//add regular actions and filters
 		add_action('admin_menu', array(&$this, 'admin_menu'));
-		add_filter('ozh_adminmenu_icon', array(&$this, 'ozh_s2_icon'));
 		add_action('create_category', array(&$this, 'autosub_new_category'));
 		add_filter('the_content', array(&$this, 'filter'), 10);
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
+
+		// add actions for other plugins
+		add_action('wp_meta', array(&$this, 'add_minimeta', 0);
+		add_filter('ozh_adminmenu_icon', array(&$this, 'ozh_s2_icon'));
 
 		// add action to display editor buttons if option is enabled
 		if ('1' == $this->subscribe2_options['show_button']) {
