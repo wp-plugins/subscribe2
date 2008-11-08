@@ -247,8 +247,6 @@ class s2class {
 	function mail ($recipients = array(), $subject = '', $message = '', $type='text') {
 		if ( (empty($recipients)) || ('' == $message) ) { return; }
 
-		natcasesort($recipients);
-
 		// Set sender details
 		if ('' == $this->myname) {
 			$admin = $this->get_userdata();
@@ -279,6 +277,7 @@ class s2class {
 
 		//  Construct BCC headers for sending or send individual emails
 		$bcc = '';
+		natcasesort($recipients);
 		if ($this->subscribe2_options['bcclimit'] == 1) {
 			// BCCLimit is 1 so send individual emails
 			foreach ($recipients as $recipient) {
@@ -2579,7 +2578,7 @@ class s2class {
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
 
 		// add actions for other plugins
-		add_action('wp_meta', array(&$this, 'add_minimeta', 0);
+		add_action('wp_meta', array(&$this, 'add_minimeta', 0));
 		add_filter('ozh_adminmenu_icon', array(&$this, 'ozh_s2_icon'));
 
 		// add action to display editor buttons if option is enabled
