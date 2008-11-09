@@ -2325,8 +2325,10 @@ class s2class {
 	Adds a link directly to the settings page from the plugin page
 	*/
 	function plugin_action($links, $file) {
-		if ($file == plugin_basename(dirname(__FILE__).'/subscribe2.php'))
-			$links[] = "<a href='options-general.php?page=subscribe2/subscribe2.php'><b>" . __('Settings', 'subscribe2') . "</b></a>";
+		if ($file == plugin_basename(dirname(__FILE__).'/subscribe2.php')) {
+			$s2link[] = "<a href='options-general.php?page=subscribe2/subscribe2.php'><b>" . __('Settings', 'subscribe2') . "</b></a>";
+			$links = array_merge($s2link, $links);
+		}
 		return $links;
 	}
 
