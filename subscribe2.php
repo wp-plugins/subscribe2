@@ -2317,7 +2317,7 @@ class s2class {
 	*/
 	function add_minimeta() {
 		if ($this->subscribe2_options['s2page'] != 0) {
-			echo "<li><a href=\"" . get_option('siteurl') . "/?p=" . $this->subscribe2_options['s2page'] . "\">" . __('[Un]Subscribe to Posts', 'subscribe2') . "</a></li>\r\n";
+			echo "<li><a href=\"" . get_option('siteurl') . "/?page_id=" . $this->subscribe2_options['s2page'] . "\">" . __('[Un]Subscribe to Posts', 'subscribe2') . "</a></li>\r\n";
 		}
 	}
 
@@ -2578,7 +2578,7 @@ class s2class {
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
 
 		// add actions for other plugins
-		add_action('wp_meta', array(&$this, 'add_minimeta', 0));
+		add_action('wp_meta', array(&$this, 'add_minimeta'), 0);
 		add_filter('ozh_adminmenu_icon', array(&$this, 'ozh_s2_icon'));
 
 		// add action to display editor buttons if option is enabled
