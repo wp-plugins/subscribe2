@@ -1266,7 +1266,7 @@ class s2class {
 		// show our form
 		echo "<form method=\"post\" action=\"\">\r\n";
 		echo "<div class=\"wrap\">";
-		echo "<h2>" . __('Manage Subscribe', 'subscribe2') . "</h2>\r\n";
+		echo "<h2>" . __('Manage Subscribers', 'subscribe2') . "</h2>\r\n";
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
 		}
@@ -1277,7 +1277,7 @@ class s2class {
 		echo "&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\"></p>\r\n";
 
 		// subscriber lists
-		echo "<h2>" . __('Subscribers', 'subscribe2') . "</h2>\r\n";
+		echo "<h2>" . __('Current Subscribers', 'subscribe2') . "</h2>\r\n";
 		echo "<br />";
 		$this->display_subscriber_dropdown($what, __('Filter', 'subscribe2'));
 		// show the selected subscribers
