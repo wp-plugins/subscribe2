@@ -1096,8 +1096,10 @@ class s2class {
 			check_admin_referer('subscribe2-manage_subscribers' . $s2nonce);
 			if ($_POST['addresses']) {
 				foreach (preg_split ("/[\s,]+/", $_POST['addresses']) as $email) {
-						if (is_email($email)) {
+					if ( (is_email($email)) && ($_POST['subscribe']) ) {
 						$this->activate($email);
+					} elseif ( (is_email($email)) && ($_POST['unsubscribe']) ) {
+						$this->delete($email);
 					}
 				}
 				$_POST['what'] = 'confirmed';
@@ -1264,14 +1266,15 @@ class s2class {
 		// show our form
 		echo "<form method=\"post\" action=\"\">\r\n";
 		echo "<div class=\"wrap\">";
-		echo "<h2>" . __('Subscribe Addresses', 'subscribe2') . "</h2>\r\n";
+		echo "<h2>" . __('Manage Subscribe', 'subscribe2') . "</h2>\r\n";
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
 		}
 		echo "<p>" . __('Enter addresses, one per line or comma-separated', 'subscribe2') . "<br />\r\n";
 		echo "<textarea rows=\"2\" cols=\"80\" name=\"addresses\"></textarea></p>\r\n";
 		echo "<input type=\"hidden\" name=\"s2_admin\" />\r\n";
-		echo "<p class=\"submit\"><input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\"/></p>\r\n";
+		echo "<p class=\"submit\" style=\"border-top: none;\"><input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\"/>";
+		echo "&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\"></p>\r\n";
 
 		// subscriber lists
 		echo "<h2>" . __('Subscribers', 'subscribe2') . "</h2>\r\n";
