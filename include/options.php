@@ -58,10 +58,13 @@ if (!isset($this->subscribe2_options['sender'])) {
 	$this->subscribe2_options['sender'] = "author";
 } // option for email notification sender
 
-// reg_override : allow registered users to subscribed to excluded cats
 if (!isset($this->subscribe2_options['reg_override'])) {
 	$this->subscribe2_options['reg_override'] = "1";
 } // option for excluded categories to be overriden for registered users
+
+if(!isset($this->subscribe2_options['show_meta'])) {
+	$this->subscribe2_options['show_meta'] = "0";
+} // option to display link to subscribe2 page from 'meta'
 
 if (!isset($this->subscribe2_options['show_button'])) {
 	$this->subscribe2_options['show_button'] = "1";

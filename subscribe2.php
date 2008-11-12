@@ -1273,8 +1273,8 @@ class s2class {
 		echo "<p>" . __('Enter addresses, one per line or comma-separated', 'subscribe2') . "<br />\r\n";
 		echo "<textarea rows=\"2\" cols=\"80\" name=\"addresses\"></textarea></p>\r\n";
 		echo "<input type=\"hidden\" name=\"s2_admin\" />\r\n";
-		echo "<p class=\"submit\" style=\"border-top: none;\"><input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\"/>";
-		echo "&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\"></p>\r\n";
+		echo "<p class=\"submit\" style=\"border-top: none;\"><input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" />";
+		echo "&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" /></p>\r\n";
 
 		// subscriber lists
 		echo "<h2>" . __('Current Subscribers', 'subscribe2') . "</h2>\r\n";
@@ -1328,7 +1328,7 @@ class s2class {
 				}
 				echo "<a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
 				if (in_array($subscriber, $registered)) {
-					echo "(<a href=\"" . get_option('home') . "/wp-admin/users.php?page=subscribe2/subscribe2.php&email=$subscriber\">" . __('edit', 'subscribe2') . "</a>)\r\n";
+					echo "(<a href=\"" . get_option('home') . "/wp-admin/users.php?page=subscribe2/subscribe2.php&amp;email=$subscriber\">" . __('edit', 'subscribe2') . "</a>)\r\n";
 				}
 				if (in_array($subscriber, $unconfirmed) || in_array($subscriber, $confirmed) ) {
 					echo "(" . $this->signup_date($subscriber) . ")</td>\r\n";
@@ -1394,28 +1394,9 @@ class s2class {
 				$this->reset();
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_reset</strong></p></div>";
 			} elseif ($_POST['submit']) {
-				// excluded categories
-				if (!empty($_POST['category'])) {
-					$exclude_cats = implode(',', $_POST['category']);
-				} else {
-					$exclude_cats = '';
-				}
-				$this->subscribe2_options['exclude'] = $exclude_cats;
-				// allow override?
-				(isset($_POST['reg_override'])) ? $override = '1' : $override = '0';
-				$this->subscribe2_options['reg_override'] = $override;
-
-				// show button?
-				($_POST['show_button'] == '1') ? $showbutton = '1' : $showbutton = '0';
-				$this->subscribe2_options['show_button'] = $showbutton;
-
-				// show widget in Presentation->Widgets
-				($_POST['widget'] == '1') ? $showwidget = '1' : $showwidget = '0';
-				$this->subscribe2_options['widget'] = $showwidget;
 
 				// BCClimit
 				$this->subscribe2_options['bcclimit'] = $_POST['bcc'];
-				$this->subscribe2_options['s2page'] = $_POST['page'];
 
 				// send as author or admin?
 				$sender = 'author';
@@ -1462,6 +1443,32 @@ class s2class {
 				$this->subscribe2_options['confirm_email'] = $_POST['confirm_email'];
 				$this->subscribe2_options['remind_email'] = $_POST['remind_email'];
 
+				// default WordPress page where Subscribe2 token is placed
+				$this->subscribe2_options['s2page'] = $_POST['page'];
+
+				// show meta link?
+				($_POST['show_meta'] == '1') ? $showmeta = '1' : $showmeta = '0';
+				$this->subscribe2_options['show_meta'] = $showmeta;
+
+				// show button?
+				($_POST['show_button'] == '1') ? $showbutton = '1' : $showbutton = '0';
+				$this->subscribe2_options['show_button'] = $showbutton;
+
+				// show widget in Presentation->Widgets
+				($_POST['widget'] == '1') ? $showwidget = '1' : $showwidget = '0';
+				$this->subscribe2_options['widget'] = $showwidget;
+
+				// excluded categories
+				if (!empty($_POST['category'])) {
+					$exclude_cats = implode(',', $_POST['category']);
+				} else {
+					$exclude_cats = '';
+				}
+				$this->subscribe2_options['exclude'] = $exclude_cats;
+				// allow override?
+				(isset($_POST['reg_override'])) ? $override = '1' : $override = '0';
+				$this->subscribe2_options['reg_override'] = $override;
+
 				//automatic subscription
 				$this->subscribe2_options['autosub'] = $_POST['autosub'];
 				$this->subscribe2_options['wpregdef'] = $_POST['wpregdef'];
@@ -1483,11 +1490,12 @@ class s2class {
 			wp_nonce_field('subscribe2-options_subscribers' . $s2nonce);
 		}
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"options\" />\r\n";
-		echo "<h2>" . __('Delivery Options', 'subscribe2') . ":</h2>\r\n";
-		echo "<p>";
 		echo "<input type=\"hidden\" id=\"jsbcc\" value=\"" . $this->subscribe2_options['bcclimit'] . "\" />";
 		echo "<input type=\"hidden\" id=\"jspage\" value=\"" . $this->subscribe2_options['s2page'] . "\" />";
-
+		
+		// settings for outgoing emails
+		echo "<h2>" . __('Delivery Options', 'subscribe2') . ":</h2>\r\n";
+		echo "<p>";
 		echo __('Restrict the number of recpients per email to (0 for unlimited)', 'subscribe2') . ': ';
 		echo "<span id=\"s2bcc_1\"><span id=\"s2bcc\" style=\"background-color: #FFFBCC\">" . $this->subscribe2_options['bcclimit'] . "</span> ";
 		echo "<a href=\"#\" onclick=\"s2_show('bcc')\">" . __('Edit', 'subscribe2') . "</a></span>\n";
@@ -1495,14 +1503,6 @@ class s2class {
 		echo "<input type=\"text\" name=\"bcc\" value=\"" . $this->subscribe2_options['bcclimit'] . "\" size=\"3\" />\r\n";
 		echo "<a href=\"#\" onclick=\"s2_update('bcc');\">". __('Update', 'subscribe2') . "</a>\n";
 		echo "<a href=\"#\" onclick=\"s2_revert('bcc');\">". __('Revert', 'subscribe2') . "</a></span>\n";
-
-		echo "<br /><br />" . __('Set default Subscribe2 page as ID', 'subscribe2') . ': ';
-		echo "<span id=\"s2page_1\"><span id=\"s2page\" style=\"background-color: #FFFBCC\">" . $this->subscribe2_options['s2page'] . "</span> ";
-		echo "<a href=\"#\" onclick=\"s2_show('page')\">" . __('Edit', 'subscribe2') . "</a></span>\n";
-		echo "<span id=\"s2page_2\">\r\n";
-		echo "<input type=\"text\" name=\"page\" value=\"" . $this->subscribe2_options['s2page'] . "\" size=\"3\" />\r\n";
-		echo "<a href=\"#\" onclick=\"s2_update('page');\">". __('Update', 'subscribe2') . "</a>\n";
-		echo "<a href=\"#\" onclick=\"s2_revert('page');\">". __('Revert', 'subscribe2') . "</a></span>\n";
 
 		echo "<br /><br />" . __('Send Emails for Pages', 'subscribe2') . ': ';
 		echo "<input type=\"radio\" name=\"pages\" value=\"yes\"";
@@ -1553,6 +1553,8 @@ class s2class {
 			$this->display_digest_choices();
 		}
 		echo "</p>";
+
+		// email templates
 		echo "<h2>" . __('Email Templates', 'subscribe2') . "</h2>\r\n";
 		echo"<br />";
 		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" class=\"editform\">\r\n";
@@ -1583,21 +1585,27 @@ class s2class {
 		echo "<textarea rows=\"9\" cols=\"60\" name=\"remind_email\">" . stripslashes($this->subscribe2_options['remind_email']) . "</textarea><br /><br />\r\n";
 		echo "</td></tr></table><br />\r\n";
 
-		// excluded categories
-		echo "<h2>" . __('Excluded Categories', 'subscribe2') . "</h2>\r\n";
+		// Main options
+		echo "<h2>" . __('Appearance Options', 'subscribe2') . "</h2>\r\n";
 		echo"<p>";
-		echo "<strong><em style=\"color: red\">" . __('Posts assigned to any Excluded Category do not generate notifications and are not included in digest notifications', 'subscribe2') . "</em></strong><br />\r\n";
-		echo"</p>";
-		$this->display_category_form(explode(',', $this->subscribe2_options['exclude']));
-		echo "<center><input type=\"checkbox\" name=\"reg_override\" value=\"1\"";
-		if ('1' == $this->subscribe2_options['reg_override']) {
+		
+		// WordPress page ID where subscribe2 token is used
+		echo __('Set default Subscribe2 page as ID', 'subscribe2') . ': ';
+		echo "<span id=\"s2page_1\"><span id=\"s2page\" style=\"background-color: #FFFBCC\">" . $this->subscribe2_options['s2page'] . "</span> ";
+		echo "<a href=\"#\" onclick=\"s2_show('page')\">" . __('Edit', 'subscribe2') . "</a></span>\n";
+		echo "<span id=\"s2page_2\">\r\n";
+		echo "<input type=\"text\" name=\"page\" value=\"" . $this->subscribe2_options['s2page'] . "\" size=\"3\" />\r\n";
+		echo "<a href=\"#\" onclick=\"s2_update('page');\">". __('Update', 'subscribe2') . "</a>\n";
+		echo "<a href=\"#\" onclick=\"s2_revert('page');\">". __('Revert', 'subscribe2') . "</a></span>\n";
+
+		// show link to WordPress page in meta
+		echo "<br /><br /><input type=\"checkbox\" name=\"show_meta\" value=\"1\"";
+		if ('1' == $this->subscribe2_options['show_meta']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</center><br />\r\n";
+		echo " /> " . __('Show a link to your subscription page in \'meta\'', 'subscribe2') . "<br /><br />\r\n";
 
-		// show button in QuickTags
-		echo "<h2>" . __('Writing Options', 'subscribe2') . "</h2>\r\n";
-		echo"<p>";
+		// show QuickTag button
 		echo "<input type=\"checkbox\" name=\"show_button\" value=\"1\"";
 		if ('1' == $this->subscribe2_options['show_button']) {
 			echo " checked=\"checked\"";
@@ -1611,6 +1619,18 @@ class s2class {
 		}
 		echo " /> " . __('Enable Subscribe2 Widget?', 'subscribe2') . "<br /><br />\r\n";
 		echo"</p>";
+
+		// excluded categories
+		echo "<h2>" . __('Excluded Categories', 'subscribe2') . "</h2>\r\n";
+		echo"<p>";
+		echo "<strong><em style=\"color: red\">" . __('Posts assigned to any Excluded Category do not generate notifications and are not included in digest notifications', 'subscribe2') . "</em></strong><br />\r\n";
+		echo"</p>";
+		$this->display_category_form(explode(',', $this->subscribe2_options['exclude']));
+		echo "<center><input type=\"checkbox\" name=\"reg_override\" value=\"1\"";
+		if ('1' == $this->subscribe2_options['reg_override']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</center><br />\r\n";
 
 		//Auto Subscription for new registrations
 		echo "<h2>" . __('Auto Subscribe', 'subscribe2') . "</h2>\r\n";
@@ -2583,7 +2603,9 @@ class s2class {
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
 
 		// add actions for other plugins
-		add_action('wp_meta', array(&$this, 'add_minimeta'), 0);
+		if  ('1' == $this->subscribe2_options['show_meta']) {
+			add_action('wp_meta', array(&$this, 'add_minimeta'), 0);
+		}
 		add_filter('ozh_adminmenu_icon', array(&$this, 'ozh_s2_icon'));
 
 		// add action to display editor buttons if option is enabled
