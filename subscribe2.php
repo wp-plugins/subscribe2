@@ -1603,7 +1603,7 @@ class s2class {
 		if ('1' == $this->subscribe2_options['show_meta']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Show a link to your subscription page in \'meta\'', 'subscribe2') . "<br /><br />\r\n";
+		echo " /> " . __('Show a link to your subscription page in "meta"?', 'subscribe2') . "<br /><br />\r\n";
 
 		// show QuickTag button
 		echo "<input type=\"checkbox\" name=\"show_button\" value=\"1\"";
