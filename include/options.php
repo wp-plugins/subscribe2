@@ -74,6 +74,10 @@ if (!isset($this->subscribe2_options['widget'])) {
 	$this->subscribe2_options['widget'] = "0";
 } // option to enable Subscribe2 Widget
 
+if (!isset($this->subscribe2_options['entries'])) {
+	$this->subscribe2_options['entries'] = 25;
+} // option for the number of subscribers displayed on each page
+
 if (!isset($this->subscribe2_options['barred'])) {
 	$this->subscribe2_options['barred'] = '';
 } // option containing domains barred from public registration

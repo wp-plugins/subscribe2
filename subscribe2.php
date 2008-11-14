@@ -1235,7 +1235,7 @@ class s2class {
 			// Displays a page number strip - adapted from code in Akismet
 			$args['what'] = $what;
 			$total_subscribers = count($subscribers);
-			$total_pages = ceil($total_subscribers / 25);
+			$total_pages = ceil($total_subscribers / $this->subscribe2_options['entries']);
 			$strip = '';
 			if ( $page > 1 ) {
 				$args['s2page'] = $page - 1;
@@ -1257,7 +1257,7 @@ class s2class {
 					}
 				}
 			}
-			if ( ( $page ) * 25 < $total_subscribers ) {
+			if ( ( $page ) * $this->subscribe2_options['entries'] < $total_subscribers ) {
 				$args['s2page'] = $page + 1;
 				$strip .=  "<a class=\"next\" href=\"" . clean_url(add_query_arg($args)) . "\">". __('Next Page', 'subscribe2') . " &raquo;</a>\n";
 			}
@@ -1301,7 +1301,7 @@ class s2class {
 
 		echo "<table cellpadding=\"2\" cellspacing=\"2\" width=\"100%\">";
 		if (!empty($subscribers)) {
-			$subscriber_chunks = array_chunk($subscribers, 25);
+			$subscriber_chunks = array_chunk($subscribers, $this->subscribe2_options['entries']);
 			$chunk = $page - 1;
 			$subscribers = $subscriber_chunks[$chunk];
 			echo "<tr class=\"$alternate\">\r\n";
@@ -1394,9 +1394,10 @@ class s2class {
 				$this->reset();
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_reset</strong></p></div>";
 			} elseif ($_POST['submit']) {
-
 				// BCClimit
-				$this->subscribe2_options['bcclimit'] = $_POST['bcc'];
+				if ( (is_numeric($_POST['bcc'])) && ($_POST['bcc'] >= 0) ) {
+					$this->subscribe2_options['bcclimit'] = $_POST['bcc'];
+				}
 
 				// send as author or admin?
 				$sender = 'author';
@@ -1443,8 +1444,26 @@ class s2class {
 				$this->subscribe2_options['confirm_email'] = $_POST['confirm_email'];
 				$this->subscribe2_options['remind_email'] = $_POST['remind_email'];
 
+				// excluded categories
+				if (!empty($_POST['category'])) {
+					$exclude_cats = implode(',', $_POST['category']);
+				} else {
+					$exclude_cats = '';
+				}
+				$this->subscribe2_options['exclude'] = $exclude_cats;
+				// allow override?
+				(isset($_POST['reg_override'])) ? $override = '1' : $override = '0';
+				$this->subscribe2_options['reg_override'] = $override;
+
 				// default WordPress page where Subscribe2 token is placed
-				$this->subscribe2_options['s2page'] = $_POST['page'];
+				if ( (is_numeric($_POST['page'])) && ($_POST['page'] >= 0) ) {
+					$this->subscribe2_options['s2page'] = $_POST['page'];
+				}
+
+				// Number of subscriber per page
+				if ( (is_numeric($_POST['entries'])) && ($POST['entries'] > 0) ) {
+					$this->subscribe2_options['entries'] =$_POST['entries'];
+				}
 
 				// show meta link?
 				($_POST['show_meta'] == '1') ? $showmeta = '1' : $showmeta = '0';
@@ -1457,17 +1476,6 @@ class s2class {
 				// show widget in Presentation->Widgets
 				($_POST['widget'] == '1') ? $showwidget = '1' : $showwidget = '0';
 				$this->subscribe2_options['widget'] = $showwidget;
-
-				// excluded categories
-				if (!empty($_POST['category'])) {
-					$exclude_cats = implode(',', $_POST['category']);
-				} else {
-					$exclude_cats = '';
-				}
-				$this->subscribe2_options['exclude'] = $exclude_cats;
-				// allow override?
-				(isset($_POST['reg_override'])) ? $override = '1' : $override = '0';
-				$this->subscribe2_options['reg_override'] = $override;
 
 				//automatic subscription
 				$this->subscribe2_options['autosub'] = $_POST['autosub'];
@@ -1485,6 +1493,8 @@ class s2class {
 		}
 		// show our form
 		echo "<div class=\"wrap\">";
+		echo "<h2>" . __('Subscribe2 Options', 'subscribe2') . "</h2>\r\n";
+
 		echo "<form method=\"post\" action=\"\">\r\n";
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-options_subscribers' . $s2nonce);
@@ -1492,17 +1502,18 @@ class s2class {
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"options\" />\r\n";
 		echo "<input type=\"hidden\" id=\"jsbcc\" value=\"" . $this->subscribe2_options['bcclimit'] . "\" />";
 		echo "<input type=\"hidden\" id=\"jspage\" value=\"" . $this->subscribe2_options['s2page'] . "\" />";
-		
+		echo "<input type=\"hidden\" id=\"jsentries\" value=\"" . $this->subscribe2_options['number'] . "\" />";
+
 		// settings for outgoing emails
-		echo "<h2>" . __('Delivery Options', 'subscribe2') . ":</h2>\r\n";
+		echo "<h2>" . __('Notification Settings', 'subscribe2') . "</h2>\r\n";
 		echo "<p>";
 		echo __('Restrict the number of recpients per email to (0 for unlimited)', 'subscribe2') . ': ';
 		echo "<span id=\"s2bcc_1\"><span id=\"s2bcc\" style=\"background-color: #FFFBCC\">" . $this->subscribe2_options['bcclimit'] . "</span> ";
-		echo "<a href=\"#\" onclick=\"s2_show('bcc')\">" . __('Edit', 'subscribe2') . "</a></span>\n";
+		echo "<a href=\"#\" onclick=\"s2_show('bcc'); return false;\">" . __('Edit', 'subscribe2') . "</a></span>\n";
 		echo "<span id=\"s2bcc_2\">\r\n";
 		echo "<input type=\"text\" name=\"bcc\" value=\"" . $this->subscribe2_options['bcclimit'] . "\" size=\"3\" />\r\n";
-		echo "<a href=\"#\" onclick=\"s2_update('bcc');\">". __('Update', 'subscribe2') . "</a>\n";
-		echo "<a href=\"#\" onclick=\"s2_revert('bcc');\">". __('Revert', 'subscribe2') . "</a></span>\n";
+		echo "<a href=\"#\" onclick=\"s2_update('bcc'); return false;\">". __('Update', 'subscribe2') . "</a>\n";
+		echo "<a href=\"#\" onclick=\"s2_revert('bcc'); return false;\">". __('Revert', 'subscribe2') . "</a></span>\n";
 
 		echo "<br /><br />" . __('Send Emails for Pages', 'subscribe2') . ': ';
 		echo "<input type=\"radio\" name=\"pages\" value=\"yes\"";
@@ -1585,18 +1596,39 @@ class s2class {
 		echo "<textarea rows=\"9\" cols=\"60\" name=\"remind_email\">" . stripslashes($this->subscribe2_options['remind_email']) . "</textarea><br /><br />\r\n";
 		echo "</td></tr></table><br />\r\n";
 
-		// Main options
-		echo "<h2>" . __('Appearance Options', 'subscribe2') . "</h2>\r\n";
+		// excluded categories
+		echo "<h2>" . __('Excluded Categories', 'subscribe2') . "</h2>\r\n";
+		echo"<p>";
+		echo "<strong><em style=\"color: red\">" . __('Posts assigned to any Excluded Category do not generate notifications and are not included in digest notifications', 'subscribe2') . "</em></strong><br />\r\n";
+		echo"</p>";
+		$this->display_category_form(explode(',', $this->subscribe2_options['exclude']));
+		echo "<center><input type=\"checkbox\" name=\"reg_override\" value=\"1\"";
+		if ('1' == $this->subscribe2_options['reg_override']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</center><br />\r\n";
+		
+		// Appearance options
+		echo "<h2>" . __('Appearance', 'subscribe2') . "</h2>\r\n";
 		echo"<p>";
 		
 		// WordPress page ID where subscribe2 token is used
 		echo __('Set default Subscribe2 page as ID', 'subscribe2') . ': ';
 		echo "<span id=\"s2page_1\"><span id=\"s2page\" style=\"background-color: #FFFBCC\">" . $this->subscribe2_options['s2page'] . "</span> ";
-		echo "<a href=\"#\" onclick=\"s2_show('page')\">" . __('Edit', 'subscribe2') . "</a></span>\n";
+		echo "<a href=\"#\" onclick=\"s2_show('page'); return false;\">" . __('Edit', 'subscribe2') . "</a></span>\n";
 		echo "<span id=\"s2page_2\">\r\n";
 		echo "<input type=\"text\" name=\"page\" value=\"" . $this->subscribe2_options['s2page'] . "\" size=\"3\" />\r\n";
-		echo "<a href=\"#\" onclick=\"s2_update('page');\">". __('Update', 'subscribe2') . "</a>\n";
-		echo "<a href=\"#\" onclick=\"s2_revert('page');\">". __('Revert', 'subscribe2') . "</a></span>\n";
+		echo "<a href=\"#\" onclick=\"s2_update('page'); return false;\">". __('Update', 'subscribe2') . "</a>\n";
+		echo "<a href=\"#\" onclick=\"s2_revert('page'); return false;\">". __('Revert', 'subscribe2') . "</a></span>\n";
+
+		// Number of subscribers per page
+		echo "<br /><br />" . __('Set the number of Subscribers displayed per page', 'subscribe2') . ': ';
+		echo "<span id=\"s2entries_1\"><span id=\"s2entries\" style=\"background-color: #FFFBCC\">" . $this->subscribe2_options['entries'] . "</span> ";
+		echo "<a href=\"#\" onclick=\"s2_show('entries'); return false;\">" . __('Edit', 'subscribe2') . "</a></span>\n";
+		echo "<span id=\"s2entries_2\">\r\n";
+		echo "<input type=\"text\" name=\"entries\" value=\"" . $this->subscribe2_options['entries'] . "\" size=\"3\" />\r\n";
+		echo "<a href=\"#\" onclick=\"s2_update('entries'); return false;\">". __('Update', 'subscribe2') . "</a>\n";
+		echo "<a href=\"#\" onclick=\"s2_revert('entries'); return false;\">". __('Revert', 'subscribe2') . "</a></span>\n";
 
 		// show link to WordPress page in meta
 		echo "<br /><br /><input type=\"checkbox\" name=\"show_meta\" value=\"1\"";
@@ -1619,18 +1651,6 @@ class s2class {
 		}
 		echo " /> " . __('Enable Subscribe2 Widget?', 'subscribe2') . "<br /><br />\r\n";
 		echo"</p>";
-
-		// excluded categories
-		echo "<h2>" . __('Excluded Categories', 'subscribe2') . "</h2>\r\n";
-		echo"<p>";
-		echo "<strong><em style=\"color: red\">" . __('Posts assigned to any Excluded Category do not generate notifications and are not included in digest notifications', 'subscribe2') . "</em></strong><br />\r\n";
-		echo"</p>";
-		$this->display_category_form(explode(',', $this->subscribe2_options['exclude']));
-		echo "<center><input type=\"checkbox\" name=\"reg_override\" value=\"1\"";
-		if ('1' == $this->subscribe2_options['reg_override']) {
-			echo " checked=\"checked\"";
-		}
-		echo " /> " . __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</center><br />\r\n";
 
 		//Auto Subscription for new registrations
 		echo "<h2>" . __('Auto Subscribe', 'subscribe2') . "</h2>\r\n";
