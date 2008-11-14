@@ -1461,7 +1461,7 @@ class s2class {
 				}
 
 				// Number of subscriber per page
-				if ( (is_numeric($_POST['entries'])) && ($POST['entries'] > 0) ) {
+				if ( (is_numeric($_POST['entries'])) && ($_POST['entries'] > 0) ) {
 					$this->subscribe2_options['entries'] =$_POST['entries'];
 				}
 
