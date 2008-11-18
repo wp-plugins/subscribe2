@@ -724,15 +724,23 @@ class s2class {
 			// make this subscription active
 			$this->activate();
 			$this->message = $this->added;
-			$subject = '[' . get_option('blogname') . '] ' . __('New subscriber', 'subscribe2');
-			$message = $this->email . " " . __('subscribed to email notifications!', 'subscribe2');
-			$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
-			$this->mail($recipients, $subject, $message);
+			if ( ($this->subscribe2_options['admin_email'] == 'subs') || ($this->subscribe2_options['admin_email'] == 'both') ) {
+				$subject = '[' . get_option('blogname') . '] ' . __('New subscription', 'subscribe2');
+				$message = $this->email . " " . __('subscribed to email notifications!', 'subscribe2');
+				$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
+				$this->mail($recipients, $subject, $message);
+			}
 			$this->filtered = 1;
 		} elseif ('0' == $action) {
 			// remove this subscriber
 			$this->delete();
 			$this->message = $this->deleted;
+			if ( ($this->subscribe2_options['admin_email'] == 'unsubs') || ($this->subscribe2_options['admin_email'] == 'both') ) {
+				$subject = '[' . get_option('blogname') . '] ' . __('New Unsubscription', 'subscribe2');
+				$message = $this->email . " " . __('unsubscribed from email notifications!', 'subscribe2');
+				$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
+				$this->mail($recipients, $subject, $message);
+			}
 			$this->filtered = 1;
 		}
 
@@ -1398,6 +1406,8 @@ class s2class {
 				if ( (is_numeric($_POST['bcc'])) && ($_POST['bcc'] >= 0) ) {
 					$this->subscribe2_options['bcclimit'] = $_POST['bcc'];
 				}
+				// admin_email
+				$this->subscribe2_options['admin_email'] = $_POST['admin_email'];
 
 				// send as author or admin?
 				$sender = 'author';
@@ -1493,8 +1503,6 @@ class s2class {
 		}
 		// show our form
 		echo "<div class=\"wrap\">";
-		echo "<h2>" . __('Subscribe2 Options', 'subscribe2') . "</h2>\r\n";
-
 		echo "<form method=\"post\" action=\"\">\r\n";
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-options_subscribers' . $s2nonce);
@@ -1502,7 +1510,7 @@ class s2class {
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"options\" />\r\n";
 		echo "<input type=\"hidden\" id=\"jsbcc\" value=\"" . $this->subscribe2_options['bcclimit'] . "\" />";
 		echo "<input type=\"hidden\" id=\"jspage\" value=\"" . $this->subscribe2_options['s2page'] . "\" />";
-		echo "<input type=\"hidden\" id=\"jsentries\" value=\"" . $this->subscribe2_options['number'] . "\" />";
+		echo "<input type=\"hidden\" id=\"jsentries\" value=\"" . $this->subscribe2_options['entries'] . "\" />";
 
 		// settings for outgoing emails
 		echo "<h2>" . __('Notification Settings', 'subscribe2') . "</h2>\r\n";
@@ -1514,6 +1522,28 @@ class s2class {
 		echo "<input type=\"text\" name=\"bcc\" value=\"" . $this->subscribe2_options['bcclimit'] . "\" size=\"3\" />\r\n";
 		echo "<a href=\"#\" onclick=\"s2_update('bcc'); return false;\">". __('Update', 'subscribe2') . "</a>\n";
 		echo "<a href=\"#\" onclick=\"s2_revert('bcc'); return false;\">". __('Revert', 'subscribe2') . "</a></span>\n";
+
+		echo "<br /><br />" . __('Send Admins notifications for new', 'subscribe2') . ': ';
+		echo "<input type=\"radio\" name=\"admin_email\" value=\"subs\"";
+		if ('subs' == $this->subscribe2_options['admin_email']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Subscriptions', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"admin_email\" value=\"unsubs\"";
+		if ('unsubs' == $this->subscribe2_options['admin_email']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Unsubscriptions', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"admin_email\" value=\"both\"";
+		if ('both' == $this->subscribe2_options['admin_email']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Both', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"admin_email\" value=\"none\"";
+		if ('none' == $this->subscribe2_options['admin_email']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Neither', 'subscribe2');
 
 		echo "<br /><br />" . __('Send Emails for Pages', 'subscribe2') . ': ';
 		echo "<input type=\"radio\" name=\"pages\" value=\"yes\"";
@@ -2491,7 +2521,7 @@ class s2class {
 					$check = true;
 				}
 			}
-			//is the current post set by the user to
+			// is the current post set by the user to
 			// not generate a notification email?
 			$s2mail = get_post_meta($post->ID, 's2mail', true);
 			if (strtolower(trim($s2mail)) == 'no') {

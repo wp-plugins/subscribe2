@@ -26,6 +26,10 @@ if(!isset($this->subscribe2_options['bcclimit'])) {
 	$this->subscribe2_options['bcclimit'] = 0;
 } // option for default bcc limit on email notifications
 
+if (!isset($this->subscribe2_options['admin_email'])) {
+	$this->subscribe2_options['admin_email'] = "subs";
+} // option for sending new subscriber notifications to admins
+
 if(!isset($this->subscribe2_options['s2page'])) {
 	$this->subscribe2_options['s2page'] = 0;
 } // option for default WordPress page for Subscribe2 to use
