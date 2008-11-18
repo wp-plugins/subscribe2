@@ -1503,6 +1503,7 @@ class s2class {
 		}
 		// show our form
 		echo "<div class=\"wrap\">";
+		echo "<h2>" . __('Subscribe2 Settings', 'subscribe2') . "</h2>\r\n";
 		echo "<form method=\"post\" action=\"\">\r\n";
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-options_subscribers' . $s2nonce);
