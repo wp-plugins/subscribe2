@@ -99,6 +99,7 @@ Version 4.12 by Matthew Robinson
 * Added ability to bulk unsubscribe a list of emails pasted into manage window
 * Define number of subscribers in Manage window
 * Added options for admin emails when public users subscribe or unsubscribe 
+* Fixed bug that prevented sending of Reminder emails from Manage->Subscribers
 
 Version 4.11 by Matthew Robinson
 

@@ -671,9 +671,6 @@ class s2class {
 	*/
 	function remind($emails = '') {
 		if ('' == $emails) { return false; }
-
-		$admin = $this->get_userdata();
-		$this->myname = $admin->display_name;
 		
 		$recipients = explode(",", $emails);
 		if (!is_array($recipients)) { $recipients = (array)$recipients; }
@@ -1301,7 +1298,7 @@ class s2class {
 			echo "<input type=\"submit\" name=\"csv\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" class=\"button\" /></td></tr></table>\r\n";
 			if ($reminderform) {
 				echo "<input type=\"hidden\" name=\"reminderemails\" value=\"" . $reminderemails . "\" />\r\n";
-				echo "<p class=\"submit\" align=\"right\" style=\"border-top:none;\"><input type=\"submit\" name=\"reminder\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" /></p>\r\n";
+				echo "<p class=\"submit\" align=\"right\" style=\"border-top:none;\"><input type=\"submit\" name=\"remind\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" /></p>\r\n";
 			}
 			echo "<table width=\"100%\"><tr><td valign=\"bottom\">" . $strip . "</td>\r\n";
 			echo "<td align=\"right\"><p class=\"submit\" align=\"right\" style=\"border-top: none;\"><input type=\"submit\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" /></p>\r\n";
@@ -1996,7 +1993,7 @@ class s2class {
 		} else {
 			$subject = __('A message from ', 'subscribe2') . get_option('blogname');
 		}
-		echo " <p>" . __('Subject', 'subscribe2') . ": <input type=\"text\" size=\"69\" name=\"subject\" value=\"" . $subject . "\" /> <br /><br />";
+		echo "<p>" . __('Subject', 'subscribe2') . ": <input type=\"text\" size=\"69\" name=\"subject\" value=\"" . $subject . "\" /> <br /><br />";
 		echo "<textarea rows=\"12\" cols=\"75\" name=\"content\">" . $body . "</textarea>";
 		echo "<br /><br />\r\n";
 		echo __('Recipients: ', 'subscribe2');
