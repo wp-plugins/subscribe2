@@ -98,6 +98,7 @@ Version 4.12 by Matthew Robinson
 * Define number of subscribers in Manage window
 * Added options for admin emails when public users subscribe or unsubscribe 
 * Fixed bug that prevented sending of Reminder emails from Manage->Subscribers
+* Amended confirmation code so that only one email is sent no matter how many times users click on (un)subscribe links
 
 Version 4.11 by Matthew Robinson
 

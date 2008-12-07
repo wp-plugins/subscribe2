@@ -717,26 +717,33 @@ class s2class {
 			return $this->no_such_email;
 		}
 
+		// get current status of email so messages are only sent once per emailed link
+		$current = $this->is_public($this->email);
+
 		if ('1' == $action) {
 			// make this subscription active
-			$this->activate();
 			$this->message = $this->added;
-			if ( ($this->subscribe2_options['admin_email'] == 'subs') || ($this->subscribe2_options['admin_email'] == 'both') ) {
-				$subject = '[' . get_option('blogname') . '] ' . __('New subscription', 'subscribe2');
-				$message = $this->email . " " . __('subscribed to email notifications!', 'subscribe2');
-				$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
-				$this->mail($recipients, $subject, $message);
+			if ('1' != $current) {
+				$this->activate();
+				if ( ($this->subscribe2_options['admin_email'] == 'subs') || ($this->subscribe2_options['admin_email'] == 'both') ) {
+					$subject = '[' . get_option('blogname') . '] ' . __('New subscription', 'subscribe2');
+					$message = $this->email . " " . __('subscribed to email notifications!', 'subscribe2');
+					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
+					$this->mail($recipients, $subject, $message);
+				}
 			}
 			$this->filtered = 1;
 		} elseif ('0' == $action) {
 			// remove this subscriber
-			$this->delete();
 			$this->message = $this->deleted;
-			if ( ($this->subscribe2_options['admin_email'] == 'unsubs') || ($this->subscribe2_options['admin_email'] == 'both') ) {
-				$subject = '[' . get_option('blogname') . '] ' . __('New Unsubscription', 'subscribe2');
-				$message = $this->email . " " . __('unsubscribed from email notifications!', 'subscribe2');
-				$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
-				$this->mail($recipients, $subject, $message);
+			if ('0' != $current) {
+				$this->delete();
+				if ( ($this->subscribe2_options['admin_email'] == 'unsubs') || ($this->subscribe2_options['admin_email'] == 'both') ) {
+					$subject = '[' . get_option('blogname') . '] ' . __('New Unsubscription', 'subscribe2');
+					$message = $this->email . " " . __('unsubscribed from email notifications!', 'subscribe2');
+					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
+					$this->mail($recipients, $subject, $message);
+				}
 			}
 			$this->filtered = 1;
 		}
@@ -2229,7 +2236,7 @@ class s2class {
 	Display our form; also handles (un)subscribe requests
 	*/
 	function filter($content = '') {
-		if ( ('' == $content) || (1 == $this->filtered) || (!strstr($content, '<!--subscribe2-->')) ) { return $content; }
+		if ( ('' == $content) || (!strstr($content, '<!--subscribe2-->')) ) { return $content; }
 		$this->s2form = $this->form;
 
 		global $user_ID;
@@ -2265,7 +2272,7 @@ class s2class {
 							$this->add();
 							$status = $this->send_confirm('add');
 							// set a variable to denote that we've already run, and shouldn't run again
-							$this->filtered = 1; //set this to not send duplicate emails
+							$this->filtered = 1;
 							if ($status) {
 								$this->s2form = $this->confirmation_sent;
 							} else {
@@ -2326,7 +2333,7 @@ class s2class {
 	*/
 	function title_filter($title) {
 		// don't interfere if we've already done our thing
-		if (1 == $this->filtered) { return; }
+		//if (1 == $this->filtered) { return; }
 		if (in_the_loop()) {
 			return __('Subscription Confirmation', 'subscribe2');
 		} else {
