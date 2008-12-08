@@ -263,7 +263,8 @@ class s2class {
 				// To send HTML mail, the Content-Type header must be set
 				$headers .= "MIME-Version: 1.0\n";
 				$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
-				$mailtext = "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>";
+				$mailtext = "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . bloginfo('stylesheet_url') . "\"
+type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>";
 		} else {
 				$headers .= "MIME-Version: 1.0\n";
 				$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
@@ -2333,7 +2334,6 @@ class s2class {
 	*/
 	function title_filter($title) {
 		// don't interfere if we've already done our thing
-		//if (1 == $this->filtered) { return; }
 		if (in_the_loop()) {
 			return __('Subscription Confirmation', 'subscribe2');
 		} else {
