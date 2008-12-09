@@ -2671,9 +2671,7 @@ type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>
 
 		// add actions for automatic subscription based on option settings
 		add_action('register_form', array(&$this, 'register_form'));
-		if ('yes' == $this->subscribe2_options['autosub']) {
-			add_action('user_register', array(&$this, 'register'));
-		}
+		add_action('user_register', array(&$this, 'register'));
 		if ('wpreg' == $this->subscribe2_options['autosub']) {
 			add_action('register_post', array(&$this, 'register_post'));
 		}
