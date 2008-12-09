@@ -263,7 +263,7 @@ class s2class {
 				// To send HTML mail, the Content-Type header must be set
 				$headers .= "MIME-Version: 1.0\n";
 				$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
-				$mailtext = "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . bloginfo('stylesheet_url') . "\"
+				$mailtext = "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . get_bloginfo('stylesheet_url') . "\"
 type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>";
 		} else {
 				$headers .= "MIME-Version: 1.0\n";
