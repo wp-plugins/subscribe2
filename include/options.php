@@ -26,6 +26,10 @@ if(!isset($this->subscribe2_options['bcclimit'])) {
 	$this->subscribe2_options['bcclimit'] = 0;
 } // option for default bcc limit on email notifications
 
+if (!isset($this->subscribe2_options['admin_email'])) {
+	$this->subscribe2_options['admin_email'] = "subs";
+} // option for sending new subscriber notifications to admins
+
 if(!isset($this->subscribe2_options['s2page'])) {
 	$this->subscribe2_options['s2page'] = 0;
 } // option for default WordPress page for Subscribe2 to use
@@ -73,6 +77,10 @@ if (!isset($this->subscribe2_options['show_button'])) {
 if (!isset($this->subscribe2_options['widget'])) {
 	$this->subscribe2_options['widget'] = "0";
 } // option to enable Subscribe2 Widget
+
+if (!isset($this->subscribe2_options['entries'])) {
+	$this->subscribe2_options['entries'] = 25;
+} // option for the number of subscribers displayed on each page
 
 if (!isset($this->subscribe2_options['barred'])) {
 	$this->subscribe2_options['barred'] = '';
