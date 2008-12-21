@@ -148,7 +148,7 @@ class s2class {
 	}
 
 	function add_weekly_sched($sched) {
-		$sched['weekly'] = array('interval' => 604800, 'display' => __('Once Weekly', 'subscribe2'));
+		$sched['weekly'] = array('interval' => 604800, 'display' => __('Weekly', 'subscribe2'));
 		return $sched;
 	}
 
