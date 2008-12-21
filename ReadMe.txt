@@ -3,7 +3,7 @@ Contributors: MattyRob, Skippy, RavanH
 Donate link: http://subscribe2.wordpress.com/donate/
 Tags: posts, subscription, email
 Requires at least: 2.0.x
-Tested up to: 2.6.2
+Tested up to: 2.7
 Stable tag: 4.12
 
 Sends a list of subscribers an email notification when new posts are published to your blog
