@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /*
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
@@ -43,7 +43,7 @@ if (!defined('WP_CONTENT_DIR')) {
 }
 
 // use Owen's excellent ButtonSnap library
-if (!function_exists(buttonsnap_textbutton)) {
+if (!function_exists('buttonsnap_textbutton')) {
 	require(WP_CONTENT_DIR . '/plugins/subscribe2/include/buttonsnap.php');
 }
 
@@ -82,7 +82,7 @@ class s2class {
 
 		$this->mail_failed = "<p>" . __('Message failed! Check your settings and check with your hosting provider', 'subscribe2') . "</p>";
 
-		$this->form = "<form method=\"post\" action=\"\"><p>" . __('Your email:', 'subscribe2') . "&#160;<input type=\"text\" name=\"email\" value=\"\" size=\"20\" />&#160;<br /><input type=\"radio\" name=\"s2_action\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . " <input type=\"radio\" name=\"s2_action\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . " &#160;<input type=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></p></form>\r\n";
+		$this->form = "<form method=\"post\" action=\"\" id=\"subscribe2form\"><label for=\"subscribe2email\">" . __('Your email:', 'subscribe2') . "</label><input type=\"text\" name=\"email\" value=\"\" size=\"20\"  id=\"subscribe2email\" /><br /><input type=\"radio\" name=\"s2_action\" value=\"subscribe\" checked=\"checked\" id=\"s2_action-subscribe\" /><label for=\"s2_action-subscribe\">" . __('Subscribe', 'subscribe2') . "</label><input type=\"radio\" name=\"s2_action\" value=\"unsubscribe\" id=\"s2_action-unsubscribe\" /><label for=\"s2_action-unsubscribe\">" . __('Unsubscribe', 'subscribe2') . " </label><input type=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></form>\r\n";
 
 		// confirmation messages
 		$this->no_such_email = "<p>" . __('No such email address is registered.', 'subscribe2') . "</p>";
@@ -263,8 +263,7 @@ class s2class {
 				// To send HTML mail, the Content-Type header must be set
 				$headers .= "MIME-Version: 1.0\n";
 				$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
-				$mailtext = "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . get_bloginfo('stylesheet_url') . "\"
-type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>";
+				$mailtext = "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . get_bloginfo('stylesheet_url') . "\" type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>";
 		} else {
 				$headers .= "MIME-Version: 1.0\n";
 				$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
@@ -895,7 +894,7 @@ type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>
 	Create the appropriate usermeta values when a user registers
 	If the registering user had previously subscribed to notifications, this function will delete them from the public subscriber list first
 	*/
-	function register ($user_id = 0, $wpreg = '') {
+	function register ($user_id = 0) {
 		global $wpdb;
 
 		if (0 == $user_id) { return $user_id; }
@@ -936,8 +935,8 @@ type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>
 			update_usermeta($user_id, 's2_autosub', $this->subscribe2_options['autosub_def']);
 		} else {
 			// create post format entries for all users
-			$check = get_usermeta($user_id, 's2_format');
-			if (empty($check)) {
+			$check_format = get_usermeta($user_id, 's2_format');
+			if (empty($check_format)) {
 				if ('html' == $this->subscribe2_options['autoformat']) {
 					update_usermeta($user_id, 's2_format', 'html');
 					update_usermeta($user_id, 's2_excerpt', 'post');
@@ -951,15 +950,15 @@ type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>
 				update_usermeta($user_id, 's2_autosub', $this->subscribe2_options['autosub_def']);
 			}
 			// ensure existing subscriptions are not overwritten on upgrade
-			$check = get_usermeta($user_id, 's2_subscribed');
+			$check_subscribed = get_usermeta($user_id, 's2_subscribed');
 			// if the are no existing subscriptions, create them based on admin options
-			if (empty($check)) {
+			if (empty($check_subscribed)) {
 				// add entries by default if autosub is on
-				if ( ('yes' == $this->subscribe2_options['autosub']) || (('wpreg' == $this->subscribe2_options['autosub']) && (1 == $wpreg)) ) {
+				if ( ('yes' == $this->subscribe2_options['autosub']) || (('wpreg' == $this->subscribe2_options['autosub']) && ('on' == $_POST['subscribe'])) ) {
 					update_usermeta($user_id, 's2_subscribed', $cats);
-						foreach(explode(',', $cats) as $cat) {
-							update_usermeta($user_id, 's2_cat' . $cat, "$cat");
-						}
+					foreach(explode(',', $cats) as $cat) {
+						update_usermeta($user_id, 's2_cat' . $cat, "$cat");
+					}
 				} else {
 					update_usermeta($user_id, 's2_subscribed', '-1');
 				}
@@ -1342,7 +1341,7 @@ type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>
 				}
 				echo "<a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
 				if (in_array($subscriber, $registered)) {
-					echo "(<a href=\"" . get_option('home') . "/wp-admin/users.php?page=subscribe2/subscribe2.php&amp;email=$subscriber\">" . __('edit', 'subscribe2') . "</a>)\r\n";
+					echo "(<a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=subscribe2/subscribe2.php&amp;email=$subscriber\">" . __('edit', 'subscribe2') . "</a>)\r\n";
 				}
 				if (in_array($subscriber, $unconfirmed) || in_array($subscriber, $confirmed) ) {
 					echo "(" . $this->signup_date($subscriber) . ")</td>\r\n";
@@ -2219,17 +2218,10 @@ type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>
 	*/
 	function register_post() {
 		if ('on' == $_POST['subscribe']) {
-			add_action('user_register', array(&$this, 'register_action'));
+			$user_id = get_userdatabylogin($_POST['user_login']);
+			if (0 == $user_id->ID) { return; }
+			$this->register($user_id->ID);
 		}
-	}
-
-	/**
-	Action to process Subscribe2 registration from WordPress registration
-	*/
-	function register_action() {
-		$user_id = get_userdatabylogin($_POST['user_login']);
-		if (0 == $user_id->ID) { return; }
-		$this->register($user_id->ID, 1);
 	}
 
 /* ===== template and filter functions ===== */
@@ -2672,10 +2664,7 @@ type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>
 		// add actions for automatic subscription based on option settings
 		add_action('register_form', array(&$this, 'register_form'));
 		add_action('user_register', array(&$this, 'register'));
-		if ('wpreg' == $this->subscribe2_options['autosub']) {
-			add_action('register_post', array(&$this, 'register_post'));
-		}
-		
+
 		// add actions for processing posts based on per-post or cron email settings
 		if ($this->subscribe2_options['email_freq'] != 'never') {
 			add_action('s2_digest_cron', array(&$this, 'subscribe2_cron'));
