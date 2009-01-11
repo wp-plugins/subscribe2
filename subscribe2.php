@@ -1294,21 +1294,24 @@ class s2class {
 		echo "<br />";
 		$this->display_subscriber_dropdown($what, __('Filter', 'subscribe2'));
 		// show the selected subscribers
-		$alternate = 'alternate';
+		$alternate = '';
 		if (!empty($subscribers)) {
 			echo "<p align=\"center\"><b>" . __('Registered on the left, confirmed in the middle, unconfirmed on the right', 'subscribe2') . "</b></p>\r\n";
 			$exportcsv = implode(",\r\n", $subscribers);
 			echo "<table cellpadding=\"2\" cellspacing=\"2\" width=\"100%\">";
-			echo "<tr><td width=\"50%\"><input type=\"text\" name=\"searchterm\" value=\"\" />&nbsp;\r\n";
+			echo "<tr class=\"alternate\"><td width=\"50%\"><input type=\"text\" name=\"searchterm\" value=\"\" />&nbsp;\r\n";
 			echo "<input type=\"submit\" name=\"search\" value=\"" . __('Search Subscribers', 'subscribe2') . "\" class=\"button\" /></td>\r\n";
 			echo "<td width=\"50%\" align=\"right\"><input type=\"hidden\" name=\"exportcsv\" value=\"" . $exportcsv . "\" />\r\n";
-			echo "<input type=\"submit\" name=\"csv\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" class=\"button\" /></td></tr></table>\r\n";
+			echo "<input type=\"submit\" name=\"csv\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" class=\"button\" /></td></tr>\r\n";
 			if ($reminderform) {
-				echo "<input type=\"hidden\" name=\"reminderemails\" value=\"" . $reminderemails . "\" />\r\n";
-				echo "<p class=\"submit\" align=\"right\" style=\"border-top:none;\"><input type=\"submit\" name=\"remind\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" /></p>\r\n";
+				echo "<tr><td width=\"50%\"><input type=\"hidden\" name=\"reminderemails\" value=\"" . $reminderemails . "\" />\r\n";
+				echo "<td width=\"50%\" align=\"right\"><input type=\"submit\" name=\"remind\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" class=\"button\" /></td></tr>\r\n";
 			}
-			echo "<table width=\"100%\"><tr><td valign=\"bottom\">" . $strip . "</td>\r\n";
-			echo "<td align=\"right\"><p class=\"submit\" align=\"right\" style=\"border-top: none;\"><input type=\"submit\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" /></p>\r\n";
+			echo "<tr><td valign=\"bottom\">" . $strip . "\r\n";
+			$show = array('all', 'public', 'confirmed', 'unconfirmed');
+			if (in_array($what, $show)) {
+				echo "</td><td align=\"right\"><input type=\"submit\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" class=\"button\" />\r\n";
+			}
 			echo "</td></tr></table>\r\n";
 		}
 
@@ -1317,18 +1320,20 @@ class s2class {
 			$subscriber_chunks = array_chunk($subscribers, $this->subscribe2_options['entries']);
 			$chunk = $page - 1;
 			$subscribers = $subscriber_chunks[$chunk];
-			echo "<tr class=\"$alternate\">\r\n";
-			echo "<td width=\"88%\"></td>\r\n";
-			echo "<td width=\"4%\" align=\"center\">";
-			echo "<img src=\"" . $urlpath . "include/arrow_left.png\" alt=\"&lt;\" title=\"" . __('Confirm this email address', 'subscribe2') . "\" /></td>\r\n";
-			echo "<td width=\"4%\" align=\"center\">";
-			echo "<img src=\"" . $urlpath . "include/arrow_right.png\" alt=\"&gt;\" title=\"" . __('Unconfirm this email address', 'subscribe2') . "\" /></td>\r\n";
-			echo "<td width=\"4%\" align=\"center\">";
-			echo "<img src=\"" . $urlpath . "include/cross.png\" alt=\"X\" title=\"" . __('Delete this email address', 'subscribe2') . "\" /></td></tr>\r\n";
-			echo "<tr><td align=\"right\"><strong>" . __('Select / Unselect All', 'subscribe2') . "</strong></td>\r\n";
-			echo "<td align=\"center\"><input type=\"checkbox\" name=\"checkall\" value=\"confirm_checkall\" /></td>\r\n";
-			echo "<td align=\"center\"><input type=\"checkbox\" name=\"checkall\" value=\"unconfirm_checkall\" /></td>\r\n";
-			echo "<td align=\"center\"><input type=\"checkbox\" name=\"checkall\" value=\"delete_checkall\" /></td></tr>\r\n";
+			if (in_array($what, $show)) {
+				echo "<tr class=\"alternate\">\r\n";
+				echo "<td width=\"88%\"></td>\r\n";
+				echo "<td width=\"4%\" align=\"center\">";
+				echo "<img src=\"" . $urlpath . "include/arrow_left.png\" alt=\"&lt;\" title=\"" . __('Confirm this email address', 'subscribe2') . "\" /></td>\r\n";
+				echo "<td width=\"4%\" align=\"center\">";
+				echo "<img src=\"" . $urlpath . "include/arrow_right.png\" alt=\"&gt;\" title=\"" . __('Unconfirm this email address', 'subscribe2') . "\" /></td>\r\n";
+				echo "<td width=\"4%\" align=\"center\">";
+				echo "<img src=\"" . $urlpath . "include/cross.png\" alt=\"X\" title=\"" . __('Delete this email address', 'subscribe2') . "\" /></td></tr>\r\n";
+				echo "<tr class=\"alternate\"><td align=\"right\"><strong>" . __('Select / Unselect All', 'subscribe2') . "</strong></td>\r\n";
+				echo "<td align=\"center\"><input type=\"checkbox\" name=\"checkall\" value=\"confirm_checkall\" /></td>\r\n";
+				echo "<td align=\"center\"><input type=\"checkbox\" name=\"checkall\" value=\"unconfirm_checkall\" /></td>\r\n";
+				echo "<td align=\"center\"><input type=\"checkbox\" name=\"checkall\" value=\"delete_checkall\" /></td></tr>\r\n";
+			}
 			foreach ($subscribers as $subscriber) {
 				echo "<tr class=\"$alternate\" style=\"height:50px;\">";
 				echo "<td";
@@ -1362,16 +1367,17 @@ class s2class {
 				('alternate' == $alternate) ? $alternate = '' : $alternate = 'alternate';
 			}
 		} else {
-			if ($_POST['search']) {
+			if ($_POST['searchterm']) {
 				echo "<tr><td align=\"center\"><b>" . __('No matching subscribers found', 'subscribe2') . "</b></td></tr>\r\n";
 			} else {
 				echo "<tr><td align=\"center\"><b>" . __('NONE', 'subscribe2') . "</b></td></tr>\r\n";
 			}
 		}
 		echo "</table>\r\n";
-		if (!empty($subscribers)) {
-			echo "<table width=\"100%\"><tr><td valign=\"bottom\">" . $strip . "</td>\r\n";
-			echo "<td align=\"right\"><p class=\"submit\" align=\"right\" style=\"border-top: none;\"><input type=\"submit\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" /></p>\r\n";
+		if (in_array($what, $show)) {
+			echo "<table width=\"100%\">";
+			echo "<tr><td valign=\"bottom\">" . $strip . "</td>\r\n";
+			echo "<td align=\"right\"><input type=\"submit\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" class=\"button\" />\r\n";
 			echo "</td></tr></table>\r\n";
 		}
 
@@ -1387,7 +1393,7 @@ class s2class {
 		echo "<input type=\"hidden\" name=\"emails\" value=\"$emails\" />\r\n";
 		$this->display_category_form();
 		echo "<p class=\"submit\"><input type=\"submit\" id=\"deletepost\" name=\"register\" value=\"" . __('Submit', 'subscribe2') . "\" /></p>";
-		echo "</div></form>\r\n";
+		echo "</form></div>\r\n";
 
 		include(ABSPATH . 'wp-admin/admin-footer.php');
 		// just to be sure
