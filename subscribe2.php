@@ -1240,6 +1240,7 @@ class s2class {
 		}
 		if ($_POST['searchterm']) {
 			$subscribers = &$result;
+			$what = 'public';
 		}
 
 		if (!empty($subscribers)) {
