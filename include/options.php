@@ -35,10 +35,6 @@ if(!isset($this->subscribe2_options['s2page'])) {
 } // option for default WordPress page for Subscribe2 to use
 
 if (!isset($this->subscribe2_options['pages'])) {
-	$this->subscribe2_options['bcclimit'] = "0";
-} // option for restricting the number of recipients per email notification
-
-if (!isset($this->subscribe2_options['pages'])) {
 	$this->subscribe2_options['pages'] = "no";
 } // option for sending notifications for WordPress pages
 

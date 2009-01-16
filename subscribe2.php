@@ -1165,6 +1165,7 @@ class s2class {
 		if ('' == $unconfirmed) { $unconfirmed = array(); }
 		if ('' == $registered) { $registered = array(); }
 
+		$show = array('all', 'public', 'confirmed', 'unconfirmed');
 		$reminderform = false;
 		$urlpath = str_replace("\\", "/", S2PATH);
 		$urlpath = trailingslashit(get_option('siteurl')) . substr($urlpath,strpos($urlpath, "wp-content/"));
@@ -1309,7 +1310,6 @@ class s2class {
 				echo "<td width=\"50%\" align=\"right\"><input type=\"submit\" name=\"remind\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" class=\"button\" /></td></tr>\r\n";
 			}
 			echo "<tr><td valign=\"bottom\">" . $strip . "\r\n";
-			$show = array('all', 'public', 'confirmed', 'unconfirmed');
 			if (in_array($what, $show)) {
 				echo "</td><td align=\"right\"><input type=\"submit\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" class=\"button\" />\r\n";
 			}
@@ -1375,7 +1375,7 @@ class s2class {
 			}
 		}
 		echo "</table>\r\n";
-		if (in_array($what, $show)) {
+		if ( (in_array($what, $show)) && (!empty($subscribers)) ) {
 			echo "<table width=\"100%\">";
 			echo "<tr><td valign=\"bottom\">" . $strip . "</td>\r\n";
 			echo "<td align=\"right\"><input type=\"submit\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" class=\"button\" />\r\n";
