@@ -353,6 +353,7 @@ class s2class {
 	*/
 	function publish($post = 0) {
 		if (!$post) { return $post; }
+		global $post;
 		$s2mail = get_post_meta($post->ID, 's2mail', true);
 		if (strtolower(trim($s2mail)) == 'no') { return $post; }
 
