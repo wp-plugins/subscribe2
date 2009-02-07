@@ -34,6 +34,10 @@ if(!isset($this->subscribe2_options['s2page'])) {
 	$this->subscribe2_options['s2page'] = 0;
 } // option for default WordPress page for Subscribe2 to use
 
+if (!isset($this->subscribe2_options['stylesheet'])) {
+	$this->subscribe2_options['stylesheet'] = "yes";
+} // option to include link to theme stylesheet from HTML notifications
+
 if (!isset($this->subscribe2_options['pages'])) {
 	$this->subscribe2_options['pages'] = "no";
 } // option for sending notifications for WordPress pages

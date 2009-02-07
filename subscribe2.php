@@ -1,9 +1,9 @@
-﻿<?php
+<?php
 /*
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.13
+Version: 4.14
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -31,7 +31,7 @@ along with Subscribe2.  If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.13');
+define('S2VERSION', '4.14');
 define('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // Pre-2.6 compatibility
@@ -82,7 +82,7 @@ class s2class {
 
 		$this->mail_failed = "<p>" . __('Message failed! Check your settings and check with your hosting provider', 'subscribe2') . "</p>";
 
-		$this->form = "<form method=\"post\" action=\"\" id=\"subscribe2form\"><label for=\"subscribe2email\">" . __('Your email:', 'subscribe2') . "</label><input type=\"text\" name=\"email\" value=\"\" size=\"20\"  id=\"subscribe2email\" /><br /><input type=\"radio\" name=\"s2_action\" value=\"subscribe\" checked=\"checked\" id=\"s2_action-subscribe\" /><label for=\"s2_action-subscribe\">" . __('Subscribe', 'subscribe2') . "</label><input type=\"radio\" name=\"s2_action\" value=\"unsubscribe\" id=\"s2_action-unsubscribe\" /><label for=\"s2_action-unsubscribe\">" . __('Unsubscribe', 'subscribe2') . " </label><input type=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></form>\r\n";
+		$this->form = "<form method=\"post\" action=\"\"><p>" . __('Your email:', 'subscribe2') . "<br /><input type=\"text\" name=\"email\" value=\"\" size=\"20\" /><br /><input type=\"radio\" name=\"s2_action\" value=\"subscribe\" checked=\"checked\" />" . __('Subscribe', 'subscribe2') . "&nbsp;&nbsp;&nbsp;<input type=\"radio\" name=\"s2_action\" value=\"unsubscribe\" />" . __('Unsubscribe', 'subscribe2') . "<br /><input type=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></p></form>\r\n";
 
 		// confirmation messages
 		$this->no_such_email = "<p>" . __('No such email address is registered.', 'subscribe2') . "</p>";
@@ -104,7 +104,7 @@ class s2class {
 		$this->options_reset = __('Options reset!', 'subscribe2');
 	} // end load_strings()
 
-/* ===== WordPress menu registration ===== */
+/* ===== WordPress menu registration and scripts ===== */
 	/**
 	Hook the menu
 	*/
@@ -123,7 +123,7 @@ class s2class {
 		add_submenu_page('post-new.php', __('Mail Subscribers', 'subscribe2'), __('Mail Subscribers', 'subscribe2'), "publish_posts", __FILE__, array(&$this, 'write_menu'));
 
 		$s2nonce = md5('subscribe2');
-	}
+	} // end admin_menu()
 
 	/**
 	Hook for Admin Drop Down Icons
@@ -134,23 +134,18 @@ class s2class {
 		} else {
 			return $hook;
 		}
-	}
+	} // end ozh_s2_icon()
 
 	/**
 	Insert Javascript into admin_header
 	*/
 	function checkbox_form_js() {
 		wp_enqueue_script('s2_checkbox', WP_CONTENT_URL . '/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_checkbox.js', array('jquery'), '1.0');
-	}
+	} //end checkbox_form_js()
 
 	function option_form_js() {
 		wp_enqueue_script('s2_edit', WP_CONTENT_URL . '/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_edit.js', array('jquery'), '1.0');
-	}
-
-	function add_weekly_sched($sched) {
-		$sched['weekly'] = array('interval' => 604800, 'display' => __('Weekly', 'subscribe2'));
-		return $sched;
-	}
+	} // end option_form_js()
 
 /* ===== Install, upgrade, reset ===== */
 	/**
@@ -260,16 +255,20 @@ class s2class {
 		$headers .= "Precedence: list\nList-Id: " . get_option('blogname') . "\n";
 
 		if ('html' == $type) {
-				// To send HTML mail, the Content-Type header must be set
-				$headers .= "MIME-Version: 1.0\n";
-				$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
+			// To send HTML mail, the Content-Type header must be set
+			$headers .= "MIME-Version: 1.0\n";
+			$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
+			if ('yes' == $this->subscribe2_options['stylesheet']) {
 				$mailtext = "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . get_bloginfo('stylesheet_url') . "\" type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>";
+			} else {
+				$mailtext = "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>";
+			}
 		} else {
-				$headers .= "MIME-Version: 1.0\n";
-				$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
-				$message = preg_replace('|&[^a][^m][^p].{0,3};|', '', $message);
-				$message = preg_replace('|&amp;|', '&', $message);
-				$mailtext = wordwrap(strip_tags($message), 80, "\n");
+			$headers .= "MIME-Version: 1.0\n";
+			$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
+			$message = preg_replace('|&[^a][^m][^p].{0,3};|', '', $message);
+			$message = preg_replace('|&amp;|', '&', $message);
+			$mailtext = wordwrap(strip_tags($message), 80, "\n");
 		}
 
 		// Replace any escaped html symbols in subject
@@ -353,9 +352,9 @@ class s2class {
 	*/
 	function publish($post = 0) {
 		if (!$post) { return $post; }
-		global $post;
+
 		$s2mail = get_post_meta($post->ID, 's2mail', true);
-		if (strtolower(trim($s2mail)) == 'no') { return $post; }
+		if ( ($_POST['s2_meta_field'] == 'no') || (strtolower(trim($s2mail)) == 'no') ) { return $post; }
 
 		// are we doing daily digests? If so, don't send anything now
 		if ($this->subscribe2_options['email_freq'] != 'never') { return $post; }
@@ -445,6 +444,8 @@ class s2class {
 		if (function_exists('strip_shortcodes')) {
 			$plaintext = strip_shortcodes($plaintext);
 		}
+		$gallid = '[gallery id="' . $post->ID . '"]';
+		$post->post_content = str_replace('[gallery]', $gallid, $post->post_content);
 		$content = apply_filters('the_content', $post->post_content);
 		$content = str_replace("]]>", "]]&gt", $content);
 		$excerpt = $post->post_excerpt;
@@ -498,7 +499,7 @@ class s2class {
 		$post = get_post($id);
 		$this->publish($post);
 		return $post;
-	}
+	} // end publish_phone()
 
 	/**
 	Send confirmation email to the user
@@ -568,7 +569,7 @@ class s2class {
 			return false;
 		}
 		return $wpdb->get_var("SELECT email FROM $this->public WHERE id=$id");
-	} // end get_email
+	} // end get_email()
 
 	/**
 	Given a public subscriber email, returns the subscriber ID
@@ -583,7 +584,7 @@ class s2class {
 	} // end get_id()
 
 	/**
-	Activate an email address
+	Activate an public subscriber email address
 	If the address is not already present, it will be added
 	*/
 	function activate ($email = '') {
@@ -607,7 +608,7 @@ class s2class {
 	} // end activate()
 
 	/**
-	Add an unconfirmed email address to the subscriber list
+	Add an public subscriber to the subscriber table as unconfirmed
 	*/
 	function add ($email = '') {
 		if ($this->filtered ==1) { return; }
@@ -631,7 +632,7 @@ class s2class {
 	} // end add()
 
 	/**
-	Remove a user from the subscription table
+	Remove a public subscriber user from the subscription table
 	*/
 	function delete($email = '') {
 		global $wpdb;
@@ -752,7 +753,7 @@ class s2class {
 		if ('' != $this->message) {
 			return $this->message;
 		}
-	} // end confirm
+	} // end confirm()
 
 	/**
 	Is the supplied email address a public subscriber?
@@ -784,7 +785,7 @@ class s2class {
 		} else {
 			return false;
 		}
-	}
+	} // end is_registered()
 
 	/**
 	Return an array of all the public subscribers
@@ -1006,7 +1007,7 @@ class s2class {
 			$newcats = array_merge($cats, $old_cats);
 			update_usermeta($user_ID, 's2_subscribed', implode(',', $newcats));
 		}
-	} // end subscribe_registered_users
+	} // end subscribe_registered_users()
 
 	/**
 	Unsubscribe all registered users to category selected on Admin Manage Page
@@ -1044,7 +1045,7 @@ class s2class {
 				update_usermeta($user_ID, 's2_subscribed', '-1');
 			}
 		}
-	} // end unsubscribe_registered_users
+	} // end unsubscribe_registered_users()
 
 	/**
 	Autosubscribe registered users to newly created categories
@@ -1067,7 +1068,7 @@ class s2class {
 			$newcats = array_merge($old_cats, (array)$new_category);
 			update_usermeta($user_ID, 's2_subscribed', implode(',', $newcats));
 		}
-	} // end autosub_new_category
+	} // end autosub_new_category()
 
 	/**
 	Get admin data from record 1 or first user with admin rights
@@ -1089,7 +1090,7 @@ class s2class {
 			$admin = get_userdata($wpdb->get_var($sql));
 		}
 		return $admin;
-	} //end get_userdata
+	} //end get_userdata()
 	
 /* ===== Menus ===== */
 	/**
@@ -1430,8 +1431,9 @@ class s2class {
 				$this->subscribe2_options['sender'] = $sender;
 
 				// send email for pages, private and password protected posts
-				$this->subscribe2_options['pages']= $_POST['pages'];
-				$this->subscribe2_options['password']= $_POST['password'];
+				$this->subscribe2_options['stylesheet'] = $_POST['stylesheet'];
+				$this->subscribe2_options['pages'] = $_POST['pages'];
+				$this->subscribe2_options['password'] = $_POST['password'];
 				$this->subscribe2_options['private'] = $_POST['private'];
 
 				// send per-post or digest emails
@@ -1529,7 +1531,7 @@ class s2class {
 		// settings for outgoing emails
 		echo "<h2>" . __('Notification Settings', 'subscribe2') . "</h2>\r\n";
 		echo "<p>";
-		echo __('Restrict the number of recpients per email to (0 for unlimited)', 'subscribe2') . ': ';
+		echo __('Restrict the number of recipients per email to (0 for unlimited)', 'subscribe2') . ': ';
 		echo "<span id=\"s2bcc_1\"><span id=\"s2bcc\" style=\"background-color: #FFFBCC\">" . $this->subscribe2_options['bcclimit'] . "</span> ";
 		echo "<a href=\"#\" onclick=\"s2_show('bcc'); return false;\">" . __('Edit', 'subscribe2') . "</a></span>\n";
 		echo "<span id=\"s2bcc_2\">\r\n";
@@ -1557,9 +1559,21 @@ class s2class {
 		if ('none' == $this->subscribe2_options['admin_email']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Neither', 'subscribe2');
+		echo " /> " . __('Neither', 'subscribe2') . "<br /><br />\r\n";
 
-		echo "<br /><br />" . __('Send Emails for Pages', 'subscribe2') . ': ';
+		echo __('Include theme CSS stylesheet in HTML notifications', 'subscribe2') . ': ';
+		echo "<input type=\"radio\" name=\"stylesheet\" value=\"yes\"";
+		if ('yes' == $this->subscribe2_options['stylesheet']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
+		echo "<input type=\"radio\" name=\"stylesheet\" value=\"no\"";
+		if ('no' == $this->subscribe2_options['stylesheet']) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
+		
+		echo __('Send Emails for Pages', 'subscribe2') . ': ';
 		echo "<input type=\"radio\" name=\"pages\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['pages']) {
 			echo " checked=\"checked\"";
@@ -2202,6 +2216,17 @@ class s2class {
 	} // end display_digest_choices()
 
 	/**
+	Adds a link directly to the settings page from the plugin page
+	*/
+	function plugin_action($links, $file) {
+		if ($file == plugin_basename(dirname(__FILE__).'/subscribe2.php')) {
+			$s2link[] = "<a href='options-general.php?page=subscribe2/subscribe2.php'><b>" . __('Settings', 'subscribe2') . "</b></a>";
+			$links = array_merge($s2link, $links);
+		}
+		return $links;
+	} // end plugin_action()
+
+	/**
 	Adds information to the WordPress registration screen for new users
 	*/
 	function register_form() {
@@ -2231,6 +2256,61 @@ class s2class {
 			$this->register($user_id->ID);
 		}
 	}
+
+	/**
+	Create meta box on write pages
+	*/
+	function s2_meta_init() {
+		if (function_exists('add_meta_box')) {
+			add_meta_box('subscribe2', __( 'Subscribe2 Notification Override', 'subscribe2' ), array(&$this, 's2_meta_box'), 'post', 'advanced');
+			add_meta_box('subscribe2', __( 'Subscribe2 Notification Override', 'subscribe2' ), array(&$this, 's2_meta_box'), 'page', 'advanced');
+		} else {
+			add_action('dbx_post_advanced', array(&$this, 's2_meta_box_old'));
+			add_action('dbx_page_advanced', array(&$this, 's2_meta_box_old'));
+		}
+	} // end s2_meta_init()
+
+	/**
+	Meta box code for WordPress 2.5+
+	*/
+	function s2_meta_box() {
+		global $post_ID;
+		$s2mail = get_post_meta($post_ID, 's2mail', true);		
+		echo "<input type=\"hidden\" name=\"s2meta_nonce\" id=\"s2meta_nonce\" value=\"" . wp_create_nonce(md5(plugin_basename(__FILE__))) . "\" />";
+		echo __("Check here to disable sending of an email notification for this post/page", 'subscribe2');
+		echo "&nbsp;&nbsp;<input type=\"checkbox\" name=\"s2_meta_field\" value=\"no\"";
+		if ($s2mail == 'no') {
+			echo " checked=\"checked\"";
+		}
+		echo " />";
+	} // end s2_meta_box()
+
+	/**
+	Meta box code for WordPress pre-2.5
+	*/
+	function s2_meta_box_old() {
+		echo "<div class=\"dbx-b-ox-wrapper\">\r\n";
+		echo "<fieldset id=\"s2_meta_box\" class=\"dbx-box\">\r\n";
+		echo "<div class=\"dbx-h-andle-wrapper\"><h3 class=\"dbx-handle\">" . __('Subscribe2 Notification Override', 'subscribe2') . "</h3></div>\r\n";   
+		echo "<div class=\"dbx-c-ontent-wrapper\"><div class=\"dbx-content\">\r\n";
+		$this->s2_meta_box();
+		echo "</div></div></fieldset></div>\r\n";
+	} // end s2_meta_box_old()
+
+	/**
+	Meta box form handler
+	*/
+	function s2_meta_handler($post_id) {
+		if (!wp_verify_nonce($_POST['s2meta_nonce'], md5(plugin_basename(__FILE__)))) { return $post_id; }
+
+		if ('page' == $_POST['post_type']) {
+			if (!current_user_can('edit_page', $post_id)) { return $post_id; }
+		} else {
+			if (!current_user_can('edit_post', $post_id)) { return $post_id; }
+		}
+
+ 		update_post_meta($post_id, 's2mail', $_POST['s2_meta_field']);
+	} // end s2_meta_box_handler()
 
 /* ===== template and filter functions ===== */
 	/**
@@ -2357,7 +2437,7 @@ class s2class {
 		echo $content;
 		echo "</div>";
 		echo $after_widget;
-	}
+	} // end widget_subscribe2widget()
 
 	/**
 	Register the optional widget control form
@@ -2375,7 +2455,7 @@ class s2class {
 		echo "<p><label for=\"s2w-title\">" . __('Title:');
 		echo "<input style=\"width: 250px;\" id=\"s2w-title\" name=\"s2w-title\" type=\"text\" value=\"" . $title . "\" /></label></p>";
 		echo "<input type=\"hidden\" id=\"s2w-submit\" name=\"s2w-submit\" value=\"1\" />";
-	}
+	} // end widget_subscribe2_widget_control()
 
 	/**
 	Actually register the Widget into the WordPress Widget API
@@ -2388,7 +2468,7 @@ class s2class {
 			register_sidebar_widget('Subscribe2', array(&$this, 'widget_subscribe2widget'));
 			register_widget_control('Subscribe2', array(&$this, 'widget_subscribe2widget_control'));
 		}
-	}
+	} // end register_subscribe2widget()
 
 	/**
 	Add hook for Minimeta Widget plugin
@@ -2397,18 +2477,7 @@ class s2class {
 		if ($this->subscribe2_options['s2page'] != 0) {
 			echo "<li><a href=\"" . get_option('siteurl') . "/?page_id=" . $this->subscribe2_options['s2page'] . "\">" . __('[Un]Subscribe to Posts', 'subscribe2') . "</a></li>\r\n";
 		}
-	}
-
-	/**
-	Adds a link directly to the settings page from the plugin page
-	*/
-	function plugin_action($links, $file) {
-		if ($file == plugin_basename(dirname(__FILE__).'/subscribe2.php')) {
-			$s2link[] = "<a href='options-general.php?page=subscribe2/subscribe2.php'><b>" . __('Settings', 'subscribe2') . "</b></a>";
-			$links = array_merge($s2link, $links);
-		}
-		return $links;
-	}
+	} // end add_minimeta()
 
 /* ===== Write Toolbar Button Functions ===== */
 
@@ -2434,7 +2503,7 @@ class s2class {
 				buttonsnap_separator();
 				buttonsnap_jsbutton(WP_CONTENT_URL . '/plugins/subscribe2/include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
 			}
-	}
+	} // end button_init()
 
 	/**
 	Add buttons for WordPress 2.5+ using built in hooks
@@ -2480,6 +2549,14 @@ class s2class {
 	}
 
 /* ===== wp-cron functions ===== */
+	/**
+	Add a weekly event to cron
+	*/
+	function add_weekly_sched($sched) {
+		$sched['weekly'] = array('interval' => 604800, 'display' => __('Weekly', 'subscribe2'));
+		return $sched;
+	} // end add_weekly_sched()
+
 	/**
 	Send a daily digest of today's new posts
 	*/
@@ -2617,7 +2694,7 @@ class s2class {
 		if ('1' == $this->subscribe2_options['widget']) {
 			add_action('plugins_loaded', array(&$this, 'register_subscribe2widget'));
 		}
-	}
+	} // end s2init()
 
 	function subscribe2() {
 		global $table_prefix;
@@ -2653,6 +2730,8 @@ class s2class {
 		
 		//add regular actions and filters
 		add_action('admin_menu', array(&$this, 'admin_menu'));
+		add_action('admin_menu', array(&$this, 's2_meta_init'));
+		add_action('save_post', array(&$this, 's2_meta_handler'));
 		add_action('create_category', array(&$this, 'autosub_new_category'));
 		add_filter('the_content', array(&$this, 'filter'), 10);
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
