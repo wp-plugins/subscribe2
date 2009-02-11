@@ -2309,8 +2309,10 @@ class s2class {
 			if (!current_user_can('edit_post', $post_id)) { return $post_id; }
 		}
 
- 		if ($_POST['s2_meta_field'] == 'yes') {
+ 		if ($_POST['s2_meta_field'] == 'no') {
  			update_post_meta($post_id, 's2mail', $_POST['s2_meta_field']);
+ 		} else {
+ 			delete_post_meta($post_id, 's2mail');
  		}
 	} // end s2_meta_box_handler()
 
