@@ -3,13 +3,13 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.13
+Version: 4.14
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
 
 /*
-Copyright (C) 2006-8 Matthew Robinson
+Copyright (C) 2006-9 Matthew Robinson
 Based on the Original Subscribe2 plugin by 
 Copyright (C) 2005 Scott Merrill (skippy@skippy.net)
 
@@ -1997,8 +1997,8 @@ class s2class {
 			} else {
 				$recipients = $this->get_registered();
 			}
-			$subject = stripslashes(strip_tags($_POST['subject']));
-			$body = stripslashes($_POST['content']);
+			$subject = $this->substitute(stripslashes(strip_tags($_POST['subject'])));
+			$body = $this->substitute(stripslashes($_POST['content']));
 			$status = $this->mail($recipients, $subject, $body, 'text');
 			if ($status) {
 				$message = $this->mail_sent;
@@ -2189,7 +2189,7 @@ class s2class {
 			}
 			echo " /> " . $value['display'] . "<br />\r\n";
 		}
-		echo "<br />" . __('Send Digest Notification at', 'subscribe2', 'subscribe2') . ": \r\n";
+		echo "<br />" . __('Send Digest Notification at', 'subscribe2') . ": \r\n";
 		$hours = array('12am', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm');
 		echo "<select name=\"hour\">\r\n";
 		while ($hour = current($hours)) {
