@@ -82,7 +82,7 @@ class s2class {
 
 		$this->mail_failed = "<p>" . __('Message failed! Check your settings and check with your hosting provider', 'subscribe2') . "</p>";
 
-		$this->form = "<form method=\"post\" action=\"\"><p>" . __('Your email:', 'subscribe2') . "<br /><input type=\"text\" name=\"email\" value=\"\" size=\"20\" /><br /><input type=\"radio\" name=\"s2_action\" value=\"subscribe\" checked=\"checked\" />" . __('Subscribe', 'subscribe2') . "&nbsp;&nbsp;&nbsp;<input type=\"radio\" name=\"s2_action\" value=\"unsubscribe\" />" . __('Unsubscribe', 'subscribe2') . "<br /><input type=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></p></form>\r\n";
+		$this->form = "<form method=\"post\" action=\"\"><p>" . __('Your email:', 'subscribe2') . "<br /><input type=\"text\" name=\"email\" value=\"\" size=\"20\" /></p><p><label><input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" /></label>&nbsp;<label><input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" /><label></p></form>\r\n";
 
 		// confirmation messages
 		$this->no_such_email = "<p>" . __('No such email address is registered.', 'subscribe2') . "</p>";
@@ -1391,8 +1391,8 @@ class s2class {
 		echo "<strong><em style=\"color: red\">" . __('Consider User Privacy as changes cannot be undone', 'subscribe2') . "</em></strong><br />\r\n";
 		echo "</p>";
 		echo "<br />" . __('Action to perform', 'subscribe2') . ":\r\n";
-		echo "<input type=\"radio\" name=\"manage\" value=\"subscribe\" checked=\"checked\" />" . __('Subscribe', 'subscribe2') . "\r\n";
-		echo "<input type=\"radio\" name=\"manage\" value=\"unsubscribe\" />" . __('Unsubscribe', 'subscribe2') . "<br /><br />\r\n";
+		echo "<label><input type=\"radio\" name=\"manage\" value=\"subscribe\" checked=\"checked\" />" . __('Subscribe', 'subscribe2') . "</label>\r\n";
+		echo "<label><input type=\"radio\" name=\"manage\" value=\"unsubscribe\" />" . __('Unsubscribe', 'subscribe2') . "</label><br /><br />\r\n";
 		echo "<input type=\"hidden\" name=\"emails\" value=\"$emails\" />\r\n";
 		$this->display_category_form();
 		echo "<p class=\"submit\"><input type=\"submit\" id=\"deletepost\" name=\"register\" value=\"" . __('Submit', 'subscribe2') . "\" /></p>";
@@ -1540,83 +1540,83 @@ class s2class {
 		echo "<a href=\"#\" onclick=\"s2_revert('bcc'); return false;\">". __('Revert', 'subscribe2') . "</a></span>\n";
 
 		echo "<br /><br />" . __('Send Admins notifications for new', 'subscribe2') . ': ';
-		echo "<input type=\"radio\" name=\"admin_email\" value=\"subs\"";
+		echo "<label><input type=\"radio\" name=\"admin_email\" value=\"subs\"";
 		if ('subs' == $this->subscribe2_options['admin_email']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Subscriptions', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"admin_email\" value=\"unsubs\"";
+		echo " /> " . __('Subscriptions', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"admin_email\" value=\"unsubs\"";
 		if ('unsubs' == $this->subscribe2_options['admin_email']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Unsubscriptions', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"admin_email\" value=\"both\"";
+		echo " /> " . __('Unsubscriptions', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"admin_email\" value=\"both\"";
 		if ('both' == $this->subscribe2_options['admin_email']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Both', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"admin_email\" value=\"none\"";
+		echo " /> " . __('Both', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"admin_email\" value=\"none\"";
 		if ('none' == $this->subscribe2_options['admin_email']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Neither', 'subscribe2') . "<br /><br />\r\n";
+		echo " /> " . __('Neither', 'subscribe2') . "</label><br /><br />\r\n";
 
 		echo __('Include theme CSS stylesheet in HTML notifications', 'subscribe2') . ': ';
-		echo "<input type=\"radio\" name=\"stylesheet\" value=\"yes\"";
+		echo "<label><input type=\"radio\" name=\"stylesheet\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['stylesheet']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"stylesheet\" value=\"no\"";
+		echo " /> " . __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"stylesheet\" value=\"no\"";
 		if ('no' == $this->subscribe2_options['stylesheet']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
+		echo " /> " . __('No', 'subscribe2') . "</label><br /><br />\r\n";
 		
 		echo __('Send Emails for Pages', 'subscribe2') . ': ';
-		echo "<input type=\"radio\" name=\"pages\" value=\"yes\"";
+		echo "<label><input type=\"radio\" name=\"pages\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['pages']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"pages\" value=\"no\"";
+		echo " /> " . __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"pages\" value=\"no\"";
 		if ('no' == $this->subscribe2_options['pages']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
+		echo " /> " . __('No', 'subscribe2') . "</label><br /><br />\r\n";
 		echo __('Send Emails for Password Protected Posts', 'subscribe2') . ': ';
-		echo "<input type=\"radio\" name=\"password\" value=\"yes\"";
+		echo "<label><input type=\"radio\" name=\"password\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['password']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"password\" value=\"no\"";
+		echo " /> " . __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"password\" value=\"no\"";
 		if ('no' == $this->subscribe2_options['password']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
+		echo " /> " . __('No', 'subscribe2') . "</label><br /><br />\r\n";
 		echo __('Send Emails for Private Posts', 'subscribe2') . ': ';
-		echo "<input type=\"radio\" name=\"private\" value=\"yes\"";
+		echo "<label><input type=\"radio\" name=\"private\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['private']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"private\" value=\"no\"";
+		echo " /> " . __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"private\" value=\"no\"";
 		if ('no' == $this->subscribe2_options['private']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
+		echo " /> " . __('No', 'subscribe2') . "</label><br /><br />\r\n";
 		echo __('Send Email From', 'subscribe2') . ': ';
-		echo "<input type=\"radio\" name=\"sender\" value=\"author\"";
+		echo "<label><input type=\"radio\" name=\"sender\" value=\"author\"";
 		if ('author' == $this->subscribe2_options['sender']) {
 			echo " checked=\"checked\" ";
 		}
-		echo " /> " . __('Author of the post', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"sender\" value=\"admin\"";
+		echo " /> " . __('Author of the post', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"sender\" value=\"admin\"";
 		if ('admin' == $this->subscribe2_options['sender']) {
 			echo " checked=\"checked\" ";
 		}
-		echo " /> " . __('Blog Admin', 'subscribe2') . "<br /><br />\r\n";
+		echo " /> " . __('Blog Admin', 'subscribe2') . "</label><br /><br />\r\n";
 		if (function_exists('wp_schedule_event')) {
 			echo __('Send Email as Digest', 'subscribe2') . ": <br /><br />\r\n";
 			$this->display_digest_choices();
@@ -1660,11 +1660,11 @@ class s2class {
 		echo "<strong><em style=\"color: red\">" . __('Posts assigned to any Excluded Category do not generate notifications and are not included in digest notifications', 'subscribe2') . "</em></strong><br />\r\n";
 		echo"</p>";
 		$this->display_category_form(explode(',', $this->subscribe2_options['exclude']));
-		echo "<center><input type=\"checkbox\" name=\"reg_override\" value=\"1\"";
+		echo "<center><label><input type=\"checkbox\" name=\"reg_override\" value=\"1\"";
 		if ('1' == $this->subscribe2_options['reg_override']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</center><br />\r\n";
+		echo " /> " . __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</label></center><br />\r\n";
 		
 		// Appearance options
 		echo "<h2>" . __('Appearance', 'subscribe2') . "</h2>\r\n";
@@ -1689,96 +1689,96 @@ class s2class {
 		echo "<a href=\"#\" onclick=\"s2_revert('entries'); return false;\">". __('Revert', 'subscribe2') . "</a></span>\n";
 
 		// show link to WordPress page in meta
-		echo "<br /><br /><input type=\"checkbox\" name=\"show_meta\" value=\"1\"";
+		echo "<br /><br /><label><input type=\"checkbox\" name=\"show_meta\" value=\"1\"";
 		if ('1' == $this->subscribe2_options['show_meta']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Show a link to your subscription page in "meta"?', 'subscribe2') . "<br /><br />\r\n";
+		echo " /> " . __('Show a link to your subscription page in "meta"?', 'subscribe2') . "</label><br /><br />\r\n";
 
 		// show QuickTag button
-		echo "<input type=\"checkbox\" name=\"show_button\" value=\"1\"";
+		echo "<label><input type=\"checkbox\" name=\"show_button\" value=\"1\"";
 		if ('1' == $this->subscribe2_options['show_button']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Show the Subscribe2 button on the Write toolbar?', 'subscribe2') . "<br /><br />\r\n";
+		echo " /> " . __('Show the Subscribe2 button on the Write toolbar?', 'subscribe2') . "</label><br /><br />\r\n";
 
 		// show Widget
-		echo "<input type=\"checkbox\" name=\"widget\" value=\"1\"";
+		echo "<label><input type=\"checkbox\" name=\"widget\" value=\"1\"";
 		if ('1' == $this->subscribe2_options['widget']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Enable Subscribe2 Widget?', 'subscribe2') . "<br /><br />\r\n";
+		echo " /> " . __('Enable Subscribe2 Widget?', 'subscribe2') . "</label><br /><br />\r\n";
 		echo"</p>";
 
 		//Auto Subscription for new registrations
 		echo "<h2>" . __('Auto Subscribe', 'subscribe2') . "</h2>\r\n";
 		echo"<p>";
 		echo __('Subscribe new users registering with your blog', 'subscribe2') . ":<br />\r\n";
-		echo "<input type=\"radio\" name=\"autosub\" value=\"yes\"";
+		echo "<label><input type=\"radio\" name=\"autosub\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['autosub']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Automatically', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"autosub\" value=\"wpreg\"";
+		echo " /> " . __('Automatically', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"autosub\" value=\"wpreg\"";
 		if ('wpreg' == $this->subscribe2_options['autosub']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('Display option on Registration Form', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"autosub\" value=\"no\"";
+		echo " /> " . __('Display option on Registration Form', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"autosub\" value=\"no\"";
 		if ('no' == $this->subscribe2_options['autosub']) {
 			echo " checked=\"checked\"";
 		}
-		echo " /> " . __('No', 'subscribe2') . "<br /><br />\r\n";
+		echo " /> " . __('No', 'subscribe2') . "</label><br /><br />\r\n";
 		echo __('Registration Form option is checked by default', 'subscribe2') . ": &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"wpregdef\" value=\"yes\"";
+		echo "<label><input type=\"radio\" name=\"wpregdef\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['wpregdef']) {
 			echo " checked=\"checked\"";
 		}
-		echo " />" . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"wpregdef\" value=\"no\"";
+		echo " />" . __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"wpregdef\" value=\"no\"";
 		if ('no' == $this->subscribe2_options['wpregdef']) {
 			echo " checked=\"checked\"";
 		}
-		echo " />" . __('No', 'subscribe2') . "<br /><br />\r\n";
+		echo " />" . __('No', 'subscribe2') . "</label><br /><br />\r\n";
 		echo __('Auto-subscribe users to receive email as', 'subscribe2') . ": <br />\r\n";
-		echo "<input type=\"radio\" name=\"autoformat\" value=\"html\"";
+		echo "<label><input type=\"radio\" name=\"autoformat\" value=\"html\"";
 		if ('html' == $this->subscribe2_options['autoformat']) {
 			echo "checked=\"checked\" ";
 		}
-		echo "/> " . __('HTML', 'subscribe2') ." &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"autoformat\" value=\"fulltext\" ";
+		echo "/> " . __('HTML', 'subscribe2') ."</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"autoformat\" value=\"fulltext\" ";
 		if ('fulltext' == $this->subscribe2_options['autoformat']) {
 			echo "checked=\"checked\" ";
 		}
-		echo "/> " . __('Plain Text - Full', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"autoformat\" value=\"text\" ";
+		echo "/> " . __('Plain Text - Full', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"autoformat\" value=\"text\" ";
 		if ('text' == $this->subscribe2_options['autoformat']) {
 			echo "checked=\"checked\" ";
 		}
-		echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . " <br /><br />";
+		echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . "</label><br /><br />";
 		echo __('Show Auto Subscribe option on Users page', 'subscribe2') . ": <br />\r\n";
-		echo "<input type=\"radio\" name=\"show_autosub\" value=\"yes\"";
+		echo "<label><input type=\"radio\" name=\"show_autosub\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['show_autosub']) {
 			echo " checked=\"checked\"";
 		}
-		echo " />" . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"show_autosub\" value=\"no\"";
+		echo " />" . __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"show_autosub\" value=\"no\"";
 		if ('no' == $this->subscribe2_options['show_autosub']) {
 			echo " checked=\"checked\"";
 		}
-		echo " />" . __('No', 'subscribe2') . "<br /><br />";
+		echo " />" . __('No', 'subscribe2') . "</label><br /><br />";
 		echo __('Auto Subscribe me to new categories is checked by default', 'subscribe2') . ": <br />\r\n";
-		echo "<input type=\"radio\" name=\"autosub_def\" value=\"yes\"";
+		echo "<label><input type=\"radio\" name=\"autosub_def\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['autosub_def']) {
 			echo " checked=\"checked\"";
 		}
-		echo " />" . __('Yes', 'subscribe2') . " &nbsp;&nbsp;";
-		echo "<input type=\"radio\" name=\"autosub_def\" value=\"no\"";
+		echo " />" . __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"autosub_def\" value=\"no\"";
 		if ('no' == $this->subscribe2_options['autosub_def']) {
 			echo " checked=\"checked\"";
 		}
 		echo " />" . __('No', 'subscribe2');
-		echo"</p>";
+		echo"</label></p>";
 
 		//barred domains
 		echo "<h2>" . __('Barred Domains', 'subscribe2') . "</h2>\r\n";
@@ -1908,39 +1908,39 @@ class s2class {
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"user\" />";
 		if ($this->subscribe2_options['email_freq'] == 'never') {
 			echo __('Receive email as', 'subscribe2') . ": &nbsp;&nbsp;";
-			echo "<input type=\"radio\" name=\"s2_format\" value=\"html\"";
+			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"html\"";
 			if ('html' == get_usermeta($user_ID, 's2_format')) {
 				echo "checked=\"checked\" ";
 			}
-			echo "/> " . __('HTML', 'subscribe2') ." &nbsp;&nbsp;";
-			echo "<input type=\"radio\" name=\"s2_format\" value=\"text\" ";
+			echo "/> " . __('HTML', 'subscribe2') ."</label>&nbsp;&nbsp;";
+			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"text\" ";
 			if ('text' == get_usermeta($user_ID, 's2_format')) {
 				echo "checked=\"checked\" ";
 			}
-			echo "/> " . __('Plain Text', 'subscribe2') . "<br /><br />\r\n";
+			echo "/> " . __('Plain Text', 'subscribe2') . "</label><br /><br />\r\n";
 
 			echo __('Email contains', 'subscribe2') . ": &nbsp;&nbsp;";
 			$amount = array('excerpt' => __('Excerpt Only', 'subscribe2'), 'post' => __('Full Post', 'subscribe2'));
 			foreach ($amount as $key => $value) {
-				echo "<input type=\"radio\" name=\"s2_excerpt\" value=\"" . $key . "\"";
+				echo "<label><input type=\"radio\" name=\"s2_excerpt\" value=\"" . $key . "\"";
 				if ($key == get_usermeta($user_ID, 's2_excerpt')) {
 					echo " checked=\"checked\"";
 				}
-				echo " /> " . $value . "&nbsp;&nbsp;";
+				echo " /> " . $value . "</label>&nbsp;&nbsp;";
 			}
 			echo "<br /><span style=\"color: red;line-height: 300%;\">" . __('Note: HTML format will always deliver the full post', 'subscribe2') . ".</span><br />\r\n";
 			if ($this->subscribe2_options['show_autosub'] == 'yes') {
 				echo __('Automatically subscribe me to newly created categories', 'subscribe2') . ': &nbsp;&nbsp;';
-				echo "<input type=\"radio\" name=\"new_category\" value=\"yes\" ";
+				echo "<label><input type=\"radio\" name=\"new_category\" value=\"yes\" ";
 				if ('yes' == get_usermeta($user_ID, 's2_autosub')) {
 					echo "checked=\"checked\" ";
 				}
-				echo "/> " . __('Yes', 'subscribe2') . "&nbsp;&nbsp;";
-				echo "<input type=\"radio\" name=\"new_category\" value=\"no\" ";
+				echo "/> " . __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
+				echo "<label><input type=\"radio\" name=\"new_category\" value=\"no\" ";
 				if ('no' == get_usermeta($user_ID, 's2_autosub')) {
 					echo "checked=\"checked\" ";
 				}
-				echo "/> " . __('No', 'subscribe2') . "<br /><br />";
+				echo "/> " . __('No', 'subscribe2') . "</label><br /><br />";
 				echo "</p>";
 			}
 
@@ -1951,19 +1951,19 @@ class s2class {
 			// we're doing daily digests, so just show
 			// subscribe / unnsubscribe
 			echo __('Receive daily summary of new posts?', 'subscribe2') . ': &nbsp;&nbsp;';
-			echo "<p>";
+			echo "<p><label>";
 			echo "<input type=\"radio\" name=\"category\" value=\"digest\" ";
 			if (get_usermeta($user_ID, 's2_subscribed') != '-1') {
 				echo "checked=\"yes\" ";
 			}
-			echo "/> " . __('Yes', 'subscribe2') . "<input type=\"radio\" name=\"category\" value=\"-1\" ";
+			echo "/> " . __('Yes', 'subscribe2') . "</label> <label><input type=\"radio\" name=\"category\" value=\"-1\" ";
 			if (get_usermeta($user_ID, 's2_subscribed') == '-1') {
 				echo "checked=\"yes\" ";
 			}
 			echo "/> " . __('No', 'subscribe2');
 			echo "</p>";
+			echo "</label></p>";
 		}
-
 
 		// submit
 		echo "<p class=\"submit\"><input type=\"submit\" name=\"submit\" value=\"" . __("Update Preferences", 'subscribe2') . " &raquo;\" /></p>";
@@ -2071,24 +2071,24 @@ class s2class {
 						$j++;
 				}
 				if (0 == $j) {
-						echo "<input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
+						echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 						if (in_array($cat->term_id, $selected)) {
 								echo " checked=\"checked\" ";
 						}
-						echo " /> " . $cat->name . "<br />\r\n";
+						echo " /> " . $cat->name . "</label><br />\r\n";
 					} else {
 
-						echo "<input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
+						echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 						if (in_array($cat->term_id, $selected)) {
 									echo " checked=\"checked\" ";
 						}
-						echo " /> " . $cat->name . "<br />\r\n";
+						echo " /> " . $cat->name . "</label><br />\r\n";
 				}
 				$i++;
 		}
 		echo "</td></tr>\r\n";
 		echo "<tr><td align=\"left\" colspan=\"2\">\r\n";
-		echo "<input type=\"checkbox\" name=\"checkall\" value=\"cat_checkall\" /> " . __('Select / Unselect All', 'subscribe2') . "\r\n";
+		echo "<label><input type=\"checkbox\" name=\"checkall\" value=\"cat_checkall\" /> " . __('Select / Unselect All', 'subscribe2') . "</label>\r\n";
 		echo "</td></tr>\r\n";
 		echo "</table>\r\n";
 	} // end display_category_form()
@@ -2183,11 +2183,11 @@ class s2class {
 			$schedule_sorted[$key] = $schedule[$key];
 		}
 		foreach ($schedule_sorted as $key => $value) {
-			echo "<input type=\"radio\" name=\"email_freq\" value=\"" . $key . "\"";
+			echo "<label><input type=\"radio\" name=\"email_freq\" value=\"" . $key . "\"";
 			if ($key == $this->subscribe2_options['email_freq']) {
 				echo " checked=\"checked\" ";
 			}
-			echo " /> " . $value['display'] . "<br />\r\n";
+			echo " /> " . $value['display'] . "</label><br />\r\n";
 		}
 		echo "<br />" . __('Send Digest Notification at', 'subscribe2') . ": \r\n";
 		$hours = array('12am', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm');
@@ -2333,7 +2333,7 @@ class s2class {
 				$this->s2form = $this->use_profile_users;
 			}
 		}
-		if (isset($_POST['s2_action'])) {
+		if ( (isset($_POST['subscribe'])) || (isset($_POST['unsubscribe'])) ) {
 			global $wpdb, $user_email;
 			if (!is_email($_POST['email'])) {
 				$this->s2form = $this->form . $this->not_an_email;
@@ -2349,7 +2349,7 @@ class s2class {
 				} else {
 					// this is not a registered email
 					// what should we do?
-					if ('subscribe' == $_POST['s2_action']) {
+					if (isset($_POST['subscribe'])) {
 						// someone is trying to subscribe
 						// lets see if they've tried to subscribe previously
 						if ('1' !== $this->is_public($this->email)) {
@@ -2368,7 +2368,7 @@ class s2class {
 							$this->s2form = $this->already_subscribed;
 						}
 						$this->action = 'subscribe';
-					} elseif ('unsubscribe' == $_POST['s2_action']) {
+					} elseif (isset($_POST['unsubscribe'])) {
 						// is this email a subscriber?
 						if (false == $this->is_public($this->email)) {
 							$this->s2form = $this->form . $this->not_subscribed;
@@ -2703,7 +2703,7 @@ class s2class {
 	function subscribe2() {
 		global $table_prefix;
 
-		load_plugin_textdomain('subscribe2', PLUGINDIR . '/' . dirname(plugin_basename(__FILE__)), dirname(plugin_basename(__FILE__)));
+		load_plugin_textdomain('subscribe2', 'wp-content/plugins/' . dirname(plugin_basename(__FILE__)), dirname(plugin_basename(__FILE__)));
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
