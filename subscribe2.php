@@ -2179,7 +2179,7 @@ class s2class {
 				echo "<h2>" . __('Subscribe to new blogs', 'subscribe2') . "</h2>\r\n";
 				echo "<ul class=\"s2_blogs s2_blogs_unsubscribed\">";
 				foreach ($blogs_notsubscribed as $blog) {
-					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "'\">" . wp_html_excerpt($blog['blogname'], 30) . "</a></span>\r\n";
+					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\">" . wp_html_excerpt($blog['blogname'], 30) . "</a></span>\r\n";
 					echo "<span class=\"buttons\"><a href=\"" . $subscribe_link . $blog['blog_id'] . "\">" . __('Subscribe', 'subscribe2') . "</a></span>\r\n";
 					echo "</li>";
 				}
