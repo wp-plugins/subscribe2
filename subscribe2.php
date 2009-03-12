@@ -2198,7 +2198,7 @@ class s2class {
 	Display the Write sub-menu
 	*/
 	function write_menu() {
-		global $wpdb, $s2nonce;
+		global $wpdb, $s2nonce, $current_user;
 
 		// was anything POSTed?
 		if (isset($_POST['s2_admin']) && ('mail' == $_POST['s2_admin']) ) {
@@ -2219,6 +2219,10 @@ class s2class {
 			}
 			$subject = $this->substitute(stripslashes(strip_tags($_POST['subject'])));
 			$body = $this->substitute(stripslashes($_POST['content']));
+			if (('' != $current_user->display_name) || ('' != $current_user->user_email)) {
+				$this->myname = html_entity_decode($current_user->display_name);
+				$this->myemail = $current_user->user_email;
+			}
 			$status = $this->mail($recipients, $subject, $body, 'text');
 			if ($status) {
 				$message = $this->mail_sent;
