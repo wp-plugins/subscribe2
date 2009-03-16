@@ -476,7 +476,7 @@ class s2class {
 		}
 		// we set these class variables so that we can avoid
 		// passing them in function calls a little later
-		$this->post_title = $post->post_title;
+		$this->post_title = "<a href=\"" . get_permalink($post->ID) . "\">" . $post->post_title . "</a>";
 		$this->permalink = "<a href=\"" . get_permalink($post->ID) . "\">" . get_permalink($post->ID) . "</a>";
 		
 		$author = get_userdata($post->post_author);
