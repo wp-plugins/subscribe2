@@ -279,11 +279,13 @@ class s2class {
 		$string = str_replace("BLOGLINK", get_bloginfo('url'), $string);
 		$string = str_replace("TITLE", stripslashes($this->post_title), $string);
 		$string = str_replace("PERMALINK", $this->permalink, $string);
-		$tinylink = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode($this->permalink));
-		if ( ($tinylink !== 'Error') || ($tinylink != FALSE) ) {
-			$string = str_replace("TINYLINK", $tinylink, $string);
-		} else {
-			$string = str_replace("TINYLINK", $this->permalink, $string);
+		if (strstr("TINYLINK", $string)) {
+			$tinylink = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode($this->permalink));
+				if ( ($tinylink !== 'Error') || ($tinylink != FALSE) ) {
+					$string = str_replace("TINYLINK", $tinylink, $string);
+				} else {
+					$string = str_replace("TINYLINK", $this->permalink, $string);
+				}
 		}
 		$string = str_replace("MYNAME", stripslashes($this->myname), $string);
 		$string = str_replace("EMAIL", $this->myemail, $string);
