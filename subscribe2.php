@@ -495,7 +495,8 @@ class s2class {
 		// Get email subject
 		$subject = stripslashes(strip_tags($this->substitute($this->s2_subject)));
 		// Get the message template
-		$mailtext = stripslashes($this->substitute($this->subscribe2_options['mailtext']));
+		$mailtext = apply_filter('s2_template_filter', $this->subscribe2_options['mailtext']);
+		$mailtext = stripslashes($this->substitute($mailtext));
 
 		$plaintext = $post->post_content;
 		if (function_exists('strip_shortcodes')) {
@@ -2728,6 +2729,9 @@ class s2class {
 			switch_to_blog($blog);
 
 			$sidebars = get_option('sidebar_widgets');
+			if (!is_array($sidebars)) {
+			 	$sidebars = array($sidebars);
+			}
 			$changed = false;
 			foreach ($sidebars as $i => $sidebar) {
 				if ($widget == 'subscribe2widget') {
@@ -2943,7 +2947,8 @@ class s2class {
 		$all_post_cats_string = implode(',', $all_post_cats);
 		$registered = $this->get_registered("cats=$all_post_cats_string");
 		$recipients = array_merge((array)$public, (array)$registered);
-		$mailtext = $this->substitute(stripslashes($this->subscribe2_options['mailtext']));
+		$mailtext = apply_filter('s2_template_filter', $this->subscribe2_options['mailtext']);
+		$mailtext = stripslashes($this->substitute($mailtext));
 		$mailtext = str_replace("TABLE", $table, $mailtext);
 		$mailtext = str_replace("POSTTIME", $message_posttime, $mailtext);
 		$mailtext = str_replace("POST", $message_post, $mailtext);
