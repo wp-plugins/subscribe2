@@ -4,7 +4,7 @@ Donate link: http://subscribe2.wordpress.com/donate/
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 2.0.x
 Tested up to: 2.7
-Stable tag: 4.14
+Stable tag: 4.13
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -113,6 +113,7 @@ Version 4.14 by Matthew Robinson
 * Improved layout of Tools->Subscriber page (Thanks to Anne-Marie Redpath)
 * Enhancements to Subscription form layout (Thanks to Anne-Marie Redpath and Andy Steinmark)
 * Sender details now uses current user information from Write->Mail Subscribers
+* Introduced 's2_template_filter' to allow other plugins to amend the email template on-the-fly
 
 Version 4.13 by Matthew Robinson
 
