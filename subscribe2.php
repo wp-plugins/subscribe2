@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.14
+Version: 4.15
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -31,7 +31,7 @@ along with Subscribe2.  If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.14');
+define('S2VERSION', '4.15');
 define('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // Pre-2.6 compatibility
@@ -495,7 +495,7 @@ class s2class {
 		// Get email subject
 		$subject = stripslashes(strip_tags($this->substitute($this->s2_subject)));
 		// Get the message template
-		$mailtext = apply_filter('s2_template_filter', $this->subscribe2_options['mailtext']);
+		$mailtext = apply_filter('s2_email_template', $this->subscribe2_options['mailtext']);
 		$mailtext = stripslashes($this->substitute($mailtext));
 
 		$plaintext = $post->post_content;
@@ -2721,22 +2721,24 @@ class s2class {
 	} // end register_subscribe2widget()
 
 	function namechange_subscribe2_widget() {
-		// rename widget without requiring user to re-enable
+		// rename WPMU widgets without requiring user to re-enable
 		global $wpdb;
 		$blogs = $wpdb->get_col("SELECT blog_id FROM {$wpdb->blogs}");
 
 		foreach ($blogs as $blog) {
 			switch_to_blog($blog);
 
-			$sidebars = get_option('sidebar_widgets');
-			if (!is_array($sidebars)) {
-			 	$sidebars = array($sidebars);
-			}
+			$sidebars = get_option('sidebars_widgets');
+			if ( (empty($sidebars)) || (!is_array($sidebars)) ) { return; }
 			$changed = false;
-			foreach ($sidebars as $i => $sidebar) {
-				if ($widget == 'subscribe2widget') {
-					$sidebars[$i][$k] = 'subscribe2';
-					$changed = true;
+			foreach ($sidebars as $s =>$sidebar) {
+				if (empty($sidebar)) { break; }
+					foreach ($sidebar as $w => $widget) {
+						if ($widget == 'subscribe2widget') {
+			 				$sidebars[$s][$w] = 'subscribe2';
+			 				$changed = true;
+			 			}
+					}
 				}
 			}
 			if ($changed) {
@@ -2947,7 +2949,7 @@ class s2class {
 		$all_post_cats_string = implode(',', $all_post_cats);
 		$registered = $this->get_registered("cats=$all_post_cats_string");
 		$recipients = array_merge((array)$public, (array)$registered);
-		$mailtext = apply_filter('s2_template_filter', $this->subscribe2_options['mailtext']);
+		$mailtext = apply_filter('s2_email_template', $this->subscribe2_options['mailtext']);
 		$mailtext = stripslashes($this->substitute($mailtext));
 		$mailtext = str_replace("TABLE", $table, $mailtext);
 		$mailtext = str_replace("POSTTIME", $message_posttime, $mailtext);
