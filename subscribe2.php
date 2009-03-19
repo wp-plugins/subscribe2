@@ -2732,13 +2732,12 @@ class s2class {
 			if ( (empty($sidebars)) || (!is_array($sidebars)) ) { return; }
 			$changed = false;
 			foreach ($sidebars as $s =>$sidebar) {
-				if (empty($sidebar)) { break; }
-					foreach ($sidebar as $w => $widget) {
-						if ($widget == 'subscribe2widget') {
-			 				$sidebars[$s][$w] = 'subscribe2';
-			 				$changed = true;
-			 			}
-					}
+			if (empty($sidebar)) { break; }
+				foreach ($sidebar as $w => $widget) {
+					if ($widget == 'subscribe2widget') {
+		 				$sidebars[$s][$w] = 'subscribe2';
+		 				$changed = true;
+		 			}
 				}
 			}
 			if ($changed) {
