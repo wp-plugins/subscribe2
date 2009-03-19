@@ -2,6 +2,7 @@ jQuery(document).ready(function() {
 	// hide our span before page loads
 	jQuery('#s2bcc_2').hide();
 	jQuery('#s2page_2').hide();
+	jQuery('#s2entries_2').hide();
 });
 
 //show span on clicking the edit link

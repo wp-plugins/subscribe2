@@ -1,0 +1,50 @@
+ul.s2_blogs { 
+	float:left;
+	width: 99%;
+}
+
+ul.s2_blogs li {
+	display: block;
+	width: 300px;
+	float: left;
+	padding: .5em 1em;
+	background-color: #e3e3e3;
+	margin-right: 1em;
+}
+
+ul.s2_blogs li .name {
+	display: block;
+}
+
+ul.s2_blogs li .buttons {
+	display: block;
+	float: left;
+	white-space: nowrap;
+}
+
+ul.s2_blogs li .buttons a {
+	font-size: .8em;
+	display: block;
+	float: left;
+	padding: .1em .5em;
+	background-color: #666;
+	color: white;
+	margin: .5em .5em 0 0;
+}
+
+ul.s2_blogs li .buttons a:hover {
+	background-color: whitesmoke;
+	color: #666;
+}
+
+ul.s2_blogs_unsubscribed li .buttons {
+	float: right;
+}
+
+ul.s2_blogs_unsubscribed li .buttons a {
+	margin: 0 0 0 1em;
+}
+
+ul.s2_blogs_unsubscribed li .name {
+	float: left;
+}
