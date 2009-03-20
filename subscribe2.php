@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.15
+Version: 4.16
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -31,7 +31,7 @@ along with Subscribe2.  If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.15');
+define('S2VERSION', '4.16');
 define('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // Pre-2.6 compatibility
@@ -495,7 +495,7 @@ class s2class {
 		// Get email subject
 		$subject = stripslashes(strip_tags($this->substitute($this->s2_subject)));
 		// Get the message template
-		$mailtext = apply_filter('s2_email_template', $this->subscribe2_options['mailtext']);
+		$mailtext = apply_filters('s2_email_template', $this->subscribe2_options['mailtext']);
 		$mailtext = stripslashes($this->substitute($mailtext));
 
 		$plaintext = $post->post_content;
@@ -915,15 +915,15 @@ class s2class {
 		if ('' != $r['cats']) {
 			$JOIN .= "INNER JOIN $wpdb->usermeta AS d ON a.user_id = d.user_id ";
 			foreach (explode(',', $r['cats']) as $cat) {
-				('' == $and) ? $and = "d.meta_key='{$this->get_usermeta_keyname('s2_cat')}$cat'" : $and .= " OR d.meta_key='{$this->get_usermeta_keyname('s2_cat')}$cat'";
+				('' == $and) ? $and = "d.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'" : $and .= " OR d.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'";
 			}
 			$AND .= " AND ($and)";
 		}
 
 		if ($s2_mu) {
-			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS e ON a.user_id = e.user_id " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND e.meta_key='{$this->get_usermeta_keyname('s2_subscribed')}'" . $AND;
+			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS e ON a.user_id = e.user_id " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND e.meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'" . $AND;
 		} else {
-			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='{$this->get_usermeta_keyname('s2_subscribed')}'" . $AND;
+			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'" . $AND;
 		}
 		$result = $wpdb->get_col($sql);
 		if ($result) {
@@ -2159,7 +2159,7 @@ class s2class {
 			}
 
 			if (!empty($blogs_subscribed)) {
-				ksort(&$blogs_subscribed);
+				ksort($blogs_subscribed);
 				$unsubscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_unsubscribe="; 
 				echo '<h2>' . __('Subscribed Blogs', 'subscribe2') . '</h2>'."\r\n";
 				
@@ -2177,7 +2177,7 @@ class s2class {
 			}
 			
 			if (!empty($blogs_notsubscribed)) {
-				ksort(&$blogs_notsubscribed);
+				ksort($blogs_notsubscribed);
 				$subscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_subscribe="; 
 				echo "<h2>" . __('Subscribe to new blogs', 'subscribe2') . "</h2>\r\n";
 				echo "<ul class=\"s2_blogs s2_blogs_unsubscribed\">";
@@ -2354,16 +2354,16 @@ class s2class {
 		if ($s2_mu) {
 			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
 		} else {
-			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='{$this->get_usermeta_keyname('s2_subscribed')}'");
+			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'");
 		}
 		$count['all'] = ($count['confirmed'] + $count['unconfirmed'] + $count['registered']);
 		if ($s2_mu) {
 			foreach ($all_cats as $cat) {
-				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(a.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key=('{$this->get_usermeta_keyname('s2_cat')}$cat->term_id')");
+				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(a.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key=('" . $this->get_usermeta_keyname('s2_cat') . "$cat->term_id')");
 			}
 		} else {
 			foreach ($all_cats as $cat) {
-				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key='{$this->get_usermeta_keyname('s2_cat')}$cat->term_id'");
+				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat->term_id'");
 			}
 		}
 
@@ -2948,7 +2948,7 @@ class s2class {
 		$all_post_cats_string = implode(',', $all_post_cats);
 		$registered = $this->get_registered("cats=$all_post_cats_string");
 		$recipients = array_merge((array)$public, (array)$registered);
-		$mailtext = apply_filter('s2_email_template', $this->subscribe2_options['mailtext']);
+		$mailtext = apply_filters('s2_email_template', $this->subscribe2_options['mailtext']);
 		$mailtext = stripslashes($this->substitute($mailtext));
 		$mailtext = str_replace("TABLE", $table, $mailtext);
 		$mailtext = str_replace("POSTTIME", $message_posttime, $mailtext);
