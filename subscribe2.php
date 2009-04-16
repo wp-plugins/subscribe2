@@ -91,10 +91,6 @@ class s2class {
 
 		$this->deleted = "<p>" . __('You have successfully unsubscribed.', 'subscribe2') . "</p>";
 
-		$this->confirm_subject = "[" . html_entity_decode(get_option('blogname')) . "] " . __('Please confirm your request', 'subscribe2');
-
-		$this->remind_subject = "[" . html_entity_decode(get_option('blogname')) . "] " . __('Subscription Reminder', 'subscribe2');
-
 		$this->subscribe = __('subscribe', 'subscribe2'); //ACTION replacement in subscribing confirmation email
 
 		$this->unsubscribe = __('unsubscribe', 'subscribe2'); //ACTION replacement in unsubscribing in confirmation email
@@ -178,8 +174,7 @@ class s2class {
 	Upgrade the database
 	*/
 	function upgrade() {
-		global $wpdb;
-
+		global $wpdb, $wp_version, $wpmu_version;
 		// include upgrade-functions for maybe_create_table;
 		if (!function_exists('maybe_create_table')) {
 			require_once(ABSPATH . 'wp-admin/install-helper.php');
@@ -212,11 +207,9 @@ class s2class {
 		update_option('subscribe2_options', $this->subscribe2_options);
 		
 		// upgrade old wpmu user meta data to new
-		global $wp_version, $wpmu_version;
-		if  ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
+		if ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
 			$this->namechange_subscribe2_widget();
 			// loop through all users
-			$users = $wpdb->get_col("SELECT ID FROM $wpdb->users");
 			foreach ($users as $user) {
 				// get categories which the user is subscribed to (old ones)
 				$categories = get_usermeta($user, 's2_subscribed');
@@ -296,12 +289,12 @@ class s2class {
 	/**
 	Delivers email to recipients in HTML or plaintext
 	*/
-	function mail ($recipients = array(), $subject = '', $message = '', $type='text') {
+	function mail($recipients = array(), $subject = '', $message = '', $type='text') {
 		if ( (empty($recipients)) || ('' == $message) ) { return; }
 
 		// Set sender details
 		if ('' == $this->myname) {
-			$admin = $this->get_userdata();
+			$admin = $this->get_userdata($this->subscribe2_options['sender']);
 			$this->myname = html_entity_decode($admin->display_name);
 			$this->myemail = $admin->user_email;
 		}
@@ -331,7 +324,7 @@ class s2class {
 		// Replace any escaped html symbols in subject
 		$subject = html_entity_decode($subject);
 
-		//  Construct BCC headers for sending or send individual emails
+		// Construct BCC headers for sending or send individual emails
 		$bcc = '';
 		natcasesort($recipients);
 		if ($this->subscribe2_options['bcclimit'] == 1) {
@@ -363,7 +356,7 @@ class s2class {
 			$batch = array();
 			foreach ($recipients as $recipient) {
 				// advance the array pointer by one, for use down below
-				// the array pointer _is not_ advanced by the foreach() loop itself
+				// the array pointer _is not_ advanced by the foreach () loop itself
 				next($recipients);
 				$recipient = trim($recipient);
 				// sanity check -- make sure we have a valid email
@@ -443,7 +436,7 @@ class s2class {
 				$check = true;
 			}
 		}
-		// if so, bail out
+
 		if ($check) {
 			// hang on -- can registered users subscribe to
 			// excluded categories?
@@ -454,17 +447,17 @@ class s2class {
 		}
 
 		// Are we sending notifications for Private posts?
-		if ($this->subscribe2_options['private'] == "yes") {
+		// Action is added if we are, but double check option and post status
+		if ( ($this->subscribe2_options['private'] == "yes") && ($post->post_status == 'private') ) {
 			// don't send notification to public users
 			$check = true;
 		}
 
-		// lets collect our public subscribers
-		// and all our registered subscribers for these categories
+		// lets collect our subscribers
 		if (!$check) {
 			// if this post is assigned to an excluded
-			// category, then this test will prevent
-			// the public from receiving notification
+			// category, or is a private post then
+			// don't send public subscribers a notification
 			$public = $this->get_public();
 		}
 		$registered = $this->get_registered("cats=$post_cats_string");
@@ -488,12 +481,12 @@ class s2class {
 			$user =& $author;
 		} else {
 			// get admin details
-			$user = $this->get_userdata();
+			$user = $this->get_userdata($this->subscribe2_options['sender']);
 		}
 		$this->myemail = $user->user_email;
 		$this->myname = html_entity_decode($user->display_name);
 		// Get email subject
-		$subject = stripslashes(strip_tags($this->substitute($this->s2_subject)));
+		$subject = stripslashes(strip_tags($this->substitute($this->subscribe2_options['notification_subject'])));
 		// Get the message template
 		$mailtext = apply_filters('s2_email_template', $this->subscribe2_options['mailtext']);
 		$mailtext = stripslashes($this->substitute($mailtext));
@@ -587,12 +580,12 @@ class s2class {
 		$link .= md5($this->email);
 		$link .= $id;
 
-		$admin = $this->get_userdata();
+		$admin = $this->get_userdata($this->subscribe2_options['sender']);
 		$this->myname = html_entity_decode($admin->display_name);
 
 		if ($is_remind == TRUE) {
 			$body = $this->substitute(stripslashes($this->subscribe2_options['remind_email']));
-			$subject = stripslashes($this->remind_subject);
+			$subject = $this->substitute(stripslashes($this->subscribe2_options['remind_subject']));
 		} else {
 			$body = $this->substitute(stripslashes($this->subscribe2_options['confirm_email']));
 			if ('add' == $what) {
@@ -600,7 +593,7 @@ class s2class {
 			} elseif ('del' == $what) {
 				$body = str_replace("ACTION", $this->unsubscribe, $body);
 			}
-			$subject = stripslashes($this->confirm_subject);
+			$subject = $this->substitute(stripslashes($this->subscribe2_options['confirm_subject']));
 		}
 
 		$body = str_replace("LINK", $link, $body);
@@ -620,7 +613,7 @@ class s2class {
 	/**
 	Given a public subscriber ID, returns the email address
 	*/
-	function get_email ($id = 0) {
+	function get_email($id = 0) {
 		global $wpdb;
 
 		if (!$id) {
@@ -632,7 +625,7 @@ class s2class {
 	/**
 	Given a public subscriber email, returns the subscriber ID
 	*/
-	function get_id ($email = '') {
+	function get_id($email = '') {
 		global $wpdb;
 
 		if (!$email) {
@@ -645,7 +638,7 @@ class s2class {
 	Activate an public subscriber email address
 	If the address is not already present, it will be added
 	*/
-	function activate ($email = '') {
+	function activate($email = '') {
 		global $wpdb;
 
 		if ('' == $email) {
@@ -668,7 +661,7 @@ class s2class {
 	/**
 	Add an public subscriber to the subscriber table as unconfirmed
 	*/
-	function add ($email = '') {
+	function add($email = '') {
 		if ($this->filtered ==1) { return; }
 		global $wpdb;
 
@@ -748,7 +741,7 @@ class s2class {
 		list($user, $domain) = split('@', $email);
 		$bar_check = stristr($barred_option, $domain);
 		
-		if(!empty($bar_check)) {
+		if (!empty($bar_check)) {
 			return true;
 		} else {
 			return false;
@@ -848,7 +841,7 @@ class s2class {
 	/**
 	Return an array of all the public subscribers
 	*/
-	function get_public ($confirmed = 1) {
+	function get_public($confirmed = 1) {
 		global $wpdb;
 		if (1 == $confirmed) {
 			if ('' == $this->all_public) {
@@ -867,11 +860,11 @@ class s2class {
 	Return an array of registered subscribers
 	Collect all the registered users of the blog who are subscribed to the specified categories
 	*/
-	function get_registered ($args = '') {
+	function get_registered($args = '') {
 		global $wpdb, $wp_version, $wpmu_version;
 
 		// Is this WordPressMU or not?
-		if  ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
+		if ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
 			$s2_mu = true;
 		}
 
@@ -881,12 +874,14 @@ class s2class {
 		$subscribers = array();
 
 		parse_str($args, $r);
-		if (!isset($r['cats']))
-			$r['cats'] = '';
 		if (!isset($r['format']))
 			$r['format'] = 'all';
 		if (!isset($r['amount']))
 			$r['amount'] = 'all';
+		if (!isset($r['active']))
+			$r['active'] = 'no';
+		if (!isset($r['cats']))
+			$r['cats'] = '';
 
 		$JOIN = ''; $AND = '';
 		// text or HTML subscribers
@@ -911,11 +906,20 @@ class s2class {
 			}
 		}
 
+		if ('no' != $r['active']) {
+			$JOIN .= "INNER JOIN $wpdb->usermeta AS d ON a.user_id = d.user_id ";
+			if ($s2_mu) {
+				$AND .= " AND e.meta_value<>'-1' ";
+			} else {
+				$AND .= " AND a.meta_value<>'-1' ";
+			}
+		}
+
 		// specific category subscribers
 		if ('' != $r['cats']) {
-			$JOIN .= "INNER JOIN $wpdb->usermeta AS d ON a.user_id = d.user_id ";
+			$JOIN .= "INNER JOIN $wpdb->usermeta AS e ON a.user_id = e.user_id ";
 			foreach (explode(',', $r['cats']) as $cat) {
-				('' == $and) ? $and = "d.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'" : $and .= " OR d.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'";
+				('' == $and) ? $and = "e.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'" : $and .= " OR e.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'";
 			}
 			$AND .= " AND ($and)";
 		}
@@ -954,7 +958,7 @@ class s2class {
 	Create the appropriate usermeta values when a user registers
 	If the registering user had previously subscribed to notifications, this function will delete them from the public subscriber list first
 	*/
-	function register ($user_id = 0) {
+	function register($user_id = 0) {
 		global $wpdb;
 
 		if (0 == $user_id) { return $user_id; }
@@ -987,7 +991,7 @@ class s2class {
 			// delete this user from the public table, and subscribe them to all the categories
 			$this->delete($user->user_email);
 			update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), $cats);
-			foreach(explode(',', $cats) as $cat) {
+			foreach (explode(',', $cats) as $cat) {
 				update_usermeta($user_id, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
 			}
 			update_usermeta($user_id, 's2_format', 'text');
@@ -1016,14 +1020,12 @@ class s2class {
 				// add entries by default if autosub is on
 				if ( ('yes' == $this->subscribe2_options['autosub']) || (('wpreg' == $this->subscribe2_options['autosub']) && ('on' == $_POST['subscribe'])) ) {
 					update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), $cats);
-					foreach(explode(',', $cats) as $cat) {
+					foreach (explode(',', $cats) as $cat) {
 						update_usermeta($user_id, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
 					}
 				} else {
 					update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), '-1');
 				}
-			} else {
-				update_usermeta($user_id, 's2_autosub', 'no');
 			}
 		}
 		return $user_id;
@@ -1032,7 +1034,7 @@ class s2class {
 	/**
 	Subscribe all registered users to category selected on Admin Manage Page
 	*/
-	function subscribe_registered_users ($emails = '', $cats = '') {
+	function subscribe_registered_users($emails = '', $cats = '') {
 		if ( ('' == $emails) || ('' == $cats) ) { return false; }
 		global $wpdb;
 		
@@ -1070,7 +1072,7 @@ class s2class {
 	/**
 	Unsubscribe all registered users to category selected on Admin Manage Page
 	*/
-	function unsubscribe_registered_users ($emails = '', $cats = '') {
+	function unsubscribe_registered_users($emails = '', $cats = '') {
 		if ( ('' == $emails) || ('' == $cats) ) { return false; }
 		global $wpdb;
 		
@@ -1187,7 +1189,7 @@ class s2class {
 						delete_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'));
 					}
 				}
-				restore_current_blog(); 
+				restore_current_blog();
 				$redirect_to_subscriptionpage = true;
 			}
 		}
@@ -1217,7 +1219,7 @@ class s2class {
 	Autosubscribe registered users to newly created categories
 	if registered user has selected this option
 	*/
-	function autosub_new_category ($new_category='') {
+	function autosub_new_category($new_category='') {
 		global $wpdb;
 
 		$sql = "SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE $wpdb->usermeta.meta_key='s2_autosub' AND $wpdb->usermeta.meta_value='yes'";
@@ -1239,22 +1241,26 @@ class s2class {
 	/**
 	Get admin data from record 1 or first user with admin rights
 	*/
-	function get_userdata() {
+	function get_userdata($admin_id) {
 		global $wpdb, $userdata;
 
-		// get details of current user
-		$admin = &$userdata;
-
-		// if current under is empty or isn't an administrator get user record 1
-		if ( (empty($admin)) || $userdata->{$wpdb->prefix . "user_level"} != 10) {
-			$admin = get_userdata(1);
+		// ensure compatability with Subscribe2 < 4.16
+		if ($admin_id == 'admin') {
+			$admin_id = 1;
 		}
 
-		// if user record 1 is empty grab the first admin from the database
+		if (is_numeric($admin_id)) {
+			$admin = get_userdata($admin_id);
+		} else {
+			$admin =& $userdata;
+		}
+
+		// if user record is empty grab the first admin from the database
 		if (empty($admin)) {
 			$sql = "SELECT DISTINCT(ID) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10' LIMIT 1";
 			$admin = get_userdata($wpdb->get_var($sql));
 		}
+
 		return $admin;
 	} //end get_userdata()
 	
@@ -1291,19 +1297,19 @@ class s2class {
 					foreach ($_POST['delete'] as $address) {
 						$this->delete($address);
 					}
-					echo "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Address(es) deleted!', 'subscribe2') . "</strong></p></div>";
+					echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) deleted!', 'subscribe2') . "</strong></p></div>";
 				}
 				if ($_POST['confirm']) {
 					foreach ($_POST['confirm'] as $address) {
 						$this->toggle($address);
 					}
-					$message =  "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Status changed!', 'subscribe2') . "</strong></p></div>";
+					$message = "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Status changed!', 'subscribe2') . "</strong></p></div>";
 				}
 				if ($_POST['unconfirm']) {
 					foreach ($_POST['unconfirm'] as $address) {
 						$this->toggle($address);
 					}
-					$message =  "<div id=\"message\" class=\"updated fade\"><p><strong>" .  __('Status changed!', 'subscribe2') . "</strong></p></div>";
+					$message = "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Status changed!', 'subscribe2') . "</strong></p></div>";
 				}
 				echo $message;
 			} elseif ($_POST['searchterm']) {
@@ -1317,7 +1323,7 @@ class s2class {
 				}
 			} elseif ($_POST['remind']) {
 				$this->remind($_POST['reminderemails']);
-				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Reminder Email(s) Sent!', 'subscribe2') . "</strong></p></div>"; 
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Reminder Email(s) Sent!', 'subscribe2') . "</strong></p></div>";
 			} elseif ( ($_POST['register']) && ('subscribe' == $_POST['manage']) ) {
 				$this->subscribe_registered_users($_POST['emails'], $_POST['category']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Subscribed!', 'subscribe2') . "</strong></p></div>";
@@ -1365,6 +1371,9 @@ class s2class {
 			} elseif (is_numeric($_POST['what'])) {
 				$what = intval($_POST['what']);
 				$subscribers = $this->get_registered("cats=$what");
+			} elseif ('registered_active' == $_POST['what']) {
+				$what = 'registered_active';
+				$subscribers = $this->get_registered("active=yes");
 			} elseif ('registered' == $_POST['what']) {
 				$what = 'registered';
 				$subscribers = $registered;
@@ -1381,7 +1390,7 @@ class s2class {
 				$subscribers = $confirmed;
 			} elseif ('unconfirmed' == $_GET['what']) {
 				$what = 'unconfirmed';
-				$subscribers = $unconfirmed;				
+				$subscribers = $unconfirmed;
 				if (!empty($subscribers)) {
 					$reminderemails = implode(",", $subscribers);
 					$reminderform = true;
@@ -1389,6 +1398,9 @@ class s2class {
 			} elseif (is_numeric($_GET['what'])) {
 				$what = intval($_GET['what']);
 				$subscribers = $this->get_registered("cats=$what");
+			} elseif ('registered_active' == $_GET['what']) {
+				$what = 'registered_active';
+				$subscribers = $this->get_registered("active=yes");
 			} elseif ('registered' == $_GET['what']) {
 				$what = 'registered';
 				$subscribers = $registered;
@@ -1411,12 +1423,12 @@ class s2class {
 			$strip = '';
 			if ( $page > 1 ) {
 				$args['s2page'] = $page - 1;
-				$strip .=  '<a class="prev" href="' . clean_url(add_query_arg($args)) . '">&laquo; '. __('Previous Page', 'subscribe2') .'</a>' . "\n";
+				$strip .= '<a class="prev" href="' . clean_url(add_query_arg($args)) . '">&laquo; '. __('Previous Page', 'subscribe2') .'</a>' . "\n";
 			}
 			if ( $total_pages > 1 ) {
 				for ( $page_num = 1; $page_num <= $total_pages; $page_num++ ) {
 					if ( $page == $page_num ) {
-						$strip .=  "<strong>" . $page_num . "</strong>\n";
+						$strip .= "<strong>" . $page_num . "</strong>\n";
 					} else {
 						if ( $page_num < 3 || ( $page_num >= $page - 2 && $page_num <= $page + 2 ) || $page_num > $total_pages - 2 ) {
 							$args['s2page'] = $page_num;
@@ -1431,7 +1443,7 @@ class s2class {
 			}
 			if ( ( $page ) * $this->subscribe2_options['entries'] < $total_subscribers ) {
 				$args['s2page'] = $page + 1;
-				$strip .=  "<a class=\"next\" href=\"" . clean_url(add_query_arg($args)) . "\">". __('Next Page', 'subscribe2') . " &raquo;</a>\n";
+				$strip .= "<a class=\"next\" href=\"" . clean_url(add_query_arg($args)) . "\">". __('Next Page', 'subscribe2') . " &raquo;</a>\n";
 			}
 		}
 
@@ -1498,16 +1510,16 @@ class s2class {
 				if (in_array($subscriber, $confirmed)) {
 					echo "</td><td align=\"center\">\r\n";
 					echo "<input class=\"unconfirm_checkall\" title=\"" . __('Unconfirm this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"unconfirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
-					echo "<td align=\"center\"><span class=\"delete\">\r\n";					
-					echo "<input  class=\"delete_checkall\" title=\"" . __('Delete this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
+					echo "<td align=\"center\"><span class=\"delete\">\r\n";
+					echo "<input class=\"delete_checkall\" title=\"" . __('Delete this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
 					echo "</span></td>\r\n";
 					echo "<td><span style=\"color:#006600\">&#x221A;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
 					echo "(<span style=\"color:#006600\">" . $this->signup_date($subscriber) . "</span>)\r\n";
 				} elseif (in_array($subscriber, $unconfirmed)) {
 					echo "<input class=\"confirm_checkall\" title=\"" . __('Confirm this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"confirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
 					echo "<td align=\"center\"></td>\r\n";
-					echo "<td align=\"center\"><span class=\"delete\">\r\n";					
-					echo "<input  class=\"delete_checkall\" title=\"" . __('Delete this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
+					echo "<td align=\"center\"><span class=\"delete\">\r\n";
+					echo "<input class=\"delete_checkall\" title=\"" . __('Delete this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
 					echo "</span></td>\r\n";
 					echo "<td><span style=\"color:#FF0000\">&nbsp;!&nbsp;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
 					echo "(<span style=\"color:#FF0000\">" . $this->signup_date($subscriber) . "</span>)\r\n";
@@ -1573,8 +1585,8 @@ class s2class {
 
 				// send as author or admin?
 				$sender = 'author';
-				if ('admin' == $_POST['sender']) {
-					$sender = 'admin';
+				if (is_numeric($_POST['sender'])) {
+					$sender = $_POST['sender'];
 				}
 				$this->subscribe2_options['sender'] = $sender;
 
@@ -1597,7 +1609,7 @@ class s2class {
 						unset($this->subscribe2_options['last_s2cron']);
 					} else {
 						// if we are using digest schedule the event and prime last_cron as now
-						$time =  current_time('timestamp') + $interval;
+						$time = current_time('timestamp') + $interval;
 						if ($interval < 86400) {
 							// Schedule CRON events occurring less than daily starting now and periodically thereafter
 							$timestamp = &$time;
@@ -1612,10 +1624,26 @@ class s2class {
 					}
 				}
 
-				// email templates
-				$this->subscribe2_options['mailtext'] = $_POST['mailtext'];
-				$this->subscribe2_options['confirm_email'] = $_POST['confirm_email'];
-				$this->subscribe2_options['remind_email'] = $_POST['remind_email'];
+				// email subject and body templates
+				// ensure that are not empty before updating
+				if (!empty($_POST['notification_subject'])) {
+					$this->subscribe2_options['notification_subject'] = $_POST['notification_subject'];
+				}
+				if (!empty($_POST['mailtext'])) {
+					$this->subscribe2_options['mailtext'] = $_POST['mailtext'];
+				}
+				if (!empty($_POST['confirm_subject'])) {
+					$this->subscribe2_options['confirm_subject'] = $_POST['confirm_subject'];
+				}
+				if (!empty($_POST['confirm_email'])) {
+					$this->subscribe2_options['confirm_email'] = $_POST['confirm_email'];
+				}
+				if (!empty($_POST['remind_subject'])) {
+					$this->subscribe2_options['remind_subject'] = $_POST['remind_subject'];
+				}
+				if (!empty($_POST['remind_email'])) {
+					$this->subscribe2_options['remind_email'] = $_POST['remind_email'];
+				}
 
 				// excluded categories
 				if (!empty($_POST['category'])) {
@@ -1678,7 +1706,6 @@ class s2class {
 
 		// settings for outgoing emails
 		echo "<h2>" . __('Notification Settings', 'subscribe2') . "</h2>\r\n";
-		echo "<p>";
 		echo __('Restrict the number of recipients per email to (0 for unlimited)', 'subscribe2') . ': ';
 		echo "<span id=\"s2bcc_1\"><span id=\"s2bcc\" style=\"background-color: #FFFBCC\">" . $this->subscribe2_options['bcclimit'] . "</span> ";
 		echo "<a href=\"#\" onclick=\"s2_show('bcc'); return false;\">" . __('Edit', 'subscribe2') . "</a></span>\n";
@@ -1755,28 +1782,22 @@ class s2class {
 		}
 		echo " /> " . __('No', 'subscribe2') . "</label><br /><br />\r\n";
 		echo __('Send Email From', 'subscribe2') . ': ';
-		echo "<label><input type=\"radio\" name=\"sender\" value=\"author\"";
-		if ('author' == $this->subscribe2_options['sender']) {
-			echo " checked=\"checked\" ";
-		}
-		echo " /> " . __('Author of the post', 'subscribe2') . "</label>&nbsp;&nbsp;";
-		echo "<label><input type=\"radio\" name=\"sender\" value=\"admin\"";
-		if ('admin' == $this->subscribe2_options['sender']) {
-			echo " checked=\"checked\" ";
-		}
-		echo " /> " . __('Blog Admin', 'subscribe2') . "</label><br /><br />\r\n";
+		echo "<label>\r\n";
+		$this->admin_dropdown(1);
+		echo "</label><br /><br />\r\n";
 		if (function_exists('wp_schedule_event')) {
 			echo __('Send Emails', 'subscribe2') . ": <br /><br />\r\n";
 			$this->display_digest_choices();
 		}
-		echo "</p>";
 
 		// email templates
 		echo "<h2>" . __('Email Templates', 'subscribe2') . "</h2>\r\n";
 		echo"<br />";
 		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" class=\"editform\">\r\n";
 		echo "<tr><td>";
-		echo __('New Post email (must not be empty)', 'subscribe2') . ":";
+		echo __('New Post email (must not be empty)', 'subscribe2') . ":<br />\r\n";
+		echo __('Subject Line', 'subscribe2') . ": ";
+		echo "<input type=\"text\" name=\"notification_subject\" value=\"" . stripslashes($this->subscribe2_options['notification_subject']) . "\" size=\"30\" />";
 		echo "<br />\r\n";
 		echo "<textarea rows=\"9\" cols=\"60\" name=\"mailtext\">" . stripslashes($this->subscribe2_options['mailtext']) . "</textarea><br /><br />\r\n";
 		echo "</td><td valign=\"top\" rowspan=\"3\">";
@@ -1797,9 +1818,13 @@ class s2class {
 		echo "<dt><b>ACTION</b></dt><dd>" . __("Action performed by LINK in confirmation email<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "</dl></td></tr><tr><td>";
 		echo __('Subscribe / Unsubscribe confirmation email', 'subscribe2') . ":<br />\r\n";
+		echo __('Subject Line', 'subscribe2') . ": ";
+		echo "<input type=\"text\" name=\"confirm_subject\" value=\"" . stripslashes($this->subscribe2_options['confirm_subject']) . "\" size=\"30\" /><br />\r\n";
 		echo "<textarea rows=\"9\" cols=\"60\" name=\"confirm_email\">" . stripslashes($this->subscribe2_options['confirm_email']) . "</textarea><br /><br />\r\n";
 		echo "</td></tr><tr valign=\"top\"><td>";
 		echo __('Reminder email to Unconfirmed Subscribers', 'subscribe2') . ":<br />\r\n";
+		echo __('Subject Line', 'subscribe2') . ": ";
+		echo "<input type=\"text\" name=\"remind_subject\" value=\"" . stripslashes($this->subscribe2_options['remind_subject']) . "\" size=\"30\" /><br />\r\n";
 		echo "<textarea rows=\"9\" cols=\"60\" name=\"remind_email\">" . stripslashes($this->subscribe2_options['remind_email']) . "</textarea><br /><br />\r\n";
 		echo "</td></tr></table><br />\r\n";
 
@@ -1878,7 +1903,7 @@ class s2class {
 			echo " checked=\"checked\"";
 		}
 		echo " /> " . __('No', 'subscribe2') . "</label><br /><br />\r\n";
-		echo __('Registration Form option is checked by default', 'subscribe2') . ": &nbsp;&nbsp;";
+		echo __('Registration Form option is checked by default', 'subscribe2') . ":<br />\r\n";
 		echo "<label><input type=\"radio\" name=\"wpregdef\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['wpregdef']) {
 			echo " checked=\"checked\"";
@@ -1966,7 +1991,7 @@ class s2class {
 		}
 
 		// Is this WordPressMU or not?
-		if  ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
+		if ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
 			$s2_mu = true;
 		}
 		else {
@@ -2087,7 +2112,7 @@ class s2class {
 				$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 				// if we are subscribed to the current blog display an "unsubscribe" link
 				if (!empty($subscribed) && $subscribed != "-1") {
-					$unsubscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_unsubscribe=". $blog_id; 
+					$unsubscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_unsubscribe=". $blog_id;
 					echo "<p><a href=\"". $unsubscribe_link ."\" class=\"button\">" . __('Unsubscribe me from this blog', 'subscribe2') . "</a></p>";
 				} else {
 					// else we show a "subscribe" link
@@ -2122,7 +2147,7 @@ class s2class {
 		
 		
 		// list of subscribed blogs on wordpress mu
-		if  ($s2_mu) {
+		if ($s2_mu) {
 			global $blog_id;
 			$blogs = get_blog_list( 0, 'all', false );
 			
@@ -2160,7 +2185,7 @@ class s2class {
 
 			if (!empty($blogs_subscribed)) {
 				ksort($blogs_subscribed);
-				$unsubscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_unsubscribe="; 
+				$unsubscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_unsubscribe=";
 				echo '<h2>' . __('Subscribed Blogs', 'subscribe2') . '</h2>'."\r\n";
 				
 				echo "<ul class=\"s2_blogs s2_blogs_subscribed\">\r\n";
@@ -2178,7 +2203,7 @@ class s2class {
 			
 			if (!empty($blogs_notsubscribed)) {
 				ksort($blogs_notsubscribed);
-				$subscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_subscribe="; 
+				$subscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_subscribe=";
 				echo "<h2>" . __('Subscribe to new blogs', 'subscribe2') . "</h2>\r\n";
 				echo "<ul class=\"s2_blogs s2_blogs_unsubscribed\">";
 				foreach ($blogs_notsubscribed as $blog) {
@@ -2217,6 +2242,8 @@ class s2class {
 			} elseif (is_numeric($_POST['what'])) {
 				$cat = intval($_POST['what']);
 				$recipients = $this->get_registered("cats=$cat");
+			} elseif ('registered_active' == $_POST['what']) {
+				$recipients = $this->get_registered("active=yes");
 			} else {
 				$recipients = $this->get_registered();
 			}
@@ -2325,19 +2352,20 @@ class s2class {
 	$selected is the option to select
 	$submit is the text to use on the Submit button
 	*/
-	function display_subscriber_dropdown ($selected = 'registered', $submit = '', $exclude = array()) {
+	function display_subscriber_dropdown($selected = 'registered', $submit = '', $exclude = array()) {
 		global $wpdb, $wp_version, $wpmu_version;
 
 		// Is this WordPressMU or not?
-		if  ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
+		if ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
 			$s2_mu = true;
 		}
 
-		$who = array('all' => __('All Subscribers', 'subscribe2'),
+		$who = array('all' => __('All Users and Subscribers', 'subscribe2'),
 			'public' => __('Public Subscribers', 'subscribe2'),
 			'confirmed' => ' &nbsp;&nbsp;' . __('Confirmed', 'subscribe2'),
 			'unconfirmed' => ' &nbsp;&nbsp;' . __('Unconfirmed', 'subscribe2'),
-			'registered' => __('Registered Users', 'subscribe2'));
+			'registered' => __('Registered Users', 'subscribe2'),
+			'registered_active' => __('Registered Subscribers', 'subscribe2'));
 
 		$all_cats = get_categories(array('hide_empty' => false));
 
@@ -2355,6 +2383,11 @@ class s2class {
 			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
 		} else {
 			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'");
+		}
+		if ($s2_mu) {
+			$count['registered_active'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
+		} else {
+			$count['registered_active'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "' AND meta_value<>'-1'");
 		}
 		$count['all'] = ($count['confirmed'] + $count['unconfirmed'] + $count['registered']);
 		if ($s2_mu) {
@@ -2397,13 +2430,40 @@ class s2class {
 		}
 	} // end display_subscriber_dropdown()
 
+	/**
+	Display a drop down lisy of administrator level users and
+	optionally include a choice for Post Author
+	*/
+	function admin_dropdown($inc_author) {
+		global $wpdb;
+
+		$sql = "SELECT ID,display_name FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'";
+		$admins = $wpdb->get_results($sql);
+		
+		
+		if ($inc_author) {
+			$author[] = (object)array('ID' => 'author', 'display_name' => 'Post Author');
+			$admins = array_merge($author, $admins);
+		}
+
+		echo "<select name=\"sender\">\r\n";
+		foreach ($admins as $admin) {
+			echo "<option value=\"" . $admin->ID . "\"";
+			if ($admin->ID == $this->subscribe2_options['sender']) {
+				echo " selected=\"selected\"";
+			}
+			echo ">" . $admin->display_name . "</option>\r\n";
+		}
+		echo "</select>\r\n";
+	} // end admin_dropdown()
+
 	function display_digest_choices() {
 		global $wpdb;
 		$scheduled_time = wp_next_scheduled('s2_digest_cron');
 		$schedule = (array)wp_get_schedules();
 		$schedule = array_merge(array('never' => array('interval' => 0, 'display' => __('For each Post', 'subscribe2'))), $schedule);
 		$sort = array();
-		foreach ( (array)$schedule as $key => $value ) $sort[$key] = $value['interval'];
+		foreach ((array)$schedule as $key => $value) $sort[$key] = $value['interval'];
 		asort($sort);
 		$schedule_sorted = array();
 		foreach ($sort as $key => $value) {
@@ -2449,7 +2509,7 @@ class s2class {
 		global $wpdb, $wp_version, $wpmu_version;
 
 		// Is this WordPressMU or not?
-		if  ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
+		if ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
 			switch($metaname) {
 				case 's2_subscribed':
 				case 's2_cat':
@@ -2521,7 +2581,7 @@ class s2class {
 	*/
 	function s2_meta_box() {
 		global $post_ID;
-		$s2mail = get_post_meta($post_ID, 's2mail', true);		
+		$s2mail = get_post_meta($post_ID, 's2mail', true);
 		echo "<input type=\"hidden\" name=\"s2meta_nonce\" id=\"s2meta_nonce\" value=\"" . wp_create_nonce(md5(plugin_basename(__FILE__))) . "\" />";
 		echo __("Check here to disable sending of an email notification for this post/page", 'subscribe2');
 		echo "&nbsp;&nbsp;<input type=\"checkbox\" name=\"s2_meta_field\" value=\"no\"";
@@ -2537,7 +2597,7 @@ class s2class {
 	function s2_meta_box_old() {
 		echo "<div class=\"dbx-b-ox-wrapper\">\r\n";
 		echo "<fieldset id=\"s2_meta_box\" class=\"dbx-box\">\r\n";
-		echo "<div class=\"dbx-h-andle-wrapper\"><h3 class=\"dbx-handle\">" . __('Subscribe2 Notification Override', 'subscribe2') . "</h3></div>\r\n";   
+		echo "<div class=\"dbx-h-andle-wrapper\"><h3 class=\"dbx-handle\">" . __('Subscribe2 Notification Override', 'subscribe2') . "</h3></div>\r\n";
 		echo "<div class=\"dbx-c-ontent-wrapper\"><div class=\"dbx-content\">\r\n";
 		$this->s2_meta_box();
 		echo "</div></div></fieldset></div>\r\n";
@@ -2680,9 +2740,10 @@ class s2class {
 		extract($args);
 		$options = get_option('widget_subscribe2widget');
 		$title = empty($options['title']) ? __('Subscribe2', 'subscribe2') : $options['title'];
+		$div = empty($options['div']) ? 'search' : $options['div'];
 		echo $before_widget;
 		echo $before_title . $title . $after_title;
-		echo "<div class=\"search\">";
+		echo "<div class=\"" . $div . "\">";
 		$content = s2class::filter('<!--subscribe2-->');
 		echo $content;
 		echo "</div>";
@@ -2696,14 +2757,18 @@ class s2class {
 		$options = $newoptions = get_option('widget_subscribe2widget');
 		if ($_POST["s2w-submit"]) {
 			$newoptions['title'] = strip_tags(stripslashes($_POST["s2w-title"]));
+			$newoptions['div'] = sanitize_title(strip_tags(stripslashes($_POST["s2w-div"])));
 		}
 		if ($options != $newoptions) {
 			$options = $newoptions;
 			update_option('widget_subscribe2widget', $options);
 		}
 		$title = htmlspecialchars($options['title'], ENT_QUOTES);
+		$div = $options['div'];
 		echo "<p><label for=\"s2w-title\">" . __('Title:');
 		echo "<input style=\"width: 250px;\" id=\"s2w-title\" name=\"s2w-title\" type=\"text\" value=\"" . $title . "\" /></label></p>";
+		echo "<p><label for=\"s2w-div\">" . __('Div class name:');
+		echo "<input style=\"width: 250px;\" id=\"s2w-title\" name=\"s2w-div\" type=\"text\" value=\"" . $div . "\" /></label></p>";
 		echo "<input type=\"hidden\" id=\"s2w-submit\" name=\"s2w-submit\" value=\"1\" />";
 	} // end widget_subscribe2_widget_control()
 
@@ -2813,7 +2878,7 @@ class s2class {
 		echo "tinyMCE.loadPlugin('subscribe2quicktags', '" . $this->fullpath . "');\n"; 
 	}
 
-	function s2_edit_form() { 
+	function s2_edit_form() {
 		echo "<!-- Start Subscribe2 Quicktags Javascript -->\r\n";
 		echo "<script type=\"text/javascript\">\r\n";
 		echo "//<![CDATA[\r\n";
@@ -2936,7 +3001,7 @@ class s2class {
 		}
 
 		// get admin details
-		$user = $this->get_userdata();
+		$user = $this->get_userdata($this->subscribe2_options['sender']);
 		$this->myemail = $user->user_email;
 		$this->myname = html_entity_decode($user->display_name);
 
@@ -3015,7 +3080,7 @@ class s2class {
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
 
 		// add actions for other plugins
-		if  ('1' == $this->subscribe2_options['show_meta']) {
+		if ('1' == $this->subscribe2_options['show_meta']) {
 			add_action('wp_meta', array(&$this, 'add_minimeta'), 0);
 		}
 		add_filter('ozh_adminmenu_icon', array(&$this, 'ozh_s2_icon'));
@@ -3064,7 +3129,6 @@ class s2class {
 	var $permalink = '';
 	var $myname = '';
 	var $myemail = '';
-	var $s2_subject = '[BLOGNAME] TITLE';
 	var $signup_dates = array();
 	var $private = false;
 	var $filtered = 0;
