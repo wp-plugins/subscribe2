@@ -906,6 +906,7 @@ class s2class {
 			}
 		}
 
+		// registered subscribers as opposed to registered users
 		if ('no' != $r['active']) {
 			$JOIN .= "INNER JOIN $wpdb->usermeta AS d ON a.user_id = d.user_id ";
 			if ($s2_mu) {
@@ -2380,12 +2381,12 @@ class s2class {
 			$count['public'] = ($count['confirmed'] + $count['unconfirmed']);
 		}
 		if ($s2_mu) {
-			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
+			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities' ");
 		} else {
 			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'");
 		}
 		if ($s2_mu) {
-			$count['registered_active'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
+			$count['registered_active'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities' AND meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "' AND meta_value<>'-1'");
 		} else {
 			$count['registered_active'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "' AND meta_value<>'-1'");
 		}
