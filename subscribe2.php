@@ -184,7 +184,7 @@ class s2class {
 
 		// let's take the time to check process registered users
 		// existing public subscribers are subscribed to all categories
-		$users = $wpdb->get_col("SELECT ID FROM $wpdb->users");
+		$users = $this->get_all_registered('ID');
 		if (!empty($users)) {
 			foreach ($users as $user) {
 				$this->register($user);
@@ -231,18 +231,13 @@ class s2class {
 							update_usermeta($user, $this->get_usermeta_keyname('s2_cat') . $subscribed_category, $subscribed_category);
 						}
 						update_usermeta($user, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $subscribed_categories));
-					} else {
-						$current_s2_subscribed = get_usermeta($user, $this->get_usermeta_keyname('s2_subscribed'));
-						if (empty($current_s2_subscribed)) {
-							update_usermeta($user, $this->get_usermeta_keyname('s2_subscribed'), '-1');
-						}
 					}
 					restore_current_blog();
 				}
 
 				// delete old user meta keys 
 				delete_usermeta($user, 's2_subscribed');
-				foreach ($categories as $cat) if ($cat != '-1') {
+				foreach ($categories as $cat) {
 					delete_usermeta($user, 's2_cat' . $cat);
 				}
 			}
@@ -272,7 +267,7 @@ class s2class {
 		$string = str_replace("BLOGLINK", get_bloginfo('url'), $string);
 		$string = str_replace("TITLE", stripslashes($this->post_title), $string);
 		$string = str_replace("PERMALINK", $this->permalink, $string);
-		if (strstr("TINYLINK", $string)) {
+		if (strstr($string, "TINYLINK")) {
 			$tinylink = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode($this->permalink));
 				if ( ($tinylink !== 'Error') || ($tinylink != FALSE) ) {
 					$string = str_replace("TINYLINK", $tinylink, $string);
@@ -309,16 +304,17 @@ class s2class {
 			$headers .= "MIME-Version: 1.0\n";
 			$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
 			if ('yes' == $this->subscribe2_options['stylesheet']) {
-				$mailtext = "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . get_bloginfo('stylesheet_url') . "\" type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>";
+				$mailtext = apply_filters('s2_html_email', "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . get_bloginfo('stylesheet_url') . "\" type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>");
 			} else {
-				$mailtext = "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>";
+				$mailtext = apply_filters('s2_html_email', "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>");
 			}
 		} else {
 			$headers .= "MIME-Version: 1.0\n";
 			$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 			$message = preg_replace('|&[^a][^m][^p].{0,3};|', '', $message);
 			$message = preg_replace('|&amp;|', '&', $message);
-			$mailtext = wordwrap(strip_tags($message), 80, "\n");
+			$message = wordwrap(strip_tags($message), 80, "\n");
+			$mailtext = apply_filters('s2_plain_email', $message);
 		}
 
 		// Replace any escaped html symbols in subject
@@ -478,7 +474,7 @@ class s2class {
 		// do we send as admin, or post author?
 		if ('author' == $this->subscribe2_options['sender']) {
 		// get author details
-			$user =& $author;
+			$user = &$author;
 		} else {
 			// get admin details
 			$user = $this->get_userdata($this->subscribe2_options['sender']);
@@ -857,6 +853,34 @@ class s2class {
 	} // end get_public()
 
 	/**
+	Return an array of all subscribers
+	*/
+	function get_all_registered($id = '') {
+		global $wpdb, $wp_version, $wpmu_version;
+
+		// Is this WordPressMU or not?
+		if ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
+			$s2_mu = true;
+		}
+
+		if ($s2_mu) {
+			if ($id) {
+				return $wpdb->get_col("SELECT user_id FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
+			} else {
+				$result = $wpdb->get_col("SELECT user_id FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
+				$ids = implode(',', $result);
+				return $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN ($ids) AND user_activation_key=''");
+			}
+		} else {
+			if ($id) {
+				return $wpdb->get_col("SELECT ID FROM $wpdb->users");
+			} else {
+				return $wpdb->get_col("SELECT user_email FROM $wpdb->users");
+			}
+		}
+	}
+
+	/**
 	Return an array of registered subscribers
 	Collect all the registered users of the blog who are subscribed to the specified categories
 	*/
@@ -878,8 +902,6 @@ class s2class {
 			$r['format'] = 'all';
 		if (!isset($r['amount']))
 			$r['amount'] = 'all';
-		if (!isset($r['active']))
-			$r['active'] = 'no';
 		if (!isset($r['cats']))
 			$r['cats'] = '';
 
@@ -906,16 +928,6 @@ class s2class {
 			}
 		}
 
-		// registered subscribers as opposed to registered users
-		if ('no' != $r['active']) {
-			$JOIN .= "INNER JOIN $wpdb->usermeta AS d ON a.user_id = d.user_id ";
-			if ($s2_mu) {
-				$AND .= " AND e.meta_value<>'-1' ";
-			} else {
-				$AND .= " AND a.meta_value<>'-1' ";
-			}
-		}
-
 		// specific category subscribers
 		if ('' != $r['cats']) {
 			$JOIN .= "INNER JOIN $wpdb->usermeta AS e ON a.user_id = e.user_id ";
@@ -926,7 +938,7 @@ class s2class {
 		}
 
 		if ($s2_mu) {
-			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS e ON a.user_id = e.user_id " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND e.meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'" . $AND;
+			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities'" . $AND;
 		} else {
 			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'" . $AND;
 		}
@@ -1002,6 +1014,7 @@ class s2class {
 			// create post format entries for all users
 			$check_format = get_usermeta($user_id, 's2_format');
 			if (empty($check_format)) {
+				// ensure existing subscription options are not overwritten on upgrade
 				if ('html' == $this->subscribe2_options['autoformat']) {
 					update_usermeta($user_id, 's2_format', 'html');
 					update_usermeta($user_id, 's2_excerpt', 'post');
@@ -1013,20 +1026,22 @@ class s2class {
 					update_usermeta($user_id, 's2_excerpt', 'excerpt');
 				}
 				update_usermeta($user_id, 's2_autosub', $this->subscribe2_options['autosub_def']);
-			}
-			// ensure existing subscriptions are not overwritten on upgrade
-			$check_subscribed = get_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'));
-			// if the are no existing subscriptions, create them based on admin options
-			if (empty($check_subscribed)) {
-				// add entries by default if autosub is on
+				// if the are no existing subscriptions, create them if, by default if autosub is on
 				if ( ('yes' == $this->subscribe2_options['autosub']) || (('wpreg' == $this->subscribe2_options['autosub']) && ('on' == $_POST['subscribe'])) ) {
 					update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), $cats);
 					foreach (explode(',', $cats) as $cat) {
 						update_usermeta($user_id, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
 					}
-				} else {
-					update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), '-1');
 				}
+			}
+			$subscribed = get_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'));
+			if (strstr($subscribed, '-1')) {
+				// make sure we remove '-1' from any settings
+				$old_cats = explode(',', $subscribed);
+				$pos = array_search('-1', $old_cats);
+				unset($old_cats[$pos]);
+				$cats = implode(',', $old_cats);
+				update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), $cats);
 			}
 		}
 		return $user_id;
@@ -1050,11 +1065,7 @@ class s2class {
 		
 		foreach ($user_IDs as $user_ID) {	
 			$old_cats = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
-			if ($old_cats == '-1') {
-				$old_cats = array();
-			} else {
-				$old_cats = explode(',', $old_cats);
-			}
+			$old_cats = explode(',', $old_cats);
 			if (!is_array($old_cats)) {
 				$old_cats = array($old_cats);
 			}
@@ -1103,7 +1114,7 @@ class s2class {
 				foreach ($cats as $id) {
 					delete_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
 				}
-				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '-1');
+				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
 			}
 		}
 	} // end unsubscribe_registered_users()
@@ -1149,9 +1160,10 @@ class s2class {
 					update_usermeta($user_id, $this->get_usermeta_keyname('s2_cat') . $term_id, $term_id);
 				}
 				if (empty($cats)) {
-					$cats = array('-1');
+					update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), '');
+				} else {
+					update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
 				}
-				update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
 
 				// don't restore_current_blog(); -> redirect to new subscription page
 				$redirect_to_subscriptionpage = true;
@@ -1166,16 +1178,15 @@ class s2class {
 
 				// delete subscription to all categories on that blog
 				$cats = get_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'));
-				if ($cats == '-1') {
-					$cats = array();
-				} else {
-					$cats = explode(',', $cats);
-					if (!is_array($cats)) $cats = array($cats);
+				$cats = explode(',', $cats);
+				if (!is_array($cats)) {
+					$cats = array($cats);
 				}
+
 				foreach ($cats as $id) {
 					delete_usermeta($user_id, $this->get_usermeta_keyname('s2_cat') . $id);
 				}
-				update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), '-1');
+				update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), '');
 
 				// remove level_0 users
 				if (!current_user_can(1)) {
@@ -1253,7 +1264,7 @@ class s2class {
 		if (is_numeric($admin_id)) {
 			$admin = get_userdata($admin_id);
 		} else {
-			$admin =& $userdata;
+			$admin = &$userdata;
 		}
 
 		// if user record is empty grab the first admin from the database
@@ -1274,8 +1285,9 @@ class s2class {
 
 		//Get Registered Subscribers for bulk management
 		$registered = $this->get_registered();
-		if (!empty($registered)) {
-			$emails = implode(",", $registered);
+		$all_users = $this->get_all_registered();
+		if (!empty($all_users)) {
+			$emails = implode(",", $all_users);
 		}
 
 		// was anything POSTed ?
@@ -1316,7 +1328,7 @@ class s2class {
 			} elseif ($_POST['searchterm']) {
 				$confirmed = $this->get_public();
 				$unconfirmed = $this->get_public(0);
-				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$registered);
+				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$all_users);
 				foreach ($subscribers as $subscriber) {
 					if (is_numeric(stripos($subscriber, $_POST['searchterm']))) {
 						$result[] = $subscriber;
@@ -1341,6 +1353,7 @@ class s2class {
 		if ('' == $confirmed) { $confirmed = array(); }
 		if ('' == $unconfirmed) { $unconfirmed = array(); }
 		if ('' == $registered) { $registered = array(); }
+		if ('' == $all_users) { $all_users = array(); }
 
 		$reminderform = false;
 		$urlpath = str_replace("\\", "/", S2PATH);
@@ -1355,7 +1368,7 @@ class s2class {
 			$page = 1;
 			if ('all' == $_POST['what']) {
 				$what = 'all';
-				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$registered);
+				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$all_users);
 			} elseif ('public' == $_POST['what']) {
 				$what = 'public';
 				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed);
@@ -1372,17 +1385,17 @@ class s2class {
 			} elseif (is_numeric($_POST['what'])) {
 				$what = intval($_POST['what']);
 				$subscribers = $this->get_registered("cats=$what");
-			} elseif ('registered_active' == $_POST['what']) {
-				$what = 'registered_active';
-				$subscribers = $this->get_registered("active=yes");
 			} elseif ('registered' == $_POST['what']) {
 				$what = 'registered';
 				$subscribers = $registered;
+			} elseif ('all_users' == $_POST['what']) {
+				$what = 'all_users';
+				$subscribers = $all_users;
 			}
 		} elseif (isset($_GET['what'])) {
 			if ('all' == $_GET['what']) {
 				$what = 'all';
-				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$registered);
+				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$all_users);
 			} elseif ('public' == $_GET['what']) {
 				$what = 'public';
 				$subscribers = array_merge((array)$confirmed, (array)$unconfirmed);
@@ -1399,16 +1412,16 @@ class s2class {
 			} elseif (is_numeric($_GET['what'])) {
 				$what = intval($_GET['what']);
 				$subscribers = $this->get_registered("cats=$what");
-			} elseif ('registered_active' == $_GET['what']) {
-				$what = 'registered_active';
-				$subscribers = $this->get_registered("active=yes");
-			} elseif ('registered' == $_GET['what']) {
+			} elseif ('registered' == $_POST['what']) {
 				$what = 'registered';
 				$subscribers = $registered;
+			} elseif ('all_users' == $_POST['what']) {
+				$what = 'all_users';
+				$subscribers = $all_users;
 			}
 		} else {
 			$what = 'all';
-			$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$registered);
+			$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$all_users);
 		}
 		if ($_POST['searchterm']) {
 			$subscribers = &$result;
@@ -1524,7 +1537,7 @@ class s2class {
 					echo "</span></td>\r\n";
 					echo "<td><span style=\"color:#FF0000\">&nbsp;!&nbsp;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
 					echo "(<span style=\"color:#FF0000\">" . $this->signup_date($subscriber) . "</span>)\r\n";
-				} elseif (in_array($subscriber, $registered)) {
+				} elseif (in_array($subscriber, $all_users)) {
 					echo "</td><td align=\"center\"></td><td align=\"center\"></td>\r\n";
 					echo "<td><span style=\"color:#006600\">&reg;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
 					echo "(<a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=subscribe2/subscribe2.php&amp;email=$subscriber\">" . __('edit', 'subscribe2') . "</a>)\r\n";
@@ -2025,7 +2038,7 @@ class s2class {
 						delete_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat);
 					}
 				}
-				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '-1');
+				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
 			} elseif ($cats == 'digest') {
 				$all_cats = get_categories(array('hide_empty' => false));
 				foreach ($all_cats as $cat) {
@@ -2112,7 +2125,7 @@ class s2class {
 				global $blog_id;
 				$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 				// if we are subscribed to the current blog display an "unsubscribe" link
-				if (!empty($subscribed) && $subscribed != "-1") {
+				if (!empty($subscribed)) {
 					$unsubscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_unsubscribe=". $blog_id;
 					echo "<p><a href=\"". $unsubscribe_link ."\" class=\"button\">" . __('Unsubscribe me from this blog', 'subscribe2') . "</a></p>";
 				} else {
@@ -2131,11 +2144,11 @@ class s2class {
 			echo __('Receive periodic summaries of new posts?', 'subscribe2') . ': &nbsp;&nbsp;';
 			echo "<p><label>";
 			echo "<input type=\"radio\" name=\"category\" value=\"digest\" ";
-			if (get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')) != '-1') {
+			if (get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'))) {
 				echo "checked=\"yes\" ";
 			}
 			echo "/> " . __('Yes', 'subscribe2') . "</label> <label><input type=\"radio\" name=\"category\" value=\"-1\" ";
-			if (get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')) == '-1') {
+			if (!get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'))) {
 				echo "checked=\"yes\" ";
 			}
 			echo "/> " . __('No', 'subscribe2');
@@ -2168,7 +2181,7 @@ class s2class {
 
 				// check if we're subscribed to the blog
 				$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
-				$subscribed = !empty($subscribed) && $subscribed != -1;
+				$subscribed = !empty($subscribed);
 
 				$blog['blogname'] = get_bloginfo('name');
 				$blog['blogurl'] = get_bloginfo('url');
@@ -2243,8 +2256,8 @@ class s2class {
 			} elseif (is_numeric($_POST['what'])) {
 				$cat = intval($_POST['what']);
 				$recipients = $this->get_registered("cats=$cat");
-			} elseif ('registered_active' == $_POST['what']) {
-				$recipients = $this->get_registered("active=yes");
+			} elseif ('all_users' == $_POST['what']) {
+				$recipients = $this->get_all_registered();
 			} else {
 				$recipients = $this->get_registered();
 			}
@@ -2365,8 +2378,8 @@ class s2class {
 			'public' => __('Public Subscribers', 'subscribe2'),
 			'confirmed' => ' &nbsp;&nbsp;' . __('Confirmed', 'subscribe2'),
 			'unconfirmed' => ' &nbsp;&nbsp;' . __('Unconfirmed', 'subscribe2'),
-			'registered' => __('Registered Users', 'subscribe2'),
-			'registered_active' => __('Registered Subscribers', 'subscribe2'));
+			'all_users' => __('All Registered Users', 'subscribe2'),
+			'registered' => __('Registered Subscribers', 'subscribe2'));
 
 		$all_cats = get_categories(array('hide_empty' => false));
 
@@ -2381,28 +2394,28 @@ class s2class {
 			$count['public'] = ($count['confirmed'] + $count['unconfirmed']);
 		}
 		if ($s2_mu) {
-			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities' ");
+			$count['all_users'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
+		} else {
+			$count['all_users'] = $wpdb->get_var("SELECT COUNT(ID) FROM $wpdb->users");
+		}
+		if ($s2_mu) {
+			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities' AND meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'");
 		} else {
 			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'");
 		}
-		if ($s2_mu) {
-			$count['registered_active'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities' AND meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "' AND meta_value<>'-1'");
-		} else {
-			$count['registered_active'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "' AND meta_value<>'-1'");
-		}
-		$count['all'] = ($count['confirmed'] + $count['unconfirmed'] + $count['registered']);
+		$count['all'] = ($count['confirmed'] + $count['unconfirmed'] + $count['all_users']);
 		if ($s2_mu) {
 			foreach ($all_cats as $cat) {
-				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(a.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key=('" . $this->get_usermeta_keyname('s2_cat') . "$cat->term_id')");
+				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(a.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key='" . $this->get_usermeta_keyname('s2_cat') . $cat->term_id . "'");
 			}
 		} else {
 			foreach ($all_cats as $cat) {
-				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat->term_id'");
+				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_cat') . $cat->term_id . "'");
 			}
 		}
 
 		// do have actually have some subscribers?
-		if ( (0 == $count['confirmed']) && (0 == $count['unconfirmed']) && (0 == $count['registered']) ) {
+		if ( (0 == $count['confirmed']) && (0 == $count['unconfirmed']) && (0 == $count['all_users']) ) {
 			// no? bail out
 			return;
 		}
