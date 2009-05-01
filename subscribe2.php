@@ -42,8 +42,8 @@ if (!defined('WP_CONTENT_DIR')) {
 	define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
 }
 
-// use Owen's excellent ButtonSnap library
-if (!function_exists('buttonsnap_textbutton')) {
+/* Include buttonsnap library by Owen Winckler */
+if (!class_exists('buttonsnap')) {
 	require(WP_CONTENT_DIR . '/plugins/subscribe2/include/buttonsnap.php');
 }
 
@@ -2841,24 +2841,24 @@ class s2class {
 	Register our button in the QuickTags bar
 	*/
 	function button_init() {
-		if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) return;
-			if ( 'true' == get_user_option('rich_editing') ) {
-				global $wp_db_version;
-				if ($wp_db_version >= 7098) {
-					//check if we are using WordPress 2.5+
-					add_filter('mce_external_plugins', array(&$this, 'mce3_plugin'));
-					add_filter('mce_buttons', array(&$this, 'mce3_button'));
-				} else {
-					// Load and append our TinyMCE external plugin
-					add_filter('mce_plugins', array(&$this, 'mce2_plugin'));
-					add_filter('mce_buttons', array(&$this, 'mce2_button'));
-					add_filter('tinymce_before_init', array(&$this, 'tinymce2_before_init'));
-				}
+		if (!current_user_can('edit_posts') && !current_user_can('edit_pages')) { return; }
+		if ('true' == get_user_option('rich_editing') ) {
+			global $wp_db_version;
+			//check if we are using WordPress 2.5+
+			if ($wp_db_version >= 7098) {
+				// Use WordPress 2.5+ hooks
+				add_filter('mce_external_plugins', array(&$this, 'mce3_plugin'));
+				add_filter('mce_buttons', array(&$this, 'mce3_button'));
 			} else {
-				//use buttonsnap to add button is not using RTE
-				buttonsnap_separator();
-				buttonsnap_jsbutton(WP_CONTENT_URL . '/plugins/subscribe2/include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
+				// Load and append our TinyMCE external plugin
+				add_filter('mce_plugins', array(&$this, 'mce2_plugin'));
+				add_filter('mce_buttons', array(&$this, 'mce2_button'));
+				add_filter('tinymce_before_init', array(&$this, 'tinymce2_before_init'));
 			}
+		} else {
+			buttonsnap_separator();
+			buttonsnap_jsbutton(WP_CONTENT_URL . '/plugins/subscribe2/include/s2_button.png',  __('Subscribe2', 'subscribe2'), 's2_insert_token();');
+		}
 	} // end button_init()
 
 	/**
