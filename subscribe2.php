@@ -930,9 +930,9 @@ class s2class {
 
 		// specific category subscribers
 		if ('' != $r['cats']) {
-			$JOIN .= "INNER JOIN $wpdb->usermeta AS e ON a.user_id = e.user_id ";
+			$JOIN .= "INNER JOIN $wpdb->usermeta AS d ON a.user_id = d.user_id ";
 			foreach (explode(',', $r['cats']) as $cat) {
-				('' == $and) ? $and = "e.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'" : $and .= " OR e.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'";
+				('' == $and) ? $and = "d.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'" : $and .= " OR d.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'";
 			}
 			$AND .= " AND ($and)";
 		}
@@ -1412,10 +1412,10 @@ class s2class {
 			} elseif (is_numeric($_GET['what'])) {
 				$what = intval($_GET['what']);
 				$subscribers = $this->get_registered("cats=$what");
-			} elseif ('registered' == $_POST['what']) {
+			} elseif ('registered' == $_GET['what']) {
 				$what = 'registered';
 				$subscribers = $registered;
-			} elseif ('all_users' == $_POST['what']) {
+			} elseif ('all_users' == $_GET['what']) {
 				$what = 'all_users';
 				$subscribers = $all_users;
 			}
