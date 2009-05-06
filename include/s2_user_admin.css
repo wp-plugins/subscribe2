@@ -7,9 +7,14 @@ ul.s2_blogs li {
 	display: block;
 	width: 300px;
 	float: left;
+	position: relative;
 	padding: .5em 1em;
 	background-color: #e3e3e3;
 	margin-right: 1em;
+	border: 1px solid #e0e0e0;
+}
+ul.s2_blogs li:hover {
+	border-color: #666;
 }
 
 ul.s2_blogs li .name {
@@ -47,4 +52,40 @@ ul.s2_blogs_unsubscribed li .buttons a {
 
 ul.s2_blogs_unsubscribed li .name {
 	float: left;
+}
+
+ul.s2_blogs div.additional_info {
+	display: none;
+	width: 260px;
+	padding: .5em 1em;
+	position: absolute;
+	left: -2px;
+	bottom: 4.2em;
+	margin-bottom: 2px;
+	z-index: 9;
+	background-color: #666;
+	color: #fff;
+	border: 1px solid white;
+	border-bottom: medium none;
+	-moz-border-radius-topright: .5em;
+	-moz-border-radius-topleft: .5em;	
+}
+ul.s2_blogs_unsubscribed div.additional_info {
+	bottom: 2.4em;
+}
+ul.s2_blogs li:hover div.additional_info {
+	display: block;
+}
+ul.s2_blogs div.additional_info li {
+	display: block;
+	width: auto;
+	float: left;
+	padding: 1px;
+	background-color: transparent;
+	margin-right: 0;
+	border: medium none;
+	margin-bottom: 0;
+}
+ul.s2_blogs div.additional_info .description {
+	font-style: italic; 
 }

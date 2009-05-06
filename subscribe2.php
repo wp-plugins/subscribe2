@@ -351,31 +351,24 @@ class s2class {
 			$count = 1;
 			$batch = array();
 			foreach ($recipients as $recipient) {
-				// advance the array pointer by one, for use down below
-				// the array pointer _is not_ advanced by the foreach () loop itself
-				next($recipients);
 				$recipient = trim($recipient);
 				// sanity check -- make sure we have a valid email
 				if (!is_email($recipient)) { continue; }
 				// and NOT the sender's email, since they'll get a copy anyway
-				if ( (! empty($recipient)) && ($this->myemail != $recipient) ) {
+				if ( (!empty($recipient)) && ($this->myemail != $recipient) ) {
 					('' == $bcc) ? $bcc = "Bcc: $recipient" : $bcc .= ", $recipient";
 					// Bcc Headers now constructed by phpmailer class
 				}
 				if ($this->subscribe2_options['bcclimit'] == $count) {
-					$count = 1;
+					$count = 0;
 					$batch[] = $bcc;
 					$bcc = '';
-				} else {
-					if (false == current($recipients)) {
-						// we've reached the end of the subscriber list
-						// add what we have to the batch, and move on
-						$batch[] = $bcc;
-						break;
-					} else {
-						$count++;
-					}
 				}
+				$count++;
+			}
+			// add any partially completed batches to our batch array
+			if ('' != $bcc) {
+				$batch[] = $bcc;
 			}
 		}
 		// rewind the array, just to be safe
@@ -2184,6 +2177,17 @@ class s2class {
 				$subscribed = !empty($subscribed);
 
 				$blog['blogname'] = get_bloginfo('name');
+				$blog['description'] = get_bloginfo('description');
+				if (defined('AUTHOR_AVATARS_VERSION')) {
+					if (!class_exists('UserList'))
+						include_once(ABSPATH . 'wp-content/plugins/author-avatars/lib/UserList.class.php' );
+					$userlist = new UserList();
+					$userlist->roles = array('Administrator', 'Editor', 'Subscriber');
+					$userlist->blogs = array($blog['blog_id']);
+					$userlist->avatar_size = 30;
+					$userlist->use_list_template();
+					$blog['users'] = $userlist->get_output();
+				}
 				$blog['blogurl'] = get_bloginfo('url');
 				$blog['subscribe_page'] = get_bloginfo('url') . "/wp-admin/users.php?page=subscribe2/subscribe2.php";
 
@@ -2204,12 +2208,13 @@ class s2class {
 				
 				echo "<ul class=\"s2_blogs s2_blogs_subscribed\">\r\n";
 				foreach ($blogs_subscribed as $blog) {
-					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\">" . wp_html_excerpt($blog['blogname'], 30) . "</a></span>\r\n";
+					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\" title=\"" . $blog['description'] . "\">" . wp_html_excerpt($blog['blogname'], 30) . "</a></span>\r\n";
 					echo "<span class=\"buttons\"><a href=\"" . $unsubscribe_link . $blog['blog_id'] . "\">" . __('Unsubscribe', 'subscribe2') . "</a>\r\n";
 					if ($blog_id != $blog['blog_id']) {
 						echo "<a href=\"". $blog['subscribe_page'] . "\">" . __('View Subscription Settings', 'subscribe2') . "</a>\r\n";
 					}
 					echo "</span>";
+					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>";
 					echo "</li>";
 				}
 				echo "</ul>";
@@ -2221,8 +2226,9 @@ class s2class {
 				echo "<h2>" . __('Subscribe to new blogs', 'subscribe2') . "</h2>\r\n";
 				echo "<ul class=\"s2_blogs s2_blogs_unsubscribed\">";
 				foreach ($blogs_notsubscribed as $blog) {
-					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\">" . wp_html_excerpt($blog['blogname'], 30) . "</a></span>\r\n";
+					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\" title=\"" . $blog['description'] . "\">" . wp_html_excerpt($blog['blogname'], 30) . "</a></span>\r\n";
 					echo "<span class=\"buttons\"><a href=\"" . $subscribe_link . $blog['blog_id'] . "\">" . __('Subscribe', 'subscribe2') . "</a></span>\r\n";
+					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>";
 					echo "</li>";
 				}
 				echo "</ul>\r\n";
