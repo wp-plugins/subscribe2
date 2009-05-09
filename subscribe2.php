@@ -1243,6 +1243,26 @@ class s2class {
 		}
 	} // end autosub_new_category()
 
+	function delete_category($deleted_category='') {
+		global $wpdb;
+
+		$sql = "SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$deleted_category'";
+		$user_IDs = $wpdb->get_col($sql);
+		if ('' == $user_IDs) { return; }
+
+		foreach ($user_IDs as $user_ID) {	
+			$old_cats = explode(',', get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
+			if (!is_array($old_cats)) {
+				$old_cats = array($old_cats);
+			}
+			// add subscription to these cat IDs
+			update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $deleted_category, '');
+			$remain = array_diff($old_cats, (array)$deleted_category);
+			update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
+		}
+		
+	}
+
 	/**
 	Get admin data from record 1 or first user with admin rights
 	*/
@@ -2156,25 +2176,23 @@ class s2class {
 		// list of subscribed blogs on wordpress mu
 		if ($s2_mu) {
 			global $blog_id;
-			$blogs = get_blog_list( 0, 'all', false );
-			
+			$blogs = get_blog_list(0, 'all', false);
+
 			$blogs_subscribed = array();
 			$blogs_notsubscribed = array();
 
 			foreach ($blogs as $key => $blog) {		
-				// exclude current blog
-				$is_current_blog = ($blog_id == $blog['blog_id']);
-
 				// switch to blog
 				switch_to_blog($blog['blog_id']);
 
 				// check that the plugin is active on the current blog
 				$current_plugins = get_option('active_plugins');
-				if ( !is_array($current_plugins) || !in_array('subscribe2/subscribe2.php', $current_plugins)) continue;
+				if ( (!is_array($current_plugins)) || (!in_array('subscribe2/subscribe2.php', $current_plugins)) ) {
+					continue;
+				}
 
 				// check if we're subscribed to the blog
 				$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
-				$subscribed = !empty($subscribed);
 
 				$blog['blogname'] = get_bloginfo('name');
 				$blog['description'] = get_bloginfo('description');
@@ -2192,12 +2210,11 @@ class s2class {
 				$blog['subscribe_page'] = get_bloginfo('url') . "/wp-admin/users.php?page=subscribe2/subscribe2.php";
 
 				$key = strtolower($blog['blogname'] . "-" . $blog['blog_id']);
-				if ($subscribed) {
+				if (!empty($subscribed)) {
 					$blogs_subscribed[$key] = $blog;
-				} elseif (!$is_current_blog) {
+				} else {
 					$blogs_notsubscribed[$key] = $blog;
 				}
-				
 				restore_current_blog();
 			}
 
@@ -2205,19 +2222,19 @@ class s2class {
 				ksort($blogs_subscribed);
 				$unsubscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_unsubscribe=";
 				echo '<h2>' . __('Subscribed Blogs', 'subscribe2') . '</h2>'."\r\n";
-				
 				echo "<ul class=\"s2_blogs s2_blogs_subscribed\">\r\n";
 				foreach ($blogs_subscribed as $blog) {
 					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\" title=\"" . $blog['description'] . "\">" . wp_html_excerpt($blog['blogname'], 30) . "</a></span>\r\n";
-					echo "<span class=\"buttons\"><a href=\"" . $unsubscribe_link . $blog['blog_id'] . "\">" . __('Unsubscribe', 'subscribe2') . "</a>\r\n";
-					if ($blog_id != $blog['blog_id']) {
-						echo "<a href=\"". $blog['subscribe_page'] . "\">" . __('View Subscription Settings', 'subscribe2') . "</a>\r\n";
+					if ($blog_id == $blog['blog_id']) {
+						echo "<span class=\"buttons\">" . __('Viewing Settings Now', 'subscribe2') . "</span>\r\n";
+					} else {
+						echo "<span class=\"buttons\"><a href=\"". $blog['subscribe_page'] . "\">" . __('View Subscription Settings', 'subscribe2') . "</a>\r\n";
+						echo "<a href=\"" . $unsubscribe_link . $blog['blog_id'] . "\">" . __('Unsubscribe', 'subscribe2') . "</a></span>\r\n";
 					}
-					echo "</span>";
-					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>";
+					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>\r\n";
 					echo "</li>";
 				}
-				echo "</ul>";
+				echo "</ul>\r\n";
 			}
 			
 			if (!empty($blogs_notsubscribed)) {
@@ -2227,8 +2244,13 @@ class s2class {
 				echo "<ul class=\"s2_blogs s2_blogs_unsubscribed\">";
 				foreach ($blogs_notsubscribed as $blog) {
 					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\" title=\"" . $blog['description'] . "\">" . wp_html_excerpt($blog['blogname'], 30) . "</a></span>\r\n";
-					echo "<span class=\"buttons\"><a href=\"" . $subscribe_link . $blog['blog_id'] . "\">" . __('Subscribe', 'subscribe2') . "</a></span>\r\n";
-					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>";
+					if ($blog_id == $blog['blog_id']) {
+						echo "<span class=\"buttons\">" . __('Viewing Settings Now', 'subscribe2') . "</span>\r\n";
+					} else {
+						echo "<span class=\"buttons\"><a href=\"". $blog['subscribe_page'] . "\">" . __('View Subscription Settings', 'subscribe2') . "</a>\r\n";
+						echo "<a href=\"" . $subscribe_link . $blog['blog_id'] . "\">" . __('Subscribe', 'subscribe2') . "</a></span>\r\n";
+					}
+					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>\r\n";
 					echo "</li>";
 				}
 				echo "</ul>\r\n";
@@ -2981,7 +3003,7 @@ class s2class {
 			if ($check) {
 				continue;
 			}
-			$table .= $post->post_title . "\r\n";
+			$table .= "* " . $post->post_title . "\r\n";
 			$message_posttime .= $post->post_title . "\r\n";
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
 			$message_posttime .= get_permalink($post->ID) . "\r\n";
@@ -3096,6 +3118,7 @@ class s2class {
 		add_action('admin_menu', array(&$this, 's2_meta_init'));
 		add_action('save_post', array(&$this, 's2_meta_handler'));
 		add_action('create_category', array(&$this, 'autosub_new_category'));
+		add_action('delete_category', array(&$this, 'delete_category'));
 		add_filter('the_content', array(&$this, 'filter'), 10);
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
 

@@ -5,7 +5,7 @@ ul.s2_blogs {
 
 ul.s2_blogs li {
 	display: block;
-	width: 300px;
+	width: 350px;
 	float: left;
 	position: relative;
 	padding: .5em 1em;
@@ -13,6 +13,7 @@ ul.s2_blogs li {
 	margin-right: 1em;
 	border: 1px solid #e0e0e0;
 }
+
 ul.s2_blogs li:hover {
 	border-color: #666;
 }
@@ -25,10 +26,10 @@ ul.s2_blogs li .buttons {
 	display: block;
 	float: left;
 	white-space: nowrap;
+	font-size: .8em;
 }
 
 ul.s2_blogs li .buttons a {
-	font-size: .8em;
 	display: block;
 	float: left;
 	padding: .1em .5em;
@@ -42,6 +43,17 @@ ul.s2_blogs li .buttons a:hover {
 	color: #666;
 }
 
+ul.s2_blogs_subscribed li .buttons {
+	float: right;
+}
+
+ul.s2_blogs_subscribed li .buttons a {
+	margin: 0 0 0 1em;
+}
+
+ul.s2_blogs_subscribed li .name {
+	float: left;
+}
 ul.s2_blogs_unsubscribed li .buttons {
 	float: right;
 }
@@ -70,12 +82,19 @@ ul.s2_blogs div.additional_info {
 	-moz-border-radius-topright: .5em;
 	-moz-border-radius-topleft: .5em;	
 }
+
 ul.s2_blogs_unsubscribed div.additional_info {
 	bottom: 2.4em;
 }
+
+ul.s2_blogs_subscribed div.additional_info {
+	bottom: 2.4em;
+}
+
 ul.s2_blogs li:hover div.additional_info {
 	display: block;
 }
+
 ul.s2_blogs div.additional_info li {
 	display: block;
 	width: auto;
@@ -86,6 +105,7 @@ ul.s2_blogs div.additional_info li {
 	border: medium none;
 	margin-bottom: 0;
 }
+
 ul.s2_blogs div.additional_info .description {
 	font-style: italic; 
 }
