@@ -2222,7 +2222,7 @@ class s2class {
 				ksort($blogs_subscribed);
 				$unsubscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_unsubscribe=";
 				echo '<h2>' . __('Subscribed Blogs', 'subscribe2') . '</h2>'."\r\n";
-				echo "<ul class=\"s2_blogs s2_blogs_subscribed\">\r\n";
+				echo "<ul class=\"s2_blogs\">\r\n";
 				foreach ($blogs_subscribed as $blog) {
 					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\" title=\"" . $blog['description'] . "\">" . wp_html_excerpt($blog['blogname'], 30) . "</a></span>\r\n";
 					if ($blog_id == $blog['blog_id']) {
@@ -2241,7 +2241,7 @@ class s2class {
 				ksort($blogs_notsubscribed);
 				$subscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_subscribe=";
 				echo "<h2>" . __('Subscribe to new blogs', 'subscribe2') . "</h2>\r\n";
-				echo "<ul class=\"s2_blogs s2_blogs_unsubscribed\">";
+				echo "<ul class=\"s2_blogs\">";
 				foreach ($blogs_notsubscribed as $blog) {
 					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\" title=\"" . $blog['description'] . "\">" . wp_html_excerpt($blog['blogname'], 30) . "</a></span>\r\n";
 					if ($blog_id == $blog['blog_id']) {

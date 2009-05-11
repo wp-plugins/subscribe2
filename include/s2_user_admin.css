@@ -20,11 +20,12 @@ ul.s2_blogs li:hover {
 
 ul.s2_blogs li .name {
 	display: block;
+	float: left;
 }
 
 ul.s2_blogs li .buttons {
 	display: block;
-	float: left;
+	float: right;
 	white-space: nowrap;
 	font-size: .8em;
 }
@@ -35,35 +36,12 @@ ul.s2_blogs li .buttons a {
 	padding: .1em .5em;
 	background-color: #666;
 	color: white;
-	margin: .5em .5em 0 0;
+	margin: 0 0 0 1em;
 }
 
 ul.s2_blogs li .buttons a:hover {
 	background-color: whitesmoke;
 	color: #666;
-}
-
-ul.s2_blogs_subscribed li .buttons {
-	float: right;
-}
-
-ul.s2_blogs_subscribed li .buttons a {
-	margin: 0 0 0 1em;
-}
-
-ul.s2_blogs_subscribed li .name {
-	float: left;
-}
-ul.s2_blogs_unsubscribed li .buttons {
-	float: right;
-}
-
-ul.s2_blogs_unsubscribed li .buttons a {
-	margin: 0 0 0 1em;
-}
-
-ul.s2_blogs_unsubscribed li .name {
-	float: left;
 }
 
 ul.s2_blogs div.additional_info {
@@ -72,7 +50,7 @@ ul.s2_blogs div.additional_info {
 	padding: .5em 1em;
 	position: absolute;
 	left: -2px;
-	bottom: 4.2em;
+	bottom: 2.4em;
 	margin-bottom: 2px;
 	z-index: 9;
 	background-color: #666;
@@ -81,14 +59,6 @@ ul.s2_blogs div.additional_info {
 	border-bottom: medium none;
 	-moz-border-radius-topright: .5em;
 	-moz-border-radius-topleft: .5em;	
-}
-
-ul.s2_blogs_unsubscribed div.additional_info {
-	bottom: 2.4em;
-}
-
-ul.s2_blogs_subscribed div.additional_info {
-	bottom: 2.4em;
 }
 
 ul.s2_blogs li:hover div.additional_info {
