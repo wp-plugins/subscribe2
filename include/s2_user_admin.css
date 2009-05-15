@@ -5,7 +5,7 @@ ul.s2_blogs {
 
 ul.s2_blogs li {
 	display: block;
-	width: 350px;
+	width: 95%;
 	float: left;
 	position: relative;
 	padding: .5em 1em;
@@ -46,7 +46,7 @@ ul.s2_blogs li .buttons a:hover {
 
 ul.s2_blogs div.additional_info {
 	display: none;
-	width: 260px;
+	width: 75%;
 	padding: .5em 1em;
 	position: absolute;
 	left: -2px;

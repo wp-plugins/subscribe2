@@ -2020,8 +2020,7 @@ class s2class {
 		// Is this WordPressMU or not?
 		if ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
 			$s2_mu = true;
-		}
-		else {
+		} else {
 			$s2_mu = false;
 		}
 		
@@ -2176,7 +2175,7 @@ class s2class {
 		// list of subscribed blogs on wordpress mu
 		if ($s2_mu) {
 			global $blog_id;
-			$blogs = get_blog_list(0, 'all', false);
+			$blogs = get_blog_list(0, 'all');
 
 			$blogs_subscribed = array();
 			$blogs_notsubscribed = array();
@@ -2187,7 +2186,10 @@ class s2class {
 
 				// check that the plugin is active on the current blog
 				$current_plugins = get_option('active_plugins');
-				if ( (!is_array($current_plugins)) || (!in_array('subscribe2/subscribe2.php', $current_plugins)) ) {
+				if (!is_array($current_plugins)) {
+					$current_plugins = (array)$current_plugins;
+				}
+				if (!in_array('subscribe2/subscribe2.php', $current_plugins)) {
 					continue;
 				}
 
@@ -2220,7 +2222,6 @@ class s2class {
 
 			if (!empty($blogs_subscribed)) {
 				ksort($blogs_subscribed);
-				$unsubscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_unsubscribe=";
 				echo '<h2>' . __('Subscribed Blogs', 'subscribe2') . '</h2>'."\r\n";
 				echo "<ul class=\"s2_blogs\">\r\n";
 				foreach ($blogs_subscribed as $blog) {
@@ -2229,17 +2230,16 @@ class s2class {
 						echo "<span class=\"buttons\">" . __('Viewing Settings Now', 'subscribe2') . "</span>\r\n";
 					} else {
 						echo "<span class=\"buttons\"><a href=\"". $blog['subscribe_page'] . "\">" . __('View Subscription Settings', 'subscribe2') . "</a>\r\n";
-						echo "<a href=\"" . $unsubscribe_link . $blog['blog_id'] . "\">" . __('Unsubscribe', 'subscribe2') . "</a></span>\r\n";
+						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_unsubscribe=" . $blog['blog_id'] . "\">" . __('Unsubscribe', 'subscribe2') . "</a></span>\r\n";
 					}
 					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>\r\n";
 					echo "</li>";
 				}
 				echo "</ul>\r\n";
 			}
-			
+
 			if (!empty($blogs_notsubscribed)) {
 				ksort($blogs_notsubscribed);
-				$subscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_subscribe=";
 				echo "<h2>" . __('Subscribe to new blogs', 'subscribe2') . "</h2>\r\n";
 				echo "<ul class=\"s2_blogs\">";
 				foreach ($blogs_notsubscribed as $blog) {
@@ -2248,7 +2248,7 @@ class s2class {
 						echo "<span class=\"buttons\">" . __('Viewing Settings Now', 'subscribe2') . "</span>\r\n";
 					} else {
 						echo "<span class=\"buttons\"><a href=\"". $blog['subscribe_page'] . "\">" . __('View Subscription Settings', 'subscribe2') . "</a>\r\n";
-						echo "<a href=\"" . $subscribe_link . $blog['blog_id'] . "\">" . __('Subscribe', 'subscribe2') . "</a></span>\r\n";
+						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_subscribe=" . $blog['blog_id'] . "\">" . __('Subscribe', 'subscribe2') . "</a></span>\r\n";
 					}
 					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>\r\n";
 					echo "</li>";
