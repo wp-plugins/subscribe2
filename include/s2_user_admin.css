@@ -1,20 +1,21 @@
 ul.s2_blogs { 
-	float:left;
+	float: left;
 	width: 99%;
 }
 
 ul.s2_blogs li {
+	background-color: #E3E3E3;
+	border:1px solid #E0E0E0;
 	display: block;
-	width: 95%;
 	float: left;
+	margin: 3px;
+	padding: 0.5em;
 	position: relative;
-	padding: .5em 1em;
-	background-color: #e3e3e3;
-	margin-right: 1em;
-	border: 1px solid #e0e0e0;
+	white-space: nowrap;
+	width: 47%;
 }
 
-ul.s2_blogs li:hover {
+ul.s2_blogs li: hover {
 	border-color: #666;
 }
 
@@ -26,6 +27,7 @@ ul.s2_blogs li .name {
 ul.s2_blogs li .buttons {
 	display: block;
 	float: right;
+	margin-left: -6px;
 	white-space: nowrap;
 	font-size: .8em;
 }
@@ -39,7 +41,7 @@ ul.s2_blogs li .buttons a {
 	margin: 0 0 0 1em;
 }
 
-ul.s2_blogs li .buttons a:hover {
+ul.s2_blogs li .buttons a: hover {
 	background-color: whitesmoke;
 	color: #666;
 }
@@ -61,7 +63,7 @@ ul.s2_blogs div.additional_info {
 	-moz-border-radius-topleft: .5em;	
 }
 
-ul.s2_blogs li:hover div.additional_info {
+ul.s2_blogs li: hover div.additional_info {
 	display: block;
 }
 

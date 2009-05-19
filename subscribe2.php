@@ -849,14 +849,9 @@ class s2class {
 	Return an array of all subscribers
 	*/
 	function get_all_registered($id = '') {
-		global $wpdb, $wp_version, $wpmu_version;
+		global $wpdb;
 
-		// Is this WordPressMU or not?
-		if ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
-			$s2_mu = true;
-		}
-
-		if ($s2_mu) {
+		if ($this->s2_mu) {
 			if ($id) {
 				return $wpdb->get_col("SELECT user_id FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
 			} else {
@@ -878,12 +873,7 @@ class s2class {
 	Collect all the registered users of the blog who are subscribed to the specified categories
 	*/
 	function get_registered($args = '') {
-		global $wpdb, $wp_version, $wpmu_version;
-
-		// Is this WordPressMU or not?
-		if ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
-			$s2_mu = true;
-		}
+		global $wpdb;
 
 		$format = '';
 		$amount = '';
@@ -930,7 +920,7 @@ class s2class {
 			$AND .= " AND ($and)";
 		}
 
-		if ($s2_mu) {
+		if ($this->s2_mu) {
 			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities'" . $AND;
 		} else {
 			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'" . $AND;
@@ -2008,7 +1998,7 @@ class s2class {
 	Our profile menu
 	*/
 	function user_menu() {
-		global $user_ID, $s2nonce, $wp_version, $wpmu_version;
+		global $user_ID, $s2nonce;
 
 		if (isset($_GET['email'])) {
 			global $wpdb;
@@ -2017,13 +2007,6 @@ class s2class {
 			get_currentuserinfo();
 		}
 
-		// Is this WordPressMU or not?
-		if ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
-			$s2_mu = true;
-		} else {
-			$s2_mu = false;
-		}
-		
 		// was anything POSTed?
 		if ( (isset($_POST['s2_admin'])) && ('user' == $_POST['s2_admin']) ) {
 			check_admin_referer('subscribe2-user_subscribers' . $s2nonce);
@@ -2133,7 +2116,7 @@ class s2class {
 			}
 
 			// subscribed categories
-			if ($s2_mu) {
+			if ($this->s2_mu) {
 				global $blog_id;
 				$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 				// if we are subscribed to the current blog display an "unsubscribe" link
@@ -2173,7 +2156,7 @@ class s2class {
 		
 		
 		// list of subscribed blogs on wordpress mu
-		if ($s2_mu) {
+		if ($this->s2_mu) {
 			global $blog_id;
 			$blogs = get_blog_list(0, 'all');
 
@@ -2196,7 +2179,12 @@ class s2class {
 				// check if we're subscribed to the blog
 				$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 
-				$blog['blogname'] = get_bloginfo('name');
+				$blogname = get_bloginfo('name');
+				if (strlen($blogname) > 30) { 
+					$blog['blogname'] = wp_html_excerpt($blogname, 30) . "..";
+				} else {
+					$blog['blogname'] = $blogname;
+				}
 				$blog['description'] = get_bloginfo('description');
 				if (defined('AUTHOR_AVATARS_VERSION')) {
 					if (!class_exists('UserList'))
@@ -2225,11 +2213,11 @@ class s2class {
 				echo '<h2>' . __('Subscribed Blogs', 'subscribe2') . '</h2>'."\r\n";
 				echo "<ul class=\"s2_blogs\">\r\n";
 				foreach ($blogs_subscribed as $blog) {
-					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\" title=\"" . $blog['description'] . "\">" . wp_html_excerpt($blog['blogname'], 30) . "</a></span>\r\n";
+					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\" title=\"" . $blog['description'] . "\">" . $blog['blogname'] . "</a></span>\r\n";
 					if ($blog_id == $blog['blog_id']) {
 						echo "<span class=\"buttons\">" . __('Viewing Settings Now', 'subscribe2') . "</span>\r\n";
 					} else {
-						echo "<span class=\"buttons\"><a href=\"". $blog['subscribe_page'] . "\">" . __('View Subscription Settings', 'subscribe2') . "</a>\r\n";
+						echo "<span class=\"buttons\"><a href=\"". $blog['subscribe_page'] . "\">" . __('View Settings', 'subscribe2') . "</a>\r\n";
 						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_unsubscribe=" . $blog['blog_id'] . "\">" . __('Unsubscribe', 'subscribe2') . "</a></span>\r\n";
 					}
 					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>\r\n";
@@ -2243,11 +2231,11 @@ class s2class {
 				echo "<h2>" . __('Subscribe to new blogs', 'subscribe2') . "</h2>\r\n";
 				echo "<ul class=\"s2_blogs\">";
 				foreach ($blogs_notsubscribed as $blog) {
-					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\" title=\"" . $blog['description'] . "\">" . wp_html_excerpt($blog['blogname'], 30) . "</a></span>\r\n";
+					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\" title=\"" . $blog['description'] . "\">" . $blog['blogname'] . "</a></span>\r\n";
 					if ($blog_id == $blog['blog_id']) {
 						echo "<span class=\"buttons\">" . __('Viewing Settings Now', 'subscribe2') . "</span>\r\n";
 					} else {
-						echo "<span class=\"buttons\"><a href=\"". $blog['subscribe_page'] . "\">" . __('View Subscription Settings', 'subscribe2') . "</a>\r\n";
+						echo "<span class=\"buttons\"><a href=\"". $blog['subscribe_page'] . "\">" . __('View Settings', 'subscribe2') . "</a>\r\n";
 						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_subscribe=" . $blog['blog_id'] . "\">" . __('Subscribe', 'subscribe2') . "</a></span>\r\n";
 					}
 					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>\r\n";
@@ -2395,12 +2383,7 @@ class s2class {
 	$submit is the text to use on the Submit button
 	*/
 	function display_subscriber_dropdown($selected = 'registered', $submit = '', $exclude = array()) {
-		global $wpdb, $wp_version, $wpmu_version;
-
-		// Is this WordPressMU or not?
-		if ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
-			$s2_mu = true;
-		}
+		global $wpdb;
 
 		$who = array('all' => __('All Users and Subscribers', 'subscribe2'),
 			'public' => __('Public Subscribers', 'subscribe2'),
@@ -2421,18 +2404,18 @@ class s2class {
 		} else {
 			$count['public'] = ($count['confirmed'] + $count['unconfirmed']);
 		}
-		if ($s2_mu) {
+		if ($this->s2_mu) {
 			$count['all_users'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
 		} else {
 			$count['all_users'] = $wpdb->get_var("SELECT COUNT(ID) FROM $wpdb->users");
 		}
-		if ($s2_mu) {
+		if ($this->s2_mu) {
 			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities' AND meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'");
 		} else {
 			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'");
 		}
 		$count['all'] = ($count['confirmed'] + $count['unconfirmed'] + $count['all_users']);
-		if ($s2_mu) {
+		if ($this->s2_mu) {
 			foreach ($all_cats as $cat) {
 				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(a.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key='" . $this->get_usermeta_keyname('s2_cat') . $cat->term_id . "'");
 			}
@@ -3082,9 +3065,16 @@ class s2class {
 	} // end s2init()
 
 	function subscribe2() {
-		global $table_prefix;
+		global $table_prefix, $wp_version, $wpmu_version;
 
 		load_plugin_textdomain('subscribe2', 'wp-content/plugins/' . dirname(plugin_basename(__FILE__)), dirname(plugin_basename(__FILE__)));
+
+		// Is this WordPressMU or not?
+		if ( (isset($wpmu_version)) || (strpos($wp_version, 'wordpress-mu')) ) {
+			$this->s2_mu = true;
+		} else {
+			$this->s2_mu = false;
+		}
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
@@ -3139,7 +3129,9 @@ class s2class {
 		add_action('user_register', array(&$this, 'register'));
 		add_action('add_user_to_blog', array(&$this, 'register'), 10, 1);
 		
-		add_action('admin_init', array(&$this, 'wpmu_subscribe'));
+		if ($this->s2_mu) {
+			add_action('admin_init', array(&$this, 'wpmu_subscribe'));
+		}
 
 		// add actions for processing posts based on per-post or cron email settings
 		if ($this->subscribe2_options['email_freq'] != 'never') {
