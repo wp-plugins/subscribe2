@@ -961,9 +961,8 @@ class s2class {
 		$user = get_userdata($user_id);
 		$all_cats = get_categories(array('hide_empty' => false));
 
-		if (0 == $this->subscribe2_options['reg_override']) {
-			// registered users are not allowed to subscribe to
-			// excluded categories
+		// Are registered users are allowed to subscribe to excluded categories?
+		if ( (0 == $this->subscribe2_options['reg_override']) || ('No' == $this->subscribe2_options['newreg_override']) ) {
 			$exclude = explode(',', $this->subscribe2_options['exclude']);
 			foreach ($all_cats as $cat => $term_id) {
 				if (in_array($all_cats[$cat]->term_id, $exclude)) {
@@ -1697,6 +1696,7 @@ class s2class {
 
 				//automatic subscription
 				$this->subscribe2_options['autosub'] = $_POST['autosub'];
+				$this->subscribe2_options['newreg_override'] = $_POST['newreg_override'];
 				$this->subscribe2_options['wpregdef'] = $_POST['wpregdef'];
 				$this->subscribe2_options['autoformat'] = $_POST['autoformat'];
 				$this->subscribe2_options['show_autosub'] = $_POST['show_autosub'];
@@ -1920,6 +1920,17 @@ class s2class {
 			echo " checked=\"checked\"";
 		}
 		echo " /> " . __('No', 'subscribe2') . "</label><br /><br />\r\n";
+		echo __('Auto-subscribe includes any excluded categories', 'subscribe2') . ":<br />\r\n";
+		echo "<label><input type=\"radio\" name=\"newreg_override\" value=\"yes\"";
+		if ('yes' == $this->subscribe2_options['newreg_override']) {
+			echo " checked=\"checked\"";
+		}
+		echo " />" . __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"newreg_override\" value=\"no\"";
+		if ('no' == $this->subscribe2_options['newreg_override']) {
+			echo " checked=\"checked\"";
+		}
+		echo " />" . __('No', 'subscribe2') . "</label><br /><br />\r\n";
 		echo __('Registration Form option is checked by default', 'subscribe2') . ":<br />\r\n";
 		echo "<label><input type=\"radio\" name=\"wpregdef\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['wpregdef']) {
@@ -1947,7 +1958,7 @@ class s2class {
 			echo "checked=\"checked\" ";
 		}
 		echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . "</label><br /><br />";
-		echo __('Show Auto Subscribe option on Users page', 'subscribe2') . ": <br />\r\n";
+		echo __('Display option for Register Users to auto-subscribe to new categories', 'subscribe2') . ": <br />\r\n";
 		echo "<label><input type=\"radio\" name=\"show_autosub\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['show_autosub']) {
 			echo " checked=\"checked\"";
@@ -1958,7 +1969,7 @@ class s2class {
 			echo " checked=\"checked\"";
 		}
 		echo " />" . __('No', 'subscribe2') . "</label><br /><br />";
-		echo __('Auto Subscribe me to new categories is checked by default', 'subscribe2') . ": <br />\r\n";
+		echo __('Option for Register Users to auto-subscribe to new categories is checked by default', 'subscribe2') . ": <br />\r\n";
 		echo "<label><input type=\"radio\" name=\"autosub_def\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['autosub_def']) {
 			echo " checked=\"checked\"";
@@ -2217,7 +2228,10 @@ class s2class {
 					if ($blog_id == $blog['blog_id']) {
 						echo "<span class=\"buttons\">" . __('Viewing Settings Now', 'subscribe2') . "</span>\r\n";
 					} else {
-						echo "<span class=\"buttons\"><a href=\"". $blog['subscribe_page'] . "\">" . __('View Settings', 'subscribe2') . "</a>\r\n";
+						echo "<span class=\"buttons\">";
+						if (is_blog_user($blog['blog_id'])) {
+							echo "<a href=\"". $blog['subscribe_page'] . "\">" . __('View Settings', 'subscribe2') . "</a>\r\n";
+						}
 						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_unsubscribe=" . $blog['blog_id'] . "\">" . __('Unsubscribe', 'subscribe2') . "</a></span>\r\n";
 					}
 					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>\r\n";
@@ -2235,7 +2249,10 @@ class s2class {
 					if ($blog_id == $blog['blog_id']) {
 						echo "<span class=\"buttons\">" . __('Viewing Settings Now', 'subscribe2') . "</span>\r\n";
 					} else {
-						echo "<span class=\"buttons\"><a href=\"". $blog['subscribe_page'] . "\">" . __('View Settings', 'subscribe2') . "</a>\r\n";
+						echo "<span class=\"buttons\">";
+						if (is_blog_user($blog['blog_id'])) {
+							echo "<a href=\"". $blog['subscribe_page'] . "\">" . __('View Settings', 'subscribe2') . "</a>\r\n";
+						}
 						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_subscribe=" . $blog['blog_id'] . "\">" . __('Subscribe', 'subscribe2') . "</a></span>\r\n";
 					}
 					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>\r\n";

@@ -6,6 +6,10 @@ if (!isset($this->subscribe2_options['autosub'])) {
 	$this->subscribe2_options['autosub'] = "no"; 
 } // option to autosubscribe registered users to new categories
 
+if (!isset($this->subscribe2_options['newreg_override'])) { 
+	$this->subscribe2_options['newreg_override'] = "no"; 
+} // option to autosubscribe registered users to new categories
+
 if (!isset($this->subscribe2_options['wpregdef'])) {
 	$this->subscribe2_options['wpregdef'] = "no";
 } // option to check registration form box by default
