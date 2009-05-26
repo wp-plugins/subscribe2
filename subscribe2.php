@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.16
+Version: 4.17
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -31,7 +31,7 @@ along with Subscribe2.  If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.16');
+define('S2VERSION', '4.17');
 define('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // Pre-2.6 compatibility
@@ -962,7 +962,7 @@ class s2class {
 		$all_cats = get_categories(array('hide_empty' => false));
 
 		// Are registered users are allowed to subscribe to excluded categories?
-		if ( (0 == $this->subscribe2_options['reg_override']) || ('No' == $this->subscribe2_options['newreg_override']) ) {
+		if ( (0 == $this->subscribe2_options['reg_override']) || ('no' == $this->subscribe2_options['newreg_override']) ) {
 			$exclude = explode(',', $this->subscribe2_options['exclude']);
 			foreach ($all_cats as $cat => $term_id) {
 				if (in_array($all_cats[$cat]->term_id, $exclude)) {
