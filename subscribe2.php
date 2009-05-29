@@ -269,7 +269,7 @@ class s2class {
 		$string = str_replace("PERMALINK", $this->permalink, $string);
 		if (strstr($string, "TINYLINK")) {
 			$tinylink = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode($this->permalink));
-				if ( ($tinylink !== 'Error') || ($tinylink != FALSE) ) {
+				if ( ($tinylink !== 'Error') || ($tinylink != false) ) {
 					$string = str_replace("TINYLINK", $tinylink, $string);
 				} else {
 					$string = str_replace("TINYLINK", $this->permalink, $string);
@@ -278,6 +278,9 @@ class s2class {
 		$string = str_replace("MYNAME", stripslashes($this->myname), $string);
 		$string = str_replace("EMAIL", $this->myemail, $string);
 		$string = str_replace("AUTHORNAME", $this->authorname, $string);
+		$string = str_replace("CATS", $this->post_cats_names, $string);
+		$string = str_replace("TAGS", $this->post_tags_names, $string);
+
 		return $string;
 	} // end substitute()
 
@@ -393,7 +396,7 @@ class s2class {
 		if (!$post) { return $post; }
 
 		$s2mail = get_post_meta($post->ID, 's2mail', true);
-		if ( ($_POST['s2_meta_field'] == 'no') || (strtolower(trim($s2mail)) == 'no') ) { return $post; }
+		if ( (isset($_POST['s2_meta_field']) && ($_POST['s2_meta_field'] == 'no')) || (strtolower(trim($s2mail)) == 'no') ) { return $post; }
 
 		// are we doing daily digests? If so, don't send anything now
 		if ($this->subscribe2_options['email_freq'] != 'never') { return $post; }
@@ -416,7 +419,6 @@ class s2class {
 		}
 
 		$post_cats = wp_get_post_categories($post->ID);
-		$post_cats_string = implode(',', $post_cats);
 		$check = false;
 		// is the current post assigned to any categories
 		// which should not generate a notification email?
@@ -449,6 +451,7 @@ class s2class {
 			// don't send public subscribers a notification
 			$public = $this->get_public();
 		}
+		$post_cats_string = implode(',', $post_cats);
 		$registered = $this->get_registered("cats=$post_cats_string");
 
 		// do we have subscribers?
@@ -479,6 +482,9 @@ class s2class {
 		// Get the message template
 		$mailtext = apply_filters('s2_email_template', $this->subscribe2_options['mailtext']);
 		$mailtext = stripslashes($this->substitute($mailtext));
+
+		$this->post_cat_names = implode(', ', wp_get_post_categories($post->ID, array('fields' => 'names')));
+		$this->post_tag_names = implode(', ', wp_get_post_tags($post->ID, array('fields' => 'names')));
 
 		$plaintext = $post->post_content;
 		if (function_exists('strip_shortcodes')) {
@@ -544,7 +550,7 @@ class s2class {
 	/**
 	Send confirmation email to the user
 	*/
-	function send_confirm($what = '', $is_remind = FALSE) {
+	function send_confirm($what = '', $is_remind = false) {
 		if ($this->filtered == 1) { return; }
 		if ( (!$this->email) || (!$what) ) {
 			return false;
@@ -572,7 +578,7 @@ class s2class {
 		$admin = $this->get_userdata($this->subscribe2_options['sender']);
 		$this->myname = html_entity_decode($admin->display_name);
 
-		if ($is_remind == TRUE) {
+		if ($is_remind == true) {
 			$body = $this->substitute(stripslashes($this->subscribe2_options['remind_email']));
 			$subject = $this->substitute(stripslashes($this->subscribe2_options['remind_subject']));
 		} else {
@@ -587,7 +593,7 @@ class s2class {
 
 		$body = str_replace("LINK", $link, $body);
 
-		$mailheaders .= "From: \"" . $admin->display_name . "\" <" . $admin->user_email . ">\n";
+		$mailheaders = "From: \"" . $admin->display_name . "\" <" . $admin->user_email . ">\n";
 		$mailheaders .= "Reply-To: \"" . $admin->display_name . "\" <" . $admin->user_email . ">\n";
 		$mailheaders .= "Return-path: <" . $admin->user_email . ">\n";
 		$mailheaders .= "X-Mailer:PHP" . phpversion() . "\n";
@@ -718,7 +724,7 @@ class s2class {
 		if (!is_array($recipients)) { $recipients = (array)$recipients; }
 		foreach ($recipients as $recipient) {
 			$this->email = $recipient;
-			$this->send_confirm('add', TRUE);
+			$this->send_confirm('add', true);
 		}
 	} //end remind()
 
@@ -914,6 +920,7 @@ class s2class {
 		// specific category subscribers
 		if ('' != $r['cats']) {
 			$JOIN .= "INNER JOIN $wpdb->usermeta AS d ON a.user_id = d.user_id ";
+			$all = '';
 			foreach (explode(',', $r['cats']) as $cat) {
 				('' == $and) ? $and = "d.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'" : $and .= " OR d.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'";
 			}
@@ -1258,8 +1265,8 @@ class s2class {
 	function get_userdata($admin_id) {
 		global $wpdb, $userdata;
 
-		// ensure compatability with Subscribe2 < 4.16
-		if ($admin_id == 'admin') {
+		// ensure compatability with possible 'sender' settings
+		if ( ($admin_id == 'admin') || ($admin_id == 'author') ) {
 			$admin_id = 1;
 		}
 
@@ -1833,6 +1840,8 @@ class s2class {
 		echo "<dt><b>AUTHORNAME</b></dt><dd>" . __("the post author's name", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>LINK</b></dt><dd>" . __("the generated link to confirm a request<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>ACTION</b></dt><dd>" . __("Action performed by LINK in confirmation email<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>CATS</b></dt><dd>" . __("the post's assigned categories", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>TAGS</b></dt><dd>" . __("the post's assigned Tags", 'subscribe2') . "</dd>\r\n";
 		echo "</dl></td></tr><tr><td>";
 		echo __('Subscribe / Unsubscribe confirmation email', 'subscribe2') . ":<br />\r\n";
 		echo __('Subject Line', 'subscribe2') . ": ";
@@ -1958,7 +1967,7 @@ class s2class {
 			echo "checked=\"checked\" ";
 		}
 		echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . "</label><br /><br />";
-		echo __('Display option for Register Users to auto-subscribe to new categories', 'subscribe2') . ": <br />\r\n";
+		echo __('Display option for Registered Users to auto-subscribe to new categories', 'subscribe2') . ": <br />\r\n";
 		echo "<label><input type=\"radio\" name=\"show_autosub\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['show_autosub']) {
 			echo " checked=\"checked\"";
@@ -1969,7 +1978,7 @@ class s2class {
 			echo " checked=\"checked\"";
 		}
 		echo " />" . __('No', 'subscribe2') . "</label><br /><br />";
-		echo __('Option for Register Users to auto-subscribe to new categories is checked by default', 'subscribe2') . ": <br />\r\n";
+		echo __('Option for Registered Users to auto-subscribe to new categories is checked by default', 'subscribe2') . ": <br />\r\n";
 		echo "<label><input type=\"radio\" name=\"autosub_def\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['autosub_def']) {
 			echo " checked=\"checked\"";
@@ -2649,7 +2658,7 @@ class s2class {
 	Meta box form handler
 	*/
 	function s2_meta_handler($post_id) {
-		if (!wp_verify_nonce($_POST['s2meta_nonce'], md5(plugin_basename(__FILE__)))) { return $post_id; }
+		if ( (!isset($_POST['s2meta_nonce'])) || (!wp_verify_nonce($_POST['s2meta_nonce'], md5(plugin_basename(__FILE__)))) ) { return $post_id; }
 
 		if ('page' == $_POST['post_type']) {
 			if (!current_user_can('edit_page', $post_id)) { return $post_id; }
@@ -2657,7 +2666,7 @@ class s2class {
 			if (!current_user_can('edit_post', $post_id)) { return $post_id; }
 		}
 
- 		if ($_POST['s2_meta_field'] == 'no') {
+ 		if ( (isset($_POST['s2_meta_field'])) && ($_POST['s2_meta_field'] == 'no') ) {
  			update_post_meta($post_id, 's2mail', $_POST['s2_meta_field']);
  		} else {
  			delete_post_meta($post_id, 's2mail');
