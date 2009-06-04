@@ -41,7 +41,7 @@ ul.s2_blogs li .buttons a {
 	margin: 0 0 0 1em;
 }
 
-ul.s2_blogs li .buttons a: hover {
+ul.s2_blogs li .buttons a:hover {
 	background-color: whitesmoke;
 	color: #666;
 }

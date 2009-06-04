@@ -1220,24 +1220,32 @@ class s2class {
 	Autosubscribe registered users to newly created categories
 	if registered user has selected this option
 	*/
-	function autosub_new_category($new_category='') {
+	function new_category($new_category='') {
+		if ('no' == $this->subscribe2_options['show_autosub']) { return; }
 		global $wpdb;
 
-		$sql = "SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE $wpdb->usermeta.meta_key='s2_autosub' AND $wpdb->usermeta.meta_value='yes'";
-		$user_IDs = $wpdb->get_col($sql);
-		if ('' == $user_IDs) { return; }
+		if ('yes' == $this->subscribe2_options['show_autosub']) {
+			$sql = "SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE $wpdb->usermeta.meta_key='s2_autosub' AND $wpdb->usermeta.meta_value='yes'";
+			$user_IDs = $wpdb->get_col($sql);
+			if ('' == $user_IDs) { return; }
 
-		foreach ($user_IDs as $user_ID) {	
-			$old_cats = explode(',', get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
-			if (!is_array($old_cats)) {
-				$old_cats = array($old_cats);
+			foreach ($user_IDs as $user_ID) {	
+				$old_cats = explode(',', get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
+				if (!is_array($old_cats)) {
+					$old_cats = array($old_cats);
+				}
+				// add subscription to these cat IDs
+				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $new_category, "$new_category");
+				$newcats = array_merge($old_cats, (array)$new_category);
+				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $newcats));
 			}
-			// add subscription to these cat IDs
-			update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $new_category, "$new_category");
-			$newcats = array_merge($old_cats, (array)$new_category);
-			update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $newcats));
+		} elseif ('exclude' == $this->subscribe2_options['show_autosub']) {
+			$excluded_cats = explode(',', $this->subscribe2_options['exclude']);
+			$excluded_cats[] = $new_category;
+			$this->subscribe2_options['exclude'] = implode(',', $excluded_cats);
+			update_option('subscribe2_options', $this->subscribe2_options);
 		}
-	} // end autosub_new_category()
+	} // end new_category()
 
 	function delete_category($deleted_category='') {
 		global $wpdb;
@@ -1967,7 +1975,7 @@ class s2class {
 			echo "checked=\"checked\" ";
 		}
 		echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . "</label><br /><br />";
-		echo __('Display option for Registered Users to auto-subscribe to new categories', 'subscribe2') . ": <br />\r\n";
+		echo __('Registered Users have the option to auto-subscribe to new categories', 'subscribe2') . ": <br />\r\n";
 		echo "<label><input type=\"radio\" name=\"show_autosub\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['show_autosub']) {
 			echo " checked=\"checked\"";
@@ -1977,7 +1985,12 @@ class s2class {
 		if ('no' == $this->subscribe2_options['show_autosub']) {
 			echo " checked=\"checked\"";
 		}
-		echo " />" . __('No', 'subscribe2') . "</label><br /><br />";
+		echo " />" . __('No', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"show_autosub\" value=\"exclude\"";
+		if ('exclude' == $this->subscribe2_options['show_autosub']) {
+			echo " checked=\"checked\"";
+		}
+		echo " />" .__('New categories are immediately excluded', 'subscribe2') . "</label><br /><br />";
 		echo __('Option for Registered Users to auto-subscribe to new categories is checked by default', 'subscribe2') . ": <br />\r\n";
 		echo "<label><input type=\"radio\" name=\"autosub_def\" value=\"yes\"";
 		if ('yes' == $this->subscribe2_options['autosub_def']) {
@@ -3133,7 +3146,7 @@ class s2class {
 		add_action('admin_menu', array(&$this, 'admin_menu'));
 		add_action('admin_menu', array(&$this, 's2_meta_init'));
 		add_action('save_post', array(&$this, 's2_meta_handler'));
-		add_action('create_category', array(&$this, 'autosub_new_category'));
+		add_action('create_category', array(&$this, 'new_category'));
 		add_action('delete_category', array(&$this, 'delete_category'));
 		add_filter('the_content', array(&$this, 'filter'), 10);
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
