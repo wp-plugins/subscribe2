@@ -290,30 +290,15 @@ class s2class {
 	function mail($recipients = array(), $subject = '', $message = '', $type='text') {
 		if ( (empty($recipients)) || ('' == $message) ) { return; }
 
-		// Set sender details
-		if ('' == $this->myname) {
-			$admin = $this->get_userdata($this->subscribe2_options['sender']);
-			$this->myname = html_entity_decode($admin->display_name);
-			$this->myemail = $admin->user_email;
-		}
-		$headers = "From: \"" . $this->myname . "\" <" . $this->myemail . ">\n";
-		$headers .= "Return-path: <" . $this->myemail . ">\n";
-		$headers .= "Reply-To: \"" . $this->myname . "\" <" . $this->myemail . ">\n";
-		$headers .= "X-Mailer:PHP" . phpversion() . "\n";
-		$headers .= "Precedence: list\nList-Id: " . get_option('blogname') . "\n";
-
 		if ('html' == $type) {
-			// To send HTML mail, the Content-Type header must be set
-			$headers .= "MIME-Version: 1.0\n";
-			$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
+			$headers = $this->headers('html');
 			if ('yes' == $this->subscribe2_options['stylesheet']) {
 				$mailtext = apply_filters('s2_html_email', "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . get_bloginfo('stylesheet_url') . "\" type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>");
 			} else {
 				$mailtext = apply_filters('s2_html_email', "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>");
 			}
 		} else {
-			$headers .= "MIME-Version: 1.0\n";
-			$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
+			$headers = $this->headers();
 			$message = preg_replace('|&[^a][^m][^p].{0,3};|', '', $message);
 			$message = preg_replace('|&amp;|', '&', $message);
 			$message = wordwrap(strip_tags($message), 80, "\n");
@@ -388,6 +373,31 @@ class s2class {
 		}
 		return $status;
 	} // end mail()
+
+
+	/**
+	Construct standard set of email headers
+	*/
+	function headers($type='text') {
+		$admin = $this->get_userdata($this->subscribe2_options['sender']);
+		$this->myname = html_entity_decode($admin->display_name);
+		$this->myemail = $admin->user_email;
+
+		$headers = "From: \"" . $this->myname . "\" <" . $this->myemail . ">\n";
+		$headers .= "Reply-To: \"" . $this->myname . "\" <" . $this->myemail . ">\n";
+		$headers .= "Return-path: <" . $this->myemail . ">\n";
+		$headers .= "Precedence: list\nList-Id: " . get_option('blogname') . "\n";
+		$headers .= "MIME-Version: 1.0\n";
+		$headers .= "X-Mailer: PHP" . phpversion() . "\n";
+		if ($type == 'html') {
+			// To send HTML mail, the Content-Type header must be set
+			$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
+		} else {
+			$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
+		}
+
+		return $headers;
+	} // end headers()
 
 	/**
 	Sends an email notification of a new post
@@ -575,9 +585,6 @@ class s2class {
 		$link .= md5($this->email);
 		$link .= $id;
 
-		$admin = $this->get_userdata($this->subscribe2_options['sender']);
-		$this->myname = html_entity_decode($admin->display_name);
-
 		if ($is_remind == true) {
 			$body = $this->substitute(stripslashes($this->subscribe2_options['remind_email']));
 			$subject = $this->substitute(stripslashes($this->subscribe2_options['remind_subject']));
@@ -593,13 +600,7 @@ class s2class {
 
 		$body = str_replace("LINK", $link, $body);
 
-		$mailheaders = "From: \"" . $admin->display_name . "\" <" . $admin->user_email . ">\n";
-		$mailheaders .= "Reply-To: \"" . $admin->display_name . "\" <" . $admin->user_email . ">\n";
-		$mailheaders .= "Return-path: <" . $admin->user_email . ">\n";
-		$mailheaders .= "X-Mailer:PHP" . phpversion() . "\n";
-		$mailheaders .= "Precedence: list\nList-Id: " . get_option('blogname') . "\n";
-		$mailheaders .= "MIME-Version: 1.0\n";
-		$mailheaders .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
+		$mailheaders = $this->headers();
 
 		return @wp_mail($this->email, $subject, $body, $mailheaders);
 	} // end send_confirm()
@@ -777,7 +778,10 @@ class s2class {
 					$subject = '[' . get_option('blogname') . '] ' . __('New subscription', 'subscribe2');
 					$message = $this->email . " " . __('subscribed to email notifications!', 'subscribe2');
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
-					$this->mail($recipients, $subject, $message);
+					$headers = $this->headers();
+					foreach ($recipients as $recipient) {
+						@wp_mail($recipient, $subject, $message, $headers);
+					}
 				}
 			}
 			$this->filtered = 1;
@@ -790,7 +794,10 @@ class s2class {
 					$subject = '[' . get_option('blogname') . '] ' . __('New Unsubscription', 'subscribe2');
 					$message = $this->email . " " . __('unsubscribed from email notifications!', 'subscribe2');
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
-					$this->mail($recipients, $subject, $message);
+					$headers = $this->headers();
+					foreach ($recipients as $recipient) {
+						@wp_mail($recipient, $subject, $message, $headers);
+					}
 				}
 			}
 			$this->filtered = 1;
@@ -961,11 +968,11 @@ class s2class {
 	Create the appropriate usermeta values when a user registers
 	If the registering user had previously subscribed to notifications, this function will delete them from the public subscriber list first
 	*/
-	function register($user_id = 0) {
+	function register($user_ID = 0) {
 		global $wpdb;
 
-		if (0 == $user_id) { return $user_id; }
-		$user = get_userdata($user_id);
+		if (0 == $user_ID) { return $user_ID; }
+		$user = get_userdata($user_ID);
 		$all_cats = get_categories(array('hide_empty' => false));
 
 		// Are registered users are allowed to subscribe to excluded categories?
@@ -985,55 +992,55 @@ class s2class {
 
 		if ('' == $cats) {
 			// sanity check, might occur if all cats excluded and reg_override = 0
-			return $user_id;
+			return $user_ID;
 		}
 
 		// has this user previously signed up for email notification?
 		if (false !== $this->is_public($user->user_email)) {
 			// delete this user from the public table, and subscribe them to all the categories
 			$this->delete($user->user_email);
-			update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), $cats);
+			update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
 			foreach (explode(',', $cats) as $cat) {
-				update_usermeta($user_id, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
+				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
 			}
-			update_usermeta($user_id, 's2_format', 'text');
-			update_usermeta($user_id, 's2_excerpt', 'excerpt');
-			update_usermeta($user_id, 's2_autosub', $this->subscribe2_options['autosub_def']);
+			update_usermeta($user_ID, 's2_format', 'text');
+			update_usermeta($user_ID, 's2_excerpt', 'excerpt');
+			update_usermeta($user_ID, 's2_autosub', $this->subscribe2_options['autosub_def']);
 		} else {
 			// create post format entries for all users
-			$check_format = get_usermeta($user_id, 's2_format');
+			$check_format = get_usermeta($user_ID, 's2_format');
 			if (empty($check_format)) {
 				// ensure existing subscription options are not overwritten on upgrade
 				if ('html' == $this->subscribe2_options['autoformat']) {
-					update_usermeta($user_id, 's2_format', 'html');
-					update_usermeta($user_id, 's2_excerpt', 'post');
+					update_usermeta($user_ID, 's2_format', 'html');
+					update_usermeta($user_ID, 's2_excerpt', 'post');
 				} elseif ('fulltext' == $this->subscribe2_options['autoformat']) {
-					update_usermeta($user_id, 's2_format', 'text');
-					update_usermeta($user_id, 's2_excerpt', 'post');
+					update_usermeta($user_ID, 's2_format', 'text');
+					update_usermeta($user_ID, 's2_excerpt', 'post');
 				} else {
-					update_usermeta($user_id, 's2_format', 'text');
-					update_usermeta($user_id, 's2_excerpt', 'excerpt');
+					update_usermeta($user_ID, 's2_format', 'text');
+					update_usermeta($user_ID, 's2_excerpt', 'excerpt');
 				}
-				update_usermeta($user_id, 's2_autosub', $this->subscribe2_options['autosub_def']);
+				update_usermeta($user_ID, 's2_autosub', $this->subscribe2_options['autosub_def']);
 				// if the are no existing subscriptions, create them if, by default if autosub is on
 				if ( ('yes' == $this->subscribe2_options['autosub']) || (('wpreg' == $this->subscribe2_options['autosub']) && ('on' == $_POST['subscribe'])) ) {
-					update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), $cats);
+					update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
 					foreach (explode(',', $cats) as $cat) {
-						update_usermeta($user_id, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
+						update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
 					}
 				}
 			}
-			$subscribed = get_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'));
+			$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 			if (strstr($subscribed, '-1')) {
 				// make sure we remove '-1' from any settings
 				$old_cats = explode(',', $subscribed);
 				$pos = array_search('-1', $old_cats);
 				unset($old_cats[$pos]);
 				$cats = implode(',', $old_cats);
-				update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), $cats);
+				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
 			}
 		}
-		return $user_id;
+		return $user_ID;
 	} // end register()
 
 	/**
@@ -1120,12 +1127,12 @@ class s2class {
 			if ($blog_id >= 0) {
 				switch_to_blog($blog_id);
 
-				$user_id = get_current_user_id();
+				$user_ID = get_current_user_id();
 
 				// if user is not a user of the current blog
 				if (!is_blog_user($blog_id)) {
 					// add user to current blog as subscriber
-					add_user_to_blog($blog_id, $user_id, 'subscriber');
+					add_user_to_blog($blog_id, $user_ID, 'subscriber');
 				}
 
 				// subscribe to all categories by default
@@ -1146,12 +1153,12 @@ class s2class {
 				foreach ($all_cats as $cat => $term) {
 					$term_id = $term->term_id;
 					$cats[] = $term_id;
-					update_usermeta($user_id, $this->get_usermeta_keyname('s2_cat') . $term_id, $term_id);
+					update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $term_id, $term_id);
 				}
 				if (empty($cats)) {
-					update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), '');
+					update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
 				} else {
-					update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
+					update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
 				}
 
 				// don't restore_current_blog(); -> redirect to new subscription page
@@ -1163,41 +1170,43 @@ class s2class {
 			if ($blog_id >= 0) {
 				switch_to_blog($blog_id);
 
-				$user_id = get_current_user_id();
+				$user_ID = get_current_user_id();
 
 				// delete subscription to all categories on that blog
-				$cats = get_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'));
+				$cats = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 				$cats = explode(',', $cats);
 				if (!is_array($cats)) {
 					$cats = array($cats);
 				}
 
 				foreach ($cats as $id) {
-					delete_usermeta($user_id, $this->get_usermeta_keyname('s2_cat') . $id);
+					delete_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
 				}
-				update_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'), '');
+				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
 
+				// TODO Is This needed?
 				// remove level_0 users
 				if (!current_user_can(1)) {
-					$blogs = get_blogs_of_user($user_id, true);
+					$blogs = get_blogs_of_user($user_ID, true);
 					// if user only has one blog left
 					if (count($blogs) == 1) {
-						wp_delete_user($user_id, 1); // delete posts and reassign any existing posts to root user
+						wp_delete_user($user_ID, 1); // delete posts and reassign any existing posts to root user
 						wp_redirect(get_option('siteurl')); // redirect to front page
 						exit();
 					} else {
-						remove_user_from_blog($user_id, $blog_id);
-						delete_usermeta($user_id, $this->get_usermeta_keyname('s2_subscribed'));
+						remove_user_from_blog($user_ID, $blog_id);
+						delete_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 					}
 				}
+				//TODO To here? (see line 1180)
 				restore_current_blog();
 				$redirect_to_subscriptionpage = true;
 			}
 		}
 
 		if ($redirect_to_subscriptionpage == true) {
-			if (!is_user_member_of_blog($user_id)) {
-				$user_blogs = get_active_blog_for_user($user_id);
+			if (!is_user_member_of_blog($user_ID)) {
+				$user_blogs = get_active_blog_for_user($user_ID);
 				if (is_array($user_blogs)) {
 					switch_to_blog(key($user_blogs));
 				}
@@ -2621,9 +2630,9 @@ class s2class {
 	*/
 	function register_post() {
 		if ('on' == $_POST['subscribe']) {
-			$user_id = get_userdatabylogin($_POST['user_login']);
-			if (0 == $user_id->ID) { return; }
-			$this->register($user_id->ID);
+			$user = get_userdatabylogin($_POST['user_login']);
+			if (0 == $user->ID) { return; }
+			$this->register($user->ID);
 		}
 	}
 
