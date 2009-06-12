@@ -405,9 +405,6 @@ class s2class {
 	function publish($post = 0, $preview = '') {
 		if (!$post) { return $post; }
 
-		$post_cats = wp_get_post_categories($post->ID);
-		$post_cats_string = implode(',', $post_cats);
-
 		if ($preview == '') {
 			// we aren't sending a Preview to the current user so carry out checks
 			$s2mail = get_post_meta($post->ID, 's2mail', true);
@@ -433,6 +430,7 @@ class s2class {
 					return $post;
 			}
 
+			$post_cats = wp_get_post_categories($post->ID);
 			$check = false;
 			// is the current post assigned to any categories
 			// which should not generate a notification email?
@@ -465,6 +463,7 @@ class s2class {
 				// don't send public subscribers a notification
 				$public = $this->get_public();
 			}
+			$post_cats_string = implode(',', $post_cats);
 			$registered = $this->get_registered("cats=$post_cats_string");
 
 			// do we have subscribers?
