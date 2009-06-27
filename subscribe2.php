@@ -575,7 +575,7 @@ class s2class {
 	Send confirmation email to the user
 	*/
 	function send_confirm($what = '', $is_remind = false) {
-		if ($this->filtered == 1) { return; }
+		if ($this->filtered == 1) { return true; }
 		if ( (!$this->email) || (!$what) ) {
 			return false;
 		}
@@ -1281,7 +1281,6 @@ class s2class {
 			$remain = array_diff($old_cats, (array)$deleted_category);
 			update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
 		}
-
 	}
 
 	/**
@@ -2524,7 +2523,6 @@ class s2class {
 
 		$sql = "SELECT ID,display_name FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value IN (8, 9, 10)";
 		$admins = $wpdb->get_results($sql);
-
 
 		if ($inc_author) {
 			$author[] = (object)array('ID' => 'author', 'display_name' => 'Post Author');
