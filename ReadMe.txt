@@ -1,10 +1,10 @@
 === Subscribe2 ===
 Contributors: MattyRob, Skippy, RavanH
 Donate link: http://subscribe2.wordpress.com/donate/
-Tags: posts, subscription, email
+Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 2.0.x
-Tested up to: 2.6.2
-Stable tag: 4.11
+Tested up to: 2.8.1beta2
+Stable tag: 4.17
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -28,15 +28,15 @@ Registered users of the blog can elect to receive email notifications for specif
 
 1. Copy the entire /subscribe2/ directory into your /wp-content/plugins/ directory.
 2. Activate the plugin.
-3. Click the "Options" admin menu link, and select "Subscribe2".
+3. Click the "Settings" admin menu link, and select "Subscribe2".
 4. Configure the options to taste, including the email template and any categories which should be excluded from notification
 5. Click the "Manage" admin menu link, and select "Subscribers".
 6. Manually subscribe people as you see fit.
 7. Create a WordPress Page (http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the subscribe2 token.  Or, if you prefer, you may manually insert the subscribe2 token:
      <!--subscribe2-->
      ***Ensure the token is on a line by itself and that it has a blank line above and below.***
-This token will automatically be replaced by the subscription form, and will display all messages as necessary.
-8. In the Subscribe2 "Options" admin link set the default page ID to the ID of the WordPress page created in step 8.
+This token will automatically be replaced by dynamic subscription information and will display all forms and messages as necessary.
+8. In the WordPress "Settings" area for Subscribe2 define the default page ID in the "Appearance" section to the ID of the WordPress page created in step 7.
 
 == Frequently Asked Questions ==
 
@@ -45,7 +45,7 @@ WordPress 2.0.x will be supported until 2010. Subscribe2 will remain supported (
 
 WordPress 2.1.x and 2.2.x are supported. For the latest information visit http://subscribe2.wordpress.com. For these versions of WordPress use Subscribe2 code from the 3.x stable.
 
-Finally, WordPress 2.3 and 2.5 are supported. Again, for the latest information visit http://subscribe2.wordpress.com. For this versions of WordPress use Subscribe2 code from the 4.x stable.
+Finally, WordPress 2.3 and up are supported. Again, for the latest information visit http://subscribe2.wordpress.com. For this versions of WordPress use Subscribe2 code from the 4.x stable.
 
 = How do I upgrade from a previous version? =
 If you are upgrading from any 2.1.x version of subscribe2, please delete both the /subscribe.php and /wp-content/plugins/subscribe2.php files before copying the new files into place.  Your subscriber list will remain intact, and your options should be preserved. Now create a WordPress Page as described above.
@@ -60,9 +60,7 @@ In the first instance check this with your hosting provider, they have access to
 
 Some hosting providers place a restriction on the maximum number of recipients in any one email message.  For example, the venerable Dreamhost (http://www.dreamhost.com/) does not allow any message to contain more than 30 recipients.
 
-Subscribe2 provides a facility to work around this restriction by sending batches of emails.  To enable this feature, edit subscribe2.php in a text editor and go to line 35:
-     define('BCCLIMIT', 0);
-Change the 0 to the number of allowed outgoing email recipients as set by your host.
+Subscribe2 provides a facility to work around this restriction by sending batches of emails.  To enable this feature, go to Settings->Subscribe2 and located the setting to restrict the number of recipients per email. If this is set to 30 then each outgoing email notification will only contain addresses for 30 recipients. 
 
 Reminder: because subscribe2 places all recipients in BCC fields, and places the blog admin in the TO field, the blog admin will receive one email per batched delivery.  So if you have 90 subscribers, the blog admin should receive three post notification emails, one for each set of 30 BCC recipients.
 
@@ -74,16 +72,116 @@ This plugin sends emails to your subscribers using the BCC (Blind Cardon Copy) h
 
 = I can't find or insert the Subscribe2 token, help! =
 
-If, for some reason the Subscribe2 button does not appear in your browser window try refreshing your browser and cache (Shift and Reload in Firefox). If this still fails then insert the token manually. In the Rich Text Editor (TinyMCE) make sure you switch to the "code" view and type in <!--subscribe2-->. 
+If, for some reason the Subscribe2 button does not appear in your browser window try refreshing your browser and cache (Shift and Reload in Firefox). If this still fails then insert the token manually. In the Rich Text Editor (TinyMCE) make sure you switch to the "code" view and type in <!--subscribe2-->.
+
+= I can't find my subscribers / the options / something else =
+
+Subscribe2 creates four (4) new admin menus in the back end of WordPress.
+
+* Posts -> Mail Subscribers : Allows users with Publish capabilities to send emails to your current subscribers
+* Tools -> Subscribers : Allows you to manually (un)subscribe users by email address, displays lists of currently subscribed users and allows you to bulk subscribe Registered Users
+* Users -> Subscriptions : Allows the currently logged in user to manage their own subscriptions
+* Settings -> Subscribe2 : Allows administrator level users to control many aspects of the plugins operation. It should be pretty self explanatory from the notes on the screen
+
+= I'm confused, what are all the different types of subscriber? =
+
+There are basically only 2 types of subscriber. Public Subscribers and Registered Subscribers.
+
+Public subscribers have provided their email address for email notification of your new posts. When they enter there address on your site they are sent an email asking them to confirm their request and added to a list of Unconfirmed Subscribers. Once they complete their request by clicking on the link in their email they will become Confirmed Subscribers.
+
+Registered Users have registered with your WorPress blog (provided you have enabled this in the core WordPress settings). Once registered they can choose to subscribe to specific categories and can also control the type of email they get by choosing plain text in an excerpt or full post format or a full post format with HTML.
 
 == Screenshots ==
 
-1. The Write->Subscribers admin page generated by the plugin.
-2. The Manage->Subscribers admin page generated by the plugin.
+1. The Posts->Mail Subscribers admin page generated by the plugin.
+2. The Tools->Subscribers admin page generated by the plugin.
 3. The Users->Subscriptions admin page generated by the plugin.
 4. The Options->Subscribe2 admin page generated by the plugin.
 
 == Version History ==
+
+Version 4.17 by Matthew Robinson
+
+* Tested for compatibility with WordPress 2.8.x
+* Added TAGS and CATS keyword for per-post notification templates
+* Fixed bug where confirmation emails may have an empty sender field if notifications come from post author
+* Fixed a bug in WPMU CSS
+* Added option to exclude new categories by default
+* Fixed a bug where emails may not be sent to subscribers when a user subscribes or unsubscribes
+* Improved accessing of 'Admin' level users on blogs where user_level is set below 10
+* Added ability to send email previews to currently logged in user from Settings->Subscribe2
+* Styled admin menu form buttons to fit with WordPress theme
+* Improved handling of confirmation sending to reduce errors
+
+Version 4.16 by Matthew Robinson
+
+* Correct minor layout issue in Settings->Subscribe2
+* Allow users to define the div class name for the widget for styling purposes
+* Select from a greater number of notification senders via dropdown list in Settings
+* Improved efficiency of newly added WordPressMU code
+* Added ability to manage across-blog subscriptions when using WordPressMU
+* Fixed bug whereby Public Subscribers may not have got notification emails for posts if Private Posts were blocked
+* Added ability to define email Subject contents in Settings->Subscribe2
+* Sanity checks of email subject and body templates to ensure they are not empty
+* Introduced s2_html_email and s2_plain_email filters to allow manipulation of email messages after construction
+* Amended handling of database entries to simplify code and database needs
+* Improved the layout of the Subscriber drop down menu
+* Added bullet points to the TABLE of posts
+* Ensure database remains clean when categories are deleted
+* Added new option to manage how auto-subscribe handles excluded categories 
+
+Version 4.15 by Matthew Robinson
+
+* Fixed E_DEPRECATE warning caused by a variable being passed by reference to the ksort() function
+* Fixed called to undefined function caused by typo
+* Fixed a syntax error in the SQL code constructors affecting some users
+
+Version 4.14 by Matthew Robinson
+
+* Reordered some functions to improve grouping
+* Stop s2mail custom variable being added if empty
+* Localised 'Send Digest Notification at' string
+* Add support for template tags in Post->Mail Subscribers emails
+* Improve handling of translation files for more recent version of WordPress
+* Implemented <label> tags in the admin pages so text descriptors are click enabled
+* Improved subscription preferences for WordPress MU (Huge thanks to Benedikt Forchhammer)
+* Added TINYLINK tag to allow TinyURL insertion in place of PERMALINK
+* Improved layout of Tools->Subscriber page (Thanks to Anne-Marie Redpath)
+* Enhancements to Subscription form layout (Thanks to Anne-Marie Redpath and Andy Steinmark)
+* Sender details now uses current user information from Write->Mail Subscribers
+* Introduced 's2_template_filter' to allow other plugins to amend the email template on-the-fly
+
+Version 4.13 by Matthew Robinson
+
+* Update weekly description
+* Improve layout in the Subscribe2 form
+* Fixed bug where registering users would not be subscribed to categories if using the checkbox on the registration page
+* Improved buttonsnap function checking to reduce PHP notices
+* Fixed typo when including CSS information in HTML emails
+* Fix 'edit' links in the Tools->Subscribers page for blogs where the WordPress files are not in root
+* Improved Tools->Subscribers page layout by hiding some buttons when they are not needed
+* Fixed glitch in default options settings file
+* Added option to include or exclude a link back to the blog theme CSS information within the HTML emails
+* Improve per-post exceptions to sending emails by introducing a separate meta-box rather than relying on a custom field
+* Fix for Gallery code in emails sending entire media library
+* Updated screen shots
+
+Version 4.12 by Matthew Robinson
+
+* Added new option to remove Auto Subscribe option from Users->Your Subscriptions
+* New POSTTIME token for digest email notifications
+* Preserve mail after sending from Write->Mail Subscribers
+* Introduced the Subscriber Counter Widget
+* Use Rich Text Editor in Write->Mail Subscribers for the Paid HTML version
+* Per User management in Admin
+* Added support Uninstall API in WordPress 2.7
+* Add support for 'Meta Widget' links
+* Subscribers are sorted alphabetically before sending notifications
+* Added ability to bulk unsubscribe a list of emails pasted into manage window
+* Define number of subscribers in Manage window
+* Added options for admin emails when public users subscribe or unsubscribe 
+* Fixed bug that prevented sending of Reminder emails from Manage->Subscribers
+* Amended confirmation code so that only one email is sent no matter how many times users click on (un)subscribe links
 
 Version 4.11 by Matthew Robinson
 
