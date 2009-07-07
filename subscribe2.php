@@ -1289,13 +1289,11 @@ class s2class {
 	function get_userdata($admin_id) {
 		global $wpdb, $userdata;
 
-		// ensure compatability with possible 'sender' settings
-		if ( ($admin_id == 'admin') || ($admin_id == 'author') ) {
-			$admin_id = 1;
-		}
-
 		if (is_numeric($admin_id)) {
 			$admin = get_userdata($admin_id);
+		} elseif ($admin_id == 'admin') {
+			//ensure compatibility with < 4.16
+			$admin = get_userdata('1');
 		} else {
 			$admin = &$userdata;
 		}
