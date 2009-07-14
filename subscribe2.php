@@ -1644,6 +1644,7 @@ class s2class {
 				$this->subscribe2_options['pages'] = $_POST['pages'];
 				$this->subscribe2_options['password'] = $_POST['password'];
 				$this->subscribe2_options['private'] = $_POST['private'];
+				$this->subscribe2_options['cron_order'] = $_POST['cron_order'];
 
 				// send per-post or digest emails
 				$email_freq = $_POST['email_freq'];
@@ -1838,6 +1839,17 @@ class s2class {
 		if (function_exists('wp_schedule_event')) {
 			echo __('Send Emails', 'subscribe2') . ": <br /><br />\r\n";
 			$this->display_digest_choices();
+			echo __('For digest notifications, date order for posts is', 'subscribe2') . ": \r\n";
+			echo "<label><input type=\"radio\" name=\"cron_order\" value=\"desc\"";
+			if ('desc' == $this->subscribe2_options['cron_order']) {
+				echo " checked=\"checked\"";
+			}
+			echo " /> " . __('Descending', 'subscribe2') . "</label>&nbsp;&nbsp;";
+			echo "<label><input type=\"radio\" name=\"cron_order\" value=\"asc\"";
+			if ('asc' == $this->subscribe2_options['cron_order']) {
+				echo " checked=\"checked\"";
+			}
+			echo " /> " . __('Ascending', 'subscribe2') . "</label><br /><br />\r\n";
 		}
 
 		// email templates
@@ -3006,7 +3018,11 @@ class s2class {
 		}
 
 		// collect posts
-		$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date");
+		if ($this->subscribe2_options['cron_order'] == 'desc') {
+			$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC");
+		} else {
+			$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC");
+		}
 
 		// do we have any posts?
 		if (empty($posts)) { return; }
@@ -3136,7 +3152,7 @@ class s2class {
 		$this->public = $table_prefix . "subscribe2";
 		if (!mysql_query("DESCRIBE " . $this->public)) { $this->install(); }
 		//do we need to upgrade anything?
-		if ($this->subscribe2_options['version'] !== S2VERSION) {
+		if ( (is_array($this->subscribe2_options)) && ($this->subscribe2_options['version'] !== S2VERSION) ) {
 			add_action('shutdown', array(&$this, 'upgrade'));
 		}
 
