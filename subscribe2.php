@@ -278,8 +278,8 @@ class s2class {
 		$string = str_replace("MYNAME", stripslashes($this->myname), $string);
 		$string = str_replace("EMAIL", $this->myemail, $string);
 		$string = str_replace("AUTHORNAME", $this->authorname, $string);
-		$string = str_replace("CATS", $this->post_cats_names, $string);
-		$string = str_replace("TAGS", $this->post_tags_names, $string);
+		$string = str_replace("CATS", $this->post_cat_names, $string);
+		$string = str_replace("TAGS", $this->post_tag_names, $string);
 
 		return $string;
 	} // end substitute()
@@ -363,7 +363,7 @@ class s2class {
 		reset($recipients);
 
 		// actually send mail
-		if (isset($batch)) {
+		if ( (isset($batch)) && (!empty($batch)) ) {
 			foreach ($batch as $bcc) {
 					$newheaders = $headers . "$bcc\r\n";
 					$status = @wp_mail($this->myemail, $subject, $mailtext, $newheaders);
@@ -379,9 +379,11 @@ class s2class {
 	Construct standard set of email headers
 	*/
 	function headers($type='text') {
-		$admin = $this->get_userdata($this->subscribe2_options['sender']);
-		$this->myname = html_entity_decode($admin->display_name);
-		$this->myemail = $admin->user_email;
+		if ( (empty($this->myname)) || (empty($this->myemail)) ) {
+			$admin = $this->get_userdata($this->subscribe2_options['sender']);
+			$this->myname = html_entity_decode($admin->display_name);
+			$this->myemail = $admin->user_email;
+		}
 
 		$headers = "From: \"" . $this->myname . "\" <" . $this->myemail . ">\n";
 		$headers .= "Reply-To: \"" . $this->myname . "\" <" . $this->myemail . ">\n";
@@ -491,14 +493,15 @@ class s2class {
 		}
 		$this->myemail = $user->user_email;
 		$this->myname = html_entity_decode($user->display_name);
+
+		$this->post_cat_names = implode(', ', wp_get_post_categories($post->ID, array('fields' => 'names')));
+		$this->post_tag_names = implode(', ', wp_get_post_tags($post->ID, array('fields' => 'names')));
+
 		// Get email subject
 		$subject = stripslashes(strip_tags($this->substitute($this->subscribe2_options['notification_subject'])));
 		// Get the message template
 		$mailtext = apply_filters('s2_email_template', $this->subscribe2_options['mailtext']);
 		$mailtext = stripslashes($this->substitute($mailtext));
-
-		$this->post_cat_names = implode(', ', wp_get_post_categories($post->ID, array('fields' => 'names')));
-		$this->post_tag_names = implode(', ', wp_get_post_tags($post->ID, array('fields' => 'names')));
 
 		$plaintext = $post->post_content;
 		if (function_exists('strip_shortcodes')) {
@@ -536,6 +539,8 @@ class s2class {
 		$html_body = str_replace("POST", $content, $html_body);
 
 		if ($preview != '') {
+			$this->myemail = $preview;
+			$this->myname = 'Preview';
 			$this->mail(array($preview), $subject, $excerpt_body);
 			$this->mail(array($preview), $subject, $full_body);
 			$this->mail(array($preview), $subject, $html_body, 'html');
@@ -544,8 +549,7 @@ class s2class {
 			$registered = $this->get_registered("cats=$post_cats_string&format=text&amount=excerpt");
 			if (empty($registered)) {
 				$recipients = (array)$public;
-			}
-			elseif (empty($public)) {
+			} elseif (empty($public)) {
 				$recipients = (array)$registered;
 			} else {
 				$recipients = array_merge((array)$public, (array)$registered);
@@ -606,10 +610,12 @@ class s2class {
 			$body = $this->substitute(stripslashes($this->subscribe2_options['confirm_email']));
 			if ('add' == $what) {
 				$body = str_replace("ACTION", $this->subscribe, $body);
+				$subject = str_replace("ACTION", $this->subscribe, $this->subscribe2_options['confirm_subject']);
 			} elseif ('del' == $what) {
 				$body = str_replace("ACTION", $this->unsubscribe, $body);
+				$subject = str_replace("ACTION", $this->unsubscribe, $this->subscribe2_options['confirm_subject']);
 			}
-			$subject = $this->substitute(stripslashes($this->subscribe2_options['confirm_subject']));
+			$subject = $this->substitute(stripslashes($subject));
 		}
 
 		$body = str_replace("LINK", $link, $body);
