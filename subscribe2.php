@@ -1655,7 +1655,7 @@ class s2class {
 				// send per-post or digest emails
 				$email_freq = $_POST['email_freq'];
 				$scheduled_time = wp_next_scheduled('s2_digest_cron');
-				if ( ($email_freq != $this->subscribe2_options['email_freq']) || ($_POST['hour'] != gmdate('H', $scheduled_time)) ) {
+				if ( ($email_freq != $this->subscribe2_options['email_freq']) || ($_POST['hour'] != date('H', $scheduled_time)) ) {
 					$this->subscribe2_options['email_freq'] = $email_freq;
 					wp_clear_scheduled_hook('s2_digest_cron');
 					$scheds = (array)wp_get_schedules();
@@ -1665,13 +1665,13 @@ class s2class {
 						unset($this->subscribe2_options['last_s2cron']);
 					} else {
 						// if we are using digest schedule the event and prime last_cron as now
-						$time = current_time('timestamp') + $interval;
+						$time = time() + $interval;
 						if ($interval < 86400) {
 							// Schedule CRON events occurring less than daily starting now and periodically thereafter
 							$timestamp = &$time;
 						} else {
 							// Schedule other CRON events starting at user defined hour and periodically thereafter
-							$timestamp = gmmktime($_POST['hour'], 0, 0, gmdate('m', $time), gmdate('d', $time), gmdate('Y', $time));
+							$timestamp = mktime($_POST['hour'], 0, 0, date('m', $time), date('d', $time), date('Y', $time));
 						}
 						wp_schedule_event($timestamp, $email_freq, 's2_digest_cron');
 						if (!isset($this->subscribe2_options['last_s2cron'])) {
@@ -2580,7 +2580,7 @@ class s2class {
 		echo "<select name=\"hour\">\r\n";
 		while ($hour = current($hours)) {
 			echo "<option value=\"" . key($hours) . "\"";
-			if (key($hours) == gmdate('H', $scheduled_time)) {
+			if (key($hours) == date('H', $scheduled_time)) {
 				echo " selected=\"selected\"";
 			}
 			echo ">" . $hour . "</option>\r\n";
@@ -2591,11 +2591,11 @@ class s2class {
 		if ($scheduled_time) {
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 			echo "<p>" . __('Current UTC time is', 'subscribe2') . ": \r\n";
-			echo "<strong>" . gmdate($datetime, current_time('timestamp', 1)) . "</strong></p>\r\n";
+			echo "<strong>" . date_i18n($datetime, false, 'gmt') . "</strong></p>\r\n";
 			echo "<p>" . __('Current blog time is', 'subscribe2') . ": \r\n";
-			echo "<strong>" . gmdate($datetime, current_time('timestamp')) . "</strong></p>\r\n";
+			echo "<strong>" . date_i18n($datetime) . "</strong></p>\r\n";
 			echo "<p>" . __('Next email notification will be sent when your blog time is after', 'subscribe2') . ": \r\n";
-			echo "<strong>" . gmdate($datetime, wp_next_scheduled('s2_digest_cron')) . "</strong></p>\r\n";
+			echo "<strong>" . date_i18n($datetime, wp_next_scheduled('s2_digest_cron')) . "</strong></p>\r\n";
 		} else {
 			echo "<br />";
 		}
