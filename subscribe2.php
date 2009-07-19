@@ -60,11 +60,11 @@ class s2class {
 	function load_strings() {
 		// adjust the output of Subscribe2 here
 
-		$this->please_log_in = "<p>" . __('To manage your subscription options please ', 'subscribe2') . "<a href=\"" . get_option('siteurl') . "/wp-login.php\">" . __('login', 'subscribe2') . "</a>.</p>";
+		$this->please_log_in = "<p>" . __('To manage your subscription options please', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-login.php\">" . __('login', 'subscribe2') . "</a>.</p>";
 
-		$this->use_profile_admin = "<p>" . __('You may manage your subscription options from your ', 'subscribe2') . "<a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=" . plugin_basename(__FILE__) . "\">" . __('profile', 'subscribe2') . "</a>.</p>";
+		$this->use_profile_admin = "<p>" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=" . plugin_basename(__FILE__) . "\">" . __('profile', 'subscribe2') . "</a>.</p>";
 
-		$this->use_profile_users = "<p>" . __('You may manage your subscription options from your ', 'subscribe2') . "<a href=\"" . get_option('siteurl') . "/wp-admin/profile.php?page=" . plugin_basename(__FILE__) . "\">" . __('profile', 'subscribe2') . "</a>.</p>";
+		$this->use_profile_users = "<p>" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/profile.php?page=" . plugin_basename(__FILE__) . "\">" . __('profile', 'subscribe2') . "</a>.</p>";
 
 		$this->confirmation_sent = "<p>" . __('A confirmation message is on its way!', 'subscribe2') . "</p>";
 
@@ -540,13 +540,13 @@ class s2class {
 
 		if ($preview != '') {
 			$this->myemail = $preview;
-			$this->myname = 'Preview';
+			$this->myname = "Preview";
 			$this->mail(array($preview), $subject, $excerpt_body);
 			$this->mail(array($preview), $subject, $full_body);
 			$this->mail(array($preview), $subject, $html_body, 'html');
 		} else {
 			// first we send plaintext summary emails
-			$registered = $this->get_registered("cats=$post_cats_string&format=text&amount=excerpt");
+			$registered = $this->get_registered("cats=$post_cats_string&format=excerpt");
 			if (empty($registered)) {
 				$recipients = (array)$public;
 			} elseif (empty($public)) {
@@ -557,7 +557,7 @@ class s2class {
 			$this->mail($recipients, $subject, $excerpt_body);
 
 			// next we send plaintext full content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=text&amount=post"), $subject, $full_body);
+			$this->mail($this->get_registered("cats=$post_cats_string&format=post"), $subject, $full_body);
 
 			// finally we send html full content emails
 			$this->mail($this->get_registered("cats=$post_cats_string&format=html"), $subject, $html_body, 'html');
@@ -909,15 +909,12 @@ class s2class {
 		global $wpdb;
 
 		$format = '';
-		$amount = '';
 		$cats = '';
 		$subscribers = array();
 
 		parse_str($args, $r);
 		if (!isset($r['format']))
 			$r['format'] = 'all';
-		if (!isset($r['amount']))
-			$r['amount'] = 'all';
 		if (!isset($r['cats']))
 			$r['cats'] = '';
 
@@ -928,28 +925,19 @@ class s2class {
 			$AND .= " AND b.meta_key='s2_format' AND b.meta_value=";
 			if ('html' == $r['format']) {
 				$AND .= "'html'";
-			} elseif ('text' == $r['format']) {
-				$AND .= "'text'";
-			}
-		}
-
-		// full post or excerpt subscribers
-		if ('all' != $r['amount']) {
-			$JOIN .= "INNER JOIN $wpdb->usermeta AS c ON a.user_id = c.user_id ";
-			$AND .= " AND c.meta_key='s2_excerpt' AND c.meta_value=";
-			if ('excerpt' == $r['amount']) {
+			} elseif ('post' == $r['format']) {
+				$AND .= "'post'";
+			} elseif ('excerpt' == $r['format']) {
 				$AND .= "'excerpt'";
-			} elseif ('post' == $r['amount']) {
-				$AND.= "'post'";
 			}
 		}
 
 		// specific category subscribers
 		if ('' != $r['cats']) {
-			$JOIN .= "INNER JOIN $wpdb->usermeta AS d ON a.user_id = d.user_id ";
+			$JOIN .= "INNER JOIN $wpdb->usermeta AS c ON a.user_id = c.user_id ";
 			$all = '';
 			foreach (explode(',', $r['cats']) as $cat) {
-				('' == $and) ? $and = "d.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'" : $and .= " OR d.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'";
+				('' == $and) ? $and = "c.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'" : $and .= " OR c.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'";
 			}
 			$AND .= " AND ($and)";
 		}
@@ -1023,8 +1011,7 @@ class s2class {
 			foreach (explode(',', $cats) as $cat) {
 				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
 			}
-			update_usermeta($user_ID, 's2_format', 'text');
-			update_usermeta($user_ID, 's2_excerpt', 'excerpt');
+			update_usermeta($user_ID, 's2_format', 'excerpt');
 			update_usermeta($user_ID, 's2_autosub', $this->subscribe2_options['autosub_def']);
 		} else {
 			// create post format entries for all users
@@ -1033,13 +1020,10 @@ class s2class {
 				// ensure existing subscription options are not overwritten on upgrade
 				if ('html' == $this->subscribe2_options['autoformat']) {
 					update_usermeta($user_ID, 's2_format', 'html');
-					update_usermeta($user_ID, 's2_excerpt', 'post');
 				} elseif ('fulltext' == $this->subscribe2_options['autoformat']) {
-					update_usermeta($user_ID, 's2_format', 'text');
-					update_usermeta($user_ID, 's2_excerpt', 'post');
+					update_usermeta($user_ID, 's2_format', 'post');
 				} else {
-					update_usermeta($user_ID, 's2_format', 'text');
-					update_usermeta($user_ID, 's2_excerpt', 'excerpt');
+					update_usermeta($user_ID, 's2_format', 'excerpt');
 				}
 				update_usermeta($user_ID, 's2_autosub', $this->subscribe2_options['autosub_def']);
 				// if the are no existing subscriptions, create them if, by default if autosub is on
@@ -1048,6 +1032,14 @@ class s2class {
 					foreach (explode(',', $cats) as $cat) {
 						update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
 					}
+				}
+			} else {
+				// if user is already registered update format remove 's2_excerpt' field and update 's2_format'
+				if ('html' == $check_format) {
+					delete_usermeta($user_ID, 's2_excerpt');
+				} elseif ('text' == $check_format) {
+					update_usermeta($user_ID, 's2_format', get_usermeta($user_ID, 's2_excerpt'));
+					delete_usermeta($user_ID, 's2_excerpt');
 				}
 			}
 			$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
@@ -1066,7 +1058,7 @@ class s2class {
 	/**
 	Subscribe all registered users to category selected on Admin Manage Page
 	*/
-	function subscribe_registered_users($emails = '', $cats = '') {
+	function subscribe_registered_users($emails = '', $cats = array()) {
 		if ( ('' == $emails) || ('' == $cats) ) { return false; }
 		global $wpdb;
 
@@ -1075,32 +1067,30 @@ class s2class {
 
 		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ('$useremails')";
 		$user_IDs = $wpdb->get_col($sql);
-		if (!is_array($cats)) {
-		 	$cats = array($cats);
-		}
 
 		foreach ($user_IDs as $user_ID) {
 			$old_cats = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
-			$old_cats = explode(',', $old_cats);
-			if (!is_array($old_cats)) {
-				$old_cats = array($old_cats);
+			if (!empty($old_cats)) {
+				$old_cats = explode(',', $old_cats);
+				$newcats = array_unique(array_merge($cats, $old_cats));
+			} else {
+				$newcats = $cats;
 			}
-			$new = array_diff($cats, $old_cats);
-			if (!empty($new)) {
+			if (!empty($newcats)) {
 				// add subscription to these cat IDs
-				foreach ($new as $id) {
+				foreach ($newcats as $id) {
 					update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id, "$id");
 				}
+				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $newcats));
 			}
-			$newcats = array_merge($cats, $old_cats);
-			update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $newcats));
+			unset($newcats);
 		}
 	} // end subscribe_registered_users()
 
 	/**
 	Unsubscribe all registered users to category selected on Admin Manage Page
 	*/
-	function unsubscribe_registered_users($emails = '', $cats = '') {
+	function unsubscribe_registered_users($emails = '', $cats = array()) {
 		if ( ('' == $emails) || ('' == $cats) ) { return false; }
 		global $wpdb;
 
@@ -1109,15 +1099,9 @@ class s2class {
 
 		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ('$useremails')";
 		$user_IDs = $wpdb->get_col($sql);
-		if (!is_array($cats)) {
-		 	$cats = array($cats);
-		}
 
 		foreach ($user_IDs as $user_ID) {
 			$old_cats = explode(',', get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
-			if (!is_array($old_cats)) {
-				$old_cats = array($old_cats);
-			}
 			$remain = array_diff($old_cats, $cats);
 			if (!empty($remain)) {
 				// remove subscription to these cat IDs and update s2_subscribed
@@ -1132,6 +1116,7 @@ class s2class {
 				}
 				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
 			}
+			unset($remain);
 		}
 	} // end unsubscribe_registered_users()
 
@@ -1374,12 +1359,21 @@ class s2class {
 			} elseif ($_POST['remind']) {
 				$this->remind($_POST['reminderemails']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Reminder Email(s) Sent!', 'subscribe2') . "</strong></p></div>";
-			} elseif ( ($_POST['register']) && ('subscribe' == $_POST['manage']) ) {
+			} elseif ( ($_POST['sub_categories']) && ('subscribe' == $_POST['manage']) ) {
 				$this->subscribe_registered_users($_POST['emails'], $_POST['category']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Subscribed!', 'subscribe2') . "</strong></p></div>";
-			} elseif ( ($_POST['register']) && ('unsubscribe' == $_POST['manage']) ) {
+			} elseif ( ($_POST['sub_categories']) && ('unsubscribe' == $_POST['manage']) ) {
 				$this->unsubscribe_registered_users($_POST['emails'], $_POST['category']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Unsubscribed!', 'subscribe2') . "</strong></p></div>";
+			} elseif ($_POST['sub_format']) {
+				if ($_POST['format'] == 'excerpt') {
+					$wpdb->get_results("UPDATE $wpdb->usermeta SET meta_value='excerpt' WHERE meta_key='s2_format'");
+				} elseif ($_POST['format'] == 'full') {
+					$wpdb->get_results("UPDATE $wpdb->usermeta SET meta_value='post' WHERE meta_key='s2_format'");
+				} elseif ($_POST['format'] == 'html') {
+					$wpdb->get_results("UPDATE $wpdb->usermeta SET meta_value='html' WHERE meta_key='s2_format'");
+				}
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Format updated for Registered Users!', 'subscribe2') . "</strong></p></div>";
 			}
 		}
 
@@ -1597,16 +1591,21 @@ class s2class {
 
 		//show bulk managment form
 		echo "<h2>" . __('Categories', 'subscribe2') . "</h2>\r\n";
-		echo "<p>";
-		echo __('Existing Registered Users can be automatically (un)subscribed to categories using this section.', 'subscribe2') . "<br />\r\n";
+		echo "<p>" . __('Preferences for all existing Registered Users can be changed using this section.', 'subscribe2') . "<br />\r\n";
 		echo "<strong><em style=\"color: red\">" . __('Consider User Privacy as changes cannot be undone', 'subscribe2') . "</em></strong><br />\r\n";
 		echo "</p>";
 		echo "<br />" . __('Action to perform', 'subscribe2') . ":\r\n";
-		echo "<label><input type=\"radio\" name=\"manage\" value=\"subscribe\" checked=\"checked\" />" . __('Subscribe', 'subscribe2') . "</label>\r\n";
-		echo "<label><input type=\"radio\" name=\"manage\" value=\"unsubscribe\" />" . __('Unsubscribe', 'subscribe2') . "</label><br /><br />\r\n";
+		echo "<label><input type=\"radio\" name=\"manage\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
+		echo "<label><input type=\"radio\" name=\"manage\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . "</label><br /><br />\r\n";
 		echo "<input type=\"hidden\" name=\"emails\" value=\"$emails\" />\r\n";
 		$this->display_category_form();
-		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"register\" value=\"" . __('Submit', 'subscribe2') . "\" /></p>";
+		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_categories\" value=\"" . __('Bulk Update Categories', 'subscribe2') . "\" /></p>";
+
+		echo "<br />" . __('Send email as', 'subscribe2') . ":\r\n";
+		echo "<label><input type=\"radio\" name=\"format\" value=\"excerpt\" checked=\"checked\" /> " . __('Plain Text - Excerpt', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
+		echo "<label><input type=\"radio\" name=\"format\" value=\"full\" /> " . __('Plain Text - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
+		echo "<label><input type=\"radio\" name=\"format\" value=\"html\" /> " . __('HTML', 'subscribe2') . "</label>\r\n";
+		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_format\" value=\"" . __('Bulk Update Format', 'subscribe2') . "\" /></p>";
 		echo "</form></div>\r\n";
 
 		include(ABSPATH . 'wp-admin/admin-footer.php');
@@ -2082,16 +2081,7 @@ class s2class {
 			check_admin_referer('subscribe2-user_subscribers' . $s2nonce);
 
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Subscription preferences updated.', 'subscribe2') . "</strong></p></div>\n";
-			$format = 'text';
-			$post = 'post';
-			if ('html' == $_POST['s2_format']) {
-				$format = 'html';
-			}
-			if ('excerpt' == $_POST['s2_excerpt']) {
-				$post = 'excerpt';
-			}
-			update_usermeta($user_ID, 's2_excerpt', $post);
-			update_usermeta($user_ID, 's2_format', $format);
+			update_usermeta($user_ID, 's2_format', $_POST['s2_format']);
 			update_usermeta($user_ID, 's2_autosub', $_POST['new_category']);
 
 			$cats = $_POST['category'];
@@ -2154,22 +2144,17 @@ class s2class {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('HTML', 'subscribe2') ."</label>&nbsp;&nbsp;";
-			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"text\" ";
-			if ('text' == get_usermeta($user_ID, 's2_format')) {
+			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"post\" ";
+			if ('post' == get_usermeta($user_ID, 's2_format')) {
 				echo "checked=\"checked\" ";
 			}
-			echo "/> " . __('Plain Text', 'subscribe2') . "</label><br /><br />\r\n";
-
-			echo __('Email contains', 'subscribe2') . ": &nbsp;&nbsp;";
-			$amount = array('excerpt' => __('Excerpt Only', 'subscribe2'), 'post' => __('Full Post', 'subscribe2'));
-			foreach ($amount as $key => $value) {
-				echo "<label><input type=\"radio\" name=\"s2_excerpt\" value=\"" . $key . "\"";
-				if ($key == get_usermeta($user_ID, 's2_excerpt')) {
-					echo " checked=\"checked\"";
-				}
-				echo " /> " . $value . "</label>&nbsp;&nbsp;";
+			echo "/> " . __('Plain Text - Full', 'subscribe2') . "</label>&nbsp;&nbsp;";
+			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"excerpt\" ";
+			if ('excerpt' == get_usermeta($user_ID, 's2_format')) {
+				echo "checked=\"checked\" ";
 			}
-			echo "<br /><span style=\"color: red;line-height: 300%;\">" . __('Note: HTML format will always deliver the full post', 'subscribe2') . ".</span><br />\r\n";
+			echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . "</label><br /><br />\r\n";
+
 			if ($this->subscribe2_options['show_autosub'] == 'yes') {
 				echo __('Automatically subscribe me to newly created categories', 'subscribe2') . ': &nbsp;&nbsp;';
 				echo "<label><input type=\"radio\" name=\"new_category\" value=\"yes\" ";
@@ -2279,7 +2264,7 @@ class s2class {
 
 			if (!empty($blogs_subscribed)) {
 				ksort($blogs_subscribed);
-				echo '<h2>' . __('Subscribed Blogs', 'subscribe2') . '</h2>'."\r\n";
+				echo "<h2>" . __('Subscribed Blogs', 'subscribe2') . "</h2>\r\n";
 				echo "<ul class=\"s2_blogs\">\r\n";
 				foreach ($blogs_subscribed as $blog) {
 					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\" title=\"" . $blog['description'] . "\">" . $blog['blogname'] . "</a></span>\r\n";
@@ -2379,12 +2364,12 @@ class s2class {
 		if (isset($_POST['subject'])) {
 			$subject = $_POST['subject'];
 		} else {
-			$subject = __('A message from ', 'subscribe2') . get_option('blogname');
+			$subject = __('A message from', 'subscribe2') . " " . get_option('blogname');
 		}
 		echo "<p>" . __('Subject', 'subscribe2') . ": <input type=\"text\" size=\"69\" name=\"subject\" value=\"" . $subject . "\" /> <br /><br />";
 		echo "<textarea rows=\"12\" cols=\"75\" name=\"content\">" . $body . "</textarea>";
 		echo "<br /><br />\r\n";
-		echo __('Recipients: ', 'subscribe2');
+		echo __('Recipients:', 'subscribe2') . " ";
 		$this->display_subscriber_dropdown('registered', false, array('all'));
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"mail\" />";
 		echo "</p>";
@@ -2667,8 +2652,8 @@ class s2class {
 	*/
 	function s2_meta_init() {
 		if (function_exists('add_meta_box')) {
-			add_meta_box('subscribe2', __( 'Subscribe2 Notification Override', 'subscribe2' ), array(&$this, 's2_meta_box'), 'post', 'advanced');
-			add_meta_box('subscribe2', __( 'Subscribe2 Notification Override', 'subscribe2' ), array(&$this, 's2_meta_box'), 'page', 'advanced');
+			add_meta_box('subscribe2', __('Subscribe2 Notification Override', 'subscribe2' ), array(&$this, 's2_meta_box'), 'post', 'advanced');
+			add_meta_box('subscribe2', __('Subscribe2 Notification Override', 'subscribe2' ), array(&$this, 's2_meta_box'), 'page', 'advanced');
 		} else {
 			add_action('dbx_post_advanced', array(&$this, 's2_meta_box_old'));
 			add_action('dbx_page_advanced', array(&$this, 's2_meta_box_old'));
@@ -3111,7 +3096,7 @@ class s2class {
 		$scheds = (array)wp_get_schedules();
 		$email_freq = $this->subscribe2_options['email_freq'];
 		$display = $scheds[$email_freq]['display'];
-		$subject = '[' . stripslashes(get_option('blogname')) . '] ' . $display . ' ' . __('Digest Email', 'subscribe2');
+		$subject = "[" . stripslashes(get_option('blogname')) . "] " . $display . " " . __('Digest Email', 'subscribe2');
 		$public = $this->get_public();
 		$all_post_cats_string = implode(',', $all_post_cats);
 		$registered = $this->get_registered("cats=$all_post_cats_string");
