@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 4.18
+Version: 4.19
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 */
@@ -31,7 +31,7 @@ along with Subscribe2.  If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.18');
+define('S2VERSION', '4.19');
 define('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // Pre-2.6 compatibility
@@ -1555,17 +1555,17 @@ class s2class {
 				if (in_array($subscriber, $confirmed)) {
 					echo "</td><td align=\"center\">\r\n";
 					echo "<input class=\"unconfirm_checkall\" title=\"" . __('Unconfirm this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"unconfirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
-					echo "<td align=\"center\"><span class=\"delete\">\r\n";
+					echo "<td align=\"center\">\r\n";
 					echo "<input class=\"delete_checkall\" title=\"" . __('Delete this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
-					echo "</span></td>\r\n";
+					echo "</td>\r\n";
 					echo "<td><span style=\"color:#006600\">&#x221A;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
 					echo "(<span style=\"color:#006600\">" . $this->signup_date($subscriber) . "</span>)\r\n";
 				} elseif (in_array($subscriber, $unconfirmed)) {
 					echo "<input class=\"confirm_checkall\" title=\"" . __('Confirm this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"confirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
 					echo "<td align=\"center\"></td>\r\n";
-					echo "<td align=\"center\"><span class=\"delete\">\r\n";
+					echo "<td align=\"center\">\r\n";
 					echo "<input class=\"delete_checkall\" title=\"" . __('Delete this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
-					echo "</span></td>\r\n";
+					echo "</td>\r\n";
 					echo "<td><span style=\"color:#FF0000\">&nbsp;!&nbsp;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
 					echo "(<span style=\"color:#FF0000\">" . $this->signup_date($subscriber) . "</span>)\r\n";
 				} elseif (in_array($subscriber, $all_users)) {
@@ -1627,8 +1627,12 @@ class s2class {
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_reset</strong></p></div>";
 			} elseif ($_POST['preview']) {
 				global $user_email;
-				$post = get_posts('numberposts=1');
-				$this->publish($post[0], $user_email);
+				if ('never' == $this->subscribe2_options['email_freq']) {
+					$post = get_posts('numberposts=1');
+					$this->publish($post[0], $user_email);
+				} else {
+					$this->subscribe2_cron($user_email);	
+				}
 			} elseif ($_POST['submit']) {
 				// BCClimit
 				if ( (is_numeric($_POST['bcc'])) && ($_POST['bcc'] >= 0) ) {
@@ -2408,6 +2412,9 @@ class s2class {
 		$i = 0;
 		$j = 0;
 		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"5\" class=\"editform\">\r\n";
+		echo "<tr><td align=\"left\" colspan=\"2\">\r\n";
+		echo "<label><input type=\"checkbox\" name=\"checkall\" value=\"cat_checkall\" /> " . __('Select / Unselect All', 'subscribe2') . "</label>\r\n";
+		echo "</td></tr>\r\n";
 		echo "<tr valign=\"top\"><td width=\"50%\" align=\"left\">\r\n";
 		foreach ($all_cats as $cat) {
 			 if ( ($i >= $half) && (0 == $j) ){
@@ -2421,7 +2428,6 @@ class s2class {
 						}
 						echo " /> " . $cat->name . "</label><br />\r\n";
 					} else {
-
 						echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 						if (in_array($cat->term_id, $selected)) {
 									echo " checked=\"checked\" ";
@@ -2430,9 +2436,6 @@ class s2class {
 				}
 				$i++;
 		}
-		echo "</td></tr>\r\n";
-		echo "<tr><td align=\"left\" colspan=\"2\">\r\n";
-		echo "<label><input type=\"checkbox\" name=\"checkall\" value=\"cat_checkall\" /> " . __('Select / Unselect All', 'subscribe2') . "</label>\r\n";
 		echo "</td></tr>\r\n";
 		echo "</table>\r\n";
 	} // end display_category_form()
@@ -2565,7 +2568,7 @@ class s2class {
 		echo "<select name=\"hour\">\r\n";
 		while ($hour = current($hours)) {
 			echo "<option value=\"" . key($hours) . "\"";
-			if (key($hours) == date('H', $scheduled_time)) {
+			if ( (key($hours) == date('H', $scheduled_time)) && (!empty($schedule_time)) ){
 				echo " selected=\"selected\"";
 			}
 			echo ">" . $hour . "</option>\r\n";
@@ -2986,33 +2989,38 @@ class s2class {
 	/**
 	Send a daily digest of today's new posts
 	*/
-	function subscribe2_cron() {
+	function subscribe2_cron($preview = '') {
 		global $wpdb;
 
-		// update last_s2cron execution time before completing or bailing
-		$now = current_time('mysql');
-		$prev = $this->subscribe2_options['last_s2cron'];
-		$this->subscribe2_options['last_s2cron'] = $now;
-		update_option('subscribe2_options', $this->subscribe2_options);
+		if ('' == $preview) {
+			// update last_s2cron execution time before completing or bailing
+			$now = current_time('mysql');
+			$prev = $this->subscribe2_options['last_s2cron'];
+			$this->subscribe2_options['last_s2cron'] = $now;
+			update_option('subscribe2_options', $this->subscribe2_options);
 
-		//set up SQL query based on options
-		if ($this->subscribe2_options['private'] == 'yes' ) {
-			$status	= "'publish', 'private'";
-		} else {
-			$status = "'publish'";
-		}
+			//set up SQL query based on options
+			if ($this->subscribe2_options['private'] == 'yes' ) {
+				$status	= "'publish', 'private'";
+			} else {
+				$status = "'publish'";
+			}
 
-		if ($this->subscribe2_options['page'] == 'yes' ) {
-			$type	= "'post', 'page'";
-		} else {
-			$type = "'post'";
-		}
+			if ($this->subscribe2_options['page'] == 'yes' ) {
+				$type	= "'post', 'page'";
+			} else {
+				$type = "'post'";
+			}
 
-		// collect posts
-		if ($this->subscribe2_options['cron_order'] == 'desc') {
-			$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC");
+			// collect posts
+			if ($this->subscribe2_options['cron_order'] == 'desc') {
+				$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC");
+			} else {
+				$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC");
+			}
 		} else {
-			$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC");
+			// we are sending a preview
+			$posts = get_posts('numberposts=1');
 		}
 
 		// do we have any posts?
@@ -3097,16 +3105,24 @@ class s2class {
 		$email_freq = $this->subscribe2_options['email_freq'];
 		$display = $scheds[$email_freq]['display'];
 		$subject = "[" . stripslashes(get_option('blogname')) . "] " . $display . " " . __('Digest Email', 'subscribe2');
-		$public = $this->get_public();
-		$all_post_cats_string = implode(',', $all_post_cats);
-		$registered = $this->get_registered("cats=$all_post_cats_string");
-		$recipients = array_merge((array)$public, (array)$registered);
 		$mailtext = apply_filters('s2_email_template', $this->subscribe2_options['mailtext']);
 		$mailtext = stripslashes($this->substitute($mailtext));
 		$mailtext = str_replace("TABLE", $table, $mailtext);
 		$mailtext = str_replace("POSTTIME", $message_posttime, $mailtext);
 		$mailtext = str_replace("POST", $message_post, $mailtext);
-		$this->mail($recipients, $subject, $mailtext);
+
+		// prepare recipients
+		if ($preview != '') {
+			$this->myemail = $preview;
+			$this->myname = "Preview";
+			$this->mail(array($preview), $subject, $mailtext);	
+		} else {
+			$public = $this->get_public();
+			$all_post_cats_string = implode(',', $all_post_cats);
+			$registered = $this->get_registered("cats=$all_post_cats_string");
+			$recipients = array_merge((array)$public, (array)$registered);
+			$this->mail($recipients, $subject, $mailtext);
+		}
 	} // end subscribe2_cron
 
 /* ===== Our constructor ===== */
