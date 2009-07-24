@@ -1,0 +1,814 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-07-24 20:16+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: subscribe2.php:63
+msgid "To manage your subscription options please"
+msgstr ""
+
+#: subscribe2.php:63
+msgid "login"
+msgstr ""
+
+#: subscribe2.php:65 subscribe2.php:67
+msgid "You may manage your subscription options from your"
+msgstr ""
+
+#: subscribe2.php:65 subscribe2.php:67
+msgid "profile"
+msgstr ""
+
+#: subscribe2.php:69
+msgid "A confirmation message is on its way!"
+msgstr ""
+
+#: subscribe2.php:71
+msgid "That email address is already subscribed."
+msgstr ""
+
+#: subscribe2.php:73
+msgid "That email address is not subscribed."
+msgstr ""
+
+#: subscribe2.php:75
+msgid "Sorry, but that does not look like an email address to me."
+msgstr ""
+
+#: subscribe2.php:77
+msgid ""
+"Sorry, email addresses at that domain are currently barred due to spam, "
+"please use an alternative email address."
+msgstr ""
+
+#: subscribe2.php:79
+msgid ""
+"Sorry, there seems to be an error on the server. Please try again later."
+msgstr ""
+
+#: subscribe2.php:81
+msgid "Message sent!"
+msgstr ""
+
+#: subscribe2.php:83
+msgid ""
+"Message failed! Check your settings and check with your hosting provider"
+msgstr ""
+
+#: subscribe2.php:85
+msgid "Your email:"
+msgstr ""
+
+#: subscribe2.php:85
+msgid "Enter email address..."
+msgstr ""
+
+#: subscribe2.php:85 subscribe2.php:1506 subscribe2.php:1598
+#: subscribe2.php:2303
+msgid "Subscribe"
+msgstr ""
+
+#: subscribe2.php:85 subscribe2.php:1507 subscribe2.php:1599
+#: subscribe2.php:2282
+msgid "Unsubscribe"
+msgstr ""
+
+#: subscribe2.php:88
+msgid "No such email address is registered."
+msgstr ""
+
+#: subscribe2.php:90
+msgid "You have successfully subscribed!"
+msgstr ""
+
+#: subscribe2.php:92
+msgid "You have successfully unsubscribed."
+msgstr ""
+
+#: subscribe2.php:94
+msgid "subscribe"
+msgstr ""
+
+#: subscribe2.php:96
+msgid "unsubscribe"
+msgstr ""
+
+#: subscribe2.php:99
+msgid "Options saved!"
+msgstr ""
+
+#: subscribe2.php:100
+msgid "Options reset!"
+msgstr ""
+
+#: subscribe2.php:108
+msgid "Subscribers"
+msgstr ""
+
+#: subscribe2.php:111
+msgid "Subscribe2 Options"
+msgstr ""
+
+#: subscribe2.php:111 subscribe2.php:2829 subscribe2.php:2933
+msgid "Subscribe2"
+msgstr ""
+
+#: subscribe2.php:116 subscribe2.php:1782
+msgid "Subscriptions"
+msgstr ""
+
+#: subscribe2.php:120
+msgid "Mail Subscribers"
+msgstr ""
+
+#: subscribe2.php:798
+msgid "New subscription"
+msgstr ""
+
+#: subscribe2.php:799
+msgid "subscribed to email notifications!"
+msgstr ""
+
+#: subscribe2.php:814
+msgid "New Unsubscription"
+msgstr ""
+
+#: subscribe2.php:815
+msgid "unsubscribed from email notifications!"
+msgstr ""
+
+#: subscribe2.php:1322
+msgid "Address(es) subscribed!"
+msgstr ""
+
+#: subscribe2.php:1325
+msgid "Address(es) unsubscribed!"
+msgstr ""
+
+#: subscribe2.php:1335
+msgid "Address(es) deleted!"
+msgstr ""
+
+#: subscribe2.php:1341 subscribe2.php:1347
+msgid "Status changed!"
+msgstr ""
+
+#: subscribe2.php:1361
+msgid "Reminder Email(s) Sent!"
+msgstr ""
+
+#: subscribe2.php:1364
+msgid "Registered Users Subscribed!"
+msgstr ""
+
+#: subscribe2.php:1367
+msgid "Registered Users Unsubscribed!"
+msgstr ""
+
+#: subscribe2.php:1376
+msgid "Format updated for Registered Users!"
+msgstr ""
+
+#: subscribe2.php:1471
+msgid "Previous Page"
+msgstr ""
+
+#: subscribe2.php:1491
+msgid "Next Page"
+msgstr ""
+
+#: subscribe2.php:1497
+msgid "Manage Subscribers"
+msgstr ""
+
+#: subscribe2.php:1502
+msgid "Add/Remove Subscribers"
+msgstr ""
+
+#: subscribe2.php:1503
+msgid "Enter addresses, one per line or comma-separated"
+msgstr ""
+
+#: subscribe2.php:1510
+msgid "Current Subscribers"
+msgstr ""
+
+#: subscribe2.php:1512
+msgid "Filter"
+msgstr ""
+
+#: subscribe2.php:1519
+msgid "Search Subscribers"
+msgstr ""
+
+#: subscribe2.php:1522
+msgid "Send Reminder Email"
+msgstr ""
+
+#: subscribe2.php:1527
+msgid "Save Emails to CSV File"
+msgstr ""
+
+#: subscribe2.php:1533 subscribe2.php:1587
+msgid "Process"
+msgstr ""
+
+#: subscribe2.php:1542 subscribe2.php:1564
+msgid "Confirm this email address"
+msgstr ""
+
+#: subscribe2.php:1544 subscribe2.php:1557
+msgid "Unconfirm this email address"
+msgstr ""
+
+#: subscribe2.php:1546 subscribe2.php:1559 subscribe2.php:1567
+msgid "Delete this email address"
+msgstr ""
+
+#: subscribe2.php:1550 subscribe2.php:2416
+msgid "Select / Unselect All"
+msgstr ""
+
+#: subscribe2.php:1574
+msgid "edit"
+msgstr ""
+
+#: subscribe2.php:1581
+msgid "No matching subscribers found"
+msgstr ""
+
+#: subscribe2.php:1583
+msgid "NONE"
+msgstr ""
+
+#: subscribe2.php:1593
+msgid "Categories"
+msgstr ""
+
+#: subscribe2.php:1594
+msgid ""
+"Preferences for all existing Registered Users can be changed using this "
+"section."
+msgstr ""
+
+#: subscribe2.php:1595
+msgid "Consider User Privacy as changes cannot be undone"
+msgstr ""
+
+#: subscribe2.php:1597
+msgid "Action to perform"
+msgstr ""
+
+#: subscribe2.php:1602
+msgid "Bulk Update Categories"
+msgstr ""
+
+#: subscribe2.php:1604
+msgid "Send email as"
+msgstr ""
+
+#: subscribe2.php:1605 subscribe2.php:2017 subscribe2.php:2160
+msgid "Plain Text - Excerpt"
+msgstr ""
+
+#: subscribe2.php:1606 subscribe2.php:2012 subscribe2.php:2155
+msgid "Plain Text - Full"
+msgstr ""
+
+#: subscribe2.php:1607 subscribe2.php:2007 subscribe2.php:2150
+msgid "HTML"
+msgstr ""
+
+#: subscribe2.php:1608
+msgid "Bulk Update Format"
+msgstr ""
+
+#: subscribe2.php:1757
+msgid "Subscribe2 Settings"
+msgstr ""
+
+#: subscribe2.php:1768 subscribe2.php:2133
+msgid "Notification Settings"
+msgstr ""
+
+#: subscribe2.php:1769
+msgid "Restrict the number of recipients per email to (0 for unlimited)"
+msgstr ""
+
+#: subscribe2.php:1771 subscribe2.php:1924 subscribe2.php:1933
+msgid "Edit"
+msgstr ""
+
+#: subscribe2.php:1774 subscribe2.php:1927 subscribe2.php:1936
+msgid "Update"
+msgstr ""
+
+#: subscribe2.php:1775 subscribe2.php:1928 subscribe2.php:1937
+msgid "Revert"
+msgstr ""
+
+#: subscribe2.php:1777
+msgid "Send Admins notifications for new"
+msgstr ""
+
+#: subscribe2.php:1787
+msgid "Unsubscriptions"
+msgstr ""
+
+#: subscribe2.php:1792
+msgid "Both"
+msgstr ""
+
+#: subscribe2.php:1797
+msgid "Neither"
+msgstr ""
+
+#: subscribe2.php:1799
+msgid "Include theme CSS stylesheet in HTML notifications"
+msgstr ""
+
+#: subscribe2.php:1804 subscribe2.php:1816 subscribe2.php:1827
+#: subscribe2.php:1838 subscribe2.php:1985 subscribe2.php:1996
+#: subscribe2.php:2023 subscribe2.php:2039 subscribe2.php:2168
+#: subscribe2.php:2204
+msgid "Yes"
+msgstr ""
+
+#: subscribe2.php:1809 subscribe2.php:1821 subscribe2.php:1832
+#: subscribe2.php:1843 subscribe2.php:1979 subscribe2.php:1990
+#: subscribe2.php:2001 subscribe2.php:2028 subscribe2.php:2044
+#: subscribe2.php:2173 subscribe2.php:2208
+msgid "No"
+msgstr ""
+
+#: subscribe2.php:1811
+msgid "Send Emails for Pages"
+msgstr ""
+
+#: subscribe2.php:1822
+msgid "Send Emails for Password Protected Posts"
+msgstr ""
+
+#: subscribe2.php:1833
+msgid "Send Emails for Private Posts"
+msgstr ""
+
+#: subscribe2.php:1844
+msgid "Send Email From"
+msgstr ""
+
+#: subscribe2.php:1849
+msgid "Send Emails"
+msgstr ""
+
+#: subscribe2.php:1851
+msgid "For digest notifications, date order for posts is"
+msgstr ""
+
+#: subscribe2.php:1856
+msgid "Descending"
+msgstr ""
+
+#: subscribe2.php:1861
+msgid "Ascending"
+msgstr ""
+
+#: subscribe2.php:1865
+msgid "Email Templates"
+msgstr ""
+
+#: subscribe2.php:1869
+msgid "New Post email (must not be empty)"
+msgstr ""
+
+#: subscribe2.php:1870 subscribe2.php:1895 subscribe2.php:1900
+msgid "Subject Line"
+msgstr ""
+
+#: subscribe2.php:1875
+msgid "Send Email Preview"
+msgstr ""
+
+#: subscribe2.php:1876
+msgid "Message substitions"
+msgstr ""
+
+#: subscribe2.php:1880
+msgid "the post's title<br />(<i>for per-post emails only</i>)"
+msgstr ""
+
+#: subscribe2.php:1881
+msgid ""
+"the excerpt or the entire post<br />(<i>based on the subscriber's "
+"preferences</i>)"
+msgstr ""
+
+#: subscribe2.php:1882
+msgid ""
+"the excerpt of the post and the time it was posted<br />(<i>for digest "
+"emails only</i>)"
+msgstr ""
+
+#: subscribe2.php:1883
+msgid "a list of post titles<br />(<i>for digest emails only</i>)"
+msgstr ""
+
+#: subscribe2.php:1884
+msgid "the post's permalink<br />(<i>for per-post emails only</i>)"
+msgstr ""
+
+#: subscribe2.php:1885
+msgid ""
+"the post's permalink after conversion by TinyURL<br />(<i>for per-post "
+"emails only</i>)"
+msgstr ""
+
+#: subscribe2.php:1886
+msgid "the admin or post author's name"
+msgstr ""
+
+#: subscribe2.php:1887
+msgid "the admin or post author's email"
+msgstr ""
+
+#: subscribe2.php:1888
+msgid "the post author's name"
+msgstr ""
+
+#: subscribe2.php:1889
+msgid ""
+"the generated link to confirm a request<br />(<i>only used in the "
+"confirmation email template</i>)"
+msgstr ""
+
+#: subscribe2.php:1890
+msgid ""
+"Action performed by LINK in confirmation email<br />(<i>only used in the "
+"confirmation email template</i>)"
+msgstr ""
+
+#: subscribe2.php:1891
+msgid "the post's assigned categories"
+msgstr ""
+
+#: subscribe2.php:1892
+msgid "the post's assigned Tags"
+msgstr ""
+
+#: subscribe2.php:1894
+msgid "Subscribe / Unsubscribe confirmation email"
+msgstr ""
+
+#: subscribe2.php:1899
+msgid "Reminder email to Unconfirmed Subscribers"
+msgstr ""
+
+#: subscribe2.php:1906
+msgid "Excluded Categories"
+msgstr ""
+
+#: subscribe2.php:1908
+msgid ""
+"Posts assigned to any Excluded Category do not generate notifications and "
+"are not included in digest notifications"
+msgstr ""
+
+#: subscribe2.php:1915
+msgid "Allow registered users to subscribe to excluded categories?"
+msgstr ""
+
+#: subscribe2.php:1918
+msgid "Appearance"
+msgstr ""
+
+#: subscribe2.php:1922
+msgid "Set default Subscribe2 page as ID"
+msgstr ""
+
+#: subscribe2.php:1931
+msgid "Set the number of Subscribers displayed per page"
+msgstr ""
+
+#: subscribe2.php:1944
+msgid "Show a link to your subscription page in \"meta\"?"
+msgstr ""
+
+#: subscribe2.php:1951
+msgid "Show the Subscribe2 button on the Write toolbar?"
+msgstr ""
+
+#: subscribe2.php:1958
+msgid "Enable Subscribe2 Widget?"
+msgstr ""
+
+#: subscribe2.php:1962
+msgid "Auto Subscribe"
+msgstr ""
+
+#: subscribe2.php:1964
+msgid "Subscribe new users registering with your blog"
+msgstr ""
+
+#: subscribe2.php:1969
+msgid "Automatically"
+msgstr ""
+
+#: subscribe2.php:1974
+msgid "Display option on Registration Form"
+msgstr ""
+
+#: subscribe2.php:1980
+msgid "Auto-subscribe includes any excluded categories"
+msgstr ""
+
+#: subscribe2.php:1991
+msgid "Registration Form option is checked by default"
+msgstr ""
+
+#: subscribe2.php:2002
+msgid "Auto-subscribe users to receive email as"
+msgstr ""
+
+#: subscribe2.php:2018
+msgid "Registered Users have the option to auto-subscribe to new categories"
+msgstr ""
+
+#: subscribe2.php:2033
+msgid "New categories are immediately excluded"
+msgstr ""
+
+#: subscribe2.php:2034
+msgid ""
+"Option for Registered Users to auto-subscribe to new categories is checked "
+"by default"
+msgstr ""
+
+#: subscribe2.php:2048
+msgid "Barred Domains"
+msgstr ""
+
+#: subscribe2.php:2050
+msgid ""
+"Enter domains to bar from public subscriptions: <br /> (Use a new line for "
+"each entry and omit the \"@\" symbol, for example email.com)"
+msgstr ""
+
+#: subscribe2.php:2055
+msgid "Submit"
+msgstr ""
+
+#: subscribe2.php:2058
+msgid "Reset Default"
+msgstr ""
+
+#: subscribe2.php:2059
+msgid ""
+"Use this to reset all options to their defaults. This <strong><em>will not</"
+"em></strong> modify your list of subscribers."
+msgstr ""
+
+#: subscribe2.php:2061
+msgid "RESET"
+msgstr ""
+
+#: subscribe2.php:2087
+msgid "Subscription preferences updated."
+msgstr ""
+
+#: subscribe2.php:2136
+msgid "Editing Subscribe2 preferences for user"
+msgstr ""
+
+#: subscribe2.php:2145
+msgid "Receive email as"
+msgstr ""
+
+#: subscribe2.php:2163
+msgid "Automatically subscribe me to newly created categories"
+msgstr ""
+
+#: subscribe2.php:2184
+msgid "Unsubscribe me from this blog"
+msgstr ""
+
+#: subscribe2.php:2188
+msgid "Subscribe to all categories"
+msgstr ""
+
+#: subscribe2.php:2190
+msgid "Subscribed Categories on"
+msgstr ""
+
+#: subscribe2.php:2192
+msgid "Subscribed Categories"
+msgstr ""
+
+#: subscribe2.php:2198
+msgid "Receive periodic summaries of new posts?"
+msgstr ""
+
+#: subscribe2.php:2213
+msgid "Update Preferences"
+msgstr ""
+
+#: subscribe2.php:2271
+msgid "Subscribed Blogs"
+msgstr ""
+
+#: subscribe2.php:2276 subscribe2.php:2297
+msgid "Viewing Settings Now"
+msgstr ""
+
+#: subscribe2.php:2280 subscribe2.php:2301
+msgid "View Settings"
+msgstr ""
+
+#: subscribe2.php:2292
+msgid "Subscribe to new blogs"
+msgstr ""
+
+#: subscribe2.php:2363
+msgid "Send an email to subscribers"
+msgstr ""
+
+#: subscribe2.php:2371
+msgid "A message from"
+msgstr ""
+
+#: subscribe2.php:2373
+msgid "Subject"
+msgstr ""
+
+#: subscribe2.php:2376
+msgid "Recipients:"
+msgstr ""
+
+#: subscribe2.php:2380
+msgid "Send"
+msgstr ""
+
+#: subscribe2.php:2451
+msgid "All Users and Subscribers"
+msgstr ""
+
+#: subscribe2.php:2452
+msgid "Public Subscribers"
+msgstr ""
+
+#: subscribe2.php:2453
+msgid "Confirmed"
+msgstr ""
+
+#: subscribe2.php:2454
+msgid "Unconfirmed"
+msgstr ""
+
+#: subscribe2.php:2455
+msgid "All Registered Users"
+msgstr ""
+
+#: subscribe2.php:2456
+msgid "Registered Subscribers"
+msgstr ""
+
+#: subscribe2.php:2551
+msgid "For each Post"
+msgstr ""
+
+#: subscribe2.php:2566
+msgid "Send Digest Notification at"
+msgstr ""
+
+#: subscribe2.php:2578
+msgid ""
+"This option will work for digest notification sent daily or less frequently"
+msgstr ""
+
+#: subscribe2.php:2581
+msgid "Current UTC time is"
+msgstr ""
+
+#: subscribe2.php:2583
+msgid "Current blog time is"
+msgstr ""
+
+#: subscribe2.php:2585
+msgid "Next email notification will be sent when your blog time is after"
+msgstr ""
+
+#: subscribe2.php:2616
+msgid "Settings"
+msgstr ""
+
+#: subscribe2.php:2628
+msgid "Check here to Subscribe to email notifications for new posts"
+msgstr ""
+
+#: subscribe2.php:2637
+msgid ""
+"By registering with this blog you are also agreeing to receive email "
+"notifications for new posts but you can unsubscribe at anytime"
+msgstr ""
+
+#: subscribe2.php:2658 subscribe2.php:2659 subscribe2.php:2687
+msgid "Subscribe2 Notification Override"
+msgstr ""
+
+#: subscribe2.php:2673
+msgid ""
+"Check here to disable sending of an email notification for this post/page"
+msgstr ""
+
+#: subscribe2.php:2815
+msgid "Subscription Confirmation"
+msgstr ""
+
+#: subscribe2.php:2855
+msgid "Title:"
+msgstr ""
+
+#: subscribe2.php:2857
+msgid "Div class name:"
+msgstr ""
+
+#: subscribe2.php:2907
+msgid "[Un]Subscribe to Posts"
+msgstr ""
+
+#: subscribe2.php:2985
+msgid "Weekly"
+msgstr ""
+
+#: subscribe2.php:3062
+msgid "Posted on"
+msgstr ""
+
+#: subscribe2.php:3107
+msgid "Digest Email"
+msgstr ""
+
+#: include/options.php:98
+msgid ""
+"BLOGNAME has posted a new item, 'TITLE'\n"
+"\n"
+"POST\n"
+"\n"
+"You may view the latest post at\n"
+"PERMALINK\n"
+"\n"
+"You received this e-mail because you asked to be notified when new updates "
+"are posted.\n"
+"Best regards,\n"
+"MYNAME\n"
+"EMAIL"
+msgstr ""
+
+#: include/options.php:106
+msgid ""
+"BLOGNAME has received a request to ACTION for this email address. To "
+"complete your request please click on the link below:\n"
+"\n"
+"LINK\n"
+"\n"
+"If you did not request this, please feel free to disregard this notice!\n"
+"\n"
+"Thank you,\n"
+"MYNAME."
+msgstr ""
+
+#: include/options.php:110
+msgid "Please confirm your request"
+msgstr ""
+
+#: include/options.php:114
+msgid ""
+"This email address was subscribed for notifications at BLOGNAME (BLOGLINK) "
+"but the subscription remains incomplete.\n"
+"\n"
+"If you wish to complete your subscription please click on the link below:\n"
+"\n"
+"LINK\n"
+"\n"
+"If you do not wish to complete your subscription please ignore this email "
+"and your address will be removed from our database.\n"
+"\n"
+"Regards,\n"
+"MYNAME"
+msgstr ""
+
+#: include/options.php:118
+msgid "Subscription Reminder"
+msgstr ""
