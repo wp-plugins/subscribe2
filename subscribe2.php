@@ -2568,7 +2568,7 @@ class s2class {
 		echo "<select name=\"hour\">\r\n";
 		while ($hour = current($hours)) {
 			echo "<option value=\"" . key($hours) . "\"";
-			if ( (key($hours) == date('H', $scheduled_time)) && (!empty($schedule_time)) ){
+			if ( (key($hours) == date('H', $scheduled_time)) && (!empty($scheduled_time)) ){
 				echo " selected=\"selected\"";
 			}
 			echo ">" . $hour . "</option>\r\n";
