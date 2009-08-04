@@ -1295,6 +1295,14 @@ class s2class {
 			$admin = get_userdata($wpdb->get_var($sql));
 		}
 
+		// handle issues from WordPress core where user_level is not set or set low
+		if (empty($admin)) {
+			$role = 'administrator';
+			$wp_user_search = new WP_User_Search( '', '', $role);
+			$results = $wp_user_search->get_results();
+			$admin = $results[0];
+		}
+
 		return $admin;
 	} //end get_userdata()
 
@@ -2244,16 +2252,6 @@ class s2class {
 					$blog['blogname'] = $blogname;
 				}
 				$blog['description'] = get_bloginfo('description');
-				if (defined('AUTHOR_AVATARS_VERSION')) {
-					if (!class_exists('UserList'))
-						include_once(ABSPATH . 'wp-content/plugins/author-avatars/lib/UserList.class.php' );
-					$userlist = new UserList();
-					$userlist->roles = array('Administrator', 'Editor', 'Subscriber');
-					$userlist->blogs = array($blog['blog_id']);
-					$userlist->avatar_size = 30;
-					$userlist->use_list_template();
-					$blog['users'] = $userlist->get_output();
-				}
 				$blog['blogurl'] = get_bloginfo('url');
 				$blog['subscribe_page'] = get_bloginfo('url') . "/wp-admin/users.php?page=subscribe2/subscribe2.php";
 
@@ -2281,7 +2279,6 @@ class s2class {
 						}
 						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_unsubscribe=" . $blog['blog_id'] . "\">" . __('Unsubscribe', 'subscribe2') . "</a></span>\r\n";
 					}
-					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>\r\n";
 					echo "</li>";
 				}
 				echo "</ul>\r\n";
@@ -2302,7 +2299,6 @@ class s2class {
 						}
 						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_subscribe=" . $blog['blog_id'] . "\">" . __('Subscribe', 'subscribe2') . "</a></span>\r\n";
 					}
-					echo "<div class=\"additional_info\"><span class=\"description\">" . $blog['description'] . "</span>" . $blog['users'] . "</div>\r\n";
 					echo "</li>";
 				}
 				echo "</ul>\r\n";
@@ -2525,8 +2521,17 @@ class s2class {
 	function admin_dropdown($inc_author = false) {
 		global $wpdb;
 
-		$sql = "SELECT ID,display_name FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value IN (8, 9, 10)";
+		$sql = "SELECT ID, display_name FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value IN (8, 9, 10)";
 		$admins = $wpdb->get_results($sql);
+		
+		// handle issues from WordPress core where user_level is not set or set low
+		if (empty($admins)) {
+			$role = 'administrator';
+			$wp_user_search = new WP_User_Search( '', '', $role);
+			$admins_string = implode(', ', $wp_user_search->get_results());
+			$sql = "SELECT ID, display_name FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
+			$admins = $wpdb->get_results($sql);
+		}
 
 		if ($inc_author) {
 			$author[] = (object)array('ID' => 'author', 'display_name' => 'Post Author');
@@ -2853,9 +2858,9 @@ class s2class {
 		$title = htmlspecialchars($options['title'], ENT_QUOTES);
 		$div = $options['div'];
 		echo "<p><label for=\"s2w-title\">" . __('Title:');
-		echo "<input style=\"width: 250px;\" id=\"s2w-title\" name=\"s2w-title\" type=\"text\" value=\"" . $title . "\" /></label></p>";
+		echo "<input class=\"widefat\" id=\"s2w-title\" name=\"s2w-title\" type=\"text\" value=\"" . $title . "\" /></label></p>";
 		echo "<p><label for=\"s2w-div\">" . __('Div class name:');
-		echo "<input style=\"width: 250px;\" id=\"s2w-title\" name=\"s2w-div\" type=\"text\" value=\"" . $div . "\" /></label></p>";
+		echo "<input class=\"widefat\" id=\"s2w-title\" name=\"s2w-div\" type=\"text\" value=\"" . $div . "\" /></label></p>";
 		echo "<input type=\"hidden\" id=\"s2w-submit\" name=\"s2w-submit\" value=\"1\" />";
 	} // end widget_subscribe2_widget_control()
 
@@ -2884,12 +2889,12 @@ class s2class {
 			if ( (empty($sidebars)) || (!is_array($sidebars)) ) { return; }
 			$changed = false;
 			foreach ($sidebars as $s =>$sidebar) {
-			if (empty($sidebar)) { break; }
+				if ( (empty($sidebar)) || (!is_array($sidebar)) ) { break; }
 				foreach ($sidebar as $w => $widget) {
 					if ($widget == 'subscribe2widget') {
-		 				$sidebars[$s][$w] = 'subscribe2';
-		 				$changed = true;
-		 			}
+						$sidebars[$s][$w] = 'subscribe2';
+						$changed = true;
+					}
 				}
 			}
 			if ($changed) {
@@ -3141,6 +3146,10 @@ class s2class {
 		if ('1' == $this->subscribe2_options['widget']) {
 			add_action('plugins_loaded', array(&$this, 'register_subscribe2widget'));
 		}
+		// add action to handle WPMU subscriptions and unsubscriptions
+		if ( (isset($_GET['s2mu_subscribe'])) || (isset($_GET['s2mu_unsubscribe'])) ) {
+			add_action('init', array(&$this, 'wpmu_subscribe'));
+		}
 	} // end s2init()
 
 	function subscribe2() {
@@ -3208,10 +3217,6 @@ class s2class {
 		add_action('user_register', array(&$this, 'register'));
 		add_action('add_user_to_blog', array(&$this, 'register'), 10, 1);
 
-		if ( ($this->s2_mu) && ((isset($_GET['s2mu_subscribe'])) || (isset($_GET['s2mu_unsubscribe']))) ) {
-			add_action('admin_init', array(&$this, 'wpmu_subscribe'));
-		}
-
 		// add actions for processing posts based on per-post or cron email settings
 		if ($this->subscribe2_options['email_freq'] != 'never') {
 			add_action('s2_digest_cron', array(&$this, 'subscribe2_cron'));
@@ -3244,28 +3249,31 @@ class s2class {
 	var $myname = '';
 	var $myemail = '';
 	var $signup_dates = array();
-	var $private = false;
 	var $filtered = 0;
 
 	// state variables used to affect processing
 	var $action = '';
 	var $email = '';
 	var $message = '';
-	var $error = '';
 
 	// some messages
 	var $please_log_in = '';
-	var $use_profile = '';
+	var $use_profile_admin = '';
+	var $use_profile_users = '';
 	var $confirmation_sent = '';
 	var $already_subscribed = '';
 	var $not_subscribed ='';
 	var $not_an_email = '';
 	var $barred_domain = '';
+	var $error = '';
 	var $mail_sent = '';
+	var $mail_failed = '';
 	var $form = '';
 	var $no_such_email = '';
 	var $added = '';
 	var $deleted = '';
+	var $subscribe = '';
+	var $unsubscribe = '';
 	var $confirm_subject = '';
 	var $options_saved = '';
 	var $options_reset = '';
