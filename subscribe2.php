@@ -2279,6 +2279,7 @@ class s2class {
 						}
 						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_unsubscribe=" . $blog['blog_id'] . "\">" . __('Unsubscribe', 'subscribe2') . "</a></span>\r\n";
 					}
+					echo "<div class=\"additional_info\">" . $blog['description'] . "</div>\r\n";
 					echo "</li>";
 				}
 				echo "</ul>\r\n";
@@ -2299,6 +2300,7 @@ class s2class {
 						}
 						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_subscribe=" . $blog['blog_id'] . "\">" . __('Subscribe', 'subscribe2') . "</a></span>\r\n";
 					}
+					echo "<div class=\"additional_info\">" . $blog['description'] . "</div>\r\n";
 					echo "</li>";
 				}
 				echo "</ul>\r\n";
