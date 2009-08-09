@@ -40,23 +40,8 @@ This token will automatically be replaced by dynamic subscription information an
 
 == Frequently Asked Questions ==
 
-= Which version should I be using, I'm on WordPress x.x.x? =
-WordPress 2.0.x will be supported until 2010. Subscribe2 will remain supported (but not actively developed) until WordPress 2.0.x is no longer supported. For WordPress 2.0.x use the Subscribe code from the 2.x stable.
-
-WordPress 2.1.x and 2.2.x are supported. For the latest information visit http://subscribe2.wordpress.com. For these versions of WordPress use Subscribe2 code from the 3.x stable.
-
-Finally, WordPress 2.3 and up are supported. Again, for the latest information visit http://subscribe2.wordpress.com. For this versions of WordPress use Subscribe2 code from the 4.x stable.
-
-= How do I upgrade from a previous version? =
-If you are upgrading from any 2.1.x version of subscribe2, please delete both the /subscribe.php and /wp-content/plugins/subscribe2.php files before copying the new files into place.  Your subscriber list will remain intact, and your options should be preserved. Now create a WordPress Page as described above.
-
-= Why doesn't the form appear in my WordPress page? =
-This is usually caused by one of two things. Firstly, it is possible that the form is there but because you haven't logged out of WordPress yourself you are seeing a message about managing your profile instead. Log out of WordPress and it will appear as the subscription form you are probably expecting.
-
-Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in your page with a blank line above and below. The easient way to do this is to deactivate the plugin, visit your WordPress page and view the source. The token should be contained in the source code of the page. If it is not there you either have not correctly entered the token or you have another plguin that is stripping the token from the page code.
-
 = Some or all email notifications fail to send, why?  =
-In the first instance check this with your hosting provider, they have access to your server logs and will be able to tell you where and why emails are being blocked.
+In the first instance ***check this with your hosting provider***, they have access to your server logs and will be able to tell you where and why emails are being blocked.
 
 Some hosting providers place a restriction on the maximum number of recipients in any one email message.  For example, the venerable Dreamhost (http://www.dreamhost.com/) does not allow any message to contain more than 30 recipients.
 
@@ -69,10 +54,6 @@ Batches will occur for each group of message as described above.  A site on Drea
 = Why is my admin address getting emails from Subscribe2? =
 
 This plugin sends emails to your subscribers using the BCC (Blind Cardon Copy) header in email messages. Each email is sent TO: the admin address. There may be emails for a plain text excerpt notification, palin text full text and HTML format emails and additionally if the BCCLIMIT has been set due to hosting restrictions duplicate copies of these emails will be sent to the admin address.
-
-= I can't find or insert the Subscribe2 token, help! =
-
-If, for some reason the Subscribe2 button does not appear in your browser window try refreshing your browser and cache (Shift and Reload in Firefox). If this still fails then insert the token manually. In the Rich Text Editor (TinyMCE) make sure you switch to the "code" view and type in <!--subscribe2-->.
 
 = I can't find my subscribers / the options / something else =
 
@@ -90,6 +71,37 @@ There are basically only 2 types of subscriber. Public Subscribers and Registere
 Public subscribers have provided their email address for email notification of your new posts. When they enter there address on your site they are sent an email asking them to confirm their request and added to a list of Unconfirmed Subscribers. Once they complete their request by clicking on the link in their email they will become Confirmed Subscribers.
 
 Registered Users have registered with your WorPress blog (provided you have enabled this in the core WordPress settings). Once registered they can choose to subscribe to specific categories and can also control the type of email they get by choosing plain text in an excerpt or full post format or a full post format with HTML.
+
+= Can I put the form elsewhere? (header, footer, sidebar without the widget) =
+
+The simple answer is yes you can but this is not supported so you need to figure out any problems that are caused by doing this on your own. Read <a href="http://subscribe2.wordpress.com/2006/09/19/sidebar-without-a-widget/">here</a> for the basic approach.
+
+= Which version should I be using, I'm on WordPress x.x.x? =
+WordPress 2.0.x will be supported until 2010. Subscribe2 will remain supported (but not actively developed) until WordPress 2.0.x is no longer supported. For WordPress 2.0.x use the Subscribe code from the 2.x stable.
+
+WordPress 2.1.x and 2.2.x are supported. For the latest information visit http://subscribe2.wordpress.com. For these versions of WordPress use Subscribe2 code from the 3.x stable.
+
+Finally, WordPress 2.3 and up are supported. Again, for the latest information visit http://subscribe2.wordpress.com. For this versions of WordPress use Subscribe2 code from the 4.x stable.
+
+= How do I upgrade from a previous version? =
+If you are upgrading from any 2.1.x version of subscribe2, please delete both the /subscribe.php and /wp-content/plugins/subscribe2.php files before copying the new files into place.  Your subscriber list will remain intact, and your options should be preserved. Now create a WordPress Page as described above.
+
+= Why doesn't the form appear in my WordPress page? =
+This is usually caused by one of two things. Firstly, it is possible that the form is there but because you haven't logged out of WordPress yourself you are seeing a message about managing your profile instead. Log out of WordPress and it will appear as the subscription form you are probably expecting.
+
+Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in your page with a blank line above and below. The easient way to do this is to deactivate the plugin, visit your WordPress page and view the source. The token should be contained in the source code of the page. If it is not there you either have not correctly entered the token or you have another plguin that is stripping the token from the page code.
+
+= I can't find or insert the Subscribe2 token, help! =
+
+If, for some reason the Subscribe2 button does not appear in your browser window try refreshing your browser and cache (Shift and Reload in Firefox). If this still fails then insert the token manually. In the Rich Text Editor (TinyMCE) make sure you switch to the "code" view and type in <!--subscribe2-->.
+
+= Can I suggest you add X as a feature =
+
+I'm open to suggestions but since the software is written by me for use on my site and then shared for free because others may find it useful as it comes don't expect your suggestion to be implemented unless I'll find it useful.
+
+= I'd like to be able to send my subscribers notifications in HTML =
+
+By default Public Subscribers get plain text emails and only Registered Subscribers can opt to receive email in HTML format. If you really want HTML for all you need to pay for the upgrade. $40US will get you the amended code and updates for 1 year.
 
 == Screenshots ==
 
