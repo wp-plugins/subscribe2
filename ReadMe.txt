@@ -51,6 +51,12 @@ Reminder: because subscribe2 places all recipients in BCC fields, and places the
 
 Batches will occur for each group of message as described above.  A site on Dreamhost with many public and registered subscribers could conceivably generate a lot of email for your own inbox.
 
+= My host has a limit of X emails per hour / day, can I limit the way Subscribe2 sends emails? =
+
+This is more commonly called 'throttling' or 'choking'. PHP is a scripting language and while it is possible to throttle emails using script it is not very efficient. It is much better in terms of spend and server overhead (CPU cycles and RAM) to throttle using a server side application.
+
+So, Subscribe2 does not and never will offer a throtting option. To solve the problem speak to your hosting provider about changing the restrictions, move to a less restriction hosting package or change hosting providers.
+
 = Why is my admin address getting emails from Subscribe2? =
 
 This plugin sends emails to your subscribers using the BCC (Blind Cardon Copy) header in email messages. Each email is sent TO: the admin address. There may be emails for a plain text excerpt notification, palin text full text and HTML format emails and additionally if the BCCLIMIT has been set due to hosting restrictions duplicate copies of these emails will be sent to the admin address.
@@ -75,6 +81,10 @@ Registered Users have registered with your WorPress blog (provided you have enab
 = Can I put the form elsewhere? (header, footer, sidebar without the widget) =
 
 The simple answer is yes you can but this is not supported so you need to figure out any problems that are caused by doing this on your own. Read <a href="http://subscribe2.wordpress.com/2006/09/19/sidebar-without-a-widget/">here</a> for the basic approach.
+
+= I'd like to be able to collect more information from users when they subscribe, can I? =
+
+Get them to register with your blog rather than using the Subscribe2 form. Additional fields would require much more intensive form processing, checking and entry into the database and since you won't then be able to easily use this information to persoanlise emails there really isn't any point in collecting this data.
 
 = Which version should I be using, I'm on WordPress x.x.x? =
 WordPress 2.0.x will be supported until 2010. Subscribe2 will remain supported (but not actively developed) until WordPress 2.0.x is no longer supported. For WordPress 2.0.x use the Subscribe code from the 2.x stable.
