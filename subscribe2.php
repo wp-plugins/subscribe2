@@ -3036,6 +3036,9 @@ class s2class {
 		// if we have posts, let's prepare the digest
 		$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 		$all_post_cats = array();
+		$table = '';
+		$message_post= '';
+		$message_posttime = '';
 		foreach ($posts as $post) {
 			$post_cats = wp_get_post_categories($post->ID);
 			$post_cats_string = implode(',', $post_cats);
@@ -3064,12 +3067,12 @@ class s2class {
 			if ($check) {
 				continue;
 			}
-			$table .= "* " . $post->post_title . "\r\n";
+			('' == $table) ? $table = "* " . $post->post_title : $table .= "\r\n* " . $post->post_title;
+			$message_post .= $post->post_title . "\r\n";
+			$message_post .= get_permalink($post->ID) . "\r\n";
 			$message_posttime .= $post->post_title . "\r\n";
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
 			$message_posttime .= get_permalink($post->ID) . "\r\n";
-			$message_post .= $post->post_title . "\r\n";
-			$message_post .= get_permalink($post->ID) . "\r\n";
 			$excerpt = $post->post_excerpt;
 			if ('' == $excerpt) {
 				 // no excerpt, is there a <!--more--> ?
@@ -3079,8 +3082,6 @@ class s2class {
 				 	if (function_exists('strip_shortcodes')) {
 						$excerpt = strip_shortcodes($excerpt);
 					}
-					// strip leading and trailing whitespace
-					$excerpt = trim($excerpt);
 				} else {
 					$excerpt = strip_tags($post->post_content);
 					if (function_exists('strip_shortcodes')) {
@@ -3093,10 +3094,16 @@ class s2class {
 						$excerpt = implode(' ', $words);
 					}
 				}
+				// strip leading and trailing whitespace
+				$excerpt = trim($excerpt);
 			}
 			$message_post .= $excerpt . "\r\n\r\n";
 			$message_posttime .= $excerpt . "\r\n\r\n";
 		}
+
+		// we add a blank line after each post excerpt now trim white space that occurs for the last post
+		$message_post = trim($message_post);
+		$message_posttime = trim($message_posttime);
 
 		//sanity check - don't send a mail if the content is empty
 		if (!$message_post && !$message_posttime && !$table) {
