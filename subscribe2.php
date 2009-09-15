@@ -2,10 +2,11 @@
 /*
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
-Description: Notifies an email list when new entries are posted.
-Version: 4.19
+Description: Notifies an email list when new entries are posted. For support visit the <a href="http://getsatisfaction.com/subscribe2/">Subscribe2 forum</a>.
+Version: 5.0
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 */
 
 /*
@@ -31,8 +32,13 @@ along with Subscribe2.  If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '4.19');
+define('S2VERSION', '5.0');
 define('S2PATH', trailingslashit(dirname(__FILE__)));
+
+// Set minimum execution time to 5 minutes - won't affect safe mode
+if (ini_get('max_execution_time') < 300) {
+	ini_set('max_execution_time', 300);
+}
 
 // Pre-2.6 compatibility
 if (!defined('WP_CONTENT_URL')) {
@@ -105,19 +111,19 @@ class s2class {
 	Hook the menu
 	*/
 	function admin_menu() {
-		$s2management = add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'manage_menu'));
+		$s2management = add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", 's2_tools', array(&$this, 'manage_menu'));
 		add_action("admin_print_scripts-$s2management", array(&$this, 'checkbox_form_js'));
 
-		$s2options = add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2', 'subscribe2'), "manage_options", __FILE__, array(&$this, 'options_menu'));
+		$s2options = add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2', 'subscribe2'), "manage_options", 's2_settings', array(&$this, 'options_menu'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'option_form_js'));
 		add_filter('plugin_action_links', array(&$this, 'plugin_action'), -10, 2);
 
-		$s2user = add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", __FILE__, array(&$this, 'user_menu'));
+		$s2user = add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", 's2_users', array(&$this, 'user_menu'));
 		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
 
-		add_submenu_page('post-new.php', __('Mail Subscribers', 'subscribe2'), __('Mail Subscribers', 'subscribe2'), "publish_posts", __FILE__, array(&$this, 'write_menu'));
+		add_submenu_page('post-new.php', __('Mail Subscribers', 'subscribe2'), __('Mail Subscribers', 'subscribe2'), "publish_posts", 's2_posts', array(&$this, 'write_menu'));
 
 		$s2nonce = md5('subscribe2');
 	} // end admin_menu()
@@ -125,12 +131,8 @@ class s2class {
 	/**
 	Hook for Admin Drop Down Icons
 	*/
-	function ozh_s2_icon($hook) {
-		if ($hook == plugin_basename(__FILE__)) {
-			return WP_CONTENT_URL . '/plugins/subscribe2/include/email_edit.png';
-		} else {
-			return $hook;
-		}
+	function ozh_s2_icon() {
+		return WP_CONTENT_URL . '/plugins/subscribe2/include/email_edit.png';
 	} // end ozh_s2_icon()
 
 	/**
@@ -522,9 +524,8 @@ class s2class {
 			} else {
 				// no <!--more-->, so grab the first 55 words
 				$excerpt = strip_tags($plaintext);
-				$excerpt_length = 55;
-				$words = explode(' ', $excerpt, $excerpt_length + 1);
-				if (count($words) > $excerpt_length) {
+				$words = explode(' ', $excerpt, $this->excerpt_length + 1);
+				if (count($words) > $this->excerpt_length) {
 					array_pop($words);
 					array_push($words, '[...]');
 					$excerpt = implode(' ', $words);
@@ -1763,6 +1764,9 @@ class s2class {
 		// show our form
 		echo "<div class=\"wrap\">";
 		echo "<h2>" . __('Subscribe2 Settings', 'subscribe2') . "</h2>\r\n";
+		echo "<a href=\"http://subscribe2.wordpress.com/\">" . __('Plugin Blog', 'subscribe2') . "</a> | ";
+		echo "<a href=\"http://getsatisfaction.com/subscribe2/\">" . __('Support Forum', 'subscribe2') . "</a> | ";
+		echo "<a href=\"https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904\">" . __('Make a donation via PayPal', 'subscribe2') . "</a>";
 		echo "<form method=\"post\" action=\"\">\r\n";
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-options_subscribers' . $s2nonce);
@@ -2551,6 +2555,10 @@ class s2class {
 		echo "</select>\r\n";
 	} // end admin_dropdown()
 
+	/**
+	Display a dropdown of choices for digest email frequency
+	and give user details of timings when event is scheduled
+	*/
 	function display_digest_choices() {
 		global $wpdb;
 		$scheduled_time = wp_next_scheduled('s2_digest_cron');
@@ -3069,10 +3077,10 @@ class s2class {
 			}
 			('' == $table) ? $table = "* " . $post->post_title : $table .= "\r\n* " . $post->post_title;
 			$message_post .= $post->post_title . "\r\n";
-			$message_post .= get_permalink($post->ID) . "\r\n";
+			$message_post .= get_permalink($post->ID) . "\r\n\r\n";
 			$message_posttime .= $post->post_title . "\r\n";
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
-			$message_posttime .= get_permalink($post->ID) . "\r\n";
+			$message_posttime .= get_permalink($post->ID) . "\r\n\r\n";
 			$excerpt = $post->post_excerpt;
 			if ('' == $excerpt) {
 				 // no excerpt, is there a <!--more--> ?
@@ -3087,8 +3095,8 @@ class s2class {
 					if (function_exists('strip_shortcodes')) {
 						$excerpt = strip_shortcodes($excerpt);
 					}
-					$words = explode(' ', $excerpt, 56);
-					if (count($words) > 55) {
+					$words = explode(' ', $excerpt, $this->excerpt_length + 1);
+					if (count($words) > $this->excerpt_length) {
 						array_pop($words);
 						array_push($words, '[...]');
 						$excerpt = implode(' ', $words);
@@ -3213,7 +3221,12 @@ class s2class {
 		if ('1' == $this->subscribe2_options['show_meta']) {
 			add_action('wp_meta', array(&$this, 'add_minimeta'), 0);
 		}
-		add_filter('ozh_adminmenu_icon', array(&$this, 'ozh_s2_icon'));
+		// Add filters for Ozh Admin Menu
+		add_filter('ozh_adminmenu_icon_s2_posts', array(&$this, 'ozh_s2_icon'));
+		add_filter('ozh_adminmenu_icon_s2_users', array(&$this, 'ozh_s2_icon'));
+		add_filter('ozh_adminmenu_icon_s2_tools', array(&$this, 'ozh_s2_icon'));
+		add_filter('ozh_adminmenu_icon_s2_settings', array(&$this, 'ozh_s2_icon'));
+
 
 		// add action to display editor buttons if option is enabled
 		if ('1' == $this->subscribe2_options['show_button']) {
@@ -3264,6 +3277,7 @@ class s2class {
 	var $action = '';
 	var $email = '';
 	var $message = '';
+	var $excerpt_length = 55;
 
 	// some messages
 	var $please_log_in = '';
