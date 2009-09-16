@@ -1214,11 +1214,11 @@ class s2class {
 
 			// redirect to profile page
 			if (current_user_can('manage_options')) {
-				$url = get_option('siteurl') . '/wp-admin/users.php?page=subscribe2/subscribe2.php';
+				$url = get_option('siteurl') . '/wp-admin/users.php?page=s2_users';
 				wp_redirect($url);
 				exit();
 			} else {
-				$url = get_option('siteurl') . '/wp-admin/profile.php?page=subscribe2/subscribe2.php';
+				$url = get_option('siteurl') . '/wp-admin/profile.php?page=s2_users';
 				wp_redirect($url);
 				exit();
 			}
@@ -1580,7 +1580,7 @@ class s2class {
 				} elseif (in_array($subscriber, $all_users)) {
 					echo "</td><td align=\"center\"></td><td align=\"center\"></td>\r\n";
 					echo "<td><span style=\"color:#006600\">&reg;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
-					echo "(<a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=subscribe2/subscribe2.php&amp;email=$subscriber\">" . __('edit', 'subscribe2') . "</a>)\r\n";
+					echo "(<a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=s2_users&amp;email=$subscriber\">" . __('edit', 'subscribe2') . "</a>)\r\n";
 				}
 				echo "</td></tr>\r\n";
 				('alternate' == $alternate) ? $alternate = '' : $alternate = 'alternate';
@@ -2257,7 +2257,7 @@ class s2class {
 				}
 				$blog['description'] = get_bloginfo('description');
 				$blog['blogurl'] = get_bloginfo('url');
-				$blog['subscribe_page'] = get_bloginfo('url') . "/wp-admin/users.php?page=subscribe2/subscribe2.php";
+				$blog['subscribe_page'] = get_bloginfo('url') . "/wp-admin/users.php?page=s2_users";
 
 				$key = strtolower($blog['blogname'] . "-" . $blog['blog_id']);
 				if (!empty($subscribed)) {
@@ -2628,7 +2628,7 @@ class s2class {
 	*/
 	function plugin_action($links, $file) {
 		if ($file == plugin_basename(dirname(__FILE__).'/subscribe2.php')) {
-			$s2link[] = "<a href='options-general.php?page=subscribe2/subscribe2.php'><b>" . __('Settings', 'subscribe2') . "</b></a>";
+			$s2link[] = "<a href='options-general.php?page=s2_settings'><b>" . __('Settings', 'subscribe2') . "</b></a>";
 			$links = array_merge($s2link, $links);
 		}
 		return $links;
