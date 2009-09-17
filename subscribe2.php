@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted. For support visit the <a href="http://getsatisfaction.com/subscribe2/">Subscribe2 forum</a>.
-Version: 5.0
+Version: 5.0.2
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -68,9 +68,9 @@ class s2class {
 
 		$this->please_log_in = "<p>" . __('To manage your subscription options please', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-login.php\">" . __('login', 'subscribe2') . "</a>.</p>";
 
-		$this->use_profile_admin = "<p>" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=" . plugin_basename(__FILE__) . "\">" . __('profile', 'subscribe2') . "</a>.</p>";
+		$this->use_profile_admin = "<p>" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=s2_users\">" . __('profile', 'subscribe2') . "</a>.</p>";
 
-		$this->use_profile_users = "<p>" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/profile.php?page=" . plugin_basename(__FILE__) . "\">" . __('profile', 'subscribe2') . "</a>.</p>";
+		$this->use_profile_users = "<p>" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/profile.php?page=s2_users\">" . __('profile', 'subscribe2') . "</a>.</p>";
 
 		$this->confirmation_sent = "<p>" . __('A confirmation message is on its way!', 'subscribe2') . "</p>";
 
