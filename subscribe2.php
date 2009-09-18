@@ -2843,11 +2843,19 @@ class s2class {
 		$options = get_option('widget_subscribe2widget');
 		$title = empty($options['title']) ? __('Subscribe2', 'subscribe2') : $options['title'];
 		$div = empty($options['div']) ? 'search' : $options['div'];
+		$widgetprecontent = empty($options['widgetprecontent']) ? '' : $options['widgetprecontent'];
+		$widgetpostcontent = empty($options['widgetpostcontent']) ? '' : $options['widgetpostcontent'];
 		echo $before_widget;
 		echo $before_title . $title . $after_title;
 		echo "<div class=\"" . $div . "\">";
 		$content = s2class::filter('<!--subscribe2-->');
+		if (!empty($widgetprecontent)) {
+			echo $widgetprecontent;
+		}
 		echo $content;
+		if (!empty($widgetpostcontent)) {
+			echo $widgetpostcontent;
+		}
 		echo "</div>";
 		echo $after_widget;
 	} // end widget_subscribe2widget()
@@ -2860,17 +2868,25 @@ class s2class {
 		if ($_POST["s2w-submit"]) {
 			$newoptions['title'] = strip_tags(stripslashes($_POST["s2w-title"]));
 			$newoptions['div'] = sanitize_title(strip_tags(stripslashes($_POST["s2w-div"])));
+			$newoptions['widgetprecontent'] = stripslashes($_POST["s2w-widgetprecontent"]);
+			$newoptions['widgetpostcontent'] = stripslashes($_POST["s2w-widgetpostcontent"]);
 		}
 		if ($options != $newoptions) {
 			$options = $newoptions;
 			update_option('widget_subscribe2widget', $options);
 		}
 		$title = htmlspecialchars($options['title'], ENT_QUOTES);
+		$widgetprecontent = htmlspecialchars($options['widgetprecontent'], ENT_QUOTES);
+		$widgetpostcontent = htmlspecialchars($options['widgetpostcontent'], ENT_QUOTES);
 		$div = $options['div'];
-		echo "<p><label for=\"s2w-title\">" . __('Title:');
+		echo "<p><label for=\"s2w-title\">" . __('Title', 'subscribe2') . ":";
 		echo "<input class=\"widefat\" id=\"s2w-title\" name=\"s2w-title\" type=\"text\" value=\"" . $title . "\" /></label></p>";
-		echo "<p><label for=\"s2w-div\">" . __('Div class name:');
+		echo "<p><label for=\"s2w-div\">" . __('Div class name', 'subscribe2') . ":";
 		echo "<input class=\"widefat\" id=\"s2w-title\" name=\"s2w-div\" type=\"text\" value=\"" . $div . "\" /></label></p>";
+		echo "<p><label for=\"s2w-widgetprecontent\">" . __('Pre-Content', 'subscribe2') . ":";
+		echo "<input class=\"widefat\" id=\"s2w-widgetprecontent\" name=\"s2w-widgetprecontent\" type=\"text\" value=\"" . $widgetprecontent . "\" /></label></p>";
+		echo "<p><label for=\"s2w-widgetpostcontent\">" . __('Post-Content', 'subscribe2') . ":";
+		echo "<input class=\"widefat\" id=\"s2w-widgetpostcontent\" name=\"s2w-widgetpostcontent\" type=\"text\" value=\"" . $widgetpostcontent . "\" /></label></p>";
 		echo "<input type=\"hidden\" id=\"s2w-submit\" name=\"s2w-submit\" value=\"1\" />";
 	} // end widget_subscribe2_widget_control()
 
