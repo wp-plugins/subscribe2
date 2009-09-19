@@ -604,6 +604,9 @@ class s2class {
 		$link .= md5($this->email);
 		$link .= $id;
 
+		// sort the headers now so we have all substitute information
+		$mailheaders = $this->headers();
+
 		if ($is_remind == true) {
 			$body = $this->substitute(stripslashes($this->subscribe2_options['remind_email']));
 			$subject = $this->substitute(stripslashes($this->subscribe2_options['remind_subject']));
@@ -620,8 +623,6 @@ class s2class {
 		}
 
 		$body = str_replace("LINK", $link, $body);
-
-		$mailheaders = $this->headers();
 
 		return @wp_mail($this->email, $subject, $body, $mailheaders);
 	} // end send_confirm()
