@@ -672,7 +672,7 @@ class s2class {
 			if ($check) { return; }
 			$wpdb->get_results("UPDATE $this->public SET active='1' WHERE email='$email'");
 		} else {
-			$wpdb->get_results("INSERT INTO $this->public (email, active, date) VALUES ('$email', '1', NOW())");
+			$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date) VALUES (%s, %d, NOW())", $email, 1));
 		}
 	} // end activate()
 
@@ -696,7 +696,7 @@ class s2class {
 		if (false !== $this->is_public($email)) {
 			$wpdb->get_results("UPDATE $this->public SET date=NOW() WHERE email='$email'");
 		} else {
-			$wpdb->get_results("INSERT INTO $this->public (email, active, date) VALUES ('$email', '0', NOW())");
+			$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date) VALUES (%s, %d, NOW())", $email, 0));
 		}
 	} // end add()
 
@@ -1300,6 +1300,9 @@ class s2class {
 		// handle issues from WordPress core where user_level is not set or set low
 		if (empty($admin)) {
 			$role = 'administrator';
+			if (!class_exists(WP_User_Search)) {
+				require(ABSPATH . 'wp-admin/includes/user.php');
+			}
 			$wp_user_search = new WP_User_Search( '', '', $role);
 			$results = $wp_user_search->get_results();
 			$admin = $results[0];
@@ -2534,6 +2537,9 @@ class s2class {
 		// handle issues from WordPress core where user_level is not set or set low
 		if (empty($admins)) {
 			$role = 'administrator';
+			if (!class_exists(WP_User_Search)) {
+				require(ABSPATH . 'wp-admin/includes/user.php');
+			}
 			$wp_user_search = new WP_User_Search( '', '', $role);
 			$admins_string = implode(', ', $wp_user_search->get_results());
 			$sql = "SELECT ID, display_name FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
