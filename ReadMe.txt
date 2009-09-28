@@ -30,7 +30,7 @@ Registered users of the blog can elect to receive email notifications for specif
 2. Activate the plugin.
 3. Click the "Settings" admin menu link, and select "Subscribe2".
 4. Configure the options to taste, including the email template and any categories which should be excluded from notification
-5. Click the "Manage" admin menu link, and select "Subscribers".
+5. Click the "Tools" admin menu link, and select "Subscribers".
 6. Manually subscribe people as you see fit.
 7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the subscribe2 token.  Or, if you prefer, you may manually insert the subscribe2 token:
      <!--subscribe2-->
