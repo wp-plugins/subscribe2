@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted. For support visit the <a href="http://getsatisfaction.com/subscribe2/">Subscribe2 forum</a>.
-Version: 5.0.2
+Version: 5.1
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -32,12 +32,13 @@ along with Subscribe2.  If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '5.0');
+define('S2VERSION', '5.1');
 define('S2PATH', trailingslashit(dirname(__FILE__)));
 
 // Set minimum execution time to 5 minutes - won't affect safe mode
-if (ini_get('max_execution_time') < 300) {
-	ini_set('max_execution_time', 300);
+$safe_mode = array('On', 'ON', 'on', 1);
+if ( (!in_array(ini_get('safe_mode'), $safe_mode)) && (ini_get('max_execution_time') < 300) ) {
+	@ini_set('max_execution_time', 300);
 }
 
 // Pre-2.6 compatibility
@@ -88,7 +89,7 @@ class s2class {
 
 		$this->mail_failed = "<p>" . __('Message failed! Check your settings and check with your hosting provider', 'subscribe2') . "</p>";
 
-		$this->form = "<form method=\"post\" action=\"\"><p>" . __('Your email:', 'subscribe2') . "<br /><input type=\"text\" name=\"email\" value=\"" . __('Enter email address...', 'subscribe2') . "\" size=\"20\" onfocus=\"if (this.value == '" . __('Enter email address...', 'subscribe2') . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . __('Enter email address...', 'subscribe2') . "';}\" /></p><p><input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" />&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" /></p></form>\r\n";
+		$this->form = "<form method=\"post\" action=\"\"><input type=\"hidden\" name=\"ip\" value=\"" . getenv('REMOTE_ADDR') . "\" /><p>" . __('Your email:', 'subscribe2') . "<br /><input type=\"text\" name=\"email\" value=\"" . __('Enter email address...', 'subscribe2') . "\" size=\"20\" onfocus=\"if (this.value == '" . __('Enter email address...', 'subscribe2') . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . __('Enter email address...', 'subscribe2') . "';}\" /></p><p><input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" />&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" /></p></form>\r\n";
  
 		// confirmation messages
 		$this->no_such_email = "<p>" . __('No such email address is registered.', 'subscribe2') . "</p>";
@@ -165,6 +166,7 @@ class s2class {
 			email varchar(64) NOT NULL default '',
 			active tinyint(1) default 0,
 			date DATE default '$date' NOT NULL,
+			ip char(64) NOT NULL default 'admin',
 			PRIMARY KEY (id) )";
 
 		// create the table, as needed
@@ -183,6 +185,7 @@ class s2class {
 		}
 		$date = date('Y-m-d');
 		maybe_add_column($this->public, 'date', "ALTER TABLE `$this->public` ADD `date` DATE DEFAULT '$date' NOT NULL AFTER `active`;");
+		maybe_add_column($this->public, 'ip', "ALTER TABLE `$this->public` ADD `ip` char(64) DEFAULT 'admin' NOT NULL AFTER `date`;");
 
 		// let's take the time to check process registered users
 		// existing public subscribers are subscribed to all categories
@@ -277,6 +280,14 @@ class s2class {
 				$string = str_replace("TINYLINK", $this->permalink, $string);
 			}
 		}
+		if (strstr($string, "BURNLINK")) {
+			$burnlink = file_get_contents('http://burnurl.com/?url=' . urlencode($this->permalink) . '&output=plain');
+			if ( ($burnlink !== 'error') || ($burnlink != false) ) {
+				$string = str_replace("BURNLINK", $burnlink, $string);
+			} else {
+				$string = str_replace("BURNLINK", $this->permalink, $string);
+			}	
+		}
 		$string = str_replace("MYNAME", stripslashes($this->myname), $string);
 		$string = str_replace("EMAIL", $this->myemail, $string);
 		$string = str_replace("AUTHORNAME", $this->authorname, $string);
@@ -308,18 +319,22 @@ class s2class {
 		}
 
 		// Replace any escaped html symbols in subject
-		$subject = html_entity_decode($subject);
+		$subject = html_entity_decode($subject, ENT_QUOTES);
 
 		// Construct BCC headers for sending or send individual emails
 		$bcc = '';
 		natcasesort($recipients);
-		if ($this->subscribe2_options['bcclimit'] == 1) {
+		if ( (function_exists('wpmq_mail')) || ($this->subscribe2_options['bcclimit'] == 1) ) {
 			// BCCLimit is 1 so send individual emails
 			foreach ($recipients as $recipient) {
 				$recipient = trim($recipient);
 				// sanity check -- make sure we have a valid email
 				if (!is_email($recipient)) { continue; }
-				$status = @wp_mail($recipient, $subject, $mailtext, $headers);
+				if (function_exists('wpmq_mail')) {
+					@wp_mail($recipient, $subject, $mailtext, $headers, NULL, 0);
+				} else {
+					@wp_mail($recipient, $subject, $mailtext, $headers);
+				}
 			}
 			// Sending completed so return $status
 			return $status;
@@ -383,7 +398,7 @@ class s2class {
 	function headers($type='text') {
 		if ( (empty($this->myname)) || (empty($this->myemail)) ) {
 			$admin = $this->get_userdata($this->subscribe2_options['sender']);
-			$this->myname = html_entity_decode($admin->display_name);
+			$this->myname = html_entity_decode($admin->display_name, ENT_QUOTES);
 			$this->myemail = $admin->user_email;
 		}
 
@@ -494,7 +509,7 @@ class s2class {
 			$user = $this->get_userdata($this->subscribe2_options['sender']);
 		}
 		$this->myemail = $user->user_email;
-		$this->myname = html_entity_decode($user->display_name);
+		$this->myname = html_entity_decode($user->display_name, ENT_QUOTES);
 
 		$this->post_cat_names = implode(', ', wp_get_post_categories($post->ID, array('fields' => 'names')));
 		$this->post_tag_names = implode(', ', wp_get_post_tags($post->ID, array('fields' => 'names')));
@@ -619,7 +634,7 @@ class s2class {
 				$body = str_replace("ACTION", $this->unsubscribe, $body);
 				$subject = str_replace("ACTION", $this->unsubscribe, $this->subscribe2_options['confirm_subject']);
 			}
-			$subject = $this->substitute(stripslashes($subject));
+			$subject = html_entity_decode($this->substitute(stripslashes($subject)), ENT_QUOTES);
 		}
 
 		$body = str_replace("LINK", $link, $body);
@@ -670,9 +685,10 @@ class s2class {
 		if (false !== $this->is_public($email)) {
 			$check = $wpdb->get_var("SELECT user_email FROM $wpdb->users WHERE user_email='$this->email'");
 			if ($check) { return; }
-			$wpdb->get_results("UPDATE $this->public SET active='1' WHERE email='$email'");
+			$wpdb->get_results("UPDATE $this->public SET active='1', ip='$this->ip' WHERE email='$email'");
 		} else {
-			$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date) VALUES (%s, %d, NOW())", $email, 1));
+			global $current_user;
+			$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, NOW(), %s)", $email, 1, $current_user->user_login));
 		}
 	} // end activate()
 
@@ -696,7 +712,7 @@ class s2class {
 		if (false !== $this->is_public($email)) {
 			$wpdb->get_results("UPDATE $this->public SET date=NOW() WHERE email='$email'");
 		} else {
-			$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date) VALUES (%s, %d, NOW())", $email, 0));
+			$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, NOW(), %s)", $email, 0, $this->ip));
 		}
 	} // end add()
 
@@ -795,9 +811,11 @@ class s2class {
 			// make this subscription active
 			$this->message = $this->added;
 			if ('1' != $current) {
+				$this->ip = getenv('REMOTE_ADDR');
 				$this->activate();
 				if ( ($this->subscribe2_options['admin_email'] == 'subs') || ($this->subscribe2_options['admin_email'] == 'both') ) {
 					$subject = '[' . get_option('blogname') . '] ' . __('New subscription', 'subscribe2');
+					$subject = html_entity_decode($subject, ENT_QUOTES);
 					$message = $this->email . " " . __('subscribed to email notifications!', 'subscribe2');
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
 					$headers = $this->headers();
@@ -814,6 +832,7 @@ class s2class {
 				$this->delete();
 				if ( ($this->subscribe2_options['admin_email'] == 'unsubs') || ($this->subscribe2_options['admin_email'] == 'both') ) {
 					$subject = '[' . get_option('blogname') . '] ' . __('New Unsubscription', 'subscribe2');
+					$subject = html_entity_decode($subject, ENT_QUOTES);
 					$message = $this->email . " " . __('unsubscribed from email notifications!', 'subscribe2');
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
 					$headers = $this->headers();
@@ -973,6 +992,24 @@ class s2class {
 			return $this->signup_dates[$email];
 		}
 	} // end signup_date()
+
+	/**
+	Collects the ip address for all public subscribers
+	*/
+	function signup_ip($email = '') {
+		if ('' == $email) {return false; }
+		
+		global $wpdb;
+		if (!empty($this->signup_ips)) {
+			return $this->signup_ips[$email];
+		} else {
+			$results = $wpdb->get_results("SELECT email, ip FROM $this->public", ARRAY_N);
+			foreach ($results as $result) {
+				$this->signup_ips[$result[0]] = $result[1];
+			}
+			return $this->signup_ips[$email];
+		}
+	} // end signup_ip()
 
 	/**
 	Create the appropriate usermeta values when a user registers
@@ -1572,7 +1609,7 @@ class s2class {
 					echo "<input class=\"delete_checkall\" title=\"" . __('Delete this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
 					echo "</td>\r\n";
 					echo "<td><span style=\"color:#006600\">&#x221A;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
-					echo "(<span style=\"color:#006600\">" . $this->signup_date($subscriber) . "</span>)\r\n";
+					echo "(<span style=\"color:#006600\"><abbr title=\"" . $this->signup_ip($subscriber) . "\">" . $this->signup_date($subscriber) . "</abbr></span>)\r\n";
 				} elseif (in_array($subscriber, $unconfirmed)) {
 					echo "<input class=\"confirm_checkall\" title=\"" . __('Confirm this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"confirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
 					echo "<td align=\"center\"></td>\r\n";
@@ -1580,7 +1617,7 @@ class s2class {
 					echo "<input class=\"delete_checkall\" title=\"" . __('Delete this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
 					echo "</td>\r\n";
 					echo "<td><span style=\"color:#FF0000\">&nbsp;!&nbsp;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
-					echo "(<span style=\"color:#FF0000\">" . $this->signup_date($subscriber) . "</span>)\r\n";
+					echo "(<span style=\"color:#FF0000\"><abbr title=\"" . $this->signup_ip($subscriber) . "\">" . $this->signup_date($subscriber) . "</abbr></span>)\r\n";
 				} elseif (in_array($subscriber, $all_users)) {
 					echo "</td><td align=\"center\"></td><td align=\"center\"></td>\r\n";
 					echo "<td><span style=\"color:#006600\">&reg;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
@@ -1899,6 +1936,7 @@ class s2class {
 		echo "<dt><b>TABLE</b></dt><dd>" . __("a list of post titles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>PERMALINK</b></dt><dd>" . __("the post's permalink<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>TINYLINK</b></dt><dd>" . __("the post's permalink after conversion by TinyURL<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>BURNLINK</b></dt><dd>" . __("the post's permalink after conversion by BurnURL<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>MYNAME</b></dt><dd>" . __("the admin or post author's name", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>EMAIL</b></dt><dd>" . __("the admin or post author's email", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>AUTHORNAME</b></dt><dd>" . __("the post author's name", 'subscribe2') . "</dd>\r\n";
@@ -2350,7 +2388,7 @@ class s2class {
 			$subject = $this->substitute(stripslashes(strip_tags($_POST['subject'])));
 			$body = $this->substitute(stripslashes($_POST['content']));
 			if (('' != $current_user->display_name) || ('' != $current_user->user_email)) {
-				$this->myname = html_entity_decode($current_user->display_name);
+				$this->myname = html_entity_decode($current_user->display_name, ENT_QUOTES);
 				$this->myemail = $current_user->user_email;
 			}
 			$status = $this->mail($recipients, $subject, $body, 'text');
@@ -2432,13 +2470,13 @@ class s2class {
 						if (in_array($cat->term_id, $selected)) {
 								echo " checked=\"checked\" ";
 						}
-						echo " /> " . $cat->name . "</label><br />\r\n";
+						echo " /> <abbr title=\"" . $cat->slug . "\">" . $cat->name . "</abbr></label><br />\r\n";
 					} else {
 						echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 						if (in_array($cat->term_id, $selected)) {
 									echo " checked=\"checked\" ";
 						}
-						echo " /> " . $cat->name . "</label><br />\r\n";
+						echo " /> <abbr title=\"" . $cat->slug . "\">" . $cat->name . "</abbr></label><br />\r\n";
 				}
 				$i++;
 		}
@@ -2756,6 +2794,7 @@ class s2class {
 				$this->s2form = $this->form . $this->barred_domain;
 			} else {
 				$this->email = $_POST['email'];
+				$this->ip = $_POST['ip'];
 				// does the supplied email belong to a registered user?
 				$check = $wpdb->get_var("SELECT user_email FROM $wpdb->users WHERE user_email = '$this->email'");
 				if ('' != $check) {
@@ -3144,7 +3183,7 @@ class s2class {
 		// get admin details
 		$user = $this->get_userdata($this->subscribe2_options['sender']);
 		$this->myemail = $user->user_email;
-		$this->myname = html_entity_decode($user->display_name);
+		$this->myname = html_entity_decode($user->display_name, ENT_QUOTES);
 
 		$scheds = (array)wp_get_schedules();
 		$email_freq = $this->subscribe2_options['email_freq'];
