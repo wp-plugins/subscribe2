@@ -2,7 +2,7 @@
 /*
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
-Description: Notifies an email list when new entries are posted. For support visit the <a href="http://getsatisfaction.com/subscribe2/">Subscribe2 forum</a>.
+Description: Notifies an email list when new entries are posted.
 Version: 5.1
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
@@ -118,7 +118,7 @@ class s2class {
 		$s2options = add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2', 'subscribe2'), "manage_options", 's2_settings', array(&$this, 'options_menu'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'option_form_js'));
-		add_filter('plugin_action_links', array(&$this, 'plugin_action'), -10, 2);
+		add_filter('plugin_row_meta', array(&$this, 'plugin_links'), 10, 2);
 
 		$s2user = add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", 's2_users', array(&$this, 'user_menu'));
 		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
@@ -1544,6 +1544,7 @@ class s2class {
 
 		// show our form
 		echo "<div class=\"wrap\">";
+		screen_icon();
 		echo "<h2>" . __('Manage Subscribers', 'subscribe2') . "</h2>\r\n";
 		echo "<form method=\"post\" action=\"\">\r\n";
 		if (function_exists('wp_nonce_field')) {
@@ -1804,6 +1805,7 @@ class s2class {
 		}
 		// show our form
 		echo "<div class=\"wrap\">";
+		screen_icon();
 		echo "<h2>" . __('Subscribe2 Settings', 'subscribe2') . "</h2>\r\n";
 		echo "<a href=\"http://subscribe2.wordpress.com/\">" . __('Plugin Blog', 'subscribe2') . "</a> | ";
 		echo "<a href=\"http://getsatisfaction.com/subscribe2/\">" . __('Support Forum', 'subscribe2') . "</a> | ";
@@ -2184,6 +2186,7 @@ class s2class {
 
 		// show our form
 		echo "<div class=\"wrap\">";
+		screen_icon();
 		echo "<h2>" . __('Notification Settings', 'subscribe2') . "</h2>\r\n";
 		if (isset($_GET['email'])) {
 			$user = get_userdata($user_ID);
@@ -2224,7 +2227,7 @@ class s2class {
 				if ('no' == get_usermeta($user_ID, 's2_autosub')) {
 					echo "checked=\"checked\" ";
 				}
-				echo "/> " . __('No', 'subscribe2') . "</label><br /><br />";
+				echo "/> " . __('No', 'subscribe2') . "</label>";
 				echo "</p>";
 			}
 
@@ -2250,14 +2253,14 @@ class s2class {
 			// we're doing daily digests, so just show
 			// subscribe / unnsubscribe
 			echo __('Receive periodic summaries of new posts?', 'subscribe2') . ': &nbsp;&nbsp;';
-			echo "<p><label>";
+			echo "<label>";
 			echo "<input type=\"radio\" name=\"category\" value=\"digest\" ";
 			if (get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'))) {
-				echo "checked=\"yes\" ";
+				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('Yes', 'subscribe2') . "</label> <label><input type=\"radio\" name=\"category\" value=\"-1\" ";
 			if (!get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'))) {
-				echo "checked=\"yes\" ";
+				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('No', 'subscribe2');
 			echo "</label></p>";
@@ -2268,7 +2271,7 @@ class s2class {
 		echo "</form>\r\n";
 
 		// list of subscribed blogs on wordpress mu
-		if ($this->s2_mu) {
+		if ( ($this->s2_mu) && (!isset($_GET['email'])) ) {
 			global $blog_id;
 			$blogs = get_blog_list(0, 'all');
 
@@ -2404,7 +2407,9 @@ class s2class {
 			echo "<div id=\"message\" class=\"updated\"><strong><p>" . $message . "</p></strong></div>\r\n";
 		}
 		// show our form
-		echo "<div class=\"wrap\"><h2>" . __('Send an email to subscribers', 'subscribe2') . "</h2>\r\n";
+		echo "<div class=\"wrap\">";
+		screen_icon();
+		echo "<h2>" . __('Send an email to subscribers', 'subscribe2') . "</h2>\r\n";
 		echo "<form method=\"post\" action=\"\">\r\n";
 		if (function_exists('wp_nonce_field')) {
 			wp_nonce_field('subscribe2-write_subscribers' . $s2nonce);
@@ -2669,15 +2674,16 @@ class s2class {
 	}
 
 	/**
-	Adds a link directly to the settings page from the plugin page
+	Adds a links directly to the settings page from the plugin page
 	*/
-	function plugin_action($links, $file) {
+	function plugin_links($links, $file) {
 		if ($file == plugin_basename(dirname(__FILE__).'/subscribe2.php')) {
-			$s2link[] = "<a href='options-general.php?page=s2_settings'><b>" . __('Settings', 'subscribe2') . "</b></a>";
-			$links = array_merge($s2link, $links);
+			$links[] = "<a href='options-general.php?page=s2_settings'>" . __('Settings', 'subscribe2') . "</a>";
+			$links[] = "<a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904'><b>" . __('Donate', 'subscribe2') . "</b></a>";
+			$links[] = "<a href='http://getsatisfaction.com/subscribe2'>" . __('Forum', 'subscribe2') . "</a>";
 		}
 		return $links;
-	} // end plugin_action()
+	} // end plugin_links()
 
 	/**
 	Adds information to the WordPress registration screen for new users
