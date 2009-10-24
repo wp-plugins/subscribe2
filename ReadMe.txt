@@ -40,12 +40,16 @@ This token will automatically be replaced by dynamic subscription information an
 
 == Frequently Asked Questions ==
 
-= Where else can I get help? =
-So, you've downloaded the plugin an it isn't doing what you expect. First you should read the documentation. There is a ReadMe.txt file and a PDF startup guide installed with the plugin.
+= Where can I get help? =
+So, you've downloaded the plugin an it isn't doing what you expect. First you should read the included documentation. There is a ReadMe.txt file and a PDF startup guide installed with the plugin.
 
 Next you could search in the [Subscribe2 Forum](http://getsatisfaction.com/subscribe2/), the [WordPress forums](http://wordpress.org/support/) or the [Subscribe2 blog FAQs](http://subscribe2.wordpress.com/category/faq/).
 
 No joy there? Well, if you can't find an answer to your question you can get [paid support](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2387904) by donating at least £20 to the plugin author.
+
+= Where can I get more information about the plugin features? =
+
+A comprehensive guide that covers many, if not all, of the Subscribe2 features is available to purchase from the [iAssistant](http://the-iassistant.com/subscribe2-guide/)
 
 == Screenshots ==
 
