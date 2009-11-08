@@ -23,11 +23,11 @@ the Free Software Foundation, either version 3 of the License, or
 
 Subscribe2 is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Subscribe2.  If not, see <http://www.gnu.org/licenses/>.
+along with Subscribe2. If not, see <http://www.gnu.org/licenses/>.
 */
 
 // our version number. Don't touch this or any line below
@@ -427,7 +427,7 @@ class s2class {
 		if ( $preview == '' ) {
 			// we aren't sending a Preview to the current user so carry out checks
 			$s2mail = get_post_meta($post->ID, 's2mail', true);
-			if ( ( isset($_POST['s2_meta_field']) && ($_POST['s2_meta_field'] == 'no') ) || strtolower(trim($s2mail)) == 'no' ) { return $post; }
+			if ( (isset($_POST['s2_meta_field']) && $_POST['s2_meta_field'] == 'no') || strtolower(trim($s2mail)) == 'no' ) { return $post; }
 
 			// are we doing daily digests? If so, don't send anything now
 			if ( $this->subscribe2_options['email_freq'] != 'never' ) { return $post; }
@@ -1682,7 +1682,7 @@ class s2class {
 					$post = get_posts('numberposts=1');
 					$this->publish($post[0], $user_email);
 				} else {
-					$this->subscribe2_cron($user_email);	
+					$this->subscribe2_cron($user_email);
 				}
 			} elseif ( $_POST['submit'] ) {
 				// BCClimit
@@ -2163,7 +2163,7 @@ class s2class {
 				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $catids);
 			} else {
 				 if ( !is_array($cats) ) {
-				 	$cats = array($_POST['category']);
+					$cats = array($_POST['category']);
 				}
 				$old_cats = explode(',', get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
 				$remove = array_diff($old_cats, $cats);
@@ -2770,11 +2770,11 @@ class s2class {
 			if ( !current_user_can('edit_post', $post_id) ) { return $post_id; }
 		}
 
- 		if ( isset($_POST['s2_meta_field']) && $_POST['s2_meta_field'] == 'no' ) {
- 			update_post_meta($post_id, 's2mail', $_POST['s2_meta_field']);
- 		} else {
- 			delete_post_meta($post_id, 's2mail');
- 		}
+		if ( isset($_POST['s2_meta_field']) && $_POST['s2_meta_field'] == 'no' ) {
+			update_post_meta($post_id, 's2mail', $_POST['s2_meta_field']);
+		} else {
+			delete_post_meta($post_id, 's2mail');
+		}
 	} // end s2_meta_box_handler()
 
 /* ===== template and filter functions ===== */
@@ -3015,7 +3015,7 @@ class s2class {
 			}
 		} else {
 			buttonsnap_separator();
-			buttonsnap_jsbutton(WP_CONTENT_URL . '/plugins/subscribe2/include/s2_button.png',  __('Subscribe2', 'subscribe2'), 's2_insert_token();');
+			buttonsnap_jsbutton(WP_CONTENT_URL . '/plugins/subscribe2/include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
 		}
 	} // end button_init()
 
@@ -3075,7 +3075,7 @@ class s2class {
 	Send a daily digest of today's new posts
 	*/
 	function subscribe2_cron($preview = '') {
-		if (defined(S2_CRON) && S2_CRON ) { return; }
+		if ( defined(S2_CRON) && S2_CRON ) { return; }
 		define(S2_CRON, true);
 		global $wpdb;
 
@@ -3157,9 +3157,9 @@ class s2class {
 			if ( '' == $excerpt ) {
 				 // no excerpt, is there a <!--more--> ?
 				 if ( false !== strpos($post->post_content, '<!--more-->') ) {
-				 	list($excerpt, $more) = explode('<!--more-->', $post->post_content, 2);
-				 	$excerpt = strip_tags($excerpt);
-				 	if ( function_exists('strip_shortcodes') ) {
+					list($excerpt, $more) = explode('<!--more-->', $post->post_content, 2);
+					$excerpt = strip_tags($excerpt);
+					if ( function_exists('strip_shortcodes') ) {
 						$excerpt = strip_shortcodes($excerpt);
 					}
 				} else {
@@ -3209,7 +3209,7 @@ class s2class {
 		if ( $preview != '' ) {
 			$this->myemail = $preview;
 			$this->myname = "Preview";
-			$this->mail(array($preview), $subject, $mailtext);	
+			$this->mail(array($preview), $subject, $mailtext);
 		} else {
 			$public = $this->get_public();
 			$all_post_cats_string = implode(',', $all_post_cats);
