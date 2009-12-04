@@ -32,8 +32,9 @@ along with Subscribe2. If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define('S2VERSION', '5.1');
-define('S2PATH', trailingslashit(dirname(__FILE__)));
+define( 'S2VERSION', '5.1' );
+define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
+define( 'S2DIR', plugin_basename(dirname(__FILE__)) );
 
 // Set minimum execution time to 5 minutes - won't affect safe mode
 $safe_mode = array('On', 'ON', 'on', 1);
@@ -43,15 +44,15 @@ if ( !in_array(ini_get('safe_mode'), $safe_mode) && ini_get('max_execution_time'
 
 // Pre-2.6 compatibility
 if ( !defined('WP_CONTENT_URL') ) {
-	define('WP_CONTENT_URL', get_option('siteurl') . '/wp-content');
+	define( 'WP_CONTENT_URL', get_option('siteurl') . '/wp-content' );
 }
 if ( !defined('WP_CONTENT_DIR') ) {
-	define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
+	define( 'WP_CONTENT_DIR', ABSPATH . 'wp-content' );
 }
 
 /* Include buttonsnap library by Owen Winckler */
 if ( !class_exists('buttonsnap') ) {
-	require(WP_CONTENT_DIR . '/plugins/subscribe2/include/buttonsnap.php');
+	require( WP_CONTENT_DIR . '/plugins/' . S2DIR . '/include/buttonsnap.php' );
 }
 
 $mysubscribe2 = new s2class;
@@ -133,22 +134,22 @@ class s2class {
 	Hook for Admin Drop Down Icons
 	*/
 	function ozh_s2_icon() {
-		return WP_CONTENT_URL . '/plugins/subscribe2/include/email_edit.png';
+		return WP_CONTENT_URL . '/plugins/' . S2DIR . '/include/email_edit.png';
 	} // end ozh_s2_icon()
 
 	/**
 	Insert Javascript into admin_header
 	*/
 	function checkbox_form_js() {
-		wp_enqueue_script('s2_checkbox', WP_CONTENT_URL . '/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_checkbox.js', array('jquery'), '1.0');
+		wp_enqueue_script('s2_checkbox', WP_CONTENT_URL . '/plugins/' . S2DIR . '/include/s2_checkbox.js', array('jquery'), '1.0');
 	} //end checkbox_form_js()
 
 	function user_admin_css() {
-		wp_enqueue_style('s2_user_admin', WP_CONTENT_URL . '/plugins/ '. dirname( plugin_basename( __FILE__ ) ) . '/include/s2_user_admin.css', array(), '1.0');
+		wp_enqueue_style('s2_user_admin', WP_CONTENT_URL . '/plugins/ '. S2DIR . '/include/s2_user_admin.css', array(), '1.0');
 	}
 
 	function option_form_js() {
-		wp_enqueue_script('s2_edit', WP_CONTENT_URL . '/plugins/' . dirname( plugin_basename( __FILE__ ) ) . '/include/s2_edit.js', array('jquery'), '1.0');
+		wp_enqueue_script('s2_edit', WP_CONTENT_URL . '/plugins/' . S2DIR . '/include/s2_edit.js', array('jquery'), '1.0');
 	} // end option_form_js()
 
 /* ===== Install, upgrade, reset ===== */
@@ -2287,7 +2288,7 @@ class s2class {
 				if ( !is_array($current_plugins) ) {
 					$current_plugins = (array)$current_plugins;
 				}
-				if ( !in_array('subscribe2/subscribe2.php', $current_plugins) ) {
+				if ( !in_array(S2DIR . '/subscribe2.php', $current_plugins) ) {
 					continue;
 				}
 
@@ -2475,13 +2476,13 @@ class s2class {
 						if ( in_array($cat->term_id, $selected) ) {
 								echo " checked=\"checked\" ";
 						}
-						echo " /> <abbr title=\"" . $cat->slug . "\">" . $cat->name . "</abbr></label><br />\r\n";
+						echo " /> <abbr title=\"" . $cat->slug . "\">" . trim(get_category_parents($cat->term_id, false, ' &raquo; '), ' &raquo; ') . "</abbr></label><br />\r\n";
 					} else {
 						echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 						if ( in_array($cat->term_id, $selected) ) {
 									echo " checked=\"checked\" ";
 						}
-						echo " /> <abbr title=\"" . $cat->slug . "\">" . $cat->name . "</abbr></label><br />\r\n";
+						echo " /> <abbr title=\"" . $cat->slug . "\">" . trim(get_category_parents($cat->term_id, false, ' &raquo; '), ' &raquo; ') . "</abbr></label><br />\r\n";
 				}
 				$i++;
 		}
@@ -2650,7 +2651,7 @@ class s2class {
 			echo "<p>" . __('Current blog time is', 'subscribe2') . ": \r\n";
 			echo "<strong>" . date_i18n($datetime) . "</strong></p>\r\n";
 			echo "<p>" . __('Next email notification will be sent when your blog time is after', 'subscribe2') . ": \r\n";
-			echo "<strong>" . date_i18n($datetime, wp_next_scheduled('s2_digest_cron')) . "</strong></p>\r\n";
+			echo "<strong>" . date_i18n($datetime, $scheduled_time) . "</strong></p>\r\n";
 		} else {
 			echo "<br />";
 		}
@@ -2679,7 +2680,7 @@ class s2class {
 	Adds a links directly to the settings page from the plugin page
 	*/
 	function plugin_links($links, $file) {
-		if ( $file == plugin_basename(dirname(__FILE__).'/subscribe2.php') ) {
+		if ( $file == S2DIR.'/subscribe2.php' ) {
 			$links[] = "<a href='options-general.php?page=s2_settings'>" . __('Settings', 'subscribe2') . "</a>";
 			$links[] = "<a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904'><b>" . __('Donate', 'subscribe2') . "</b></a>";
 			$links[] = "<a href='http://getsatisfaction.com/subscribe2'>" . __('Forum', 'subscribe2') . "</a>";
@@ -3015,7 +3016,7 @@ class s2class {
 			}
 		} else {
 			buttonsnap_separator();
-			buttonsnap_jsbutton(WP_CONTENT_URL . '/plugins/subscribe2/include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
+			buttonsnap_jsbutton(WP_CONTENT_URL . '/plugins/' . S2DIR . '/include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
 		}
 	} // end button_init()
 
@@ -3023,7 +3024,7 @@ class s2class {
 	Add buttons for WordPress 2.5+ using built in hooks
 	*/
 	function mce3_plugin($arr) {
-		$path = WP_CONTENT_URL . '/plugins/subscribe2/tinymce3/editor_plugin.js';
+		$path = WP_CONTENT_URL . '/plugins/' . S2DIR . '/tinymce3/editor_plugin.js';
 		$arr['subscribe2'] = $path;
 		return $arr;
 	}
@@ -3046,7 +3047,7 @@ class s2class {
 	}
 
 	function tinymce2_before_init() {
-		$this->fullpath = WP_CONTENT_URL . '/plugins/subscribe2/tinymce/';
+		$this->fullpath = WP_CONTENT_URL . '/plugins/' . S2DIR . '/tinymce/';
 		echo "tinyMCE.loadPlugin('subscribe2quicktags', '" . $this->fullpath . "');\n"; 
 	}
 
@@ -3076,7 +3077,7 @@ class s2class {
 	*/
 	function subscribe2_cron($preview = '') {
 		if ( defined(S2_CRON) && S2_CRON ) { return; }
-		define(S2_CRON, true);
+		define( S2_CRON, true );
 		global $wpdb;
 
 		if ( '' == $preview ) {
@@ -3116,6 +3117,7 @@ class s2class {
 		// if we have posts, let's prepare the digest
 		$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 		$all_post_cats = array();
+		$mailtext = apply_filters('s2_email_template', $this->subscribe2_options['mailtext']);
 		$table = '';
 		$message_post= '';
 		$message_posttime = '';
@@ -3149,10 +3151,25 @@ class s2class {
 			}
 			('' == $table) ? $table = "* " . $post->post_title : $table .= "\r\n* " . $post->post_title;
 			$message_post .= $post->post_title . "\r\n";
-			$message_post .= get_permalink($post->ID) . "\r\n\r\n";
+			$message_post .= get_permalink($post->ID) . "\r\n";
 			$message_posttime .= $post->post_title . "\r\n";
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
-			$message_posttime .= get_permalink($post->ID) . "\r\n\r\n";
+			$message_posttime .= get_permalink($post->ID) . "\r\n";
+			if ( strstr($mailtext, "CATS")) {
+				$post_cat_names = implode(', ', wp_get_post_categories($post->ID, array('fields' => 'names')));
+				$message_post .= __('Posted in', 'subscribe2') . ": " . $post_cat_names . "\r\n";
+				$message_posttime .= __('Posted in', 'subscribe2') . ": " . $post_cat_names . "\r\n";
+			}
+			if ( strstr($mailtext, "TAGS")) {
+				$post_tag_names = implode(', ', wp_get_post_tags($post->ID, array('fields' => 'names')));
+				if ( $post_tag_names != '' ) {
+					$message_post .= __('Tagged as', 'subscribe2') . ": " . $post_tag_names . "\r\n";
+					$message_posttime .= __('Tagged as', 'subscribe2') . ": " . $post_tag_names . "\r\n";
+				}
+			}
+			$message_post .= "\r\n";
+			$message_posttime .= "\r\n";
+
 			$excerpt = $post->post_excerpt;
 			if ( '' == $excerpt ) {
 				 // no excerpt, is there a <!--more--> ?
@@ -3199,7 +3216,6 @@ class s2class {
 		$email_freq = $this->subscribe2_options['email_freq'];
 		$display = $scheds[$email_freq]['display'];
 		$subject = "[" . stripslashes(get_option('blogname')) . "] " . $display . " " . __('Digest Email', 'subscribe2');
-		$mailtext = apply_filters('s2_email_template', $this->subscribe2_options['mailtext']);
 		$mailtext = stripslashes($this->substitute($mailtext));
 		$mailtext = str_replace("TABLE", $table, $mailtext);
 		$mailtext = str_replace("POSTTIME", $message_posttime, $mailtext);
@@ -3244,7 +3260,7 @@ class s2class {
 	function subscribe2() {
 		global $table_prefix, $wp_version, $wpmu_version;
 
-		load_plugin_textdomain('subscribe2', 'wp-content/plugins/' . dirname(plugin_basename(__FILE__)), dirname(plugin_basename(__FILE__)));
+		load_plugin_textdomain('subscribe2', 'wp-content/plugins/' . S2DIR, S2DIR);
 
 		// Is this WordPressMU or not?
 		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
