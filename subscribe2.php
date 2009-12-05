@@ -272,22 +272,16 @@ class s2class {
 		$string = str_replace("BLOGNAME", get_option('blogname'), $string);
 		$string = str_replace("BLOGLINK", get_bloginfo('url'), $string);
 		$string = str_replace("TITLE", stripslashes($this->post_title), $string);
-		$string = str_replace("PERMALINK", $this->permalink, $string);
+		$link = "<a href=\"" . $this->permalink . "\">" . $this->permalink . "</a>";
+		$string = str_replace("PERMALINK", $link, $string);
 		if ( strstr($string, "TINYLINK") ) {
 			$tinylink = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode($this->permalink));
 			if ( $tinylink !== 'Error' || $tinylink != false ) {
-				$string = str_replace("TINYLINK", $tinylink, $string);
+				$tlink = "<a href=\"" . $tinylink . "\">" . $tinylink . "</a>";
+				$string = str_replace("TINYLINK", $tlink, $string);
 			} else {
-				$string = str_replace("TINYLINK", $this->permalink, $string);
+				$string = str_replace("TINYLINK", $link, $string);
 			}
-		}
-		if ( strstr($string, "BURNLINK") ) {
-			$burnlink = file_get_contents('http://burnurl.com/?url=' . urlencode($this->permalink) . '&output=plain');
-			if ( $burnlink !== 'error' || $burnlink != false ) {
-				$string = str_replace("BURNLINK", $burnlink, $string);
-			} else {
-				$string = str_replace("BURNLINK", $this->permalink, $string);
-			}	
 		}
 		$string = str_replace("MYNAME", stripslashes($this->myname), $string);
 		$string = str_replace("EMAIL", $this->myemail, $string);
@@ -496,7 +490,7 @@ class s2class {
 		// we set these class variables so that we can avoid
 		// passing them in function calls a little later
 		$this->post_title = "<a href=\"" . get_permalink($post->ID) . "\">" . $post->post_title . "</a>";
-		$this->permalink = "<a href=\"" . get_permalink($post->ID) . "\">" . get_permalink($post->ID) . "</a>";
+		$this->permalink = get_permalink($post->ID);
 
 		$author = get_userdata($post->post_author);
 		$this->authorname = $author->display_name;
@@ -1939,7 +1933,6 @@ class s2class {
 		echo "<dt><b>TABLE</b></dt><dd>" . __("a list of post titles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>PERMALINK</b></dt><dd>" . __("the post's permalink<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>TINYLINK</b></dt><dd>" . __("the post's permalink after conversion by TinyURL<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>BURNLINK</b></dt><dd>" . __("the post's permalink after conversion by BurnURL<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>MYNAME</b></dt><dd>" . __("the admin or post author's name", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>EMAIL</b></dt><dd>" . __("the admin or post author's email", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>AUTHORNAME</b></dt><dd>" . __("the post author's name", 'subscribe2') . "</dd>\r\n";
