@@ -331,8 +331,7 @@ class s2class {
 					@wp_mail($recipient, $subject, $mailtext, $headers);
 				}
 			}
-			// Sending completed so return $status
-			return $status;
+			return;
 		} elseif ( $this->subscribe2_options['bcclimit'] == 0 ) {
 			// we're not using BCCLimit
 			foreach ( $recipients as $recipient ) {
@@ -1617,7 +1616,7 @@ class s2class {
 				} elseif ( in_array($subscriber, $all_users) ) {
 					echo "</td><td align=\"center\"></td><td align=\"center\"></td>\r\n";
 					echo "<td><span style=\"color:#006600\">&reg;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
-					echo "(<a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=s2_users&amp;email=$subscriber\">" . __('edit', 'subscribe2') . "</a>)\r\n";
+					echo "(<a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=s2_users&amp;email=" . urlencode($subscriber) . "\">" . __('edit', 'subscribe2') . "</a>)\r\n";
 				}
 				echo "</td></tr>\r\n";
 				('alternate' == $alternate) ? $alternate = '' : $alternate = 'alternate';
@@ -2267,6 +2266,7 @@ class s2class {
 		// list of subscribed blogs on wordpress mu
 		if ( $this->s2_mu && !isset($_GET['email']) ) {
 			global $blog_id;
+			$s2blog_id = $blog_id;
 			$blogs = get_blog_list(0, 'all');
 
 			$blogs_subscribed = array();
@@ -2313,7 +2313,7 @@ class s2class {
 				echo "<ul class=\"s2_blogs\">\r\n";
 				foreach ( $blogs_subscribed as $blog ) {
 					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\" title=\"" . $blog['description'] . "\">" . $blog['blogname'] . "</a></span>\r\n";
-					if ( $blog_id == $blog['blog_id'] ) {
+					if ( $s2blog_id == $blog['blog_id'] ) {
 						echo "<span class=\"buttons\">" . __('Viewing Settings Now', 'subscribe2') . "</span>\r\n";
 					} else {
 						echo "<span class=\"buttons\">";
@@ -2334,7 +2334,7 @@ class s2class {
 				echo "<ul class=\"s2_blogs\">";
 				foreach ( $blogs_notsubscribed as $blog ) {
 					echo "<li><span class=\"name\"><a href=\"" . $blog['blogurl'] . "\" title=\"" . $blog['description'] . "\">" . $blog['blogname'] . "</a></span>\r\n";
-					if ( $blog_id == $blog['blog_id'] ) {
+					if ( $s2blog_id == $blog['blog_id'] ) {
 						echo "<span class=\"buttons\">" . __('Viewing Settings Now', 'subscribe2') . "</span>\r\n";
 					} else {
 						echo "<span class=\"buttons\">";
