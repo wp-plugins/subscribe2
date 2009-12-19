@@ -3,8 +3,8 @@ Contributors: MattyRob, Skippy, RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 2.0.x
-Tested up to: 2.8.4
-Stable tag: 5.1
+Tested up to: 2.9
+Stable tag: 5.2
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -40,16 +40,90 @@ This token will automatically be replaced by dynamic subscription information an
 
 == Frequently Asked Questions ==
 
+= I want HTML email to be the default email type =
+
+You need to pay for the [Subscribe2 HTML version](http://wpplugins.com/plugin/46/subscribe2-html). 
+
 = Where can I get help? =
 So, you've downloaded the plugin an it isn't doing what you expect. First you should read the included documentation. There is a ReadMe.txt file and a PDF startup guide installed with the plugin.
 
 Next you could search in the [Subscribe2 Forum](http://getsatisfaction.com/subscribe2/), the [WordPress forums](http://wordpress.org/support/) or the [Subscribe2 blog FAQs](http://subscribe2.wordpress.com/category/faq/).
 
-No joy there? Well, if you can't find an answer to your question you can get [paid support](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2387904) by donating at least £20 to the plugin author.
+No joy there? Well, if you can't find an answer to your question you can get [paid support](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2387904) by donating at least 20 UK pounds to the plugin author.
 
 = Where can I get more information about the plugin features? =
 
 A comprehensive guide that covers many, if not all, of the Subscribe2 features is available to purchase from the [iAssistant](http://the-iassistant.com/subscribe2-guide/)
+
+= Some or all email notifications fail to send, why?  =
+In the first instance ***check this with your hosting provider***, they have access to your server logs and will be able to tell you where and why emails are being blocked.
+
+Some hosting providers place a restriction on the maximum number of recipients in any one email message.  Some hosts simply block all emails on certain low-cost hosting plans.
+
+Subscribe2 provides a facility to work around this restriction by sending batches of emails.  To enable this feature, go to Settings->Subscribe2 and located the setting to restrict the number of recipients per email. If this is set to 30 then each outgoing email notification will only contain addresses for 30 recipients. 
+
+Reminder: because subscribe2 places all recipients in BCC fields, and places the blog admin in the TO field, the blog admin will receive one email per batched delivery.  So if you have 90 subscribers, the blog admin should receive three post notification emails, one for each set of 30 BCC recipients.
+
+Batches will occur for each group of message as described above.  A site on Dreamhost with many public and registered subscribers could conceivably generate a lot of email for your own inbox.
+
+= My host has a limit of X emails per hour / day, can I limit the way Subscribe2 sends emails? =
+
+This is more commonly called 'throttling' or 'choking'. PHP is a scripting language and while it is technically possible to throttle emails using script it is not very efficient. It is much better in terms of speed and server overhead (CPU cycles and RAM) to throttle using a server side application.
+
+So, Subscribe2 does not and never will offer a throtting option. To solve the problem speak to your hosting provider about changing the restrictions, move to a less restriction hosting package or change hosting providers. Alternatively, there may be another WordPress plugin that can provide this functionality.
+
+= Why is my admin address getting emails from Subscribe2? =
+
+This plugin sends emails to your subscribers using the BCC (Blind Cardon Copy) header in email messages. Each email is sent TO: the admin address. There may be emails for a plain text excerpt notification, palin text full text and HTML format emails and additionally if the BCCLIMIT has been set due to hosting restrictions duplicate copies of these emails will be sent to the admin address.
+
+= I can't find my subscribers / the options / something else =
+
+Subscribe2 creates four (4) new admin menus in the back end of WordPress.
+
+* Posts -> Mail Subscribers : Allows users with Publish capabilities to send emails to your current subscribers
+* Tools -> Subscribers : Allows you to manually (un)subscribe users by email address, displays lists of currently subscribed users and allows you to bulk subscribe Registered Users
+* Users -> Subscriptions : Allows the currently logged in user to manage their own subscriptions
+* Settings -> Subscribe2 : Allows administrator level users to control many aspects of the plugins operation. It should be pretty self explanatory from the notes on the screen
+
+= I'm confused, what are all the different types of subscriber? =
+
+There are basically only 2 types of subscriber. Public Subscribers and Registered Subscribers.
+
+Public subscribers have provided their email address for email notification of your new posts. When they enter there address on your site they are sent an email asking them to confirm their request and added to a list of Unconfirmed Subscribers. Once they complete their request by clicking on the link in their email they will become Confirmed Subscribers.
+
+Registered Users have registered with your WorPress blog (provided you have enabled this in the core WordPress settings). Once registered they can choose to subscribe to specific categories and can also control the type of email they get by choosing plain text in an excerpt or full post format or a full post format with HTML.
+
+= Can I put the form elsewhere? (header, footer, sidebar without the widget) =
+
+The simple answer is yes you can but this is not supported so you need to figure out any problems that are caused by doing this on your own. Read <a href="http://subscribe2.wordpress.com/2006/09/19/sidebar-without-a-widget/">here</a> for the basic approach.
+
+= I'd like to be able to collect more information from users when they subscribe, can I? =
+
+Get them to register with your blog rather than using the Subscribe2 form. Additional fields would require much more intensive form processing, checking and entry into the database and since you won't then be able to easily use this information to persoanlise emails there really isn't any point in collecting this data.
+
+= I can't find or insert the Subscribe2 token, help! =
+
+If, for some reason the Subscribe2 button does not appear in your browser window try refreshing your browser and cache (Shift and Reload in Firefox). If this still fails then insert the token manually. In the Rich Text Editor (TinyMCE) make sure you switch to the "code" view and type in <!--subscribe2-->.
+
+= Can I suggest you add X as a feature =
+
+I'm open to suggestions but since the software is written by me for use on my site and then shared for free because others may find it useful as it comes don't expect your suggestion to be implemented unless I'll find it useful.
+
+= I'd like to be able to send my subscribers notifications in HTML =
+
+By default Public Subscribers get plain text emails and only Registered Subscribers can opt to receive email in HTML format. If you really want HTML for all you need to pay for the upgrade. $40US will get you the amended code and updates for 1 year.
+
+= Which version should I be using, I'm on WordPress x.x.x? =
+WordPress 2.3 and up require Subscribe2 from the 4.x stable branch. The most recent version is hosted via [Wordpress.org](http://wordpress.org/extend/plugins/subscribe2/).
+
+WordPress 2.1.x and 2.2.x require Subscribe2 from the 3.x stable. The most recent version is [3.8](http://downloads.wordpress.org/plugin/subscribe2.3.8.zip).
+
+WordPress 2.0.x requires Subscribe2 from the 2.x stable branch. The most recent version is [2.22](http://downloads.wordpress.org/plugin/subscribe2.2.22.zip).
+
+= Why doesn't the form appear in my WordPress page? =
+This is usually caused by one of two things. Firstly, it is possible that the form is there but because you haven't logged out of WordPress yourself you are seeing a message about managing your profile instead. Log out of WordPress and it will appear as the subscription form you are probably expecting.
+
+Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in your page with a blank line above and below. The easient way to do this is to deactivate the plugin, visit your WordPress page and view the source. The token should be contained in the source code of the page. If it is not there you either have not correctly entered the token or you have another plugin that is stripping the token from the page code.
 
 == Screenshots ==
 
@@ -59,6 +133,19 @@ A comprehensive guide that covers many, if not all, of the Subscribe2 features i
 4. The Options->Subscribe2 admin page generated by the plugin.
 
 == Changelog ==
+
+= Version 5.2 by Matthew Robinson =
+
+* Added screen_icon() to each Subscribe2 admin page
+* Improved addition of links to the Plugins admin page
+* Improved XHTML validity of admin pages
+* Improved display of category hierarchy display in the category form
+* Added ability to use TAGS & CATS keywords in digest mails (position is static irrespective of keyword location)
+* Use PHP variable for Subscribe2 folder to allow for easier renaming (if needed)
+* Fixed a bug in TinyURL encoding introduced when links were click enabled
+* Removed BurnURL from the plugin as it appears to be no longer operational
+* Added urlencode to email addresses in Tools->Subscribers when editing other user preferences
+* Restored several FAQs to the ReadMe file and the [WordPress.org FAQ section](http://wordpress.org/extend/plugins/subscribe2/faq/)
 
 = Version 5.1 by Matthew Robinson =
 

@@ -3166,7 +3166,7 @@ class s2class {
 			$excerpt = $post->post_excerpt;
 			if ( '' == $excerpt ) {
 				 // no excerpt, is there a <!--more--> ?
-				 if ( false !== strpos($post->post_content, '<!--more-->') ) {
+				if ( false !== strpos($post->post_content, '<!--more-->') ) {
 					list($excerpt, $more) = explode('<!--more-->', $post->post_content, 2);
 					$excerpt = strip_tags($excerpt);
 					if ( function_exists('strip_shortcodes') ) {
