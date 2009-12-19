@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2 Counter Widget
 Plugin URI: http://subscribe2.wordpress.com
 Description: Adds a sidebar widget to easily customize and display your Subscribe2 subscribers stats.
-Version: 5.1
+Version: 5.2
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
