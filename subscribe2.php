@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 5.2
+Version: 5.3
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -85,6 +85,8 @@ class s2class {
 		$this->barred_domain = "<p>" . __('Sorry, email addresses at that domain are currently barred due to spam, please use an alternative email address.', 'subscribe2') . "</p>";
 
 		$this->error = "<p>" . __('Sorry, there seems to be an error on the server. Please try again later.', 'subscribe2') . "</p>";
+
+		$this->no_page = "<p>" . __('You must to create a WordPress page for this plugin to work correctly.', 'subscribe2') . "<p>";
 
 		$this->mail_sent = "<p>" . __('Message sent!', 'subscribe2') . "</p>";
 
@@ -1662,7 +1664,14 @@ class s2class {
 	Our options page
 	*/
 	function options_menu() {
-		global $s2nonce;
+		global $s2nonce, $wpdb;
+
+		// send error message if no WordPress page exists
+		$sql = "SELECT ID FROM $wpdb->posts WHERE post_type='page' AND post_status='publish' LIMIT 1";
+		$id = $wpdb->get_var($sql);
+		if ( empty($id) ) {
+			echo "<div id=\"message\" class=\"error\"><p><strong>$this->no_page</strong></p></div>";
+		}
 
 		// was anything POSTed?
 		if ( isset( $_POST['s2_admin']) ) {
@@ -1716,7 +1725,20 @@ class s2class {
 						$time = time() + $interval;
 						if ( $interval < 86400 ) {
 							// Schedule CRON events occurring less than daily starting now and periodically thereafter
-							$timestamp = &$time;
+							$maybe_time = mktime($_POST['hour'], 0, 0, date('m', time()), date('d', time()), date('Y', time()));
+							// is maybe_time in the future
+							$offset = $maybe_time - time();
+							// is maybe_time + $interval in the future
+							$offset2 = ($maybe_time + $interval) - time();
+							if ( $offset < 0 ) {
+								if ( $offset2 < 0 ) {
+									$timestamp = &$time;
+								} else {
+									$timestamp = $maybe_time + $interval;
+								}
+							} else {
+								$timestamp = &$maybe_time;
+							}
 						} else {
 							// Schedule other CRON events starting at user defined hour and periodically thereafter
 							$timestamp = mktime($_POST['hour'], 0, 0, date('m', $time), date('d', $time), date('Y', $time));
@@ -1969,12 +1991,7 @@ class s2class {
 
 		// WordPress page ID where subscribe2 token is used
 		echo __('Set default Subscribe2 page as ID', 'subscribe2') . ': ';
-		echo "<span id=\"s2page_1\"><span id=\"s2page\" style=\"background-color: #FFFBCC\">" . $this->subscribe2_options['s2page'] . "</span> ";
-		echo "<a href=\"#\" onclick=\"s2_show('page'); return false;\">" . __('Edit', 'subscribe2') . "</a></span>\n";
-		echo "<span id=\"s2page_2\">\r\n";
-		echo "<input type=\"text\" name=\"page\" value=\"" . $this->subscribe2_options['s2page'] . "\" size=\"3\" />\r\n";
-		echo "<a href=\"#\" onclick=\"s2_update('page'); return false;\">". __('Update', 'subscribe2') . "</a>\n";
-		echo "<a href=\"#\" onclick=\"s2_revert('page'); return false;\">". __('Revert', 'subscribe2') . "</a></span>\n";
+		$this->pages_dropdown();
 
 		// Number of subscribers per page
 		echo "<br /><br />" . __('Set the number of Subscribers displayed per page', 'subscribe2') . ': ';
@@ -2437,7 +2454,7 @@ class s2class {
 	function display_category_form($selected = array(), $override = 1) {
 		global $wpdb;
 
-		$all_cats = get_categories(array('hide_empty' => false));
+		$all_cats = get_categories(array('hide_empty' => false, 'orderby' => 'slug'));
 		$exclude = explode(',', $this->subscribe2_options['exclude']);
 
 		if ( 0 == $override ) {
@@ -2636,7 +2653,7 @@ class s2class {
 			next($hours);
 		}
 		echo "</select>\r\n";
-		echo "<strong><em style=\"color: red\">" . __('This option will work for digest notification sent daily or less frequently', 'subscribe2') . "</em></strong>\r\n";
+		echo "<strong><em style=\"color: red\">" . __('This option will be ignored if the time selected is not in the future in relation to the current time', 'subscribe2') . "</em></strong>\r\n";
 		if ( $scheduled_time ) {
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 			echo "<p>" . __('Current UTC time is', 'subscribe2') . ": \r\n";
@@ -2649,6 +2666,27 @@ class s2class {
 			echo "<br />";
 		}
 	} // end display_digest_choices()
+
+	/**
+	Create and display a dropdown list of pages
+	*/
+	function pages_dropdown() {
+		global $wpdb;
+		$sql = "SELECT ID, post_title FROM $wpdb->posts WHERE post_type='page' AND post_status='publish'";
+		$pages = $wpdb->get_results($sql);
+
+		if ( empty($pages) ) { return; }
+
+		echo "<select name=\"page\">\r\n";
+		foreach ( $pages as $page ) {
+			echo "<option value=\"" . $page->ID . "\"";
+			if ( $page->ID == $this->subscribe2_options['s2page'] ) {
+				echo " selected=\"selected\"";
+			}
+			echo ">" . $page->post_title . "</option>\r\n";
+		}
+		echo "</select>\r\n";
+	} // end pages_dropdown()
 
 	/**
 	Filter for usermeta table key names to adjust them if needed for WPMU blogs
@@ -3253,7 +3291,7 @@ class s2class {
 	function subscribe2() {
 		global $table_prefix, $wp_version, $wpmu_version;
 
-		load_plugin_textdomain('subscribe2', 'wp-content/plugins/' . S2DIR, S2DIR);
+		load_plugin_textdomain('subscribe2', 'wp-content/plugins/' . S2DIR, '/' . S2DIR);
 
 		// Is this WordPressMU or not?
 		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
