@@ -328,7 +328,7 @@ class s2class {
 				// sanity check -- make sure we have a valid email
 				if ( !is_email($recipient) ) { continue; }
 				if ( function_exists('wpmq_mail') ) {
-					@wp_mail($recipient, $subject, $mailtext, $headers, NULL, 0);
+					@wp_mail($recipient, $subject, $mailtext, $headers, '', 0);
 				} else {
 					@wp_mail($recipient, $subject, $mailtext, $headers);
 				}
@@ -406,9 +406,9 @@ class s2class {
 		$headers .= "X-Mailer: PHP" . phpversion() . "\n";
 		if ( $type == 'html' ) {
 			// To send HTML mail, the Content-Type header must be set
-			$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
+			$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"";
 		} else {
-			$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
+			$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"";
 		}
 
 		return $headers;
@@ -635,7 +635,12 @@ class s2class {
 
 		$body = str_replace("LINK", $link, $body);
 
-		return @wp_mail($this->email, $subject, $body, $mailheaders);
+		if ( $is_remind == true && function_exists('wpmq_mail') ) {
+			// could be sending lots of reminders so queue them if wpmq is enabled
+			@wp_mail($this->email, $subject, $body, $mailheaders, '', 0);
+		} else {
+			return @wp_mail($this->email, $subject, $body, $mailheaders);
+		}
 	} // end send_confirm()
 
 /* ===== Subscriber functions ===== */
@@ -1559,21 +1564,21 @@ class s2class {
 		$this->display_subscriber_dropdown($what, __('Filter', 'subscribe2'));
 		// show the selected subscribers
 		$alternate = '';
+		echo "<table cellpadding=\"2\" cellspacing=\"2\" width=\"100%\">";
+		echo "<tr class=\"alternate\"><td width=\"50%\"><input type=\"text\" name=\"searchterm\" value=\"\" />&nbsp;\r\n";
+		echo "<input type=\"submit\" class=\"button-secondary\" name=\"search\" value=\"" . __('Search Subscribers', 'subscribe2') . "\" /></td>\r\n";
+		if ( $reminderform ) {
+			echo "<td width=\"25%\" align=\"right\"><input type=\"hidden\" name=\"reminderemails\" value=\"" . $reminderemails . "\" />\r\n";
+			echo "<input type=\"submit\" class=\"button-secondary\" name=\"remind\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" /></td>\r\n";
+		} else {
+			echo "<td width=\"25%\"></td>";
+		}
 		if ( !empty($subscribers) ) {
 			$exportcsv = implode(",\r\n", $subscribers);
-			echo "<table cellpadding=\"2\" cellspacing=\"2\" width=\"100%\">";
-			echo "<tr class=\"alternate\"><td width=\"50%\"><input type=\"text\" name=\"searchterm\" value=\"\" />&nbsp;\r\n";
-			echo "<input type=\"submit\" class=\"button-secondary\" name=\"search\" value=\"" . __('Search Subscribers', 'subscribe2') . "\" /></td>\r\n";
-			if ( $reminderform ) {
-				echo "<td width=\"25%\" align=\"right\"><input type=\"hidden\" name=\"reminderemails\" value=\"" . $reminderemails . "\" />\r\n";
-				echo "<input type=\"submit\" class=\"button-secondary\" name=\"remind\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" /></td>\r\n";
-			} else {
-				echo "<td width=\"25%\"></td>";
-			}
 			echo "<td width=\"25%\" align=\"right\"><input type=\"hidden\" name=\"exportcsv\" value=\"" . $exportcsv . "\" />\r\n";
-			echo "<input type=\"submit\" class=\"button-secondary\" name=\"csv\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" /></td></tr>\r\n";
-			echo "</table>";
+			echo "<input type=\"submit\" class=\"button-secondary\" name=\"csv\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" /></td>\r\n";
 		}
+		echo "</tr></table>";
 
 		echo "<table class=\"widefat\" cellpadding=\"2\" cellspacing=\"2\">";
 		if ( !empty($subscribers) ) {
