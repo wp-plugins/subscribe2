@@ -327,7 +327,8 @@ class s2class {
 				$recipient = trim($recipient);
 				// sanity check -- make sure we have a valid email
 				if ( !is_email($recipient) ) { continue; }
-				if ( function_exists('wpmq_mail') ) {
+				// Use the mail queue provided we are not sending a preview
+				if ( function_exists('wpmq_mail') && !$this->preview_email ) {
 					@wp_mail($recipient, $subject, $mailtext, $headers, '', 0);
 				} else {
 					@wp_mail($recipient, $subject, $mailtext, $headers);
@@ -543,12 +544,33 @@ class s2class {
 				}
 			}
 		}
+		$html_excerpt = $post->post_excerpt;
+		if ( '' == $html_excerpt ) {
+			// no excerpt, is there a <!--more--> ?
+			if ( false !== strpos($content, '<!--more-->') ) {
+				list($html_excerpt, $more) = explode('<!--more-->', $content, 2);
+				// strip leading and trailing whitespace
+				$html_excerpt = balanceTags($html_excerpt);
+				$html_excerpt = trim($html_excerpt);
+			} else {
+				// no <!--more-->, so grab the first 55 words
+				$words = explode(' ', $content, $this->excerpt_length + 1);
+				if (count($words) > $this->excerpt_length) {
+					array_pop($words);
+					array_push($words, '[...]');
+					$html_excerpt = implode(' ', $words);
+					$html_excerpt = trim(balanceTags($html_excerpt));
+				}
+			}
+		}
 
 		// prepare mail body texts
 		$excerpt_body = str_replace("POST", $excerpt, $mailtext);
 		$full_body = str_replace("POST", strip_tags($plaintext), $mailtext);
 		$html_body = str_replace("\r\n", "<br />\r\n", $mailtext);
 		$html_body = str_replace("POST", $content, $html_body);
+		$html_excerpt_body = str_replace("\r\n", "<br />\r\n", $mailtext);
+		$html_excerpt_body = str_replace("POST", $html_excerpt, $html_excerpt_body);
 
 		if ( $preview != '' ) {
 			$this->myemail = $preview;
@@ -556,6 +578,7 @@ class s2class {
 			$this->mail(array($preview), $subject, $excerpt_body);
 			$this->mail(array($preview), $subject, $full_body);
 			$this->mail(array($preview), $subject, $html_body, 'html');
+			$this->mail(array($preview), $subject, $html_excerpt_body, 'html');
 		} else {
 			// first we send plaintext summary emails
 			$registered = $this->get_registered("cats=$post_cats_string&format=excerpt");
@@ -570,6 +593,9 @@ class s2class {
 
 			// next we send plaintext full content emails
 			$this->mail($this->get_registered("cats=$post_cats_string&format=post"), $subject, $full_body);
+
+			// next we send html excerpt content emails
+			$this->mail($this->get_registered("cats=$post_cats_string&format=html_excerpt"), $subject, $html_excerpt, 'html');
 
 			// finally we send html full content emails
 			$this->mail($this->get_registered("cats=$post_cats_string&format=html"), $subject, $html_body, 'html');
@@ -947,6 +973,8 @@ class s2class {
 			$AND .= " AND b.meta_key='s2_format' AND b.meta_value=";
 			if ( 'html' == $r['format'] ) {
 				$AND .= "'html'";
+			} elseif ( 'html_excerpt' == $r['format'] ) {
+				$AND .= "'html_excerpt'";
 			} elseif ( 'post' == $r['format'] ) {
 				$AND .= "'post'";
 			} elseif ( 'excerpt' == $r['format'] ) {
@@ -1654,9 +1682,10 @@ class s2class {
 		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_categories\" value=\"" . __('Bulk Update Categories', 'subscribe2') . "\" /></p>";
 
 		echo "<br />" . __('Send email as', 'subscribe2') . ":\r\n";
-		echo "<label><input type=\"radio\" name=\"format\" value=\"excerpt\" checked=\"checked\" /> " . __('Plain Text - Excerpt', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
+		echo "<label><input type=\"radio\" name=\"format\" value=\"html\" /> " . __('HTML - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
+		echo "<label><input type=\"radio\" name=\"format\" value=\"html_excerpt\" /> " . __('HTML - Excerpt', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
 		echo "<label><input type=\"radio\" name=\"format\" value=\"full\" /> " . __('Plain Text - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
-		echo "<label><input type=\"radio\" name=\"format\" value=\"html\" /> " . __('HTML', 'subscribe2') . "</label>\r\n";
+		echo "<label><input type=\"radio\" name=\"format\" value=\"excerpt\" checked=\"checked\" /> " . __('Plain Text - Excerpt', 'subscribe2') . "</label>\r\n";	
 		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_format\" value=\"" . __('Bulk Update Format', 'subscribe2') . "\" /></p>";
 		echo "</form></div>\r\n";
 
@@ -1686,12 +1715,14 @@ class s2class {
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_reset</strong></p></div>";
 			} elseif ( $_POST['preview'] ) {
 				global $user_email;
+				$this->preview_email = true;
 				if ( 'never' == $this->subscribe2_options['email_freq'] ) {
 					$post = get_posts('numberposts=1');
 					$this->publish($post[0], $user_email);
 				} else {
 					$this->subscribe2_cron($user_email);
 				}
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Preview message(s) sent to logged in user', 'subscribe2') . "</strong></p></div>";
 			} elseif ( $_POST['submit'] ) {
 				// BCClimit
 				if ( is_numeric($_POST['bcc']) && $_POST['bcc'] >= 0 ) {
@@ -2075,9 +2106,14 @@ class s2class {
 		if ( 'html' == $this->subscribe2_options['autoformat'] ) {
 			echo "checked=\"checked\" ";
 		}
-		echo "/> " . __('HTML', 'subscribe2') ."</label>&nbsp;&nbsp;";
-		echo "<label><input type=\"radio\" name=\"autoformat\" value=\"fulltext\" ";
-		if ( 'fulltext' == $this->subscribe2_options['autoformat'] ) {
+		echo "/> " . __('HTML - Full', 'subscribe2') ."</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"autoformat\" value=\"html\"";
+		if ( 'html' == $this->subscribe2_options['autoformat'] ) {
+			echo "checked=\"checked\" ";
+		}
+		echo "/> " . __('HTML - Excerpt', 'subscribe2') ."</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"autoformat\" value=\"html_excerpt\" ";
+		if ( 'html_excerpt' == $this->subscribe2_options['autoformat'] ) {
 			echo "checked=\"checked\" ";
 		}
 		echo "/> " . __('Plain Text - Full', 'subscribe2') . "</label>&nbsp;&nbsp;";
@@ -2219,7 +2255,12 @@ class s2class {
 			if ( 'html' == get_usermeta($user_ID, 's2_format') ) {
 				echo "checked=\"checked\" ";
 			}
-			echo "/> " . __('HTML', 'subscribe2') ."</label>&nbsp;&nbsp;";
+			echo "/> " . __('HTML - Full', 'subscribe2') ."</label>&nbsp;&nbsp;";
+			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"html_excerpt\" ";
+			if ( 'html_excerpt' == get_usermeta($user_ID, 's2_format') ) {
+				echo "checked=\"checked\" ";
+			}
+			echo "/> " . __('HTML - Excerpt', 'subscribe2') . "</label>&nbsp;&nbsp;";
 			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"post\" ";
 			if ( 'post' == get_usermeta($user_ID, 's2_format') ) {
 				echo "checked=\"checked\" ";
@@ -3307,9 +3348,9 @@ class s2class {
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
-		if ( !mysql_query("DESCRIBE " . $this->public) ) { $this->install(); }
+		if ( !mysql_query("DESCRIBE {$this->public};") ) { $this->install(); }
 		//do we need to upgrade anything?
-		if ( is_array($this->subscribe2_options) && $this->subscribe2_options['version'] !== S2VERSION ) {
+		if ( !$this->subscribe2_options && $this->subscribe2_options['version'] !== S2VERSION ) {
 			add_action('shutdown', array(&$this, 'upgrade'));
 		}
 
@@ -3396,6 +3437,7 @@ class s2class {
 	var $myemail = '';
 	var $signup_dates = array();
 	var $filtered = 0;
+	var $preview_email = false;
 
 	// state variables used to affect processing
 	var $action = '';
