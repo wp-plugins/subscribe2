@@ -2530,15 +2530,15 @@ class s2class {
 				if ( 0 == $j ) {
 						echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 						if ( in_array($cat->term_id, $selected) ) {
-								echo " checked=\"checked\" ";
+								echo " checked=\"checked\"";
 						}
-						echo " /> <abbr title=\"" . $cat->slug . "\">" . trim(get_category_parents($cat->term_id, false, ' &raquo; '), ' &raquo; ') . "</abbr></label><br />\r\n";
+						echo " /> <abbr title=\"" . $cat->slug . "\">" . trim(get_category_parents($cat->term_id, false, ' &#187; '), ' &#187; ') . "</abbr></label><br />\r\n";
 					} else {
 						echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 						if ( in_array($cat->term_id, $selected) ) {
-									echo " checked=\"checked\" ";
+									echo " checked=\"checked\"";
 						}
-						echo " /> <abbr title=\"" . $cat->slug . "\">" . trim(get_category_parents($cat->term_id, false, ' &raquo; '), ' &raquo; ') . "</abbr></label><br />\r\n";
+						echo " /> <abbr title=\"" . $cat->slug . "\">" . trim(get_category_parents($cat->term_id, false, ' &#187; '), ' &#187; ') . "</abbr></label><br />\r\n";
 				}
 				$i++;
 		}
@@ -3335,7 +3335,7 @@ class s2class {
 	} // end s2init()
 
 	function subscribe2() {
-		global $table_prefix, $wp_version, $wpmu_version;
+		global $wpdb, $table_prefix, $wp_version, $wpmu_version;
 
 		load_plugin_textdomain('subscribe2', 'wp-content/plugins/' . S2DIR, '/' . S2DIR);
 
@@ -3348,7 +3348,7 @@ class s2class {
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
-		if ( !mysql_query("DESCRIBE {$this->public};") ) { $this->install(); }
+		if ( !$wpdb->query("DESCRIBE {$this->public};") ) { $this->install(); }
 		//do we need to upgrade anything?
 		if ( !$this->subscribe2_options && $this->subscribe2_options['version'] !== S2VERSION ) {
 			add_action('shutdown', array(&$this, 'upgrade'));
