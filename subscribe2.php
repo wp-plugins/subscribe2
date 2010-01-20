@@ -3348,7 +3348,8 @@ class s2class {
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
-		if ( !$wpdb->query("DESCRIBE {$this->public};") ) { $this->install(); }
+		$installed = $wpdb->get_results("DESCRIBE {$this->public};");
+		if ( empty($installed) && $installed !== false ) { $this->install(); }
 		//do we need to upgrade anything?
 		if ( !$this->subscribe2_options && $this->subscribe2_options['version'] !== S2VERSION ) {
 			add_action('shutdown', array(&$this, 'upgrade'));
