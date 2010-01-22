@@ -20,15 +20,15 @@ function s2_hide(id) {
 };
 
 function s2_update(id) {
-	var input = jQuery('input[@name="'+id+'"]').val();
-	jQuery('input[@name="'+id+'"]').val(input);
+	var input = jQuery('input[name="'+id+'"]').val();
+	jQuery('input[name="'+id+'"]').val(input);
 	jQuery('#s2'+id).html(input);
 	s2_hide(id);
 };
 
 function s2_revert(id) {
 	var option = jQuery('#js'+id).val();
-	jQuery('input[@name="'+id+'"]').val(option);
+	jQuery('input[name="'+id+'"]').val(option);
 	jQuery('#s2'+id).html(option);
 	s2_hide(id);
 };
