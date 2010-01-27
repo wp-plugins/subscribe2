@@ -92,7 +92,7 @@ class s2class {
 
 		$this->mail_failed = "<p>" . __('Message failed! Check your settings and check with your hosting provider', 'subscribe2') . "</p>";
 
-		$this->form = "<form method=\"post\" action=\"\"><input type=\"hidden\" name=\"ip\" value=\"" . getenv('REMOTE_ADDR') . "\" /><p>" . __('Your email:', 'subscribe2') . "<br /><input type=\"text\" name=\"email\" value=\"" . __('Enter email address...', 'subscribe2') . "\" size=\"20\" onfocus=\"if (this.value == '" . __('Enter email address...', 'subscribe2') . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . __('Enter email address...', 'subscribe2') . "';}\" /></p><p><input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" />&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" /></p></form>\r\n";
+		$this->form = "<form method=\"post\" action=\"\"><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p>" . __('Your email:', 'subscribe2') . "<br /><input type=\"text\" name=\"email\" value=\"" . __('Enter email address...', 'subscribe2') . "\" size=\"20\" onfocus=\"if (this.value == '" . __('Enter email address...', 'subscribe2') . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . __('Enter email address...', 'subscribe2') . "';}\" /></p><p><input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" />&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" /></p></form>\r\n";
  
 		// confirmation messages
 		$this->no_such_email = "<p>" . __('No such email address is registered.', 'subscribe2') . "</p>";
@@ -838,7 +838,7 @@ class s2class {
 			// make this subscription active
 			$this->message = $this->added;
 			if ( '1' != $current ) {
-				$this->ip = getenv('REMOTE_ADDR');
+				$this->ip = $_SERVER['REMOTE_ADDR'];
 				$this->activate();
 				if ( $this->subscribe2_options['admin_email'] == 'subs' || $this->subscribe2_options['admin_email'] == 'both' ) {
 					$subject = '[' . get_option('blogname') . '] ' . __('New subscription', 'subscribe2');
@@ -938,7 +938,7 @@ class s2class {
 			} else {
 				$result = $wpdb->get_col("SELECT user_id FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
 				$ids = implode(',', $result);
-				return $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN ($ids) AND user_activation_key=''");
+				return $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN ($ids)");
 			}
 		} else {
 			if ( $id ) {
@@ -1000,7 +1000,7 @@ class s2class {
 		$result = $wpdb->get_col($sql);
 		if ( $result ) {
 			$ids = implode(',', $result);
-			return $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN ($ids) AND user_activation_key = ''");
+			return $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN ($ids)");
 		}
 	} // end get_registered()
 
@@ -1552,7 +1552,7 @@ class s2class {
 			if ( $total_pages > 1 ) {
 				for ( $page_num = 1; $page_num <= $total_pages; $page_num++ ) {
 					if ( $page == $page_num ) {
-						$strip .= "<strong>" . $page_num . "</strong>\n";
+						$strip .= "<strong>Page " . $page_num . "</strong>\n";
 					} else {
 						if ( $page_num < 3 || ( $page_num >= $page - 2 && $page_num <= $page + 2 ) || $page_num > $total_pages - 2 ) {
 							$args['s2page'] = $page_num;
@@ -3348,8 +3348,7 @@ class s2class {
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
-		$installed = $wpdb->get_results("DESCRIBE {$this->public};");
-		if ( empty($installed) && $installed !== false ) { $this->install(); }
+		if ( $wpdb->get_var("SHOW TABLES LIKE '$this->public'") != $this->public ) { $this->install(); }
 		//do we need to upgrade anything?
 		if ( !$this->subscribe2_options && $this->subscribe2_options['version'] !== S2VERSION ) {
 			add_action('shutdown', array(&$this, 'upgrade'));
