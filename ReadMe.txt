@@ -138,6 +138,21 @@ Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in y
 
 == Changelog ==
 
+= Version 5.3 by Matthew Robinson =
+
+* Added an HTML Excerpt notification type which sends an HTML formatted excerpt of the post
+* Issue an error message in Settings->Subscribe2 if there is no WordPress page published on the blog site
+* Improved usage of time dropdown in Settings->Subscribe2 so it works for periodic emails that are on a less than daily frequency
+* Sorted categories by slugname for better presentation in the category selection area
+* Make sure Preview emails skip the mail queue if WPMQ is used
+* Fixed issue where blog posts made by email generated duplicate notifications
+* Added fixes with the hope of stopping the random settings reset glitch many thanks to Barbara Wiebel
+* Fixed AJAX bugs caused by deprecated jQuery function
+* Fixed an issue where Registered Users who have requests a password reset disappear from Subscribe2
+* Amended code for IP address collection to work around IIS servers
+* Added COUNT keyword
+* Ensure that BLOGNAME is not used in digest emails if it is empty
+
 = Version 5.2 by Matthew Robinson =
 
 * Added screen_icon() to each Subscribe2 admin page
