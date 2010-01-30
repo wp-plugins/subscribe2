@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 5.3
+Version: 5.4
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -348,7 +348,7 @@ class s2class {
 					// Bcc Headers now constructed by phpmailer class
 				}
 			}
-			$headers .= "$bcc\r\n";
+			$headers .= "\r\n$bcc";
 		} else {
 			// we're using BCCLimit
 			$count = 1;
@@ -380,7 +380,7 @@ class s2class {
 		// actually send mail
 		if ( isset($batch) && !empty($batch) ) {
 			foreach ( $batch as $bcc ) {
-					$newheaders = $headers . "$bcc\r\n";
+					$newheaders = $headers . "\r\n$bcc";
 					$status = @wp_mail($this->myemail, $subject, $mailtext, $newheaders);
 			}
 		} else {
@@ -842,7 +842,8 @@ class s2class {
 				$this->ip = $_SERVER['REMOTE_ADDR'];
 				$this->activate();
 				if ( $this->subscribe2_options['admin_email'] == 'subs' || $this->subscribe2_options['admin_email'] == 'both' ) {
-					$subject = '[' . get_option('blogname') . '] ' . __('New subscription', 'subscribe2');
+					( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(get_option('blogname')) . "] ";
+					$subject .= __('New subscription', 'subscribe2');
 					$subject = html_entity_decode($subject, ENT_QUOTES);
 					$message = $this->email . " " . __('subscribed to email notifications!', 'subscribe2');
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
@@ -859,7 +860,8 @@ class s2class {
 			if ( '0' != $current ) {
 				$this->delete();
 				if ( $this->subscribe2_options['admin_email'] == 'unsubs' || $this->subscribe2_options['admin_email'] == 'both' ) {
-					$subject = '[' . get_option('blogname') . '] ' . __('New Unsubscription', 'subscribe2');
+					( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(get_option('blogname')) . "] ";
+					$subject .= __('New Unsubscription', 'subscribe2');
 					$subject = html_entity_decode($subject, ENT_QUOTES);
 					$message = $this->email . " " . __('unsubscribed from email notifications!', 'subscribe2');
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
