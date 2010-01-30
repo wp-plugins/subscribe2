@@ -290,6 +290,7 @@ class s2class {
 		$string = str_replace("AUTHORNAME", $this->authorname, $string);
 		$string = str_replace("CATS", $this->post_cat_names, $string);
 		$string = str_replace("TAGS", $this->post_tag_names, $string);
+		$string = str_replace("COUNT", $this->post_count, $string);
 
 		return $string;
 	} // end substitute()
@@ -1997,6 +1998,7 @@ class s2class {
 		echo "<dt><b>ACTION</b></dt><dd>" . __("Action performed by LINK in confirmation email<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>CATS</b></dt><dd>" . __("the post's assigned categories", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>TAGS</b></dt><dd>" . __("the post's assigned Tags", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>COUNT</b></dt><dd>" . __("the number of posts included in the digest email<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "</dl></td></tr><tr><td>";
 		echo __('Subscribe / Unsubscribe confirmation email', 'subscribe2') . ":<br />\r\n";
 		echo __('Subject Line', 'subscribe2') . ": ";
@@ -3190,6 +3192,7 @@ class s2class {
 
 		// do we have any posts?
 		if ( empty($posts) ) { return; }
+		$this->post_count = count($posts);
 
 		// if we have posts, let's prepare the digest
 		$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
@@ -3292,7 +3295,8 @@ class s2class {
 		$scheds = (array)wp_get_schedules();
 		$email_freq = $this->subscribe2_options['email_freq'];
 		$display = $scheds[$email_freq]['display'];
-		$subject = "[" . stripslashes(get_option('blogname')) . "] " . $display . " " . __('Digest Email', 'subscribe2');
+		( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(get_option('blogname')) . "] ";
+		$subject .= $display . " " . __('Digest Email', 'subscribe2');
 		$mailtext = stripslashes($this->substitute($mailtext));
 		$mailtext = str_replace("TABLE", $table, $mailtext);
 		$mailtext = str_replace("POSTTIME", $message_posttime, $mailtext);
@@ -3413,7 +3417,6 @@ class s2class {
 			add_action('pending_to_publish', array(&$this, 'publish'));
 			add_action('private_to_publish', array(&$this, 'publish'));
 			add_action('future_to_publish', array(&$this, 'publish'));
-			add_action('publish_phone', array(&$this, 'publish_phone'));
 			if ( $this->subscribe2_options['private'] == 'yes' ) {
 				add_action('new_to_private', array(&$this, 'publish'));
 				add_action('draft_to_private', array(&$this, 'publish'));

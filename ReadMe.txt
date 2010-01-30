@@ -3,8 +3,8 @@ Contributors: MattyRob, Skippy, RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 2.0.x
-Tested up to: 2.9
-Stable tag: 5.2
+Tested up to: 2.9.1
+Stable tag: 5.3
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -36,7 +36,7 @@ If you want to send HTML emails to Public Subscribers too then upgrade to [Subsc
      <!--subscribe2-->
      ***Ensure the token is on a line by itself and that it has a blank line above and below.***
 This token will automatically be replaced by dynamic subscription information and will display all forms and messages as necessary.
-8. In the WordPress "Settings" area for Subscribe2 define the default page ID in the "Appearance" section to the ID of the WordPress page created in step 7.
+8. In the WordPress "Settings" area for Subscribe2 select the page name in the "Appearance" section that of the WordPress page created in step 7.
 
 == Frequently Asked Questions ==
 
@@ -68,9 +68,11 @@ Batches will occur for each group of message as described above.  A site on Drea
 
 = My host has a limit of X emails per hour / day, can I limit the way Subscribe2 sends emails? =
 
-This is more commonly called 'throttling' or 'choking'. PHP is a scripting language and while it is technically possible to throttle emails using script it is not very efficient. It is much better in terms of speed and server overhead (CPU cycles and RAM) to throttle using a server side application.
+This is the second most common question I get asked (the first being about emails not being sent which quote often ends up here anyway!). This is more commonly called 'throttling' or 'choking'. PHP is a scripting language and while it is technically possible to throttle emails using script it is not very efficient. It is much better in terms of speed and server overhead (CPU cycles and RAM) to throttle using a server side application.
 
-So, Subscribe2 does not and never will offer a throtting option. To solve the problem speak to your hosting provider about changing the restrictions, move to a less restriction hosting package or change hosting providers. Alternatively, there may be another WordPress plugin that can provide this functionality.
+In the first instance you should try to solve the problem by speaking to your hosting provider about changing the restrictions, move to a less restricting hosting package or change hosting providers.
+
+If the above has not put you off then I spent some time writing a Mail Queue script for Subscribe2 that adds the mails to a database table and sends then in periodic batches. It is available, at a price, [here](http://wpplugins.com/plugin/76/wordpress-mail-queue-wpmq).
 
 = Why is my admin address getting emails from Subscribe2? =
 
