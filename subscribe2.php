@@ -348,7 +348,7 @@ class s2class {
 					// Bcc Headers now constructed by phpmailer class
 				}
 			}
-			$headers .= "\r\n$bcc";
+			$headers .= "$bcc\n";
 		} else {
 			// we're using BCCLimit
 			$count = 1;
@@ -380,7 +380,7 @@ class s2class {
 		// actually send mail
 		if ( isset($batch) && !empty($batch) ) {
 			foreach ( $batch as $bcc ) {
-					$newheaders = $headers . "\r\n$bcc";
+					$newheaders = $headers . "$bcc\n";
 					$status = @wp_mail($this->myemail, $subject, $mailtext, $newheaders);
 			}
 		} else {
@@ -408,9 +408,9 @@ class s2class {
 		$headers .= "X-Mailer: PHP" . phpversion() . "\n";
 		if ( $type == 'html' ) {
 			// To send HTML mail, the Content-Type header must be set
-			$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"";
+			$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
 		} else {
-			$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"";
+			$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
 		}
 
 		return $headers;
