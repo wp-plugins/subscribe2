@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 5.4
+Version: 5.5
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -32,7 +32,7 @@ along with Subscribe2. If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define( 'S2VERSION', '5.4' );
+define( 'S2VERSION', '5.5' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', plugin_basename(dirname(__FILE__)) );
 
@@ -187,8 +187,8 @@ class s2class {
 			require_once(ABSPATH . 'wp-admin/install-helper.php');
 		}
 		$date = date('Y-m-d');
-		maybe_add_column($this->public, 'date', "ALTER TABLE `$this->public` ADD `date` DATE DEFAULT '$date' NOT NULL AFTER `active`;");
-		maybe_add_column($this->public, 'ip', "ALTER TABLE `$this->public` ADD `ip` char(64) DEFAULT 'admin' NOT NULL AFTER `date`;");
+		maybe_add_column($this->public, 'date', "ALTER TABLE $this->public ADD date DATE DEFAULT '$date' NOT NULL AFTER active;");
+		maybe_add_column($this->public, 'ip', "ALTER TABLE $this->public ADD ip char(64) DEFAULT 'admin' NOT NULL AFTER date;");
 
 		// let's take the time to check process registered users
 		// existing public subscribers are subscribed to all categories
