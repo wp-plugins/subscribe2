@@ -400,18 +400,22 @@ class s2class {
 			$this->myemail = $admin->user_email;
 		}
 
-		$headers = "From: \"" . $this->myname . "\" <" . $this->myemail . ">\n";
-		$headers .= "Reply-To: \"" . $this->myname . "\" <" . $this->myemail . ">\n";
-		$headers .= "Return-path: <" . $this->myemail . ">\n";
-		$headers .= "Precedence: list\nList-Id: " . get_option('blogname') . "\n";
-		$headers .= "MIME-Version: 1.0\n";
-		$headers .= "X-Mailer: PHP" . phpversion() . "\n";
+		$headers['From'] = "From: \"" . $this->myname . "\" <" . $this->myemail . ">";
+		$headers['Reply-To'] = "Reply-To: \"" . $this->myname . "\" <" . $this->myemail . ">";
+		$headers['Return-path'] = "Return-path: <" . $this->myemail . ">";
+		$headers['Precedence'] = "Precedence: list\nList-Id: " . get_option('blogname') . "";
+		$headers['MIME-Version'] = "MIME-Version: 1.0";
+		$headers['X-Mailer'] = "X-Mailer: PHP" . phpversion() . "";
 		if ( $type == 'html' ) {
 			// To send HTML mail, the Content-Type header must be set
-			$headers .= "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"\n";
+			$headers['Content-Type'] = "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"";
 		} else {
-			$headers .= "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"\n";
+			$headers['Content-Type'] = "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"";
 		}
+
+		$headers = apply_filters('s2_email_headers', $headers);
+		$headers = implode("\n", $headers);
+		$headers .= "\n";
 
 		return $headers;
 	} // end headers()
