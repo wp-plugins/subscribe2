@@ -182,8 +182,8 @@ class s2class {
 	*/
 	function upgrade() {
 		global $wpdb, $wp_version, $wpmu_version;
-		// include upgrade-functions for maybe_create_table;
-		if ( !function_exists('maybe_create_table') ) {
+		// include upgrade-functions for maybe_add_column;
+		if ( !function_exists('maybe_add_column') ) {
 			require_once(ABSPATH . 'wp-admin/install-helper.php');
 		}
 		$date = date('Y-m-d');
@@ -400,20 +400,25 @@ class s2class {
 			$this->myemail = $admin->user_email;
 		}
 
-		$headers['From'] = "From: \"" . $this->myname . "\" <" . $this->myemail . ">";
-		$headers['Reply-To'] = "Reply-To: \"" . $this->myname . "\" <" . $this->myemail . ">";
-		$headers['Return-path'] = "Return-path: <" . $this->myemail . ">";
-		$headers['Precedence'] = "Precedence: list\nList-Id: " . get_option('blogname') . "";
-		$headers['MIME-Version'] = "MIME-Version: 1.0";
-		$headers['X-Mailer'] = "X-Mailer: PHP" . phpversion() . "";
+		$headers['From'] = $this->myname . "\" <" . $this->myemail . ">";
+		$headers['Reply-To'] = $this->myname . "\" <" . $this->myemail . ">";
+		$headers['Return-path'] = "<" . $this->myemail . ">";
+		$headers['Precedence'] = "list\nList-Id: " . get_option('blogname') . "";
+		$headers['MIME-Version'] = "1.0";
+		$headers['X-Mailer'] = "PHP" . phpversion() . "";
 		if ( $type == 'html' ) {
 			// To send HTML mail, the Content-Type header must be set
-			$headers['Content-Type'] = "Content-Type: " . get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"";
+			$headers['Content-Type'] = get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"";
 		} else {
-			$headers['Content-Type'] = "Content-Type: text/plain; charset=\"". get_bloginfo('charset') . "\"";
+			$headers['Content-Type'] = "text/plain; charset=\"". get_bloginfo('charset') . "\"";
 		}
 
+		// apply header filter to allow on-the-fly amendments
 		$headers = apply_filters('s2_email_headers', $headers);
+		// collapse the headers using $key as the header name
+		foreach ( $headers as $key => $value ) {
+			$headers[$key] = $key . ": " . $value;
+		}
 		$headers = implode("\n", $headers);
 		$headers .= "\n";
 
