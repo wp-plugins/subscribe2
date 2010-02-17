@@ -210,7 +210,7 @@ class s2class {
 			}
 		}
 		$this->subscribe2_options['version'] = S2VERSION;
-		//double check that the options are in the database
+		// ensure that the options are in the database
 		require(S2PATH . "include/options.php");
 		update_option('subscribe2_options', $this->subscribe2_options);
 
@@ -327,7 +327,7 @@ class s2class {
 			foreach ( $recipients as $recipient ) {
 				$recipient = trim($recipient);
 				// sanity check -- make sure we have a valid email
-				if ( !is_email($recipient) ) { continue; }
+				if ( !is_email($recipient) || empty($recipient) ) { continue; }
 				// Use the mail queue provided we are not sending a preview
 				if ( function_exists('wpmq_mail') && !$this->preview_email ) {
 					@wp_mail($recipient, $subject, $mailtext, $headers, '', 0);
@@ -3365,7 +3365,7 @@ class s2class {
 		$this->public = $table_prefix . "subscribe2";
 		if ( $wpdb->get_var("SHOW TABLES LIKE '$this->public'") != $this->public ) { $this->install(); }
 		//do we need to upgrade anything?
-		if ( !$this->subscribe2_options && $this->subscribe2_options['version'] !== S2VERSION ) {
+		if ( !$this->subscribe2_options || $this->subscribe2_options['version'] !== S2VERSION ) {
 			add_action('shutdown', array(&$this, 'upgrade'));
 		}
 
