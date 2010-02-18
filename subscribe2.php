@@ -3365,7 +3365,7 @@ class s2class {
 		$this->public = $table_prefix . "subscribe2";
 		if ( $wpdb->get_var("SHOW TABLES LIKE '$this->public'") != $this->public ) { $this->install(); }
 		//do we need to upgrade anything?
-		if ( !$this->subscribe2_options || $this->subscribe2_options['version'] !== S2VERSION ) {
+		if ( is_array($this->subscribe2_options) && $this->subscribe2_options['version'] !== S2VERSION ) {
 			add_action('shutdown', array(&$this, 'upgrade'));
 		}
 
