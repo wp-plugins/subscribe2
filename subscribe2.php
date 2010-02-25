@@ -271,7 +271,7 @@ class s2class {
 		if ( '' == $string ) {
 			return;
 		}
-		$string = str_replace("BLOGNAME", get_option('blogname'), $string);
+		$string = str_replace("BLOGNAME", html_entity_decode(get_option('blogname'), ENT_QUOTES), $string);
 		$string = str_replace("BLOGLINK", get_bloginfo('url'), $string);
 		$string = str_replace("TITLE", stripslashes($this->post_title), $string);
 		$link = "<a href=\"" . $this->permalink . "\">" . $this->permalink . "</a>";
@@ -287,7 +287,7 @@ class s2class {
 		}
 		$string = str_replace("MYNAME", stripslashes($this->myname), $string);
 		$string = str_replace("EMAIL", $this->myemail, $string);
-		$string = str_replace("AUTHORNAME", $this->authorname, $string);
+		$string = str_replace("AUTHORNAME", stripslashes($this->authorname), $string);
 		$string = str_replace("CATS", $this->post_cat_names, $string);
 		$string = str_replace("TAGS", $this->post_tag_names, $string);
 		$string = str_replace("COUNT", $this->post_count, $string);
@@ -501,7 +501,7 @@ class s2class {
 
 		// we set these class variables so that we can avoid
 		// passing them in function calls a little later
-		$this->post_title = "<a href=\"" . get_permalink($post->ID) . "\">" . $post->post_title . "</a>";
+		$this->post_title = "<a href=\"" . get_permalink($post->ID) . "\">" . html_entity_decode($post->post_title, ENT_QUOTES) . "</a>";
 		$this->permalink = get_permalink($post->ID);
 
 		$author = get_userdata($post->post_author);
@@ -2545,13 +2545,13 @@ class s2class {
 						if ( in_array($cat->term_id, $selected) ) {
 								echo " checked=\"checked\"";
 						}
-						echo " /> <abbr title=\"" . $cat->slug . "\">" . trim(get_category_parents($cat->term_id, false, ' &#187; '), ' &#187; ') . "</abbr></label><br />\r\n";
+						echo " /> <abbr title=\"" . $cat->slug . "\">" . rtrim(get_category_parents($cat->term_id, false, ' &#187; '), ' &#187; ') . "</abbr></label><br />\r\n";
 					} else {
 						echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 						if ( in_array($cat->term_id, $selected) ) {
 									echo " checked=\"checked\"";
 						}
-						echo " /> <abbr title=\"" . $cat->slug . "\">" . trim(get_category_parents($cat->term_id, false, ' &#187; '), ' &#187; ') . "</abbr></label><br />\r\n";
+						echo " /> <abbr title=\"" . $cat->slug . "\">" . rtrim(get_category_parents($cat->term_id, false, ' &#187; '), ' &#187; ') . "</abbr></label><br />\r\n";
 				}
 				$i++;
 		}
@@ -3240,10 +3240,11 @@ class s2class {
 			if ( $check ) {
 				continue;
 			}
-			('' == $table) ? $table = "* " . $post->post_title : $table .= "\r\n* " . $post->post_title;
-			$message_post .= $post->post_title . "\r\n";
+			$post_title = html_entity_decone($post->post_title, ENT_QUOTES);
+			('' == $table) ? $table = "* " . $post_title : $table .= "\r\n* " . $post_title;
+			$message_post .= $post_title . "\r\n";
 			$message_post .= get_permalink($post->ID) . "\r\n";
-			$message_posttime .= $post->post_title . "\r\n";
+			$message_posttime .= $post_title . "\r\n";
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
 			$message_posttime .= get_permalink($post->ID) . "\r\n";
 			if ( strstr($mailtext, "CATS")) {
@@ -3363,7 +3364,7 @@ class s2class {
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
-		if ( $wpdb->get_var("SHOW TABLES LIKE '$this->public'") != $this->public ) { $this->install(); }
+		if ( $wpdb->get_var("SHOW TABLES LIKE $this->public") != $this->public ) { $this->install(); }
 		//do we need to upgrade anything?
 		if ( is_array($this->subscribe2_options) && $this->subscribe2_options['version'] !== S2VERSION ) {
 			add_action('shutdown', array(&$this, 'upgrade'));
