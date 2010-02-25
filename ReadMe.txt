@@ -66,6 +66,10 @@ Reminder: because subscribe2 places all recipients in BCC fields, and places the
 
 Batches will occur for each group of message as described above.  A site on Dreamhost with many public and registered subscribers could conceivably generate a lot of email for your own inbox.
 
+= When I click on Send Preview in Settings->Susbcribe2 I get 4 emails, why =
+
+Subscribe2 supports 4 potential email formats for Susbcribers so you will get a preview for each of the different possibilities.
+
 = My host has a limit of X emails per hour / day, can I limit the way Subscribe2 sends emails? =
 
 This is the second most common question I get asked (the first being about emails not being sent which quote often ends up here anyway!). This is more commonly called 'throttling' or 'choking'. PHP is a scripting language and while it is technically possible to throttle emails using script it is not very efficient. It is much better in terms of speed and server overhead (CPU cycles and RAM) to throttle using a server side application.
@@ -95,7 +99,7 @@ Public subscribers have provided their email address for email notification of y
 
 Registered Users have registered with your WorPress blog (provided you have enabled this in the core WordPress settings). Registered users of the blog can elect to receive email notifications for specific categories (unless Digest email are select, then it is an opt in or out decision).  The Users->Subscription menu item will also allow them greater control to select the delivery format (plaintext or HTML), amount of message (excerpt or full post), and the categories to which they want to subscribe.  You, the blog owner, have the option (Options->Subscribe2) to allow registered users to subscribe to your excluded categories or not.
 
-**Note** You can sent HTML emails to Public Subscribers with the paid [Subscribe2 HTML version](http://wpplugins.com/plugin/46/subscribe2-html) of the plugin.
+**Note** You can send HTML emails to Public Subscribers with the paid [Subscribe2 HTML version](http://wpplugins.com/plugin/46/subscribe2-html) of the plugin.
 
 = Can I put the form elsewhere? (header, footer, sidebar without the widget) =
 
@@ -109,16 +113,23 @@ Get them to register with your blog rather than using the Subscribe2 form. Addit
 
 If, for some reason the Subscribe2 button does not appear in your browser window try refreshing your browser and cache (Shift and Reload in Firefox). If this still fails then insert the token manually. In the Rich Text Editor (TinyMCE) make sure you switch to the "code" view and type in <!--subscribe2-->.
 
+= My digest email didn't send, how can I resend it? =
+
+In order to force sending you'd need to change the date of publication on the posts from last week or amend the date stamp in the database regarding when the posts should be included from.
+
+If you opt for the latter way look in the options table for the subscribe2_options settings (it's an array) and you'll need to change the 'last_s2cron' value to a timestamp for last week. Then force the cron event to run again with [WP-Crontrol](http://wordpress.org/extend/plugins/wp-crontrol/).
+
 = Can I suggest you add X as a feature =
 
 I'm open to suggestions but since the software is written by me for use on my site and then shared for free because others may find it useful as it comes don't expect your suggestion to be implemented unless I'll find it useful.
 
 = I'd like to be able to send my subscribers notifications in HTML =
 
-By default Public Subscribers get plain text emails and only Registered Subscribers can opt to receive email in HTML format. If you really want HTML for all you need to pay for the upgrade. $40US will get you the amended code and updates for 1 year.
+By default Public Subscribers get plain text emails and only Registered Subscribers can opt to receive email in HTML format. If you really want HTML for all you need to pay for the [Subscribe2 HTML version](http://wpplugins.com/plugin/46/subscribe2-html).
 
 = Which version should I be using, I'm on WordPress x.x.x? =
-WordPress 2.3 and up require Subscribe2 from the 4.x stable branch. The most recent version is hosted via [Wordpress.org](http://wordpress.org/extend/plugins/subscribe2/).
+
+WordPress 2.3 and up require Subscribe2 from the 4.x or 5.x stable branch. The most recent version is hosted via [Wordpress.org](http://wordpress.org/extend/plugins/subscribe2/).
 
 WordPress 2.1.x and 2.2.x require Subscribe2 from the 3.x stable. The most recent version is [3.8](http://downloads.wordpress.org/plugin/subscribe2.3.8.zip).
 
