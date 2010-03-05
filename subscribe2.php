@@ -174,7 +174,11 @@ class s2class {
 
 		// create the table, as needed
 		maybe_create_table($this->public, $sql);
-		$this->reset();
+
+		// safety check if options exist and if not create them
+		if ( !is_array($this->subscribe2_options) ) {
+			$this->reset();
+		}
 	} // end install()
 
 	/**
@@ -400,23 +404,23 @@ class s2class {
 			$this->myemail = $admin->user_email;
 		}
 
-		$headers['From'] = $this->myname . "\" <" . $this->myemail . ">";
-		$headers['Reply-To'] = $this->myname . "\" <" . $this->myemail . ">";
-		$headers['Return-path'] = "<" . $this->myemail . ">";
-		$headers['Precedence'] = "list\nList-Id: " . get_option('blogname') . "";
-		$headers['MIME-Version'] = "1.0";
-		$headers['X-Mailer'] = "PHP" . phpversion() . "";
+		$header['From'] = $this->myname . " <" . $this->myemail . ">";
+		$header['Reply-To'] = $this->myname . " <" . $this->myemail . ">";
+		$header['Return-path'] = "<" . $this->myemail . ">";
+		$header['Precedence'] = "list\nList-Id: " . get_option('blogname') . "";
+		$header['MIME-Version'] = "1.0";
+		$header['X-Mailer'] = "PHP" . phpversion() . "";
 		if ( $type == 'html' ) {
 			// To send HTML mail, the Content-Type header must be set
-			$headers['Content-Type'] = get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"";
+			$header['Content-Type'] = get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"";
 		} else {
-			$headers['Content-Type'] = "text/plain; charset=\"". get_bloginfo('charset') . "\"";
+			$header['Content-Type'] = "text/plain; charset=\"". get_bloginfo('charset') . "\"";
 		}
 
 		// apply header filter to allow on-the-fly amendments
-		$headers = apply_filters('s2_email_headers', $headers);
+		$header = apply_filters('s2_email_headers', $header);
 		// collapse the headers using $key as the header name
-		foreach ( $headers as $key => $value ) {
+		foreach ( $header as $key => $value ) {
 			$headers[$key] = $key . ": " . $value;
 		}
 		$headers = implode("\n", $headers);
@@ -640,7 +644,7 @@ class s2class {
 		// ACTION = 1 to subscribe, 0 to unsubscribe
 		// HASH = md5 hash of email address
 		// ID = user's ID in the subscribe2 table
-		//use home instead of siteurl incase index.php is not in core wordpress directory
+		// use home instead of siteurl incase index.php is not in core wordpress directory
 		$link = get_option('home') . "/?s2=";
 
 		if ( 'add' == $what ) {
@@ -3364,7 +3368,7 @@ class s2class {
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
-		if ( $wpdb->get_var("SHOW TABLES LIKE $this->public") != $this->public ) { $this->install(); }
+		if ( $wpdb->get_var("SHOW TABLES LIKE '{$this->public}'") != $this->public ) { $this->install(); }
 		//do we need to upgrade anything?
 		if ( is_array($this->subscribe2_options) && $this->subscribe2_options['version'] !== S2VERSION ) {
 			add_action('shutdown', array(&$this, 'upgrade'));
