@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 5.5
+Version: 5.6
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -32,7 +32,7 @@ along with Subscribe2. If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define( 'S2VERSION', '5.5' );
+define( 'S2VERSION', '5.6' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', plugin_basename(dirname(__FILE__)) );
 
@@ -216,6 +216,13 @@ class s2class {
 		$this->subscribe2_options['version'] = S2VERSION;
 		// ensure that the options are in the database
 		require(S2PATH . "include/options.php");
+		// correct autoformat to upgrade from pre 5.6
+		if ( $this->subscribe2_options['autoformat'] == 'text' ) {
+			$this->subscribe2_options['autoformat'] = 'excerpt';
+		}
+		if ( $this->subscribe2_options['autoformat'] == 'full' ) {
+			$this->subscribe2_options['autoformat'] = 'post';
+		}
 		update_option('subscribe2_options', $this->subscribe2_options);
 
 		// upgrade old wpmu user meta data to new
@@ -1102,10 +1109,8 @@ class s2class {
 			$check_format = get_usermeta($user_ID, 's2_format');
 			if ( empty($check_format) ) {
 				// ensure existing subscription options are not overwritten on upgrade
-				if ( 'html' == $this->subscribe2_options['autoformat'] ) {
-					update_usermeta($user_ID, 's2_format', 'html');
-				} elseif ( 'fulltext' == $this->subscribe2_options['autoformat'] ) {
-					update_usermeta($user_ID, 's2_format', 'post');
+				if ( in_array($this->subscribe2_options['autoformat'], array('html', 'html_excerpt', 'post', 'excerpt')) ) {
+					update_usermeta($user_ID, 's2_format', $this->subscribe2_options['autoformat']);
 				} else {
 					update_usermeta($user_ID, 's2_format', 'excerpt');
 				}
@@ -2124,18 +2129,18 @@ class s2class {
 			echo "checked=\"checked\" ";
 		}
 		echo "/> " . __('HTML - Full', 'subscribe2') ."</label>&nbsp;&nbsp;";
-		echo "<label><input type=\"radio\" name=\"autoformat\" value=\"html\"";
-		if ( 'html' == $this->subscribe2_options['autoformat'] ) {
-			echo "checked=\"checked\" ";
-		}
-		echo "/> " . __('HTML - Excerpt', 'subscribe2') ."</label>&nbsp;&nbsp;";
-		echo "<label><input type=\"radio\" name=\"autoformat\" value=\"html_excerpt\" ";
+		echo "<label><input type=\"radio\" name=\"autoformat\" value=\"html_excerpt\"";
 		if ( 'html_excerpt' == $this->subscribe2_options['autoformat'] ) {
 			echo "checked=\"checked\" ";
 		}
+		echo "/> " . __('HTML - Excerpt', 'subscribe2') ."</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"autoformat\" value=\"post\" ";
+		if ( 'post' == $this->subscribe2_options['autoformat'] ) {
+			echo "checked=\"checked\" ";
+		}
 		echo "/> " . __('Plain Text - Full', 'subscribe2') . "</label>&nbsp;&nbsp;";
-		echo "<label><input type=\"radio\" name=\"autoformat\" value=\"text\" ";
-		if ( 'text' == $this->subscribe2_options['autoformat'] ) {
+		echo "<label><input type=\"radio\" name=\"autoformat\" value=\"excerpt\" ";
+		if ( 'excerpt' == $this->subscribe2_options['autoformat'] ) {
 			echo "checked=\"checked\" ";
 		}
 		echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . "</label><br /><br />";
