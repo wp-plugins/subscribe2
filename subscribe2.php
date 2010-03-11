@@ -616,7 +616,7 @@ class s2class {
 			$this->mail($this->get_registered("cats=$post_cats_string&format=post"), $subject, $full_body);
 
 			// next we send html excerpt content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=html_excerpt"), $subject, $html_excerpt, 'html');
+			$this->mail($this->get_registered("cats=$post_cats_string&format=html_excerpt"), $subject, $html_excerpt_body, 'html');
 
 			// finally we send html full content emails
 			$this->mail($this->get_registered("cats=$post_cats_string&format=html"), $subject, $html_body, 'html');
@@ -1210,6 +1210,24 @@ class s2class {
 	} // end unsubscribe_registered_users()
 
 	/**
+	Handles bulk changes to email format for Registered Subscribers
+	*/
+	function format_change($format, $subscribers_string) {
+		if ( empty($format) ) { return; }
+		
+		global $wpdb;
+		$emails ='';
+		$subscribers = explode(',', $subscribers_string);
+		foreach ( $subscribers as $subscriber ) {
+			( '' == $emails) ? $emails = "'$subscriber'" : $emails .= ",'$subscriber'";
+		}
+		$ids = $wpdb->get_col("SELECT ID FROM $wpdb->users WHERE user_email IN ($emails)");
+		$ids = implode(',', $ids);
+		$sql = "UPDATE $wpdb->usermeta SET meta_value='{$format}' WHERE meta_key='s2_format' AND user_id IN ($ids)";
+		$wpdb->get_results("UPDATE $wpdb->usermeta SET meta_value='{$format}' WHERE meta_key='s2_format' AND user_id IN ($ids)");
+	} // end bulk_manage()
+
+	/**
 	Handles subscriptions and unsubscriptions for different blogs on WPMU installs
 	*/
 	function wpmu_subscribe() {
@@ -1408,9 +1426,6 @@ class s2class {
 		//Get Registered Subscribers for bulk management
 		$registered = $this->get_registered();
 		$all_users = $this->get_all_registered();
-		if ( !empty($all_users) ) {
-			$emails = implode(",", $all_users);
-		}
 
 		// was anything POSTed ?
 		if ( isset($_POST['s2_admin']) ) {
@@ -1466,14 +1481,8 @@ class s2class {
 				$this->unsubscribe_registered_users($_POST['emails'], $_POST['category']);
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Unsubscribed!', 'subscribe2') . "</strong></p></div>";
 			} elseif ( $_POST['sub_format'] ) {
-				if ( $_POST['format'] == 'excerpt' ) {
-					$wpdb->get_results("UPDATE $wpdb->usermeta SET meta_value='excerpt' WHERE meta_key='s2_format'");
-				} elseif ( $_POST['format'] == 'full' ) {
-					$wpdb->get_results("UPDATE $wpdb->usermeta SET meta_value='post' WHERE meta_key='s2_format'");
-				} elseif ( $_POST['format'] == 'html' ) {
-					$wpdb->get_results("UPDATE $wpdb->usermeta SET meta_value='html' WHERE meta_key='s2_format'");
-				}
-				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Format updated for Registered Users!', 'subscribe2') . "</strong></p></div>";
+				$this->format_change( $_POST['format'], $_POST['emails'] );
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Format updated for Selected Registered Users!', 'subscribe2') . "</strong></p></div>";
 			}
 		}
 
@@ -1690,24 +1699,26 @@ class s2class {
 		}
 		echo "</table>\r\n";
 
-		//show bulk managment form
-		echo "<h2>" . __('Categories', 'subscribe2') . "</h2>\r\n";
-		echo "<p>" . __('Preferences for all existing Registered Users can be changed using this section.', 'subscribe2') . "<br />\r\n";
-		echo "<strong><em style=\"color: red\">" . __('Consider User Privacy as changes cannot be undone', 'subscribe2') . "</em></strong><br />\r\n";
-		echo "</p>";
-		echo "<br />" . __('Action to perform', 'subscribe2') . ":\r\n";
-		echo "<label><input type=\"radio\" name=\"manage\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
-		echo "<label><input type=\"radio\" name=\"manage\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . "</label><br /><br />\r\n";
-		echo "<input type=\"hidden\" name=\"emails\" value=\"$emails\" />\r\n";
-		$this->display_category_form();
-		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_categories\" value=\"" . __('Bulk Update Categories', 'subscribe2') . "\" /></p>";
+		// show bulk managment form if filtered in some Registered Users
+		if ( in_array($what, array('registered', 'all_users')) || is_numeric($what) ) {
+			$subscribers_string = implode(',', $subscribers);
+			echo "<h2>" . __('Categories', 'subscribe2') . "</h2>\r\n";
+			echo __('Preferences for Registered Users selected in the filter above can be changed using this section.', 'subscribe2') . "<br />\r\n";
+			echo "<strong><em style=\"color: red\">" . __('Consider User Privacy as changes cannot be undone', 'subscribe2') . "</em></strong><br />\r\n";
+			echo "<br />" . __('Action to perform', 'subscribe2') . ":\r\n";
+			echo "<label><input type=\"radio\" name=\"manage\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
+			echo "<label><input type=\"radio\" name=\"manage\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . "</label><br /><br />\r\n";
+			echo "<input type=\"hidden\" name=\"emails\" value=\"$subscribers_string\" />\r\n";
+			$this->display_category_form();
+			echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_categories\" value=\"" . __('Bulk Update Categories', 'subscribe2') . "\" /></p>";
 
-		echo "<br />" . __('Send email as', 'subscribe2') . ":\r\n";
-		echo "<label><input type=\"radio\" name=\"format\" value=\"html\" /> " . __('HTML - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
-		echo "<label><input type=\"radio\" name=\"format\" value=\"html_excerpt\" /> " . __('HTML - Excerpt', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
-		echo "<label><input type=\"radio\" name=\"format\" value=\"full\" /> " . __('Plain Text - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
-		echo "<label><input type=\"radio\" name=\"format\" value=\"excerpt\" checked=\"checked\" /> " . __('Plain Text - Excerpt', 'subscribe2') . "</label>\r\n";	
-		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_format\" value=\"" . __('Bulk Update Format', 'subscribe2') . "\" /></p>";
+			echo "<br />" . __('Send email as', 'subscribe2') . ":\r\n";
+			echo "<label><input type=\"radio\" name=\"format\" value=\"html\" /> " . __('HTML - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
+			echo "<label><input type=\"radio\" name=\"format\" value=\"html_excerpt\" /> " . __('HTML - Excerpt', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
+			echo "<label><input type=\"radio\" name=\"format\" value=\"full\" /> " . __('Plain Text - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
+			echo "<label><input type=\"radio\" name=\"format\" value=\"excerpt\" checked=\"checked\" /> " . __('Plain Text - Excerpt', 'subscribe2') . "</label>\r\n";	
+			echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_format\" value=\"" . __('Bulk Update Format', 'subscribe2') . "\" /></p>";
+		}
 		echo "</form></div>\r\n";
 
 		include(ABSPATH . 'wp-admin/admin-footer.php');
@@ -1744,6 +1755,9 @@ class s2class {
 					$this->subscribe2_cron($user_email);
 				}
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Preview message(s) sent to logged in user', 'subscribe2') . "</strong></p></div>";
+			} elseif ( $_POST['resend'] ) {
+				$this->subscribe2_cron('', 'resend');
+				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Attempt made to resend the Digest Notification email', 'subscribe2') . "</strong></p></div>";
 			} elseif ( $_POST['submit'] ) {
 				// BCClimit
 				if ( is_numeric($_POST['bcc']) && $_POST['bcc'] >= 0 ) {
@@ -2730,6 +2744,10 @@ class s2class {
 			echo "<strong>" . date_i18n($datetime) . "</strong></p>\r\n";
 			echo "<p>" . __('Next email notification will be sent when your blog time is after', 'subscribe2') . ": \r\n";
 			echo "<strong>" . date_i18n($datetime, $scheduled_time) . "</strong></p>\r\n";
+			if ( !empty($this->subscribe2_options['previous_s2cron']) ) {
+				echo "<p>" . __('Attempt to resend the last Digest Notification email', 'subscribe2') . ": ";
+				echo "<input type=\"submit\" class=\"button-secondary\" name=\"resend\" value=\"" . __('Resend Digest', 'subscribe2') . "\" /></p>\r\n";
+			}
 		} else {
 			echo "<br />";
 		}
@@ -3174,7 +3192,7 @@ class s2class {
 	/**
 	Send a daily digest of today's new posts
 	*/
-	function subscribe2_cron($preview = '') {
+	function subscribe2_cron($preview = '', $resend = '') {
 		if ( defined(S2_CRON) && S2_CRON ) { return; }
 		define( S2_CRON, true );
 		global $wpdb;
@@ -3183,7 +3201,9 @@ class s2class {
 			// update last_s2cron execution time before completing or bailing
 			$now = current_time('mysql');
 			$prev = $this->subscribe2_options['last_s2cron'];
+			$last = $this->subscribe2_options['previous_s2cron'];
 			$this->subscribe2_options['last_s2cron'] = $now;
+			$this->subscribe2_options['previous_s2cron'] = $prev;
 			update_option('subscribe2_options', $this->subscribe2_options);
 
 			//set up SQL query based on options
@@ -3200,10 +3220,18 @@ class s2class {
 			}
 
 			// collect posts
-			if ( $this->subscribe2_options['cron_order'] == 'desc' ) {
-				$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC");
+			if ( $resend == 'resend' ) {
+				if ( $this->subscribe2_options['cron_order'] == 'desc' ) {
+					$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$last' AND post_date < '$prev' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC");
+				} else {
+					$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$last' AND post_date < '$prev' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC");
+				}
 			} else {
-				$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC");
+				if ( $this->subscribe2_options['cron_order'] == 'desc' ) {
+					$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC");
+				} else {
+					$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC");
+				}
 			}
 		} else {
 			// we are sending a preview
@@ -3249,7 +3277,7 @@ class s2class {
 			if ( $check ) {
 				continue;
 			}
-			$post_title = html_entity_decone($post->post_title, ENT_QUOTES);
+			$post_title = html_entity_decode($post->post_title, ENT_QUOTES);
 			('' == $table) ? $table = "* " . $post_title : $table .= "\r\n* " . $post_title;
 			$message_post .= $post_title . "\r\n";
 			$message_post .= get_permalink($post->ID) . "\r\n";
