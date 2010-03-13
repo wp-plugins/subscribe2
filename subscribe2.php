@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 5.6
+Version: 5.7
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -32,7 +32,7 @@ along with Subscribe2. If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define( 'S2VERSION', '5.6' );
+define( 'S2VERSION', '5.7' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', plugin_basename(dirname(__FILE__)) );
 
@@ -2811,7 +2811,7 @@ class s2class {
 	function register_form() {
 		if ( 'wpreg' == $this->subscribe2_options['autosub'] ) {
 			echo "<p>\r\n<label>";
-			echo __('Check here to Subscribe to email notifications for new posts') . ":<br />\r\n";
+			echo __('Check here to Subscribe to email notifications for new posts', 'subscribe2') . ":<br />\r\n";
 			echo "<input type=\"checkbox\" name=\"subscribe\"";
 			if ( 'yes' == $this->subscribe2_options['wpregdef'] ) {
 				echo " checked=\"checked\"";
@@ -3279,17 +3279,27 @@ class s2class {
 			}
 			$post_title = html_entity_decode($post->post_title, ENT_QUOTES);
 			('' == $table) ? $table = "* " . $post_title : $table .= "\r\n* " . $post_title;
-			$message_post .= $post_title . "\r\n";
+			$message_post .= $post_title;
+			$message_posttime .= $post_title
+			if ( strstr($mailtext, "AUTHORNAME") ) {
+				$author = get_userdata($post->post_author);
+				if ( $author->display_name != '' ) {
+					$message_post .= __('Author', 'subscribe2') . ": " . $author->display_name . ")\r\n";
+					$message_posttime .= __('Author', 'subscribe2') . ": " . $author->display_name . ")\r\n";
+				}
+			} else {
+				 $message_post .= "\r\n"
+				 $message_posttime .= "\r\n";
+			}
 			$message_post .= get_permalink($post->ID) . "\r\n";
-			$message_posttime .= $post_title . "\r\n";
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
 			$message_posttime .= get_permalink($post->ID) . "\r\n";
-			if ( strstr($mailtext, "CATS")) {
+			if ( strstr($mailtext, "CATS") ) {
 				$post_cat_names = implode(', ', wp_get_post_categories($post->ID, array('fields' => 'names')));
 				$message_post .= __('Posted in', 'subscribe2') . ": " . $post_cat_names . "\r\n";
 				$message_posttime .= __('Posted in', 'subscribe2') . ": " . $post_cat_names . "\r\n";
 			}
-			if ( strstr($mailtext, "TAGS")) {
+			if ( strstr($mailtext, "TAGS") ) {
 				$post_tag_names = implode(', ', wp_get_post_tags($post->ID, array('fields' => 'names')));
 				if ( $post_tag_names != '' ) {
 					$message_post .= __('Tagged as', 'subscribe2') . ": " . $post_tag_names . "\r\n";
