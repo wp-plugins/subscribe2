@@ -157,7 +157,7 @@ Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in y
 
 = Version 5.6 by Matthew Robinson =
 
-* Fixed a critical bug in the digest function - a type resulting failed notifications
+* Fixed a critical bug in the digest function - a typo resulting failed notifications
 * Added ability to resend the last digest email again
 * Improved Bulk Management to apply to filtered users only (provided they are still Registered and not Public Subscribers)
 * Fix for HTML Excerpt mails not using email template
