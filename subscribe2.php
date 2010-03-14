@@ -3204,7 +3204,10 @@ class s2class {
 			$last = $this->subscribe2_options['previous_s2cron'];
 			$this->subscribe2_options['last_s2cron'] = $now;
 			$this->subscribe2_options['previous_s2cron'] = $prev;
-			update_option('subscribe2_options', $this->subscribe2_options);
+			if ( '' != $resend ) {
+				// update sending times provided this is not a resend
+				update_option('subscribe2_options', $this->subscribe2_options);
+			}
 
 			//set up SQL query based on options
 			if ( $this->subscribe2_options['private'] == 'yes' ) {
@@ -3284,8 +3287,8 @@ class s2class {
 			if ( strstr($mailtext, "AUTHORNAME") ) {
 				$author = get_userdata($post->post_author);
 				if ( $author->display_name != '' ) {
-					$message_post .= "(" . __('Author', 'subscribe2') . ": " . $author->display_name . ")\r\n";
-					$message_posttime .= "(" . __('Author', 'subscribe2') . ": " . $author->display_name . ")\r\n";
+					$message_post .= " (" . __('Author', 'subscribe2') . ": " . $author->display_name . ")\r\n";
+					$message_posttime .= " (" . __('Author', 'subscribe2') . ": " . $author->display_name . ")\r\n";
 				}
 			} else {
 				 $message_post .= "\r\n";
