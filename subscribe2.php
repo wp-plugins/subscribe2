@@ -3280,15 +3280,15 @@ class s2class {
 			$post_title = html_entity_decode($post->post_title, ENT_QUOTES);
 			('' == $table) ? $table = "* " . $post_title : $table .= "\r\n* " . $post_title;
 			$message_post .= $post_title;
-			$message_posttime .= $post_title
+			$message_posttime .= $post_title;
 			if ( strstr($mailtext, "AUTHORNAME") ) {
 				$author = get_userdata($post->post_author);
 				if ( $author->display_name != '' ) {
-					$message_post .= __('Author', 'subscribe2') . ": " . $author->display_name . ")\r\n";
-					$message_posttime .= __('Author', 'subscribe2') . ": " . $author->display_name . ")\r\n";
+					$message_post .= "(" . __('Author', 'subscribe2') . ": " . $author->display_name . ")\r\n";
+					$message_posttime .= "(" . __('Author', 'subscribe2') . ": " . $author->display_name . ")\r\n";
 				}
 			} else {
-				 $message_post .= "\r\n"
+				 $message_post .= "\r\n";
 				 $message_posttime .= "\r\n";
 			}
 			$message_post .= get_permalink($post->ID) . "\r\n";
