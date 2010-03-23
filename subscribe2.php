@@ -867,6 +867,16 @@ class s2class {
 					$subject = html_entity_decode($subject, ENT_QUOTES);
 					$message = $this->email . " " . __('subscribed to email notifications!', 'subscribe2');
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
+					if ( empty($recipients) ) {
+						$role = 'administrator';
+						if ( !class_exists(WP_User_Search) ) {
+							require(ABSPATH . 'wp-admin/includes/user.php');
+						}
+						$wp_user_search = new WP_User_Search( '', '', $role);
+						$admins_string = implode(', ', $wp_user_search->get_results());
+						$sql = "SELECT user_email FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
+						$recipients = $wpdb->get_col($sql);
+					}
 					$headers = $this->headers();
 					foreach ( $recipients as $recipient ) {
 						@wp_mail($recipient, $subject, $message, $headers);
@@ -885,6 +895,16 @@ class s2class {
 					$subject = html_entity_decode($subject, ENT_QUOTES);
 					$message = $this->email . " " . __('unsubscribed from email notifications!', 'subscribe2');
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
+					if ( empty($recipients) ) {
+						$role = 'administrator';
+						if ( !class_exists(WP_User_Search) ) {
+							require(ABSPATH . 'wp-admin/includes/user.php');
+						}
+						$wp_user_search = new WP_User_Search( '', '', $role);
+						$admins_string = implode(', ', $wp_user_search->get_results());
+						$sql = "SELECT user_email FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
+						$recipients = $wpdb->get_col($sql);
+					}
 					$headers = $this->headers();
 					foreach ( $recipients as $recipient ) {
 						@wp_mail($recipient, $subject, $message, $headers);
