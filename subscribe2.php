@@ -1664,7 +1664,11 @@ class s2class {
 			echo "<td align=\"right\">" . $strip . "</td></tr>\r\n";
 		}
 		if ( !empty($subscribers) ) {
-			$subscriber_chunks = array_chunk($subscribers, $this->subscribe2_options['entries']);
+			if ( is_int($this->subscribe2_options['entries']) ) {
+				$subscriber_chunks = array_chunk($subscribers, $this->subscribe2_options['entries']);
+			} else {
+				$subscriber_chunks = array_chunk($subscribers, 25);
+			}
 			$chunk = $page - 1;
 			$subscribers = $subscriber_chunks[$chunk];
 			echo "<tr class=\"alternate\" style=\"height:1.5em;\">\r\n";
@@ -1879,8 +1883,8 @@ class s2class {
 				}
 
 				// Number of subscriber per page
-				if ( is_numeric($_POST['entries']) && $_POST['entries'] > 0 ) {
-					$this->subscribe2_options['entries'] =$_POST['entries'];
+				if ( is_int($_POST['entries']) && $_POST['entries'] > 0 ) {
+					$this->subscribe2_options['entries'] = $_POST['entries'];
 				}
 
 				// show meta link?
