@@ -3217,8 +3217,8 @@ class s2class {
 	Send a daily digest of today's new posts
 	*/
 	function subscribe2_cron($preview = '', $resend = '') {
-		if ( defined(S2_CRON) && S2_CRON ) { return; }
-		define( S2_CRON, true );
+		if ( defined(DOING_S2_CRON) && DOING_S2_CRON ) { return; }
+		define( DOING_S2_CRON, true );
 		global $wpdb;
 
 		if ( '' == $preview ) {
