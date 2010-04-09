@@ -3228,7 +3228,7 @@ class s2class {
 			$last = $this->subscribe2_options['previous_s2cron'];
 			$this->subscribe2_options['last_s2cron'] = $now;
 			$this->subscribe2_options['previous_s2cron'] = $prev;
-			if ( '' != $resend ) {
+			if ( '' == $resend ) {
 				// update sending times provided this is not a resend
 				update_option('subscribe2_options', $this->subscribe2_options);
 			}
