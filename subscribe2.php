@@ -115,19 +115,19 @@ class s2class {
 	Hook the menu
 	*/
 	function admin_menu() {
-		$s2management = add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "level_10", 's2_tools', array(&$this, 'manage_menu'));
+		$s2management = add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", 's2_tools', array(&$this, 'manage_menu'));
 		add_action("admin_print_scripts-$s2management", array(&$this, 'checkbox_form_js'));
 
-		$s2options = add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2', 'subscribe2'), "level_10", 's2_settings', array(&$this, 'options_menu'));
+		$s2options = add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2', 'subscribe2'), "manage_options", 's2_settings', array(&$this, 'options_menu'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'option_form_js'));
 		add_filter('plugin_row_meta', array(&$this, 'plugin_links'), 10, 2);
 
-		$s2user = add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "level_0", 's2_users', array(&$this, 'user_menu'));
+		$s2user = add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", 's2_users', array(&$this, 'user_menu'));
 		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
 
-		add_submenu_page('post-new.php', __('Mail Subscribers', 'subscribe2'), __('Mail Subscribers', 'subscribe2'), "level_2", 's2_posts', array(&$this, 'write_menu'));
+		add_submenu_page('post-new.php', __('Mail Subscribers', 'subscribe2'), __('Mail Subscribers', 'subscribe2'), "publish_posts", 's2_posts', array(&$this, 'write_menu'));
 
 		$s2nonce = md5('subscribe2');
 	} // end admin_menu()
@@ -296,6 +296,8 @@ class s2class {
 				$string = str_replace("TINYLINK", $link, $string);
 			}
 		}
+		$string = str_replace("DATE", $this->post_date, $string);
+		$string = str_replace("TIME", $this->post_time, $string);
 		$string = str_replace("MYNAME", stripslashes($this->myname), $string);
 		$string = str_replace("EMAIL", $this->myemail, $string);
 		$string = str_replace("AUTHORNAME", stripslashes($this->authorname), $string);
@@ -514,6 +516,8 @@ class s2class {
 		// passing them in function calls a little later
 		$this->post_title = "<a href=\"" . get_permalink($post->ID) . "\">" . html_entity_decode($post->post_title, ENT_QUOTES) . "</a>";
 		$this->permalink = get_permalink($post->ID);
+		$this->post_date = get_the_date();
+		$this->post_time = get_the_time();
 
 		$author = get_userdata($post->post_author);
 		$this->authorname = $author->display_name;
@@ -2049,6 +2053,8 @@ class s2class {
 		echo "<dt><b>TABLE</b></dt><dd>" . __("a list of post titles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>PERMALINK</b></dt><dd>" . __("the post's permalink<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>TINYLINK</b></dt><dd>" . __("the post's permalink after conversion by TinyURL<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>DATE</b></dt><dd>" . __("the date the post was made<br />(<i>for per-post emails only</i>)", "subscribe2") . "</dd>\r\n";
+		echo "<dt><b>TIME</b></dt><dd>" . __("the time the post was made<br />(<i>for per-post emails only</i>)", "subscribe2") . "</dd>\r\n";
 		echo "<dt><b>MYNAME</b></dt><dd>" . __("the admin or post author's name", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>EMAIL</b></dt><dd>" . __("the admin or post author's email", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>AUTHORNAME</b></dt><dd>" . __("the post author's name", 'subscribe2') . "</dd>\r\n";
@@ -3189,7 +3195,7 @@ class s2class {
 
 	function tinymce2_before_init() {
 		$this->fullpath = WP_CONTENT_URL . '/plugins/' . S2DIR . '/tinymce/';
-		echo "tinyMCE.loadPlugin('subscribe2quicktags', '" . $this->fullpath . "');\n"; 
+		echo "tinyMCE.loadPlugin('subscribe2quicktags', '" . $this->fullpath . "');\n";
 	}
 
 	function s2_edit_form() {
@@ -3217,8 +3223,8 @@ class s2class {
 	Send a daily digest of today's new posts
 	*/
 	function subscribe2_cron($preview = '', $resend = '') {
-		if ( defined(DOING_S2_CRON) && DOING_S2_CRON ) { return; }
-		define( DOING_S2_CRON, true );
+		if ( defined('DOING_S2_CRON') && DOING_S2_CRON ) { return; }
+		define( 'DOING_S2_CRON', true );
 		global $wpdb;
 
 		if ( '' == $preview ) {
