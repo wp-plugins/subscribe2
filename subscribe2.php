@@ -1887,8 +1887,8 @@ class s2class {
 				}
 
 				// Number of subscriber per page
-				if ( is_int($_POST['entries']) && $_POST['entries'] > 0 ) {
-					$this->subscribe2_options['entries'] = $_POST['entries'];
+				if ( is_numeric($_POST['entries']) && $_POST['entries'] > 0 ) {
+					$this->subscribe2_options['entries'] = (int)$_POST['entries'];
 				}
 
 				// show meta link?
@@ -3246,7 +3246,7 @@ class s2class {
 				$status = "'publish'";
 			}
 
-			if ( $this->subscribe2_options['page'] == 'yes' ) {
+			if ( $this->subscribe2_options['pages'] == 'yes' ) {
 				$type = "'post', 'page'";
 			} else {
 				$type = "'post'";
@@ -3287,11 +3287,15 @@ class s2class {
 			$post_cats_string = implode(',', $post_cats);
 			$all_post_cats = array_unique(array_merge($all_post_cats, $post_cats));
 			$check = false;
-			// is the current post assigned to any categories
-			// which should not generate a notification email?
-			foreach ( explode(',', $this->subscribe2_options['exclude']) as $cat ) {
-				if ( in_array($cat, $post_cats) ) {
-					$check = true;
+			// Pages are put into category 1 so make sure we don't exclude
+			// pages if category 1 is excluded
+			if ( $post->post_type != 'page' ) {
+				// is the current post assigned to any categories
+				// which should not generate a notification email?
+				foreach ( explode(',', $this->subscribe2_options['exclude']) as $cat ) {
+					if ( in_array($cat, $post_cats) ) {
+						$check = true;
+					}
 				}
 			}
 			// is the current post set by the user to
@@ -3317,13 +3321,13 @@ class s2class {
 			if ( strstr($mailtext, "AUTHORNAME") ) {
 				$author = get_userdata($post->post_author);
 				if ( $author->display_name != '' ) {
-					$message_post .= " (" . __('Author', 'subscribe2') . ": " . $author->display_name . ")\r\n";
-					$message_posttime .= " (" . __('Author', 'subscribe2') . ": " . $author->display_name . ")\r\n";
+					$message_post .= " (" . __('Author', 'subscribe2') . ": " . $author->display_name . ")";
+					$message_posttime .= " (" . __('Author', 'subscribe2') . ": " . $author->display_name . ")";
 				}
-			} else {
-				 $message_post .= "\r\n";
-				 $message_posttime .= "\r\n";
 			}
+			$message_post .= "\r\n";
+			$message_posttime .= "\r\n";
+			
 			$message_post .= get_permalink($post->ID) . "\r\n";
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
 			$message_posttime .= get_permalink($post->ID) . "\r\n";
