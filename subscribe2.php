@@ -123,7 +123,7 @@ class s2class {
 		add_action("admin_print_scripts-$s2options", array(&$this, 'option_form_js'));
 		add_filter('plugin_row_meta', array(&$this, 'plugin_links'), 10, 2);
 
-		$s2user = add_users_page(__('Subscriptions', 'subscribe2'), __('Subscriptions', 'subscribe2'), "read", 's2_users', array(&$this, 'user_menu'));
+		$s2user = add_users_page(__('Your Subscriptions', 'subscribe2'), __('Your Subscriptions', 'subscribe2'), "read", 's2_users', array(&$this, 'user_menu'));
 		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
 
@@ -348,7 +348,7 @@ class s2class {
 					@wp_mail($recipient, $subject, $mailtext, $headers);
 				}
 			}
-			return;
+			return true;
 		} elseif ( $this->subscribe2_options['bcclimit'] == 0 ) {
 			// we're not using BCCLimit
 			foreach ( $recipients as $recipient ) {
@@ -402,7 +402,6 @@ class s2class {
 		return $status;
 	} // end mail()
 
-
 	/**
 	Construct standard set of email headers
 	*/
@@ -452,9 +451,15 @@ class s2class {
 			// are we doing daily digests? If so, don't send anything now
 			if ( $this->subscribe2_options['email_freq'] != 'never' ) { return $post; }
 
-			// is the current post a page
-			// and should this not generate a notification email?
-			if ( $this->subscribe2_options['pages'] == 'no' && $post->post_type == 'page' ) {
+			// is the current post of a type that should generate a notification email?
+			// uses s2_post_types filter to allow for custom post types in WP 3.0
+			if ( $this->subscribe2_options['pages'] == 'yes' ) {
+				$s2_post_types = array('page', 'post');
+			} else {
+				$s2_post_types = array('post');
+			}
+			$s2_post_types = apply_filters('s2_post_types', $s2_post_types);
+			if ( !in_array($post->post_type, $s2_post_types) ) {
 				return $post;
 			}
 
@@ -2495,27 +2500,32 @@ class s2class {
 		// was anything POSTed?
 		if ( isset($_POST['s2_admin']) && 'mail' == $_POST['s2_admin'] ) {
 			check_admin_referer('subscribe2-write_subscribers' . $s2nonce);
-			if ( 'confirmed' == $_POST['what'] ) {
-				$recipients = $this->get_public();
-			} elseif ( 'unconfirmed' == $_POST['what'] ) {
-				$recipients = $this->get_public(0);
-			} elseif ( 'public' == $_POST['what'] ) {
-				$confirmed = $this->get_public();
-				$unconfirmed = $this->get_public(0);
-				$recipients = array_merge((array)$confirmed, (array)$unconfirmed);
-			} elseif ( is_numeric($_POST['what']) ) {
-				$cat = intval($_POST['what']);
-				$recipients = $this->get_registered("cats=$cat");
-			} elseif ( 'all_users' == $_POST['what'] ) {
-				$recipients = $this->get_all_registered();
-			} else {
-				$recipients = $this->get_registered();
-			}
 			$subject = $this->substitute(stripslashes(strip_tags($_POST['subject'])));
 			$body = $this->substitute(stripslashes($_POST['content']));
 			if ( '' != $current_user->display_name || '' != $current_user->user_email ) {
 				$this->myname = html_entity_decode($current_user->display_name, ENT_QUOTES);
 				$this->myemail = $current_user->user_email;
+			}
+			if ( isset($_POST['send']) ) {
+				if ( 'confirmed' == $_POST['what'] ) {
+					$recipients = $this->get_public();
+				} elseif ( 'unconfirmed' == $_POST['what'] ) {
+					$recipients = $this->get_public(0);
+				} elseif ( 'public' == $_POST['what'] ) {
+					$confirmed = $this->get_public();
+					$unconfirmed = $this->get_public(0);
+					$recipients = array_merge((array)$confirmed, (array)$unconfirmed);
+				} elseif ( is_numeric($_POST['what']) ) {
+					$cat = intval($_POST['what']);
+					$recipients = $this->get_registered("cats=$cat");
+				} elseif ( 'all_users' == $_POST['what'] ) {
+					$recipients = $this->get_all_registered();
+				} else {
+					$recipients = $this->get_registered();
+				}
+			} elseif ( isset($_POST['preview']) ) {
+				global $user_email;
+				$recipients[] = $user_email;
 			}
 			$status = $this->mail($recipients, $subject, $body, 'text');
 			if ( $status ) {
@@ -2549,7 +2559,7 @@ class s2class {
 		$this->display_subscriber_dropdown('registered', false, array('all'));
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"mail\" />";
 		echo "</p>";
-		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></p>";
+		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-secondary\" name=\"preview\" value=\""  . __('Preview', 'subscribe2') . "\" \><input type=\"submit\" class=\"button-primary\" name=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></p>";
 		echo "</form></div>\r\n";
 		echo "<div style=\"clear: both;\"><p>&nbsp;</p></div>";
 
@@ -3239,17 +3249,23 @@ class s2class {
 				update_option('subscribe2_options', $this->subscribe2_options);
 			}
 
-			//set up SQL query based on options
+			// set up SQL query based on options
 			if ( $this->subscribe2_options['private'] == 'yes' ) {
 				$status	= "'publish', 'private'";
 			} else {
 				$status = "'publish'";
 			}
 
+			// send notifications for allowed post type (defaults for posts and pages)
+			// uses s2_post_types filter to allow for custom post types in WP 3.0
 			if ( $this->subscribe2_options['pages'] == 'yes' ) {
-				$type = "'post', 'page'";
+				$s2_post_types = array('page', 'post');
 			} else {
-				$type = "'post'";
+				$s2_post_types = array('post');
+			}
+			$s2_post_types = apply_filters('s2_post_types', $s2_post_types);
+			foreach( $s2_post_types as $post_type ) {
+				('' == $type) ? $type = "'$post_type'" : $type .= ", '$post_type'"; 
 			}
 
 			// collect posts
@@ -3491,7 +3507,6 @@ class s2class {
 		add_filter('ozh_adminmenu_icon_s2_users', array(&$this, 'ozh_s2_icon'));
 		add_filter('ozh_adminmenu_icon_s2_tools', array(&$this, 'ozh_s2_icon'));
 		add_filter('ozh_adminmenu_icon_s2_settings', array(&$this, 'ozh_s2_icon'));
-
 
 		// add action to display editor buttons if option is enabled
 		if ( '1' == $this->subscribe2_options['show_button'] ) {
