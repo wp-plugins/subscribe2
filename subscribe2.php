@@ -416,7 +416,6 @@ class s2class {
 		$header['Reply-To'] = $this->myname . " <" . $this->myemail . ">";
 		$header['Return-path'] = "<" . $this->myemail . ">";
 		$header['Precedence'] = "list\nList-Id: " . get_option('blogname') . "";
-		$header['MIME-Version'] = "1.0";
 		$header['X-Mailer'] = "PHP" . phpversion() . "";
 		if ( $type == 'html' ) {
 			// To send HTML mail, the Content-Type header must be set
@@ -1928,7 +1927,6 @@ class s2class {
 		screen_icon();
 		echo "<h2>" . __('Subscribe2 Settings', 'subscribe2') . "</h2>\r\n";
 		echo "<a href=\"http://subscribe2.wordpress.com/\">" . __('Plugin Blog', 'subscribe2') . "</a> | ";
-		echo "<a href=\"http://getsatisfaction.com/subscribe2/\">" . __('Support Forum', 'subscribe2') . "</a> | ";
 		echo "<a href=\"https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904\">" . __('Make a donation via PayPal', 'subscribe2') . "</a>";
 		echo "<form method=\"post\" action=\"\">\r\n";
 		if ( function_exists('wp_nonce_field') ) {
@@ -2840,7 +2838,6 @@ class s2class {
 		if ( $file == S2DIR.'/subscribe2.php' ) {
 			$links[] = "<a href='options-general.php?page=s2_settings'>" . __('Settings', 'subscribe2') . "</a>";
 			$links[] = "<a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904'><b>" . __('Donate', 'subscribe2') . "</b></a>";
-			$links[] = "<a href='http://getsatisfaction.com/subscribe2'>" . __('Forum', 'subscribe2') . "</a>";
 		}
 		return $links;
 	} // end plugin_links()
