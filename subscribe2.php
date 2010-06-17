@@ -852,7 +852,7 @@ class s2class {
 		$code = str_replace($hash, '', $code);
 		$id = intval(substr($code, 1));
 		if ( $id ) {
-			$this->email = $this->get_email($id);
+			$this->email = $this->sanitize_email($this->get_email($id));
 			if ( !$this->email || $hash !== md5($this->email) ) {
 				return $this->no_such_email;
 			}
@@ -935,7 +935,8 @@ class s2class {
 
 		if ( '' == $email ) { return false; }
 
-		$check = $wpdb->get_var("SELECT active FROM $this->public WHERE email='$email'");
+		// run the query and force case sensitivity
+		$check = $wpdb->get_var("SELECT active FROM $this->public WHERE email='$email' COLLATE utf8_bin");
 		if ( '0' == $check || '1' == $check ) {
 			return $check;
 		} else {
@@ -1092,6 +1093,17 @@ class s2class {
 	} // end signup_ip()
 
 	/**
+	function to ensure email is compliant with internet messaging standards
+	*/
+	function sanitize_email($email) {
+	if ( !is_email($email) ) { return; }
+
+	// ensure that domain is in lowercase as per internet email standards
+	list($name, $domain) = explode('@', $email, 2);
+	return $name . "@" . strtolower($domain);;
+	} // end sanitize_email()
+
+	/**
 	Create the appropriate usermeta values when a user registers
 	If the registering user had previously subscribed to notifications, this function will delete them from the public subscriber list first
 	*/
@@ -1123,7 +1135,7 @@ class s2class {
 		}
 
 		// has this user previously signed up for email notification?
-		if ( false !== $this->is_public($user->user_email) ) {
+		if ( false !== $this->is_public($this->sanitize_email($user->user_email)) ) {
 			// delete this user from the public table, and subscribe them to all the categories
 			$this->delete($user->user_email);
 			update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
@@ -1461,10 +1473,10 @@ class s2class {
 			if ( $_POST['addresses'] ) {
 				foreach ( preg_split ("/[\s,]+/", $_POST['addresses']) as $email ) {
 					if ( is_email($email) && $_POST['subscribe'] ) {
-						$this->activate($email);
+						$this->activate($this->sanitize_email($email));
 						$message = "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) subscribed!', 'subscribe2') . "</strong></p></div>";
 					} elseif ( is_email($email) && $_POST['unsubscribe'] ) {
-						$this->delete($email);
+						$this->delete($this->sanitize_email($email));
 						$message = "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) unsubscribed!', 'subscribe2') . "</strong></p></div>";
 					}
 				}
@@ -1479,13 +1491,13 @@ class s2class {
 				}
 				if ( $_POST['confirm'] ) {
 					foreach ( $_POST['confirm'] as $address ) {
-						$this->toggle($address);
+						$this->toggle($this->sanitize_email($address));
 					}
 					$message = "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Status changed!', 'subscribe2') . "</strong></p></div>";
 				}
 				if ( $_POST['unconfirm'] ) {
 					foreach ( $_POST['unconfirm'] as $address ) {
-						$this->toggle($address);
+						$this->toggle($this->sanitize_email($address));
 					}
 					$message = "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Status changed!', 'subscribe2') . "</strong></p></div>";
 				}
@@ -2956,7 +2968,7 @@ class s2class {
 			} elseif ( $this->is_barred($_POST['email']) ) {
 				$this->s2form = $this->form . $this->barred_domain;
 			} else {
-				$this->email = $_POST['email'];
+				$this->email = $this->sanitize_email($_POST['email']);
 				$this->ip = $_POST['ip'];
 				// does the supplied email belong to a registered user?
 				$check = $wpdb->get_var("SELECT user_email FROM $wpdb->users WHERE user_email = '$this->email'");
