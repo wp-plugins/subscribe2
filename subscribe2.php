@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 5.8
+Version: 5.9
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -32,7 +32,7 @@ along with Subscribe2. If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define( 'S2VERSION', '5.8' );
+define( 'S2VERSION', '5.9' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', plugin_basename(dirname(__FILE__)) );
 
@@ -259,6 +259,18 @@ class s2class {
 				foreach ( $categories as $cat ) {
 					delete_usermeta($user, 's2_cat' . $cat);
 				}
+			}
+		}
+		
+		// ensure existing public subscriber emails are all sanitized
+		$confirmed = $this->get_public();
+		$unconfirmed = $this->get_public(0);
+		$public_subscribers = array_merge((array)$confirmed, (array)$unconfirmed);
+
+		foreach ( $public_subscribers as $email ) {
+			$new_email = $this->sanitize_email($email);
+			if ( $email !== $new_email ) {
+				$wpdb->get_results("UPDATE $this->public SET email='$new_email' WHERE email='$email'");
 			}
 		}
 	} // end upgrade()
