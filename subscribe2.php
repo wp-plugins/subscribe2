@@ -964,13 +964,26 @@ class s2class {
 
 		if ( '' == $email ) { return false; }
 
-		$check = $wpdb->get_var("SELECT email FROM $wpdb->users WHERE user_email='$email'");
+		$check = $wpdb->get_var("SELECT user_email FROM $wpdb->users WHERE user_email='$email'");
 		if ( $check ) {
 			return true;
 		} else {
 			return false;
 		}
 	} // end is_registered()
+
+	/**
+	Return Registered User ID from email
+	*/
+	function get_user_id($email = '') {
+		global $wpdb;
+		
+		if ( '' == $email ) { return false; }
+		
+		$id = $wpdb->get_var("SELECT id FROM $wpdb->users WHERE user_email='$email'");
+		
+		return $id;
+	} // end get_user_id()
 
 	/**
 	Return an array of all the public subscribers
@@ -1685,7 +1698,7 @@ class s2class {
 		}
 		if ( !empty($subscribers) ) {
 			$exportcsv = implode(",\r\n", $subscribers);
-			echo "<td width=\"25%\" align=\"right\"><input type=\"hidden\" name=\"exportcsv\" value=\"" . $exportcsv . "\" />\r\n";
+			echo "<td width=\"25%\" align=\"right\"><input type=\"hidden\" name=\"exportcsv\" value=\"" . $what . "\" />\r\n";
 			echo "<input type=\"submit\" class=\"button-secondary\" name=\"csv\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" /></td>\r\n";
 		}
 		echo "</tr></table>";
@@ -2837,6 +2850,64 @@ class s2class {
 	} // end pages_dropdown()
 
 	/**
+	Export subscriber emails and other details to CSV
+	*/
+	function prepare_export( $what ) {
+		$confirmed = $this->get_public();
+		$unconfirmed = $this->get_public(0);
+		if ( 'all' == $what ) {
+			$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$this->get_all_registered());
+		} elseif ( 'public' == $what ) {
+			$subscribers = array_merge((array)$confirmed, (array)$unconfirmed);
+		} elseif ( 'confirmed' == $what ) {
+			$subscribers = $confirmed;
+		} elseif ( 'unconfirmed' == $what ) {
+			$subscribers = $unconfirmed;
+		} elseif ( is_numeric($what) ) {
+			$subscribers = $this->get_registered("cats=$what");
+		} elseif ( 'registered' == $what ) {
+			$subscribers = $this->get_registered();
+		} elseif ( 'all_users' == $what ) {
+			$subscribers = $this->get_all_registered();
+		}
+
+		natcasesort($subscribers);
+
+		$exportcsv = "User Email,User Name";
+		$all_cats = get_categories(array('hide_empty' => false, 'orderby' => 'ID'));
+		foreach ($all_cats as $cat) {
+			$exportcsv .= "," . $cat->cat_name;
+			$cat_ids[] = $cat->term_id;
+		}
+		$exportcsv .= "\r\n";
+		
+		foreach ( $subscribers as $subscriber ) {
+			if ( $this->is_registered($subscriber) ) {
+				$user_id = $this->get_user_id( $subscriber );
+				$user_info = get_userdata($user_id);
+
+				$cats = explode(',', get_usermeta($user_info->ID, $this->get_usermeta_keyname('s2_subscribed')));
+				$subscribed_cats = '';
+				foreach ( $cat_ids as $cat ) {
+					(in_array($cat, $cats)) ? $subscribed_cats .= ",Yes" : $subscribed_cats .= ", No";
+				}
+	
+				$exportcsv .= $user_info->user_email . ',';
+				$exportcsv .= $user_info->display_name;
+				$exportcsv .= $subscribed_cats . "\r\n";
+			} else {
+				if ( in_array($subscriber, $confirmed) ) {
+					$exportcsv .= $subscriber . ',' . __('Confirmed Public Subscriber', 'subscribe2') . "\r\n";
+				} elseif ( in_array($subscriber, $unconfirmed) ) {
+					$exportcsv .= $subscriber . ',' . __('Unconfirmed Public Subscriber', 'subscribe2') . "\r\n";
+				}
+			}
+		}
+
+		return $exportcsv;
+	} // end prepare_export()
+
+	/**
 	Filter for usermeta table key names to adjust them if needed for WPMU blogs
 	*/
 	function get_usermeta_keyname($metaname) {
@@ -3505,7 +3576,7 @@ class s2class {
 			header("Content-Disposition: attachment; filename=subscribe2_users_$date.csv");
 			header("Pragma: no-cache");
 			header("Expires: 0");
-			echo $_POST['exportcsv'];
+			echo $this->prepare_export($_POST['exportcsv']);
 
 			exit(0);
 		}
