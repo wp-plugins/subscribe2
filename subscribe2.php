@@ -1825,8 +1825,12 @@ class s2class {
 				}
 				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Preview message(s) sent to logged in user', 'subscribe2') . "</strong></p></div>";
 			} elseif ( $_POST['resend'] ) {
-				$this->subscribe2_cron('', 'resend');
-				echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Attempt made to resend the Digest Notification email', 'subscribe2') . "</strong></p></div>";
+				$status = $this->subscribe2_cron('', 'resend');
+				if ( $status === false ) {
+					echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('The Digest Notification email contained no post information. No email was sent', 'subscribe2') . "</strong></p></div>";
+				} else {
+					echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Attempt made to resend the Digest Notification email', 'subscribe2') . "</strong></p></div>";
+				}
 			} elseif ( $_POST['submit'] ) {
 				// BCClimit
 				if ( is_numeric($_POST['bcc']) && $_POST['bcc'] >= 0 ) {
@@ -2594,7 +2598,7 @@ class s2class {
 		$this->display_subscriber_dropdown('registered', false, array('all'));
 		echo "<input type=\"hidden\" name=\"s2_admin\" value=\"mail\" />";
 		echo "</p>";
-		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-secondary\" name=\"preview\" value=\""  . __('Preview', 'subscribe2') . "\" \><input type=\"submit\" class=\"button-primary\" name=\"submit\" value=\"" . __('Send', 'subscribe2') . "\" /></p>";
+		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-secondary\" name=\"preview\" value=\""  . __('Preview', 'subscribe2') . "\" \><input type=\"submit\" class=\"button-primary\" name=\"send\" value=\"" . __('Send', 'subscribe2') . "\" /></p>";
 		echo "</form></div>\r\n";
 		echo "<div style=\"clear: both;\"><p>&nbsp;</p></div>";
 
@@ -3380,7 +3384,7 @@ class s2class {
 		}
 
 		// do we have any posts?
-		if ( empty($posts) ) { return; }
+		if ( empty($posts) ) { return false; }
 		$this->post_count = count($posts);
 
 		// if we have posts, let's prepare the digest
