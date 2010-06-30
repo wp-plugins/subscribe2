@@ -1,9 +1,14 @@
 (function() {
 	tinymce.create('tinymce.plugins.Subscribe2Plugin', {
 		init : function(ed, url) {
-			var pb = '<img src="' + url + '/../../include/trans.gif" class="mceSubscribe2 mceItemNoResize" />', cls = 'mceSubscribe2', sep = ed.getParam('subscribe2_separator', '<!--subscribe2-->'), pbRE;
+			var pb = '<img src="' + url + '/../../include/trans.gif" class="mceSubscribe2 mceItemNoResize" />',
+			cls = 'mceSubscribe2',
+			sep = ed.getParam('subscribe2_separator', '<!--subscribe2-->'),
+			pbRE;
 
-			pbRE = new RegExp(sep.replace(/[\?\.\*\[\]\(\)\{\}\+\^\$\:]/g, function(a) {return '\\' + a;}), 'g');
+			pbRE = new RegExp(sep.replace(/[\?\.\*\[\]\(\)\{\}\+\^\$\:]/g, function(a) {
+				return '\\' + a;
+			}), 'g');
 
 			// Register commands
 			ed.addCommand('mceSubscribe2', function() {
@@ -11,7 +16,11 @@
 			});
 
 			// Register buttons
-			ed.addButton('subscribe2', {title : 'Insert Subscribe2 Token', image : url + '/../include/s2_button.png', cmd : cls});
+			ed.addButton('subscribe2', {
+				title : 'Insert Subscribe2 Token',
+				image : url + '/../include/s2_button.png',
+				cmd : cls
+			});
 
 			ed.onInit.add(function() {
 				ed.dom.loadCSS(url + "/css/content.css");

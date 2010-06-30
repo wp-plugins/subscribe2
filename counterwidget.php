@@ -1,11 +1,12 @@
 <?php
 /*
 Plugin Name: Subscribe2 Counter Widget
-Version: 4.12
 Plugin URI: http://subscribe2.wordpress.com
 Description: Adds a sidebar widget to easily customize and display your Subscribe2 subscribers stats.
+Version: 5.9
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 */
 
 // Put functions into one big function we'll call at the plugins_loaded
@@ -13,7 +14,10 @@ Author URI: http://subscribe2.wordpress.com
 function widget_s2counter_init() {
 
 	if ( !function_exists('register_sidebar_widget') )
-	return;
+		return;
+
+	if ( !class_exists('s2class') )
+		return;
 
 	/**
 	Register the Widget
@@ -23,22 +27,18 @@ function widget_s2counter_init() {
 		$options = get_option('widget_s2counter');
 		$title = empty($options['title']) ? 'Subscriber Count' : $options['title'];
 		$s2w_bg = $options['s2w_bg'];
-	    $s2w_fg = $options['s2w_fg'];
-	    $s2w_width = $options['s2w_width'];
-	    $s2w_height = $options['s2w_height'];
-	    $s2w_font = $options['s2w_font'];
+		$s2w_fg = $options['s2w_fg'];
+		$s2w_width = $options['s2w_width'];
+		$s2w_height = $options['s2w_height'];
+		$s2w_font = $options['s2w_font'];
 		echo $before_widget;
 		echo $before_title . $title . $after_title;
-		global $wpdb, $table;
-		if ($s2_mu) {
-			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
-		} else {
-			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='s2_subscribed'");
-		}
-		$count['confirmed'] = $wpdb->get_var("SELECT COUNT(id) FROM " . $wpdb->prefix . "subscribe2 WHERE active='1'");
-		$count['all'] = ($count['registered'] + $count['confirmed']);
+		global $mysubscribe2;
+		$registered = $mysubscribe2->get_registered();
+		$confirmed = $mysubscribe2->get_public();
+		$count = (count($registered) + count($confirmed));
 		echo "<center><div style=\"text-align:center; background-color:" . $s2w_bg . "; color:" . $s2w_fg . "; width:" . $s2w_width . "px; height:" . $s2w_height . "px; font:" . $s2w_font . "pt Verdana, Arial, Helvetica, sans-serif; vertical-align:middle; padding:3px; border:1px solid #444;\">";
-		echo $count['all'];
+		echo $count;
 		echo "</div></center>";
 		echo $after_widget;
 	}
@@ -116,7 +116,7 @@ function assignSize(theSize, theStyle) {
 		}
 	}
 }
-</script>  
+</script>
 
 <div>
 	<fieldset>
