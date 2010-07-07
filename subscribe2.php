@@ -270,7 +270,7 @@ class s2class {
 		foreach ( $public_subscribers as $email ) {
 			$new_email = $this->sanitize_email($email);
 			if ( $email !== $new_email ) {
-				$wpdb->get_results("UPDATE $this->public SET email='$new_email' WHERE email='$email'");
+				$wpdb->get_results("UPDATE $this->public SET email='$new_email' WHERE email='$email' COLLATE utf8_bin");
 			}
 		}
 	} // end upgrade()
@@ -753,7 +753,7 @@ class s2class {
 		if ( false !== $this->is_public($email) ) {
 			$check = $wpdb->get_var("SELECT user_email FROM $wpdb->users WHERE user_email='$this->email'");
 			if ( $check ) { return; }
-			$wpdb->get_results("UPDATE $this->public SET active='1', ip='$this->ip' WHERE email='$email'");
+			$wpdb->get_results("UPDATE $this->public SET active='1', ip='$this->ip' WHERE email='$email' COLLATE utf8_bin");
 		} else {
 			global $current_user;
 			$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, NOW(), %s)", $email, 1, $current_user->user_login));
@@ -778,7 +778,7 @@ class s2class {
 		if ( !is_email($email) ) { return false; }
 
 		if ( false !== $this->is_public($email) ) {
-			$wpdb->get_results("UPDATE $this->public SET date=NOW() WHERE email='$email'");
+			$wpdb->get_results("UPDATE $this->public SET date=NOW() WHERE email='$email' COLLATE utf8_bin");
 		} else {
 			$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, NOW(), %s)", $email, 0, $this->ip));
 		}
@@ -799,7 +799,7 @@ class s2class {
 		}
 
 		if ( !is_email($email) ) { return false; }
-		$wpdb->get_results("DELETE FROM $this->public WHERE email='$email'");
+		$wpdb->get_results("DELETE FROM $this->public WHERE email='$email' COLLATE utf8_bin");
 	} // end delete()
 
 	/**
@@ -815,9 +815,9 @@ class s2class {
 		if ( false === $status ) { return false; }
 
 		if ( '0' == $status ) {
-			$wpdb->get_results("UPDATE $this->public SET active='1' WHERE email='$email'");
+			$wpdb->get_results("UPDATE $this->public SET active='1' WHERE email='$email' COLLATE utf8_bin");
 		} else {
-			$wpdb->get_results("UPDATE $this->public SET active='0' WHERE email='$email'");
+			$wpdb->get_results("UPDATE $this->public SET active='0' WHERE email='$email' COLLATE utf8_bin");
 		}
 	} // end toggle()
 
@@ -1496,14 +1496,31 @@ class s2class {
 		if ( isset($_POST['s2_admin']) ) {
 			check_admin_referer('subscribe2-manage_subscribers' . $s2nonce);
 			if ( $_POST['addresses'] ) {
+				$sub_error = '';
+				$unsub_error = '';
 				foreach ( preg_split ("/[\s,]+/", $_POST['addresses']) as $email ) {
+					$email = $this->sanitize_email($email);
 					if ( is_email($email) && $_POST['subscribe'] ) {
-						$this->activate($this->sanitize_email($email));
+						if ( $this->is_public($email) !== false ) {
+							('' == $sub_error) ? $sub_error = "$email" : $sub_error .= ", $email";
+							continue;
+						}
+						$this->activate($email);
 						$message = "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) subscribed!', 'subscribe2') . "</strong></p></div>";
 					} elseif ( is_email($email) && $_POST['unsubscribe'] ) {
-						$this->delete($this->sanitize_email($email));
+						if ( $this->is_public($email) === false ) {
+							('' == $unsub_error) ? $unsub_error = "$email" : $unsub_error .= ", $email";
+							continue;
+						}
+						$this->delete($email);
 						$message = "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) unsubscribed!', 'subscribe2') . "</strong></p></div>";
 					}
+				}
+				if ( $sub_error != '' ) {
+					echo "<div id=\"message\" class=\"error\"><p><strong>" . __('Some emails were not processed, the following were already subscribed' , 'subscribe2') . ":<br />$sub_error</strong></p></div>";
+				}
+				if ( $unsub_error != '' ) {
+					echo "<div id=\"message\" class=\"error\"><p><strong>" . __('Some emails were not processed, the following were not in the database' , 'subscribe2') . ":<br />$unsub_error</strong></p></div>";
 				}
 				echo $message;
 				$_POST['what'] = 'confirmed';
