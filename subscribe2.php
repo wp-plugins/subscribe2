@@ -270,7 +270,7 @@ class s2class {
 		foreach ( $public_subscribers as $email ) {
 			$new_email = $this->sanitize_email($email);
 			if ( $email !== $new_email ) {
-				$wpdb->get_results("UPDATE $this->public SET email='$new_email' WHERE email='$email' COLLATE utf8_bin");
+				$wpdb->get_results("UPDATE $this->public SET email='$new_email' WHERE CAST(email as binary)='$email'");
 			}
 		}
 	} // end upgrade()
@@ -753,7 +753,7 @@ class s2class {
 		if ( false !== $this->is_public($email) ) {
 			$check = $wpdb->get_var("SELECT user_email FROM $wpdb->users WHERE user_email='$this->email'");
 			if ( $check ) { return; }
-			$wpdb->get_results("UPDATE $this->public SET active='1', ip='$this->ip' WHERE email='$email' COLLATE utf8_bin");
+			$wpdb->get_results("UPDATE $this->public SET active='1', ip='$this->ip' WHERE CAST(email as binary)='$email'");
 		} else {
 			global $current_user;
 			$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, NOW(), %s)", $email, 1, $current_user->user_login));
@@ -778,7 +778,7 @@ class s2class {
 		if ( !is_email($email) ) { return false; }
 
 		if ( false !== $this->is_public($email) ) {
-			$wpdb->get_results("UPDATE $this->public SET date=NOW() WHERE email='$email' COLLATE utf8_bin");
+			$wpdb->get_results("UPDATE $this->public SET date=NOW() WHERE CAST(email as binary)='$email'");
 		} else {
 			$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, NOW(), %s)", $email, 0, $this->ip));
 		}
@@ -799,7 +799,7 @@ class s2class {
 		}
 
 		if ( !is_email($email) ) { return false; }
-		$wpdb->get_results("DELETE FROM $this->public WHERE email='$email' COLLATE utf8_bin");
+		$wpdb->get_results("DELETE FROM $this->public WHERE CAST(email as binary)='$email'");
 	} // end delete()
 
 	/**
@@ -815,9 +815,9 @@ class s2class {
 		if ( false === $status ) { return false; }
 
 		if ( '0' == $status ) {
-			$wpdb->get_results("UPDATE $this->public SET active='1' WHERE email='$email' COLLATE utf8_bin");
+			$wpdb->get_results("UPDATE $this->public SET active='1' WHERE CAST(email as binary)='$email'");
 		} else {
-			$wpdb->get_results("UPDATE $this->public SET active='0' WHERE email='$email' COLLATE utf8_bin");
+			$wpdb->get_results("UPDATE $this->public SET active='0' WHERE CAST(email as binary)='$email'");
 		}
 	} // end toggle()
 
@@ -948,7 +948,7 @@ class s2class {
 		if ( '' == $email ) { return false; }
 
 		// run the query and force case sensitivity
-		$check = $wpdb->get_var("SELECT active FROM $this->public WHERE email='$email' COLLATE utf8_bin");
+		$check = $wpdb->get_var("SELECT active FROM $this->public WHERE CAST(email as binary)='$email'");
 		if ( '0' == $check || '1' == $check ) {
 			return $check;
 		} else {
