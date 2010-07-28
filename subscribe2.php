@@ -1965,6 +1965,10 @@ class s2class {
 				( $_POST['widget'] == '1' ) ? $showwidget = '1' : $showwidget = '0';
 				$this->subscribe2_options['widget'] = $showwidget;
 
+				// Subscribe2 over ride postmeta checked by default
+				( $_POST['s2meta_default'] == '1' ) ? $s2meta_default = '1' : $s2meta_default = '0';
+				$this->subscribe2_options['s2meta_default'] = $s2meta_default;
+
 				//automatic subscription
 				$this->subscribe2_options['autosub'] = $_POST['autosub'];
 				$this->subscribe2_options['newreg_override'] = $_POST['newreg_override'];
@@ -2185,7 +2189,14 @@ class s2class {
 			echo " checked=\"checked\"";
 		}
 		echo " /> " . __('Enable Subscribe2 Widget?', 'subscribe2') . "</label><br /><br />\r\n";
-		echo"</p>";
+
+		// s2_meta checked by default
+		echo "<label><input type =\"checkbox\" name=\"s2meta_default\" value=\"1\"";
+		if ( "1" == $this->subscribe2_options['s2meta_default'] ) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Disable email notifications is checked by default on authoring pages?', 'subscribe2') . "</label>\r\n";
+		echo "</p>";
 
 		//Auto Subscription for new registrations
 		echo "<h2>" . __('Auto Subscribe', 'subscribe2') . "</h2>\r\n";
@@ -3011,7 +3022,7 @@ class s2class {
 		echo "<input type=\"hidden\" name=\"s2meta_nonce\" id=\"s2meta_nonce\" value=\"" . wp_create_nonce(md5(plugin_basename(__FILE__))) . "\" />";
 		echo __("Check here to disable sending of an email notification for this post/page", 'subscribe2');
 		echo "&nbsp;&nbsp;<input type=\"checkbox\" name=\"s2_meta_field\" value=\"no\"";
-		if ( $s2mail == 'no' ) {
+		if ( $s2mail == 'no' || ($this->subscribe2_options['s2meta_default'] == "1" && $s2mail == "") ) {
 			echo " checked=\"checked\"";
 		}
 		echo " />";
@@ -3044,7 +3055,7 @@ class s2class {
 		if ( isset($_POST['s2_meta_field']) && $_POST['s2_meta_field'] == 'no' ) {
 			update_post_meta($post_id, 's2mail', $_POST['s2_meta_field']);
 		} else {
-			delete_post_meta($post_id, 's2mail');
+			update_post_meta($post_id, 's2mail', 'yes');
 		}
 	} // end s2_meta_box_handler()
 
