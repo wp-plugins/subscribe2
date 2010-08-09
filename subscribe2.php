@@ -3580,10 +3580,12 @@ class s2class {
 		load_plugin_textdomain('subscribe2', 'wp-content/plugins/' . S2DIR, '/' . S2DIR);
 
 		// Is this WordPressMU or not?
+		$this->s2_mu = false;
 		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
 			$this->s2_mu = true;
-		} else {
-			$this->s2_mu = false;
+		}
+		if ( defined('WP_ALLOW_MULTISITE') && WP_ALLOW_MULTISITE === true ) {
+			$this->s2_mu = true;
 		}
 
 		// do we need to install anything?
