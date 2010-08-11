@@ -2943,10 +2943,10 @@ class s2class {
 	Filter for usermeta table key names to adjust them if needed for WPMU blogs
 	*/
 	function get_usermeta_keyname($metaname) {
-		global $wpdb, $wp_version, $wpmu_version;
+		global $wpdb;
 
 		// Is this WordPressMU or not?
-		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
+		if ( $this->s2_mu === true ) {
 			switch( $metaname ) {
 				case 's2_subscribed':
 				case 's2_cat':
