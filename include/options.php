@@ -26,13 +26,9 @@ if (!isset($this->subscribe2_options['autosub_def'])) {
 	$this->subscribe2_options['autosub_def'] = "yes";
 } // option for user default auto-subscription to new categories
 
-if (!isset($this->subscribe2_options['bcclimit'])) {
+if(!isset($this->subscribe2_options['bcclimit'])) {
 	$this->subscribe2_options['bcclimit'] = 0;
 } // option for default bcc limit on email notifications
-
-if (!isset($this->subscribe2_options['cron_order'])) {
-	$this->subscribe2_options['cron_order'] = 'asc';
-} // option for sorting digest posts in ascending or descending order
 
 if (!isset($this->subscribe2_options['admin_email'])) {
 	$this->subscribe2_options['admin_email'] = "subs";
@@ -86,9 +82,9 @@ if (!isset($this->subscribe2_options['widget'])) {
 	$this->subscribe2_options['widget'] = "0";
 } // option to enable Subscribe2 Widget
 
-if (!isset($this->subscribe2_options['s2meta_default'])) {
-	$this->subscribe2_options['s2meta_default'] = "0";
-} // option to check override box by default
+if (!isset($this->subscribe2_options['counterwidget'])) {
+	$this->subscribe2_options['counterwidget'] = "0";
+} // option to enable Subscribe2 Counter Widget
 
 if (!isset($this->subscribe2_options['entries'])) {
 	$this->subscribe2_options['entries'] = 25;

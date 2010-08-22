@@ -71,8 +71,22 @@ class s2class {
 		$this->please_log_in = "<p>" . __('To manage your subscription options please', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-login.php\">" . __('login', 'subscribe2') . "</a>.</p>";
 
 		$this->use_profile_admin = "<p>" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=s2_users\">" . __('profile', 'subscribe2') . "</a>.</p>";
+		if ( $this->s2_mu === true) {
+			global $blog_id, $user_ID;
+			if ( !is_blog_user($blog_id) ) {
+				// if we are on multisite and the user is not a member of this blog change the link
+				$this->use_profile_admin = "<p><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a>" . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
+			}
+		}
 
 		$this->use_profile_users = "<p>" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/profile.php?page=s2_users\">" . __('profile', 'subscribe2') . "</a>.</p>";
+		if ( $this->s2_mu === true) {
+			global $blog_id, $user_ID;
+			if ( !is_blog_user($blog_id) ) {
+				// if we are on multisite and the user is not a member of this blog change the link
+				$this->use_profile_users = "<p><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a>" . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
+			}
+		}
 
 		$this->confirmation_sent = "<p>" . __('A confirmation message is on its way!', 'subscribe2') . "</p>";
 
@@ -226,7 +240,7 @@ class s2class {
 		update_option('subscribe2_options', $this->subscribe2_options);
 
 		// upgrade old wpmu user meta data to new
-		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
+		if ( $this->s2_mu === true ) {
 			$this->namechange_subscribe2_widget();
 			// loop through all users
 			foreach ( $users as $user ) {
@@ -295,7 +309,7 @@ class s2class {
 			return;
 		}
 		$string = str_replace("BLOGNAME", html_entity_decode(get_option('blogname'), ENT_QUOTES), $string);
-		$string = str_replace("BLOGLINK", get_bloginfo('url'), $string);
+		$string = str_replace("BLOGLINK", get_option('home'), $string);
 		$string = str_replace("TITLE", stripslashes($this->post_title), $string);
 		$link = "<a href=\"" . $this->permalink . "\">" . $this->permalink . "</a>";
 		$string = str_replace("PERMALINK", $link, $string);
@@ -329,7 +343,7 @@ class s2class {
 		if ( 'html' == $type ) {
 			$headers = $this->headers('html');
 			if ( 'yes' == $this->subscribe2_options['stylesheet'] ) {
-				$mailtext = apply_filters('s2_html_email', "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . get_bloginfo('stylesheet_url') . "\" type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>");
+				$mailtext = apply_filters('s2_html_email', "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . get_stylesheet_uri() . "\" type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>");
 			} else {
 				$mailtext = apply_filters('s2_html_email', "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>");
 			}
@@ -431,9 +445,9 @@ class s2class {
 		$header['X-Mailer'] = "PHP" . phpversion() . "";
 		if ( $type == 'html' ) {
 			// To send HTML mail, the Content-Type header must be set
-			$header['Content-Type'] = get_bloginfo('html_type') . "; charset=\"". get_bloginfo('charset') . "\"";
+			$header['Content-Type'] = get_option('html_type') . "; charset=\"". get_option('blog_charset') . "\"";
 		} else {
-			$header['Content-Type'] = "text/plain; charset=\"". get_bloginfo('charset') . "\"";
+			$header['Content-Type'] = "text/plain; charset=\"". get_option('blog_charset') . "\"";
 		}
 
 		// apply header filter to allow on-the-fly amendments
@@ -1965,6 +1979,10 @@ class s2class {
 				( $_POST['widget'] == '1' ) ? $showwidget = '1' : $showwidget = '0';
 				$this->subscribe2_options['widget'] = $showwidget;
 
+				// show counterwidget in Presentation->Widgets
+				( $_POST['counterwidget'] == '1' ) ? $showcounterwidget = '1' : $showcounterwidget = '0';
+				$this->subscribe2_options['counterwidget'] = $showcounterwidget;
+
 				// Subscribe2 over ride postmeta checked by default
 				( $_POST['s2meta_default'] == '1' ) ? $s2meta_default = '1' : $s2meta_default = '0';
 				$this->subscribe2_options['s2meta_default'] = $s2meta_default;
@@ -2110,8 +2128,8 @@ class s2class {
 		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-secondary\" name=\"preview\" value=\"" . __('Send Email Preview', 'subscribe2') . "\" /></p>\r\n";
 		echo "<h3>" . __('Message substitions', 'subscribe2') . "</h3>\r\n";
 		echo "<dl>";
-		echo "<dt><b>BLOGNAME</b></dt><dd>" . get_bloginfo('name') . "</dd>\r\n";
-		echo "<dt><b>BLOGLINK</b></dt><dd>" . get_bloginfo('url') . "</dd>\r\n";
+		echo "<dt><b>BLOGNAME</b></dt><dd>" . get_option('blogname') . "</dd>\r\n";
+		echo "<dt><b>BLOGLINK</b></dt><dd>" . get_option('home') . "</dd>\r\n";
 		echo "<dt><b>TITLE</b></dt><dd>" . __("the post's title<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>POST</b></dt><dd>" . __("the excerpt or the entire post<br />(<i>based on the subscriber's preferences</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>POSTTIME</b></dt><dd>" . __("the excerpt of the post and the time it was posted<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
@@ -2189,6 +2207,13 @@ class s2class {
 			echo " checked=\"checked\"";
 		}
 		echo " /> " . __('Enable Subscribe2 Widget?', 'subscribe2') . "</label><br /><br />\r\n";
+
+		// show Counter Widget
+		echo "<label><input type=\"checkbox\" name=\"counterwidget\" value=\"1\"";
+		if ( '1' == $this->subscribe2_options['counterwidget'] ) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('Enable Subscribe2 Counter Widget?', 'subscribe2') . "</label><br /><br />\r\n";
 
 		// s2_meta checked by default
 		echo "<label><input type =\"checkbox\" name=\"s2meta_default\" value=\"1\"";
@@ -2431,14 +2456,14 @@ class s2class {
 				$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 				// if we are subscribed to the current blog display an "unsubscribe" link
 				if ( !empty($subscribed) ) {
-					$unsubscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_unsubscribe=". $blog_id;
+					$unsubscribe_link = get_option('home') . "/wp-admin/?s2mu_unsubscribe=". $blog_id;
 					echo "<p><a href=\"". $unsubscribe_link ."\" class=\"button\">" . __('Unsubscribe me from this blog', 'subscribe2') . "</a></p>";
 				} else {
 					// else we show a "subscribe" link
-					$subscribe_link = get_bloginfo('url') . "/wp-admin/?s2mu_subscribe=". $blog_id;
+					$subscribe_link = get_option('home') . "/wp-admin/?s2mu_subscribe=". $blog_id;
 					echo "<p><a href=\"". $subscribe_link ."\" class=\"button\">" . __('Subscribe to all categories', 'subscribe2') . "</a></p>";
 				}
-				echo "<h2>" . __('Subscribed Categories on', 'subscribe2') . " " . get_bloginfo('name') . " </h2>\r\n";
+				echo "<h2>" . __('Subscribed Categories on', 'subscribe2') . " " . get_option('blogname') . " </h2>\r\n";
 			} else {
 				echo "<h2>" . __('Subscribed Categories', 'subscribe2') . "</h2>\r\n";
 			}
@@ -2468,7 +2493,7 @@ class s2class {
 		if ( $this->s2_mu && !isset($_GET['email']) ) {
 			global $blog_id;
 			$s2blog_id = $blog_id;
-			$blogs = get_blog_list(0, 'all');
+			$blogs = $this->get_mu_blog_list();
 
 			$blogs_subscribed = array();
 			$blogs_notsubscribed = array();
@@ -2489,15 +2514,15 @@ class s2class {
 				// check if we're subscribed to the blog
 				$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 
-				$blogname = get_bloginfo('name');
+				$blogname = get_option('blogname');
 				if ( strlen($blogname) > 30 ) { 
 					$blog['blogname'] = wp_html_excerpt($blogname, 30) . "..";
 				} else {
 					$blog['blogname'] = $blogname;
 				}
-				$blog['description'] = get_bloginfo('description');
-				$blog['blogurl'] = get_bloginfo('url');
-				$blog['subscribe_page'] = get_bloginfo('url') . "/wp-admin/users.php?page=s2_users";
+				$blog['description'] = get_option('blogdescription');
+				$blog['blogurl'] = get_option('home');
+				$blog['subscribe_page'] = get_option('home') . "/wp-admin/users.php?page=s2_users";
 
 				$key = strtolower($blog['blogname'] . "-" . $blog['blog_id']);
 				if ( !empty($subscribed) ) {
@@ -2959,6 +2984,25 @@ class s2class {
 	}
 
 	/**
+	Obtain a list of current WordPress multiuser blogs
+	Note this may affect performance but there is no alternative
+	*/
+	function get_mu_blog_list() {
+		global $wpdb;
+		$blogs = $wpdb->get_results( $wpdb->prepare("SELECT blog_id, domain, path FROM $wpdb->blogs WHERE site_id = %d AND archived = '0' AND mature = '0' AND spam = '0' AND deleted = '0' ORDER BY registered DESC", $wpdb->siteid), ARRAY_A );
+
+		foreach ( (array) $blogs as $details ) {
+			$blog_list[$details['blog_id']] = $details;
+		}
+
+		if ( false == is_array( $blog_list ) ) {
+			return array();
+		}
+
+		return $blog_list;
+	} // end get_mu_blog_list()
+
+	/**
 	Adds a links directly to the settings page from the plugin page
 	*/
 	function plugin_links($links, $file) {
@@ -3004,13 +3048,8 @@ class s2class {
 	Create meta box on write pages
 	*/
 	function s2_meta_init() {
-		if ( function_exists('add_meta_box') ) {
-			add_meta_box('subscribe2', __('Subscribe2 Notification Override', 'subscribe2' ), array(&$this, 's2_meta_box'), 'post', 'advanced');
-			add_meta_box('subscribe2', __('Subscribe2 Notification Override', 'subscribe2' ), array(&$this, 's2_meta_box'), 'page', 'advanced');
-		} else {
-			add_action('dbx_post_advanced', array(&$this, 's2_meta_box_old'));
-			add_action('dbx_page_advanced', array(&$this, 's2_meta_box_old'));
-		}
+		add_meta_box('subscribe2', __('Subscribe2 Notification Override', 'subscribe2' ), array(&$this, 's2_meta_box'), 'post', 'advanced');
+		add_meta_box('subscribe2', __('Subscribe2 Notification Override', 'subscribe2' ), array(&$this, 's2_meta_box'), 'page', 'advanced');
 	} // end s2_meta_init()
 
 	/**
@@ -3027,18 +3066,6 @@ class s2class {
 		}
 		echo " />";
 	} // end s2_meta_box()
-
-	/**
-	Meta box code for WordPress pre-2.5
-	*/
-	function s2_meta_box_old() {
-		echo "<div class=\"dbx-b-ox-wrapper\">\r\n";
-		echo "<fieldset id=\"s2_meta_box\" class=\"dbx-box\">\r\n";
-		echo "<div class=\"dbx-h-andle-wrapper\"><h3 class=\"dbx-handle\">" . __('Subscribe2 Notification Override', 'subscribe2') . "</h3></div>\r\n";
-		echo "<div class=\"dbx-c-ontent-wrapper\"><div class=\"dbx-content\">\r\n";
-		$this->s2_meta_box();
-		echo "</div></div></fieldset></div>\r\n";
-	} // end s2_meta_box_old()
 
 	/**
 	Meta box form handler
@@ -3171,73 +3198,56 @@ class s2class {
 
 /* ===== widget functions ===== */
 	/**
-	Registers our widget so it appears with the other available
-	widgets and can be dragged and dropped into any active sidebars
+	Register the form widget
 	*/
-	function widget_subscribe2widget($args) {
-		extract($args);
-		$options = get_option('widget_subscribe2widget');
-		$title = empty($options['title']) ? __('Subscribe2', 'subscribe2') : $options['title'];
-		$div = empty($options['div']) ? 'search' : $options['div'];
-		$widgetprecontent = empty($options['widgetprecontent']) ? '' : $options['widgetprecontent'];
-		$widgetpostcontent = empty($options['widgetpostcontent']) ? '' : $options['widgetpostcontent'];
-		echo $before_widget;
-		echo $before_title . $title . $after_title;
-		echo "<div class=\"" . $div . "\">";
-		$content = s2class::filter('<!--subscribe2-->');
-		if ( !empty($widgetprecontent) ) {
-			echo $widgetprecontent;
-		}
-		echo $content;
-		if ( !empty($widgetpostcontent) ) {
-			echo $widgetpostcontent;
-		}
-		echo "</div>";
-		echo $after_widget;
-	} // end widget_subscribe2widget()
+	function subscribe2_widget() {
+		require_once( WP_CONTENT_DIR . '/plugins/' . S2DIR . '/include/widget.php');
+		register_widget('S2_Form_widget');
+	} // end subscribe2_widget()
 
 	/**
-	Register the optional widget control form
+	Register the counter widget
 	*/
-	function widget_subscribe2widget_control() {
-		$options = $newoptions = get_option('widget_subscribe2widget');
-		if ( $_POST["s2w-submit"] ) {
-			$newoptions['title'] = strip_tags(stripslashes($_POST["s2w-title"]));
-			$newoptions['div'] = sanitize_title(strip_tags(stripslashes($_POST["s2w-div"])));
-			$newoptions['widgetprecontent'] = stripslashes($_POST["s2w-widgetprecontent"]);
-			$newoptions['widgetpostcontent'] = stripslashes($_POST["s2w-widgetpostcontent"]);
-		}
-		if ( $options != $newoptions ) {
-			$options = $newoptions;
-			update_option('widget_subscribe2widget', $options);
-		}
-		$title = htmlspecialchars($options['title'], ENT_QUOTES);
-		$widgetprecontent = htmlspecialchars($options['widgetprecontent'], ENT_QUOTES);
-		$widgetpostcontent = htmlspecialchars($options['widgetpostcontent'], ENT_QUOTES);
-		$div = $options['div'];
-		echo "<p><label for=\"s2w-title\">" . __('Title', 'subscribe2') . ":";
-		echo "<input class=\"widefat\" id=\"s2w-title\" name=\"s2w-title\" type=\"text\" value=\"" . $title . "\" /></label></p>";
-		echo "<p><label for=\"s2w-div\">" . __('Div class name', 'subscribe2') . ":";
-		echo "<input class=\"widefat\" id=\"s2w-title\" name=\"s2w-div\" type=\"text\" value=\"" . $div . "\" /></label></p>";
-		echo "<p><label for=\"s2w-widgetprecontent\">" . __('Pre-Content', 'subscribe2') . ":";
-		echo "<input class=\"widefat\" id=\"s2w-widgetprecontent\" name=\"s2w-widgetprecontent\" type=\"text\" value=\"" . $widgetprecontent . "\" /></label></p>";
-		echo "<p><label for=\"s2w-widgetpostcontent\">" . __('Post-Content', 'subscribe2') . ":";
-		echo "<input class=\"widefat\" id=\"s2w-widgetpostcontent\" name=\"s2w-widgetpostcontent\" type=\"text\" value=\"" . $widgetpostcontent . "\" /></label></p>";
-		echo "<input type=\"hidden\" id=\"s2w-submit\" name=\"s2w-submit\" value=\"1\" />";
-	} // end widget_subscribe2_widget_control()
+	function counter_widget() {
+		require_once( WP_CONTENT_DIR . '/plugins/' . S2DIR . '/include/counterwidget.php');
+		register_widget('S2_Counter_widget');
+	} // end counter_widget()
 
 	/**
-	Actually register the Widget into the WordPress Widget API
+	Function to add js files to admin header
 	*/
-	function register_subscribe2widget() {
-		//Check Sidebar Widget and Subscribe2 plugins are activated
-		if ( !function_exists('register_sidebar_widget') || !class_exists('s2class') ) {
-			return;
-		} else {
-			register_sidebar_widget('Subscribe2', array(&$this, 'widget_subscribe2widget'));
-			register_widget_control('Subscribe2', array(&$this, 'widget_subscribe2widget_control'));
-		}
-	} // end register_subscribe2widget()
+	function widget_s2counter_js() {
+		echo '<script type="text/javascript" src="' . WP_CONTENT_URL . '/plugins/' . S2DIR . '/include/colorpicker/js/colorpicker.js"></script>' . "\r\n";
+		echo "<script type=\"text/javascript\">
+			jQuery(document).ready(function() {
+				jQuery('.colorpickerField').focusin(function() {
+					jQuery(this).ColorPickerShow();
+				});
+				jQuery('.colorpickerField').focusout(function() {
+					jQuery(this).ColorPickerHide();
+				});
+				jQuery('.colorpickerField').ColorPicker({
+					onSubmit: function(hsb, hex, rgb, el) {
+						jQuery(el).val(hex);
+						jQuery(el).ColorPickerHide();
+					},
+					onBeforeShow: function () {
+						jQuery(this).ColorPickerSetColor(this.value);
+					}
+				})
+				.bind('keyup', function(){
+					jQuery(this).ColorPickerSetColor(this.value);
+				});
+			});
+			</script>";
+	} // end widget_s2_counter_js()
+
+	/**
+	Function to add css files to admin header
+	*/
+	function widget_s2counter_css() {
+		echo '<link rel="stylesheet" href="' . WP_CONTENT_URL . '/plugins/' . S2DIR . '/include/colorpicker/css/colorpicker.css" type="text/css" />' . "\r\n";
+	} // end widget_s2counter_css
 
 	function namechange_subscribe2_widget() {
 		// rename WPMU widgets without requiring user to re-enable
@@ -3283,18 +3293,9 @@ class s2class {
 	function button_init() {
 		if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) { return; }
 		if ( 'true' == get_user_option('rich_editing') ) {
-			global $wp_db_version;
-			//check if we are using WordPress 2.5+
-			if ( $wp_db_version >= 7098 ) {
-				// Use WordPress 2.5+ hooks
-				add_filter('mce_external_plugins', array(&$this, 'mce3_plugin'));
-				add_filter('mce_buttons', array(&$this, 'mce3_button'));
-			} else {
-				// Load and append our TinyMCE external plugin
-				add_filter('mce_plugins', array(&$this, 'mce2_plugin'));
-				add_filter('mce_buttons', array(&$this, 'mce2_button'));
-				add_filter('tinymce_before_init', array(&$this, 'tinymce2_before_init'));
-			}
+			// Use WordPress 2.5+ hooks
+			add_filter('mce_external_plugins', array(&$this, 'mce3_plugin'));
+			add_filter('mce_buttons', array(&$this, 'mce3_button'));
 		} else {
 			buttonsnap_separator();
 			buttonsnap_jsbutton(WP_CONTENT_URL . '/plugins/' . S2DIR . '/include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
@@ -3313,23 +3314,6 @@ class s2class {
 	function mce3_button($arr) {
 		$arr[] = 'subscribe2';
 		return $arr;
-	}
-
-	// Add buttons in WordPress v2.1+, thanks to An-archos
-	function mce2_plugin($plugins) {
-		array_push($plugins, '-subscribe2quicktags');
-		return $plugins;
-	}
-
-	function mce2_button($buttons) {
-		array_push($buttons, 'separator');
-		array_push($buttons, 'subscribe2quicktags');
-		return $buttons;
-	}
-
-	function tinymce2_before_init() {
-		$this->fullpath = WP_CONTENT_URL . '/plugins/' . S2DIR . '/tinymce/';
-		echo "tinyMCE.loadPlugin('subscribe2quicktags', '" . $this->fullpath . "');\n";
 	}
 
 	function s2_edit_form() {
@@ -3564,10 +3548,19 @@ class s2class {
 		if ( '1' == $this->subscribe2_options['show_button'] ) {
 			add_action('init', array(&$this, 'button_init'));
 		}
+
 		// add action to display widget if option is enabled
 		if ( '1' == $this->subscribe2_options['widget'] ) {
-			add_action('plugins_loaded', array(&$this, 'register_subscribe2widget'));
+			add_action('widgets_init', array(&$this, 'subscribe2_widget'));
 		}
+
+		// add action to display counter widget if option is enabled
+		if ( '1' == $this->subscribe2_options['counterwidget'] ) {
+			add_action('admin_print_styles', array(&$this, 'widget_s2counter_css'), 20);
+			add_action('admin_print_scripts', array(&$this, 'widget_s2counter_js'), 20);
+			add_action('widgets_init', array(&$this, 'counter_widget'));
+		}
+
 		// add action to handle WPMU subscriptions and unsubscriptions
 		if ( isset($_GET['s2mu_subscribe']) || isset($_GET['s2mu_unsubscribe']) ) {
 			add_action('init', array(&$this, 'wpmu_subscribe'));
@@ -3598,6 +3591,8 @@ class s2class {
 
 		if ( isset($_GET['s2']) ) {
 			// someone is confirming a request
+			if ( defined('DOING_S2_CONFIRM') && DOING_S2_CONFIRM ) { return; }
+			define( 'DOING_S2_CONFIRM', true );
 			add_filter('query_string', array(&$this, 'query_filter'));
 			add_filter('the_title', array(&$this, 'title_filter'));
 			add_filter('the_content', array(&$this, 'confirm'));

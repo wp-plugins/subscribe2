@@ -160,6 +160,12 @@ Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in y
 * Improved case sensitive SQL queries to avoid issues on some server configurations
 * Introduced option to check the notification override button by default at Settings->Subscribe2 - Appearance
 * Extend support for for multiuser sites to include WordPress 3.0
+* Converted both Widgets to the WordPress 2.8 API
+* Improved the Colour Picker in the Counter Widget
+* Integrated the Counter Widget into the Settings page
+* Removed several functions from the code for WordPress version prior to 2.8 (2.8 is now a minimum requirement for Subscribe2)
+* Removed tinymce files (tinymce3 work with current WordPress version)
+* Added code to prevent duplicate Public Subscriber entries
 
 = Version 5.9 by Matthew Robinson =
 
