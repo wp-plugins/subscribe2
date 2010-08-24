@@ -162,7 +162,7 @@ Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in y
 * Correct Digest display issue associated with use of AUTHORNAME keyword
 * Fixed issue where posts were not included in Digest notifications despite settings
 * Fixed possible issue where a page is not included in Digest notifications if a certain category is excluded
-* Fixed issue where successful emailing from Post->Mail Subscribers would report as failed if Subscribe2 is set to email one user per email - Thanks to Meini Renner (www.utechworld.com)
+* Fixed issue where successful emailing from Post->Mail Subscribers would report as failed if Subscribe2 is set to email one user per email - Thanks to Meini from Utech Computer Solutions (www.utechworld.com)
 * Added a preview button in the Email Subscribers screen that will send current content of the window to the logged in user
 * Avoid duplicating the MIME-Version header in the emails
 * Removed direct links to Support forum
