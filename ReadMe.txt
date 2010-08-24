@@ -2,7 +2,7 @@
 Contributors: MattyRob, Skippy, RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
-Requires at least: 2.0.x
+Requires at least: 2.8
 Tested up to: 3.0.1
 Stable tag: 5.9
 
@@ -155,7 +155,7 @@ Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in y
 
 == Changelog ==
 
-= Version 5.10 by Matthew Robinson =
+= Version 6.0 by Matthew Robinson =
 
 * Improved case sensitive SQL queries to avoid issues on some server configurations
 * Introduced option to check the notification override button by default at Settings->Subscribe2 - Appearance
@@ -174,7 +174,7 @@ Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in y
 * Correct Digest display issue associated with use of AUTHORNAME keyword
 * Fixed issue where posts were not included in Digest notifications despite settings
 * Fixed possible issue where a page is not included in Digest notifications if a certain category is excluded
-* Fixed issue where successful emailing from Post->Mail Subscribers would report as failed if Subscribe2 is set to email one user per email - Thanks to Meini Renner (www.utechworld.com)
+* Fixed issue where successful emailing from Post->Mail Subscribers would report as failed if Subscribe2 is set to email one user per email - Thanks to Meini from Utech Computer Solutions (www.utechworld.com)
 * Added a preview button in the Email Subscribers screen that will send current content of the window to the logged in user
 * Avoid duplicating the MIME-Version header in the emails
 * Removed direct links to Support forum
