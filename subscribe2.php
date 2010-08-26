@@ -3,14 +3,14 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 5.9
+Version: 6.0
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 */
 
 /*
-Copyright (C) 2006-9 Matthew Robinson
+Copyright (C) 2006-10 Matthew Robinson
 Based on the Original Subscribe2 plugin by 
 Copyright (C) 2005 Scott Merrill (skippy@skippy.net)
 
@@ -32,7 +32,7 @@ along with Subscribe2. If not, see <http://www.gnu.org/licenses/>.
 
 // our version number. Don't touch this or any line below
 // unless you know exacly what you are doing
-define( 'S2VERSION', '5.9' );
+define( 'S2VERSION', '6.0' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', plugin_basename(dirname(__FILE__)) );
 
@@ -40,14 +40,6 @@ define( 'S2DIR', plugin_basename(dirname(__FILE__)) );
 $safe_mode = array('On', 'ON', 'on', 1);
 if ( !in_array(ini_get('safe_mode'), $safe_mode) && ini_get('max_execution_time') < 300 ) {
 	@ini_set('max_execution_time', 300);
-}
-
-// Pre-2.6 compatibility
-if ( !defined('WP_CONTENT_URL') ) {
-	define( 'WP_CONTENT_URL', get_option('siteurl') . '/wp-content' );
-}
-if ( !defined('WP_CONTENT_DIR') ) {
-	define( 'WP_CONTENT_DIR', ABSPATH . 'wp-content' );
 }
 
 /* Include buttonsnap library by Owen Winckler */
@@ -2134,6 +2126,7 @@ class s2class {
 		echo "<dt><b>POST</b></dt><dd>" . __("the excerpt or the entire post<br />(<i>based on the subscriber's preferences</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>POSTTIME</b></dt><dd>" . __("the excerpt of the post and the time it was posted<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>TABLE</b></dt><dd>" . __("a list of post titles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>TABLELINKS</b></dt><dd>" . __("a list of post titles followed by links to the atricles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>PERMALINK</b></dt><dd>" . __("the post's permalink<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>TINYLINK</b></dt><dd>" . __("the post's permalink after conversion by TinyURL<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>DATE</b></dt><dd>" . __("the date the post was made<br />(<i>for per-post emails only</i>)", "subscribe2") . "</dd>\r\n";
@@ -3404,6 +3397,7 @@ class s2class {
 		$all_post_cats = array();
 		$mailtext = apply_filters('s2_email_template', $this->subscribe2_options['mailtext']);
 		$table = '';
+		$tablelinks = '';
 		$message_post= '';
 		$message_posttime = '';
 		foreach ( $posts as $post ) {
@@ -3439,7 +3433,8 @@ class s2class {
 				continue;
 			}
 			$post_title = html_entity_decode($post->post_title, ENT_QUOTES);
-			('' == $table) ? $table = "* " . $post_title : $table .= "\r\n* " . $post_title;
+			('' == $table) ? $table .= "* " . $post_title : $table .= "\r\n* " . $post_title;
+			('' == $tablelinks) ? $tablelinks .= "* " . $post_title : $tablelinks .= "\r\n* " . $post_title;
 			$message_post .= $post_title;
 			$message_posttime .= $post_title;
 			if ( strstr($mailtext, "AUTHORNAME") ) {
@@ -3452,6 +3447,7 @@ class s2class {
 			$message_post .= "\r\n";
 			$message_posttime .= "\r\n";
 			
+			$tablelinks .= "\r\n" . get_permalink($post->ID) . "\r\n";
 			$message_post .= get_permalink($post->ID) . "\r\n";
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
 			$message_posttime .= get_permalink($post->ID) . "\r\n";
@@ -3503,7 +3499,7 @@ class s2class {
 		$message_posttime = trim($message_posttime);
 
 		//sanity check - don't send a mail if the content is empty
-		if ( !$message_post && !$message_posttime && !$table ) {
+		if ( !$message_post && !$message_posttime && !$table && !$tablelinks ) {
 			return;
 		}
 
@@ -3518,6 +3514,7 @@ class s2class {
 		( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(get_option('blogname')) . "] ";
 		$subject .= $display . " " . __('Digest Email', 'subscribe2');
 		$mailtext = stripslashes($this->substitute($mailtext));
+		$mailtext = str_replace("TABLELINKS", $tablelinks, $mailtext);
 		$mailtext = str_replace("TABLE", $table, $mailtext);
 		$mailtext = str_replace("POSTTIME", $message_posttime, $mailtext);
 		$mailtext = str_replace("POST", $message_post, $mailtext);
