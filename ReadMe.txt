@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_butt
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 2.8
 Tested up to: 3.0.1
-Stable tag: 5.9
+Stable tag: 6.0
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -160,12 +160,13 @@ Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in y
 * Improved case sensitive SQL queries to avoid issues on some server configurations
 * Introduced option to check the notification override button by default at Settings->Subscribe2 - Appearance
 * Extend support for for multiuser sites to include WordPress 3.0
-* Converted both Widgets to the WordPress 2.8 API
+* Converted both Widgets to the WordPress 2.8 API - check your widgets are installation
 * Improved the Colour Picker in the Counter Widget
 * Integrated the Counter Widget into the Settings page
-* Removed several functions from the code for WordPress version prior to 2.8 (2.8 is now a minimum requirement for Subscribe2)
-* Removed tinymce files (tinymce3 work with current WordPress version)
+* Removed several functions from the code for WordPress versions prior to 2.8 (2.8 is now a minimum requirement for Subscribe2)
+* Removed legacy tinymce files that are no longer required
 * Added code to prevent duplicate Public Subscriber entries
+* Introduced TABLELINKS keyword for digest type notifications
 
 = Version 5.9 by Matthew Robinson =
 
