@@ -67,7 +67,7 @@ class S2_Form_widget extends WP_Widget {
 		$widgetprecontent = htmlspecialchars($instance['widgetprecontent'], ENT_QUOTES);
 		$widgetpostcontent = htmlspecialchars($instance['widgetpostcontent'], ENT_QUOTES);
 
-		echo "<div\r\n";
+		echo "<div>\r\n";
 		echo "<p><label for=\"" . $this->get_field_name('title') . "\">" . __('Title', 'subscribe2') . ":";
 		echo "<input class=\"widefat\" id=\"" . $this->get_field_id('title') . "\" name=\"" . $this->get_field_name('title') . "\" type=\"text\" value=\"" . $title . "\" /></label></p>";
 		echo "<p><label for=\"" . $this->get_field_name('div') . "\">" . __('Div class name', 'subscribe2') . ":";
@@ -76,7 +76,7 @@ class S2_Form_widget extends WP_Widget {
 		echo "<input class=\"widefat\" id=\"" . $this->get_field_name('widgetprecontent') . "\" name=\"" . $this->get_field_name('widgetprecontent') . "\" type=\"text\" value=\"" . $widgetprecontent . "\" /></label></p>";
 		echo "<p><label for=\"" . $this->get_field_name('widgetpostcontent') . "\">" . __('Post-Content', 'subscribe2') . ":";
 		echo "<input class=\"widefat\" id=\"" . $this->get_field_id('widgetpostcontent') . "\" name=\"" . $this->get_field_name('widgetpostcontent') . "\" type=\"text\" value=\"" . $widgetpostcontent . "\" /></label></p>";
-		echo "</div\r\n";
+		echo "</div>\r\n";
 	}
 } // End S2_Form_widget class
 ?>
