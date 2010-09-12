@@ -155,6 +155,12 @@ Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in y
 
 == Changelog ==
 
+= Version 6.1 by Matthew Robinson =
+
+* Fixed a glitch in the HTML tags in the Subscribe2 Widget that affected drag and drop functions in WordPress - thanks to Marty McOmber
+* Improved detection of Multisite installs - thanks to Nada Oneal
+* Fixed precontent and postcontent in the Widget to retain entered HTML tags - reported by Rob Saxe
+
 = Version 6.0 by Matthew Robinson =
 
 * Improved case sensitive SQL queries to avoid issues on some server configurations

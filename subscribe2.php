@@ -63,7 +63,7 @@ class s2class {
 		$this->please_log_in = "<p>" . __('To manage your subscription options please', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-login.php\">" . __('login', 'subscribe2') . "</a>.</p>";
 
 		$this->use_profile_admin = "<p>" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=s2_users\">" . __('profile', 'subscribe2') . "</a>.</p>";
-		if ( $this->s2_mu === true) {
+		if ( $this->s2_mu === true ) {
 			global $blog_id, $user_ID;
 			if ( !is_blog_user($blog_id) ) {
 				// if we are on multisite and the user is not a member of this blog change the link
@@ -72,7 +72,7 @@ class s2class {
 		}
 
 		$this->use_profile_users = "<p>" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/profile.php?page=s2_users\">" . __('profile', 'subscribe2') . "</a>.</p>";
-		if ( $this->s2_mu === true) {
+		if ( $this->s2_mu === true ) {
 			global $blog_id, $user_ID;
 			if ( !is_blog_user($blog_id) ) {
 				// if we are on multisite and the user is not a member of this blog change the link
@@ -3574,7 +3574,7 @@ class s2class {
 		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
 			$this->s2_mu = true;
 		}
-		if ( defined('WP_ALLOW_MULTISITE') && WP_ALLOW_MULTISITE === true ) {
+		if ( function_exists('is_multisite') && is_multisite() ) {
 			$this->s2_mu = true;
 		}
 

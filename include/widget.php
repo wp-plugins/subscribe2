@@ -41,8 +41,8 @@ class S2_Form_widget extends WP_Widget {
 		$instance = $old_instance;
 		$instance['title'] = strip_tags(stripslashes($new_instance['title']));
 		$instance['div'] = strip_tags(stripslashes($new_instance['div']));
-		$instance['widgetprecontent'] = strip_tags(stripslashes($new_instance['widgetprecontent']));
-		$instance['widgetpostcontent'] = strip_tags(stripslashes($new_instance['widgetpostcontent']));
+		$instance['widgetprecontent'] = stripslashes($new_instance['widgetprecontent']);
+		$instance['widgetpostcontent'] = stripslashes($new_instance['widgetpostcontent']);
 		
 		return $instance;
 	}
