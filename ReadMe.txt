@@ -162,6 +162,7 @@ Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in y
 * Fixed precontent and postcontent in the Widget to retain entered HTML tags - reported by Rob Saxe
 * Fixed a few small typos in the inline code comments and email subjects
 * Fixed a bug where Bulk Management changes to move all users to Plain Text Full content would result in blank settings - reported by Sean @ GetSatisfaction
+* Fixed issued with TIME and AUTHORNAME keywords in digest emails - thanks to Robert @ GetSatisfaction
 
 = Version 6.0 by Matthew Robinson =
 

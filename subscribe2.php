@@ -3372,15 +3372,15 @@ class s2class {
 			// collect posts
 			if ( $resend == 'resend' ) {
 				if ( $this->subscribe2_options['cron_order'] == 'desc' ) {
-					$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$last' AND post_date < '$prev' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC");
+					$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= '$last' AND post_date < '$prev' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC");
 				} else {
-					$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$last' AND post_date < '$prev' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC");
+					$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= '$last' AND post_date < '$prev' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC");
 				}
 			} else {
 				if ( $this->subscribe2_options['cron_order'] == 'desc' ) {
-					$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC");
+					$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC");
 				} else {
-					$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC");
+					$posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= '$prev' AND post_date < '$now' AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC");
 				}
 			}
 		} else {
@@ -3513,11 +3513,11 @@ class s2class {
 		$display = $scheds[$email_freq]['display'];
 		( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(get_option('blogname')) . "] ";
 		$subject .= $display . " " . __('Digest Email', 'subscribe2');
-		$mailtext = stripslashes($this->substitute($mailtext));
 		$mailtext = str_replace("TABLELINKS", $tablelinks, $mailtext);
 		$mailtext = str_replace("TABLE", $table, $mailtext);
 		$mailtext = str_replace("POSTTIME", $message_posttime, $mailtext);
 		$mailtext = str_replace("POST", $message_post, $mailtext);
+		$mailtext = stripslashes($this->substitute($mailtext));
 
 		// prepare recipients
 		if ( $preview != '' ) {
