@@ -98,8 +98,6 @@ class s2class {
 
 		$this->mail_failed = "<p>" . __('Message failed! Check your settings and check with your hosting provider', 'subscribe2') . "</p>";
 
-		$this->form = "<form method=\"post\" action=\"\"><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p>" . __('Your email:', 'subscribe2') . "<br /><input type=\"text\" name=\"email\" value=\"" . __('Enter email address...', 'subscribe2') . "\" size=\"20\" onfocus=\"if (this.value == '" . __('Enter email address...', 'subscribe2') . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . __('Enter email address...', 'subscribe2') . "';}\" /></p><p><input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" />&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" /></p></form>\r\n";
- 
 		// confirmation messages
 		$this->no_such_email = "<p>" . __('No such email address is registered.', 'subscribe2') . "</p>";
 
@@ -2169,7 +2167,9 @@ class s2class {
 
 		// WordPress page ID where subscribe2 token is used
 		echo __('Set default Subscribe2 page as ID', 'subscribe2') . ': ';
-		$this->pages_dropdown();
+		echo "<select name=\"page\">\r\n";
+		$this->pages_dropdown($this->subscribe2_options['s2page']);
+		echo "</select>\r\n";
 
 		// Number of subscribers per page
 		echo "<br /><br />" . __('Set the number of Subscribers displayed per page', 'subscribe2') . ': ';
@@ -2881,22 +2881,23 @@ class s2class {
 	/**
 	Create and display a dropdown list of pages
 	*/
-	function pages_dropdown() {
+	function pages_dropdown($s2page) {
 		global $wpdb;
 		$sql = "SELECT ID, post_title FROM $wpdb->posts WHERE post_type='page' AND post_status='publish'";
 		$pages = $wpdb->get_results($sql);
 
 		if ( empty($pages) ) { return; }
 
-		echo "<select name=\"page\">\r\n";
+		$option = '';
 		foreach ( $pages as $page ) {
-			echo "<option value=\"" . $page->ID . "\"";
-			if ( $page->ID == $this->subscribe2_options['s2page'] ) {
-				echo " selected=\"selected\"";
+			$option .= "<option value=\"" . $page->ID . "\"";
+			if ( $page->ID == $s2page ) {
+				$option .= " selected=\"selected\"";
 			}
-			echo ">" . $page->post_title . "</option>\r\n";
+			$option .= ">" . $page->post_title . "</option>\r\n";
 		}
-		echo "</select>\r\n";
+		
+		echo $option;
 	} // end pages_dropdown()
 
 	/**
@@ -3083,8 +3084,27 @@ class s2class {
 	/**
 	Display our form; also handles (un)subscribe requests
 	*/
-	function filter($content = '') {
-		if ( '' == $content || !strstr($content, '<!--subscribe2-->') ) { return $content; }
+	function shortcode($atts) {
+		extract(shortcode_atts(array(
+			'hide'  => '',
+			'id'    => ''
+			), $atts));
+
+		// if a button is hidden, show only other
+		if ( $hide == 'subscribe' ) {
+			$this->input_form_action = "<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" />";
+		} elseif ( $hide == 'unsubscribe' ) {
+			$this->input_form_action = "<input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" />";
+		} else {
+			// both form input actions
+			$this->input_form_action = "<input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" />&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" />";
+		}
+		// if ID is provided, get permalink
+		if ( $id ) {
+			$url = get_permalink( $id );
+		}
+		// build default form
+		$this->form = "<form method=\"post\" action=\"" . $url . "\"><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p>" . __('Your email:', 'subscribe2') . "<br /><input type=\"text\" name=\"email\" value=\"" . __('Enter email address...', 'subscribe2') . "\" size=\"20\" onfocus=\"if (this.value == '" . __('Enter email address...', 'subscribe2') . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . __('Enter email address...', 'subscribe2') . "';}\" /></p><p>" . $this->input_form_action . "</p></form>\r\n";
 		$this->s2form = $this->form;
 
 		global $user_ID;
@@ -3151,7 +3171,16 @@ class s2class {
 				}
 			}
 		}
-		return preg_replace('|(<p>)?(\n)*<!--subscribe2-->(\n)*(</p>)?|', $this->s2form, $content);
+		return $this->s2form;
+	} // end shortcode()
+
+	/**
+	Display form when deprecated <!--subscribe2--> is used
+	*/
+	function filter($content = '') {
+		if ( '' == $content || !strstr($content, '<!--subscribe2-->') ) { return $content; }
+
+		return preg_replace('|(<p>)?(\n)*<!--subscribe2-->(\n)*(</p>)?|', do_shortcode( '[subscribe2]' ), $content);
 	} // end filter()
 
 	/**
@@ -3366,7 +3395,7 @@ class s2class {
 			}
 			$s2_post_types = apply_filters('s2_post_types', $s2_post_types);
 			foreach( $s2_post_types as $post_type ) {
-				('' == $type) ? $type = "'$post_type'" : $type .= ", '$post_type'"; 
+				('' == $type) ? $type = "'$post_type'" : $type .= ", '$post_type'";
 			}
 
 			// collect posts
@@ -3613,6 +3642,7 @@ class s2class {
 		add_action('save_post', array(&$this, 's2_meta_handler'));
 		add_action('create_category', array(&$this, 'new_category'));
 		add_action('delete_category', array(&$this, 'delete_category'));
+		add_shortcode('subscribe2', array(&$this, 'shortcode'));
 		add_filter('the_content', array(&$this, 'filter'), 10);
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
 
