@@ -458,6 +458,11 @@ class s2class {
 	function publish($post = 0, $preview = '') {
 		if ( !$post ) { return $post; }
 
+		if ( $this->s2_mu ) {
+			global $switched;
+			if ( $switched ) { return; }
+		}
+
 		if ( $preview == '' ) {
 			// we aren't sending a Preview to the current user so carry out checks
 			$s2mail = get_post_meta($post->ID, 's2mail', true);
