@@ -3092,7 +3092,8 @@ class s2class {
 	function shortcode($atts) {
 		extract(shortcode_atts(array(
 			'hide'  => '',
-			'id'    => ''
+			'id'    => '',
+			'url' => ''
 			), $atts));
 
 		// if a button is hidden, show only other

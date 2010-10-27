@@ -32,8 +32,8 @@ If you want to send HTML emails to Public Subscribers too then upgrade to [Subsc
 4. Configure the options to taste, including the email template and any categories which should be excluded from notification
 5. Click the "Tools" admin menu link, and select "Subscribers".
 6. Manually subscribe people as you see fit.
-7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the subscribe2 token.  Or, if you prefer, you may manually insert the subscribe2 token:
-	<!--subscribe2-->
+7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the subscribe2 token.  Or, if you prefer, you may manually insert the subscribe2 shortcode or token:
+	[subscribe2] or the HTML invisible <!--subscribe2-->
 	***Ensure the token is on a line by itself and that it has a blank line above and below.***
 This token will automatically be replaced by dynamic subscription information and will display all forms and messages as necessary.
 8. In the WordPress "Settings" area for Subscribe2 select the page name in the "Appearance" section that of the WordPress page created in step 7.
@@ -115,9 +115,25 @@ The simple answer is yes you can but this is not supported so you need to figure
 
 Get them to register with your blog rather than using the Subscribe2 form. Additional fields would require much more intensive form processing, checking and entry into the database and since you won't then be able to easily use this information to persoanlise emails there really isn't any point in collecting this data.
 
-= I can't find or insert the Subscribe2 token, help! =
+= How do I use the Subscribe2 shortcode? =
 
-If, for some reason the Subscribe2 button does not appear in your browser window try refreshing your browser and cache (Shift and Reload in Firefox). If this still fails then insert the token manually. In the Rich Text Editor (TinyMCE) make sure you switch to the "code" view and type in <!--subscribe2-->.
+In version 6.1 of Subscribe2 the new standard WordPress shortcode [subscribe2] was introduced. By default, it behaves same as old Subscribe2 token, <--subscribe2-->, which means that it will show the same Subscribe2 output in your chosen page in WordPress or in the Widget.
+
+But it also has advanced options, which are related to form. The default form contains two buttons for subscribing and unsubscribing. You may, for example, only want form that handles unsubscribing, so the shortcode accepts a **hide** parameter to hide one of the buttons.
+
+If you use the shortcode [subscribe2 hide="subscribe"] then the button for subscribing will be hidden and similarly if you use [subscribe2 hide="unsubscribe"], only button for subscribing will be shown.
+
+The new shortcode also accepts two further attributes, these are **id** and **url**. To understand these parameters you need to understand that Subscribe2 returns a user to the default WordPress Page on your site where you use the shortcode or token however in some circumstances you may ant to override this behaviour. If you specify a WordPress page id using the id parameter or a full URL using the url parameter then the user would be returned to the alternative page.
+
+There are many scenarios in which to use new options, but here is an example:
+
+* Two separate WordPress pages, “Subscribe” that shows only Subscribe button, and “Unsubscibe”, that shows only Unsubscibe button. Both pages also have text that should help users in use of form.
+* In the widget, show only Subscribe button and post form content to page “Subcribe”
+* In the Subscribe2 email template for new post, add text “You can unsubscribe on a following page:” which is followed with link to “Unsubscribe” page
+
+= I can't find or insert the Subscribe2 token or shortcode, help! =
+
+If, for some reason the Subscribe2 button does not appear in your browser window try refreshing your browser and cache (Shift and Reload in Firefox). If this still fails then insert the token manually. In the Rich Text Editor (TinyMCE) make sure you switch to the "code" view and type in [subscribe2] or <!--subscribe2-->.
 
 = My digest email didn't send, how can I resend it? =
 
@@ -144,7 +160,7 @@ WordPress 2.0.x requires Subscribe2 from the 2.x stable branch. The most recent 
 = Why doesn't the form appear in my WordPress page? =
 This is usually caused by one of two things. Firstly, it is possible that the form is there but because you haven't logged out of WordPress yourself you are seeing a message about managing your profile instead. Log out of WordPress and it will appear as the subscription form you are probably expecting.
 
-Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in your page with a blank line above and below. The easient way to do this is to deactivate the plugin, visit your WordPress page and view the source. The token should be contained in the source code of the page. If it is not there you either have not correctly entered the token or you have another plugin that is stripping the token from the page code.
+Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correctly entered in your page with a blank line above and below. The easient way to do this is to deactivate the plugin, visit your WordPress page and view the source. The token should be contained in the source code of the page. If it is not there you either have not correctly entered the token or you have another plugin that is stripping the token from the page code.
 
 == Screenshots ==
 
@@ -163,6 +179,7 @@ Secondly, make sure that the token (<!--subscribe2-->) is correctly entered in y
 * Fixed a few small typos in the inline code comments and email subjects
 * Fixed a bug where Bulk Management changes to move all users to Plain Text Full content would result in blank settings - reported by Sean @ GetSatisfaction
 * Fixed issued with TIME and AUTHORNAME keywords in digest emails - thanks to Robert @ GetSatisfaction
+* Introduced a more flexible Subscribe2 shortcode - thanks to Milan for the patch code
 
 = Version 6.0 by Matthew Robinson =
 
