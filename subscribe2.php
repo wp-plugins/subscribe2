@@ -11,7 +11,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_butt
 
 /*
 Copyright (C) 2006-10 Matthew Robinson
-Based on the Original Subscribe2 plugin by 
+Based on the Original Subscribe2 plugin by
 Copyright (C) 2005 Scott Merrill (skippy@skippy.net)
 
 This file is part of Subscribe2.
@@ -258,14 +258,14 @@ class s2class {
 					restore_current_blog();
 				}
 
-				// delete old user meta keys 
+				// delete old user meta keys
 				delete_usermeta($user, 's2_subscribed');
 				foreach ( $categories as $cat ) {
 					delete_usermeta($user, 's2_cat' . $cat);
 				}
 			}
 		}
-		
+
 		// ensure existing public subscriber emails are all sanitized
 		$confirmed = $this->get_public();
 		$unconfirmed = $this->get_public(0);
@@ -889,7 +889,7 @@ class s2class {
 			$this->message = $this->added;
 			if ( '1' != $current ) {
 				$this->ip = $_SERVER['REMOTE_ADDR'];
-				$this->activate();
+				$this->activate($this->email);
 				if ( $this->subscribe2_options['admin_email'] == 'subs' || $this->subscribe2_options['admin_email'] == 'both' ) {
 					( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(get_option('blogname')) . "] ";
 					$subject .= __('New Subscription', 'subscribe2');
@@ -986,11 +986,11 @@ class s2class {
 	*/
 	function get_user_id($email = '') {
 		global $wpdb;
-		
+
 		if ( '' == $email ) { return false; }
-		
+
 		$id = $wpdb->get_var("SELECT id FROM $wpdb->users WHERE user_email='$email'");
-		
+
 		return $id;
 	} // end get_user_id()
 
@@ -1113,7 +1113,7 @@ class s2class {
 	*/
 	function signup_ip($email = '') {
 		if ( '' == $email ) {return false; }
-		
+
 		global $wpdb;
 		if ( !empty($this->signup_ips) ) {
 			return $this->signup_ips[$email];
@@ -1130,11 +1130,11 @@ class s2class {
 	function to ensure email is compliant with internet messaging standards
 	*/
 	function sanitize_email($email) {
-	if ( !is_email($email) ) { return; }
+		if ( !is_email($email) ) { return; }
 
-	// ensure that domain is in lowercase as per internet email standards
-	list($name, $domain) = explode('@', $email, 2);
-	return $name . "@" . strtolower($domain);;
+		// ensure that domain is in lowercase as per internet email standards
+		list($name, $domain) = explode('@', $email, 2);
+		return $name . "@" . strtolower($domain);;
 	} // end sanitize_email()
 
 	/**
@@ -1288,7 +1288,7 @@ class s2class {
 	*/
 	function format_change($format, $subscribers_string) {
 		if ( empty($format) ) { return; }
-		
+
 		global $wpdb;
 		$emails ='';
 		$subscribers = explode(',', $subscribers_string);
@@ -1507,7 +1507,7 @@ class s2class {
 			if ( $_POST['addresses'] ) {
 				$sub_error = '';
 				$unsub_error = '';
-				foreach ( preg_split ("/[\s,]+/", $_POST['addresses']) as $email ) {
+				foreach ( preg_split ("|[\s,]+|", $_POST['addresses']) as $email ) {
 					$email = $this->sanitize_email($email);
 					if ( is_email($email) && $_POST['subscribe'] ) {
 						if ( $this->is_public($email) !== false ) {
@@ -1811,7 +1811,7 @@ class s2class {
 			echo "<label><input type=\"radio\" name=\"format\" value=\"html\" /> " . __('HTML - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
 			echo "<label><input type=\"radio\" name=\"format\" value=\"html_excerpt\" /> " . __('HTML - Excerpt', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
 			echo "<label><input type=\"radio\" name=\"format\" value=\"post\" /> " . __('Plain Text - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
-			echo "<label><input type=\"radio\" name=\"format\" value=\"excerpt\" checked=\"checked\" /> " . __('Plain Text - Excerpt', 'subscribe2') . "</label>\r\n";	
+			echo "<label><input type=\"radio\" name=\"format\" value=\"excerpt\" checked=\"checked\" /> " . __('Plain Text - Excerpt', 'subscribe2') . "</label>\r\n";
 			echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_format\" value=\"" . __('Bulk Update Format', 'subscribe2') . "\" /></p>";
 		}
 		echo "</form></div>\r\n";
@@ -2123,6 +2123,7 @@ class s2class {
 		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-secondary\" name=\"preview\" value=\"" . __('Send Email Preview', 'subscribe2') . "\" /></p>\r\n";
 		echo "<h3>" . __('Message substitions', 'subscribe2') . "</h3>\r\n";
 		echo "<dl>";
+		echo "<dt><b><em style=\"color: red\">" . __('IF THE FOLLOWING KEYWORDS ARE ALSO IN YOUR POST THEY WILL BE SUBSTITUTED' ,'subscribe2') . "</em></b></dt><dd></dd>\r\n";
 		echo "<dt><b>BLOGNAME</b></dt><dd>" . get_option('blogname') . "</dd>\r\n";
 		echo "<dt><b>BLOGLINK</b></dt><dd>" . get_option('home') . "</dd>\r\n";
 		echo "<dt><b>TITLE</b></dt><dd>" . __("the post's title<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
@@ -2513,7 +2514,7 @@ class s2class {
 				$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 
 				$blogname = get_option('blogname');
-				if ( strlen($blogname) > 30 ) { 
+				if ( strlen($blogname) > 30 ) {
 					$blog['blogname'] = wp_html_excerpt($blogname, 30) . "..";
 				} else {
 					$blog['blogname'] = $blogname;
@@ -2799,7 +2800,7 @@ class s2class {
 
 		$sql = "SELECT ID, display_name FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value IN (8, 9, 10)";
 		$admins = $wpdb->get_results($sql);
-		
+
 		// handle issues from WordPress core where user_level is not set or set low
 		if ( empty($admins) ) {
 			$role = 'administrator';
@@ -2901,7 +2902,7 @@ class s2class {
 			}
 			$option .= ">" . $page->post_title . "</option>\r\n";
 		}
-		
+
 		echo $option;
 	} // end pages_dropdown()
 
@@ -2936,18 +2937,18 @@ class s2class {
 			$cat_ids[] = $cat->term_id;
 		}
 		$exportcsv .= "\r\n";
-		
+
 		foreach ( $subscribers as $subscriber ) {
 			if ( $this->is_registered($subscriber) ) {
-				$user_id = $this->get_user_id( $subscriber );
-				$user_info = get_userdata($user_id);
+				$user_ID = $this->get_user_id( $subscriber );
+				$user_info = get_userdata($user_ID);
 
 				$cats = explode(',', get_usermeta($user_info->ID, $this->get_usermeta_keyname('s2_subscribed')));
 				$subscribed_cats = '';
 				foreach ( $cat_ids as $cat ) {
 					(in_array($cat, $cats)) ? $subscribed_cats .= ",Yes" : $subscribed_cats .= ", No";
 				}
-	
+
 				$exportcsv .= $user_info->user_email . ',';
 				$exportcsv .= $user_info->display_name;
 				$exportcsv .= $subscribed_cats . "\r\n";
@@ -3110,7 +3111,7 @@ class s2class {
 			$url = get_permalink( $id );
 		}
 		// build default form
-		$this->form = "<form method=\"post\" action=\"" . $url . "\"><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p>" . __('Your email:', 'subscribe2') . "<br /><input type=\"text\" name=\"email\" value=\"" . __('Enter email address...', 'subscribe2') . "\" size=\"20\" onfocus=\"if (this.value == '" . __('Enter email address...', 'subscribe2') . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . __('Enter email address...', 'subscribe2') . "';}\" /></p><p>" . $this->input_form_action . "</p></form>\r\n";
+		$this->form = "<form method=\"post\" action=\"" . $url . "\"><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . __('Enter email address...', 'subscribe2') . "\" size=\"20\" onfocus=\"if (this.value == '" . __('Enter email address...', 'subscribe2') . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . __('Enter email address...', 'subscribe2') . "';}\" /></p><p>" . $this->input_form_action . "</p></form>\r\n";
 		$this->s2form = $this->form;
 
 		global $user_ID;
@@ -3144,7 +3145,7 @@ class s2class {
 						// lets see if they've tried to subscribe previously
 						if ( '1' !== $this->is_public($this->email) ) {
 							// the user is unknown or inactive
-							$this->add();
+							$this->add($this->email);
 							$status = $this->send_confirm('add');
 							// set a variable to denote that we've already run, and shouldn't run again
 							$this->filtered = 1;
@@ -3481,7 +3482,7 @@ class s2class {
 			}
 			$message_post .= "\r\n";
 			$message_posttime .= "\r\n";
-			
+
 			$tablelinks .= "\r\n" . get_permalink($post->ID) . "\r\n";
 			$message_post .= get_permalink($post->ID) . "\r\n";
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";

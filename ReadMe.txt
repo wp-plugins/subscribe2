@@ -42,7 +42,7 @@ This token will automatically be replaced by dynamic subscription information an
 
 = I want HTML email to be the default email type =
 
-You need to pay for the [Subscribe2 HTML version](http://wpplugins.com/plugin/46/subscribe2-html). 
+You need to pay for the [Subscribe2 HTML version](http://wpplugins.com/plugin/46/subscribe2-html).
 
 = Where can I get help? =
 So, you've downloaded the plugin an it isn't doing what you expect. First you should read the included documentation. There is a ReadMe.txt file and a PDF startup guide installed with the plugin.
@@ -60,7 +60,7 @@ In the first instance ***check this with your hosting provider***, they have acc
 
 Some hosting providers place a restriction on the maximum number of recipients in any one email message.  Some hosts simply block all emails on certain low-cost hosting plans.
 
-Subscribe2 provides a facility to work around this restriction by sending batches of emails.  To enable this feature, go to Settings->Subscribe2 and located the setting to restrict the number of recipients per email. If this is set to 30 then each outgoing email notification will only contain addresses for 30 recipients. 
+Subscribe2 provides a facility to work around this restriction by sending batches of emails.  To enable this feature, go to Settings->Subscribe2 and located the setting to restrict the number of recipients per email. If this is set to 30 then each outgoing email notification will only contain addresses for 30 recipients.
 
 Reminder: because subscribe2 places all recipients in BCC fields, and places the blog admin in the TO field, the blog admin will receive one email per batched delivery.  So if you have 90 subscribers, the blog admin should receive three post notification emails, one for each set of 30 BCC recipients.
 
@@ -127,9 +127,9 @@ The new shortcode also accepts two further attributes, these are **id** and **ur
 
 There are many scenarios in which to use new options, but here is an example:
 
-* Two separate WordPress pages, “Subscribe” that shows only Subscribe button, and “Unsubscibe”, that shows only Unsubscibe button. Both pages also have text that should help users in use of form.
-* In the widget, show only Subscribe button and post form content to page “Subcribe”
-* In the Subscribe2 email template for new post, add text “You can unsubscribe on a following page:” which is followed with link to “Unsubscribe” page
+* Two separate WordPress pages, "Subscribe" that shows only Subscribe button, and "Unsubscibe", that shows only Unsubscibe button. Both pages also have text that should help users in use of form.
+* In the widget, show only Subscribe button and post form content to page "Subcribe"
+* In the Subscribe2 email template for new post, add text "You can unsubscribe on a following page:" which is followed with link to "Unsubscribe" page
 
 = I can't find or insert the Subscribe2 token or shortcode, help! =
 
@@ -171,6 +171,10 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 == Changelog ==
 
+= Version 6.2 by Matthew Robinson =
+
+* Pass email address to add() function explicitly
+
 = Version 6.1 by Matthew Robinson =
 
 * Fixed a glitch in the HTML tags in the Subscribe2 Widget that affected drag and drop functions in WordPress - thanks to Marty McOmber
@@ -209,7 +213,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Improved the 'Save Emails to CSV' function to include additional information - Thanks to John Griffiths (www.luadesign.co.uk)
 * Report that there is no digest notification to resend rather than success if there are no posts in the email
 
-= Version 5.8 by Matthew Robinson = 
+= Version 5.8 by Matthew Robinson =
 
 * Reverted erroneous use of a WordPress 3.0 function
 
@@ -299,7 +303,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 * Option to sort digest posts in ascending or descending order
 * Check that plugin options array exists before calling upgrade functions
-* Improved reliability of the Preview function 
+* Improved reliability of the Preview function
 * Extended Preview function to digest emails
 * Fixed a code glitch that stopped CATS and TAGS from working
 * Fixed incorrect sender information is emails are set to come from Post Author
@@ -340,7 +344,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Improved the layout of the Subscriber drop down menu
 * Added bullet points to the TABLE of posts
 * Ensure database remains clean when categories are deleted
-* Added new option to manage how auto-subscribe handles excluded categories 
+* Added new option to manage how auto-subscribe handles excluded categories
 
 = Version 4.15 by Matthew Robinson =
 
@@ -391,7 +395,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Subscribers are sorted alphabetically before sending notifications
 * Added ability to bulk unsubscribe a list of emails pasted into manage window
 * Define number of subscribers in Manage window
-* Added options for admin emails when public users subscribe or unsubscribe 
+* Added options for admin emails when public users subscribe or unsubscribe
 * Fixed bug that prevented sending of Reminder emails from Manage->Subscribers
 * Amended confirmation code so that only one email is sent no matter how many times users click on (un)subscribe links
 
@@ -565,7 +569,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * QuickTag button added! Works with Visual and Standard Editor. __Look in Code for token addition if using RTE.__
 * Current Server time displayed for Cron tasks
 * Fixed bug so Registered users now identified correctly
-* Upgrade function called via WordPress hook to prevent calls to undefined functions 
+* Upgrade function called via WordPress hook to prevent calls to undefined functions
 * Fixed a bug affecting Registered Users not appearing in the drop down list
 * Improved handling of the Subscribe2 option array
 
@@ -615,7 +619,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 * Current Server time displayed for Cron tasks
 * Fixed bug so Registered users now identified correctly
-* Upgrade function called via WordPress hook to prevent calls to undefined functions 
+* Upgrade function called via WordPress hook to prevent calls to undefined functions
 
 = Version 2.16 by Matthew Robinson =
 
