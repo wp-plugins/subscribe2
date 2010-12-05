@@ -3,7 +3,7 @@ Contributors: MattyRob, Skippy, RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 2.8
-Tested up to: 3.0.1
+Tested up to: 3..0.2
 Stable tag: 6.1
 
 Sends a list of subscribers an email notification when new posts are published to your blog
@@ -14,7 +14,7 @@ Subscribe2 provides a comprehensive subscription management and email notificati
 
 Email Notifications can be sent on a per-post basis or periodically in a Digest email. Additionally, certain categories can be excluded from inclusion in the notification and posts can be excluded on an individual basis by setting a custom field.
 
-The plugin also handles subscription requests allowing users to publically subscribe (**Public Subscribers**) by submitting their email address in an easy to use form or to register with your blog (**Registered Users**) which enables greater flexibility over the email content for per-post notifications for the subscriber. Admins are given control over the presentation of the email notifications, can bulk manage subscriptions for users and manually send email notices to subscribers.
+The plugin also handles subscription requests allowing users to publicly subscribe (**Public Subscribers**) by submitting their email address in an easy to use form or to register with your blog (**Registered Users**) which enables greater flexibility over the email content for per-post notifications for the subscriber. Admins are given control over the presentation of the email notifications, can bulk manage subscriptions for users and manually send email notices to subscribers.
 
 The format of the email can also be customised for per-post notifications, subscribe2 can generate emails for each of the following formats:
 
@@ -86,7 +86,7 @@ If the above has not put you off then I spent some time writing a Mail Queue scr
 
 = Why is my admin address getting emails from Subscribe2? =
 
-This plugin sends emails to your subscribers using the BCC (Blind Cardon Copy) header in email messages. Each email is sent TO: the admin address. There may be emails for a plain text excerpt notification, palin text full text and HTML format emails and additionally if the BCCLIMIT has been set due to hosting restrictions duplicate copies of these emails will be sent to the admin address.
+This plugin sends emails to your subscribers using the BCC (Blind Carbon Copy) header in email messages. Each email is sent TO: the admin address. There may be emails for a plain text excerpt notification, plain text full text and HTML format emails and additionally if the BCCLIMIT has been set due to hosting restrictions duplicate copies of these emails will be sent to the admin address.
 
 = I can't find my subscribers / the options / something else =
 
@@ -113,7 +113,7 @@ The simple answer is yes you can but this is not supported so you need to figure
 
 = I'd like to be able to collect more information from users when they subscribe, can I? =
 
-Get them to register with your blog rather than using the Subscribe2 form. Additional fields would require much more intensive form processing, checking and entry into the database and since you won't then be able to easily use this information to persoanlise emails there really isn't any point in collecting this data.
+Get them to register with your blog rather than using the Subscribe2 form. Additional fields would require much more intensive form processing, checking and entry into the database and since you won't then be able to easily use this information to personalise emails there really isn't any point in collecting this data.
 
 = How do I use the Subscribe2 shortcode? =
 
@@ -127,8 +127,8 @@ The new shortcode also accepts two further attributes, these are **id** and **ur
 
 There are many scenarios in which to use new options, but here is an example:
 
-* Two separate WordPress pages, "Subscribe" that shows only Subscribe button, and "Unsubscibe", that shows only Unsubscibe button. Both pages also have text that should help users in use of form.
-* In the widget, show only Subscribe button and post form content to page "Subcribe"
+* Two separate WordPress pages, "Subscribe" that shows only Subscribe button, and "Unsubscribe", that shows only Unsubscribe button. Both pages also have text that should help users in use of form.
+* In the widget, show only Subscribe button and post form content to page "Subscribe"
 * In the Subscribe2 email template for new post, add text "You can unsubscribe on a following page:" which is followed with link to "Unsubscribe" page
 
 = I can't find or insert the Subscribe2 token or shortcode, help! =
@@ -174,6 +174,10 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 = Version 6.2 by Matthew Robinson =
 
 * Pass email address to add() function explicitly
+* Fix typos in the ReadMe
+* Added warning on the Options page to avoid using the Subscribe2 KEYWORDS in posts as they will get substituted
+* Added HTML LABEL tags to the SSubscribe2 form to support WCAG
+* SSL friendly with WordPress admin areas
 
 = Version 6.1 by Matthew Robinson =
 

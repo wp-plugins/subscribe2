@@ -34,7 +34,8 @@ along with Subscribe2. If not, see <http://www.gnu.org/licenses/>.
 // unless you know exactly what you are doing
 define( 'S2VERSION', '6.2' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
-define( 'S2DIR', plugin_basename(dirname(__FILE__)) );
+define( 'S2DIR', trailingslashit(plugin_basename(dirname(__FILE__))) );
+define( 'S2URL', plugin_dir_url(dirname(__FILE__)) . S2DIR );
 
 // Set minimum execution time to 5 minutes - won't affect safe mode
 $safe_mode = array('On', 'ON', 'on', 1);
@@ -44,7 +45,7 @@ if ( !in_array(ini_get('safe_mode'), $safe_mode) && ini_get('max_execution_time'
 
 /* Include buttonsnap library by Owen Winckler */
 if ( !class_exists('buttonsnap') ) {
-	require( WP_CONTENT_DIR . '/plugins/' . S2DIR . '/include/buttonsnap.php' );
+	require( WP_CONTENT_DIR . '/plugins/' . S2DIR . 'include/buttonsnap.php' );
 }
 
 $mysubscribe2 = new s2class;
@@ -140,22 +141,22 @@ class s2class {
 	Hook for Admin Drop Down Icons
 	*/
 	function ozh_s2_icon() {
-		return WP_CONTENT_URL . '/plugins/' . S2DIR . '/include/email_edit.png';
+		return S2URL . 'include/email_edit.png';
 	} // end ozh_s2_icon()
 
 	/**
 	Insert Javascript into admin_header
 	*/
 	function checkbox_form_js() {
-		wp_enqueue_script('s2_checkbox', WP_CONTENT_URL . '/plugins/' . S2DIR . '/include/s2_checkbox.js', array('jquery'), '1.0');
+		wp_enqueue_script('s2_checkbox', S2URL . 'include/s2_checkbox.js', array('jquery'), '1.0');
 	} //end checkbox_form_js()
 
 	function user_admin_css() {
-		wp_enqueue_style('s2_user_admin', WP_CONTENT_URL . '/plugins/ '. S2DIR . '/include/s2_user_admin.css', array(), '1.0');
+		wp_enqueue_style('s2_user_admin', S2URL . 'include/s2_user_admin.css', array(), '1.0');
 	}
 
 	function option_form_js() {
-		wp_enqueue_script('s2_edit', WP_CONTENT_URL . '/plugins/' . S2DIR . '/include/s2_edit.js', array('jquery'), '1.0');
+		wp_enqueue_script('s2_edit', S2URL . 'include/s2_edit.js', array('jquery'), '1.0');
 	} // end option_form_js()
 
 /* ===== Install, upgrade, reset ===== */
@@ -2506,7 +2507,7 @@ class s2class {
 				if ( !is_array($current_plugins) ) {
 					$current_plugins = (array)$current_plugins;
 				}
-				if ( !in_array(S2DIR . '/subscribe2.php', $current_plugins) ) {
+				if ( !in_array(S2DIR . 'subscribe2.php', $current_plugins) ) {
 					continue;
 				}
 
@@ -3006,7 +3007,7 @@ class s2class {
 	Adds a links directly to the settings page from the plugin page
 	*/
 	function plugin_links($links, $file) {
-		if ( $file == S2DIR.'/subscribe2.php' ) {
+		if ( $file == S2DIR.'subscribe2.php' ) {
 			$links[] = "<a href='options-general.php?page=s2_settings'>" . __('Settings', 'subscribe2') . "</a>";
 			$links[] = "<a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904'><b>" . __('Donate', 'subscribe2') . "</b></a>";
 		}
@@ -3230,7 +3231,7 @@ class s2class {
 	Register the form widget
 	*/
 	function subscribe2_widget() {
-		require_once( WP_CONTENT_DIR . '/plugins/' . S2DIR . '/include/widget.php');
+		require_once( WP_CONTENT_DIR . '/plugins/' . S2DIR . 'include/widget.php');
 		register_widget('S2_Form_widget');
 	} // end subscribe2_widget()
 
@@ -3238,7 +3239,7 @@ class s2class {
 	Register the counter widget
 	*/
 	function counter_widget() {
-		require_once( WP_CONTENT_DIR . '/plugins/' . S2DIR . '/include/counterwidget.php');
+		require_once( WP_CONTENT_DIR . '/plugins/' . S2DIR . 'include/counterwidget.php');
 		register_widget('S2_Counter_widget');
 	} // end counter_widget()
 
@@ -3246,7 +3247,7 @@ class s2class {
 	Function to add js files to admin header
 	*/
 	function widget_s2counter_js() {
-		echo '<script type="text/javascript" src="' . WP_CONTENT_URL . '/plugins/' . S2DIR . '/include/colorpicker/js/colorpicker.js"></script>' . "\r\n";
+		echo '<script type="text/javascript" src="' . S2URL . 'include/colorpicker/js/colorpicker.js"></script>' . "\r\n";
 		echo "<script type=\"text/javascript\">
 			jQuery(document).ready(function() {
 				jQuery('.colorpickerField').focusin(function() {
@@ -3275,7 +3276,7 @@ class s2class {
 	Function to add css files to admin header
 	*/
 	function widget_s2counter_css() {
-		echo '<link rel="stylesheet" href="' . WP_CONTENT_URL . '/plugins/' . S2DIR . '/include/colorpicker/css/colorpicker.css" type="text/css" />' . "\r\n";
+		echo '<link rel="stylesheet" href="' . S2URL . 'include/colorpicker/css/colorpicker.css" type="text/css" />' . "\r\n";
 	} // end widget_s2counter_css
 
 	function namechange_subscribe2_widget() {
@@ -3327,7 +3328,7 @@ class s2class {
 			add_filter('mce_buttons', array(&$this, 'mce3_button'));
 		} else {
 			buttonsnap_separator();
-			buttonsnap_jsbutton(WP_CONTENT_URL . '/plugins/' . S2DIR . '/include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
+			buttonsnap_jsbutton(S2URL . 'include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
 		}
 	} // end button_init()
 
@@ -3335,7 +3336,7 @@ class s2class {
 	Add buttons for WordPress 2.5+ using built in hooks
 	*/
 	function mce3_plugin($arr) {
-		$path = WP_CONTENT_URL . '/plugins/' . S2DIR . '/tinymce3/editor_plugin.js';
+		$path = S2URL . 'tinymce3/editor_plugin.js';
 		$arr['subscribe2'] = $path;
 		return $arr;
 	}
