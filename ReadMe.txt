@@ -3,7 +3,7 @@ Contributors: MattyRob, Skippy, RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 2.8
-Tested up to: 3..0.2
+Tested up to: 3.0.4
 Stable tag: 6.1
 
 Sends a list of subscribers an email notification when new posts are published to your blog
@@ -20,9 +20,10 @@ The format of the email can also be customised for per-post notifications, subsc
 
 * plaintext excerpt
 * plaintext full post (Registered Users only)
+* HTML excerpt (Registered Users only)
 * HTML full post (Registered Users only)
 
-If you want to send HTML emails to Public Subscribers too then upgrade to [Subscribe2 HTML](http://wpplugins.com/plugin/46/subscribe2-html).
+If you want to send full content HTML emails to Public Subscribers too then upgrade to [Subscribe2 HTML](http://wpplugins.com/plugin/46/subscribe2-html).
 
 == Installation ==
 
@@ -53,7 +54,7 @@ No joy there? Well, if you can't find an answer to your question you can get [pa
 
 = Where can I get more information about the plugin features? =
 
-A comprehensive guide that covers many, if not all, of the Subscribe2 features is available to purchase from the [iAssistant](http://the-iassistant.com/subscribe2-guide/)
+A comprehensive guide that covers many, if not all, of the Subscribe2 features is available to purchase from the [My WP Works](http://mywpworks.com/store/subscribe2-ebook/)
 
 = Some or all email notifications fail to send, why?  =
 In the first instance ***check this with your hosting provider***, they have access to your server logs and will be able to tell you where and why emails are being blocked.

@@ -424,9 +424,14 @@ class s2class {
 	*/
 	function headers($type='text') {
 		if ( empty($this->myname) || empty($this->myemail) ) {
-			$admin = $this->get_userdata($this->subscribe2_options['sender']);
-			$this->myname = html_entity_decode($admin->display_name, ENT_QUOTES);
-			$this->myemail = $admin->user_email;
+			if ( $this->subscribe2_options['sender'] == 'blogname' ) {
+				$this->myname = html_entity_decode(get_option('blogname'), ENT_QUOTES);
+				$this->myemail = get_option('admin_email');
+			} else {
+				$admin = $this->get_userdata($this->subscribe2_options['sender']);
+				$this->myname = html_entity_decode($admin->display_name, ENT_QUOTES);
+				$this->myemail = $admin->user_email;
+			}
 		}
 
 		$header['From'] = $this->myname . " <" . $this->myemail . ">";
@@ -552,12 +557,17 @@ class s2class {
 		if ( 'author' == $this->subscribe2_options['sender'] ) {
 			// get author details
 			$user = &$author;
+			$this->myemail = $user->user_email;
+			$this->myname = html_entity_decode($user->display_name, ENT_QUOTES);
+		} elseif ( 'blogname' == $this->subscribe2_options['sender'] ) {
+			$this->myemail = get_option('admin_email');
+			$this->myname = html_entity_decode(get_option('blogname'), ENT_QUOTES);
 		} else {
 			// get admin details
 			$user = $this->get_userdata($this->subscribe2_options['sender']);
+			$this->myemail = $user->user_email;
+			$this->myname = html_entity_decode($user->display_name, ENT_QUOTES);
 		}
-		$this->myemail = $user->user_email;
-		$this->myname = html_entity_decode($user->display_name, ENT_QUOTES);
 
 		$this->post_cat_names = implode(', ', wp_get_post_categories($post->ID, array('fields' => 'names')));
 		$this->post_tag_names = implode(', ', wp_get_post_tags($post->ID, array('fields' => 'names')));
@@ -1866,10 +1876,13 @@ class s2class {
 				// admin_email
 				$this->subscribe2_options['admin_email'] = $_POST['admin_email'];
 
-				// send as author or admin?
-				$sender = 'author';
+				// send as blogname, author or admin?
 				if ( is_numeric($_POST['sender']) ) {
 					$sender = $_POST['sender'];
+				} elseif ($_POST['sender'] == 'author') {
+					$sender = 'author';
+				} else {
+					$sender = 'blogname';
 				}
 				$this->subscribe2_options['sender'] = $sender;
 
@@ -2816,6 +2829,7 @@ class s2class {
 
 		if ( $inc_author ) {
 			$author[] = (object)array('ID' => 'author', 'display_name' => 'Post Author');
+			$author[] = (object)array('ID' => 'blogname', 'display_name' => html_entity_decode(get_option('blogname'), ENT_QUOTES));
 			$admins = array_merge($author, $admins);
 		}
 
@@ -3426,7 +3440,7 @@ class s2class {
 		}
 
 		// do we have any posts?
-		if ( empty($posts) ) { return false; }
+		if ( empty($posts) && !has_filter('s2_digest_email') ) { return false; }
 		$this->post_count = count($posts);
 
 		// if we have posts, let's prepare the digest
@@ -3535,15 +3549,24 @@ class s2class {
 		$message_post = trim($message_post);
 		$message_posttime = trim($message_posttime);
 
+		// apply filter to allow external content to be inserted or content manipulated
+		$message_post = apply_filters('s2_digest_email', $now, $prev, $last, $this->subscribe2_options['cron_order']);
+		$message_posttime = apply_filters('s2_digest_email', $now, $prev, $last, $this->subscribe2_options['cron_order']);
+
 		//sanity check - don't send a mail if the content is empty
 		if ( !$message_post && !$message_posttime && !$table && !$tablelinks ) {
 			return;
 		}
 
-		// get admin details
-		$user = $this->get_userdata($this->subscribe2_options['sender']);
-		$this->myemail = $user->user_email;
-		$this->myname = html_entity_decode($user->display_name, ENT_QUOTES);
+		// get sender details
+		if ( $this->subscribe2_options['sender'] == 'blogname' ) {
+			$this->myname = html_entity_decode(get_option('blogname'), ENT_QUOTES);
+			$this->myemail = get_bloginfo('admin_email');
+		} else {
+			$user = $this->get_userdata($this->subscribe2_options['sender']);
+			$this->myemail = $user->user_email;
+			$this->myname = html_entity_decode($user->display_name, ENT_QUOTES);
+		}
 
 		$scheds = (array)wp_get_schedules();
 		$email_freq = $this->subscribe2_options['email_freq'];
