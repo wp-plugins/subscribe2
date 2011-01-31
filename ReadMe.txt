@@ -177,8 +177,11 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Pass email address to add() function explicitly
 * Fix typos in the ReadMe
 * Added warning on the Options page to avoid using the Subscribe2 KEYWORDS in posts as they will get substituted
-* Added HTML LABEL tags to the SSubscribe2 form to support WCAG
+* Added HTML LABEL tags to the Subscribe2 form to support WCAG
 * SSL friendly with WordPress admin areas
+* Added filter to allow on-the-fly manipulation of the digest email
+* Added option choice to have emails send from the global admin email and addressed from the name of the blog
+* Change sending details for Preview emails so they can be more easily identified by type
 
 = Version 6.1 by Matthew Robinson =
 

@@ -61,50 +61,50 @@ class s2class {
 	function load_strings() {
 		// adjust the output of Subscribe2 here
 
-		$this->please_log_in = "<p>" . __('To manage your subscription options please', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-login.php\">" . __('login', 'subscribe2') . "</a>.</p>";
+		$this->please_log_in = "<p class=\"s2_message\">" . __('To manage your subscription options please', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-login.php\">" . __('login', 'subscribe2') . "</a>.</p>";
 
-		$this->use_profile_admin = "<p>" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=s2_users\">" . __('profile', 'subscribe2') . "</a>.</p>";
+		$this->use_profile_admin = "<p class=\"s2_message\">" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=s2_users\">" . __('profile', 'subscribe2') . "</a>.</p>";
 		if ( $this->s2_mu === true ) {
 			global $blog_id, $user_ID;
 			if ( !is_blog_user($blog_id) ) {
 				// if we are on multisite and the user is not a member of this blog change the link
-				$this->use_profile_admin = "<p><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a>" . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
+				$this->use_profile_admin = "<p class=\"s2_message\"><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a>" . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
 			}
 		}
 
-		$this->use_profile_users = "<p>" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/profile.php?page=s2_users\">" . __('profile', 'subscribe2') . "</a>.</p>";
+		$this->use_profile_users = "<p class=\"s2_message\">" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/profile.php?page=s2_users\">" . __('profile', 'subscribe2') . "</a>.</p>";
 		if ( $this->s2_mu === true ) {
 			global $blog_id, $user_ID;
 			if ( !is_blog_user($blog_id) ) {
 				// if we are on multisite and the user is not a member of this blog change the link
-				$this->use_profile_users = "<p><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a>" . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
+				$this->use_profile_users = "<p class=\"s2_message\"><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a>" . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
 			}
 		}
 
-		$this->confirmation_sent = "<p>" . __('A confirmation message is on its way!', 'subscribe2') . "</p>";
+		$this->confirmation_sent = "<p class=\"s2_message\">" . __('A confirmation message is on its way!', 'subscribe2') . "</p>";
 
-		$this->already_subscribed = "<p>" . __('That email address is already subscribed.', 'subscribe2') . "</p>";
+		$this->already_subscribed = "<p class=\"s2_error\">" . __('That email address is already subscribed.', 'subscribe2') . "</p>";
 
-		$this->not_subscribed = "<p>" . __('That email address is not subscribed.', 'subscribe2') . "</p>";
+		$this->not_subscribed = "<p class=\"s2_error\">" . __('That email address is not subscribed.', 'subscribe2') . "</p>";
 
-		$this->not_an_email = "<p>" . __('Sorry, but that does not look like an email address to me.', 'subscribe2') . "</p>";
+		$this->not_an_email = "<p class=\"s2_error\">" . __('Sorry, but that does not look like an email address to me.', 'subscribe2') . "</p>";
 
-		$this->barred_domain = "<p>" . __('Sorry, email addresses at that domain are currently barred due to spam, please use an alternative email address.', 'subscribe2') . "</p>";
+		$this->barred_domain = "<p class=\"s2_error\">" . __('Sorry, email addresses at that domain are currently barred due to spam, please use an alternative email address.', 'subscribe2') . "</p>";
 
-		$this->error = "<p>" . __('Sorry, there seems to be an error on the server. Please try again later.', 'subscribe2') . "</p>";
+		$this->error = "<p class=\"s2_error\">" . __('Sorry, there seems to be an error on the server. Please try again later.', 'subscribe2') . "</p>";
 
-		$this->no_page = "<p>" . __('You must to create a WordPress page for this plugin to work correctly.', 'subscribe2') . "<p>";
+		$this->no_page = "<p class=\"s2_error\">" . __('You must to create a WordPress page for this plugin to work correctly.', 'subscribe2') . "<p>";
 
-		$this->mail_sent = "<p>" . __('Message sent!', 'subscribe2') . "</p>";
+		$this->mail_sent = "<p class=\"s2_message\">" . __('Message sent!', 'subscribe2') . "</p>";
 
-		$this->mail_failed = "<p>" . __('Message failed! Check your settings and check with your hosting provider', 'subscribe2') . "</p>";
+		$this->mail_failed = "<p class=\"s2_error\">" . __('Message failed! Check your settings and check with your hosting provider', 'subscribe2') . "</p>";
 
 		// confirmation messages
-		$this->no_such_email = "<p>" . __('No such email address is registered.', 'subscribe2') . "</p>";
+		$this->no_such_email = "<p class=\"s2_error\">" . __('No such email address is registered.', 'subscribe2') . "</p>";
 
-		$this->added = "<p>" . __('You have successfully subscribed!', 'subscribe2') . "</p>";
+		$this->added = "<p class=\"s2_message\">" . __('You have successfully subscribed!', 'subscribe2') . "</p>";
 
-		$this->deleted = "<p>" . __('You have successfully unsubscribed.', 'subscribe2') . "</p>";
+		$this->deleted = "<p class=\"s2_message\">" . __('You have successfully unsubscribed.', 'subscribe2') . "</p>";
 
 		$this->subscribe = __('subscribe', 'subscribe2'); //ACTION replacement in subscribing confirmation email
 
@@ -583,8 +583,8 @@ class s2class {
 			$plaintext = strip_shortcodes($plaintext);
 		}
 		$gallid = '[gallery id="' . $post->ID . '"]';
-		$post->post_content = str_replace('[gallery]', $gallid, $post->post_content);
-		$content = apply_filters('the_content', $post->post_content);
+		$content = str_replace('[gallery]', $gallid, $post->post_content);
+		$content = apply_filters('the_content', $content);
 		$content = str_replace("]]>", "]]&gt", $content);
 		$excerpt = $post->post_excerpt;
 		if ( '' == $excerpt ) {
@@ -635,11 +635,14 @@ class s2class {
 
 		if ( $preview != '' ) {
 			$this->myemail = $preview;
-			$this->myname = "Preview";
+			$this->myname = __('Plain Text Excerpt Preview', 'subscribe2');
 			$this->mail(array($preview), $subject, $excerpt_body);
+			$this->myname = __('Plain Text Full Preview', 'subscribe2');
 			$this->mail(array($preview), $subject, $full_body);
-			$this->mail(array($preview), $subject, $html_body, 'html');
+			$this->myname = __('HTML Excerpt Preview', 'subscribe2');
 			$this->mail(array($preview), $subject, $html_excerpt_body, 'html');
+			$this->myname = __('HTML Full Preview', 'subscribe2');
+			$this->mail(array($preview), $subject, $html_body, 'html');
 		} else {
 			// first we send plaintext summary emails
 			$registered = $this->get_registered("cats=$post_cats_string&format=excerpt");
@@ -3550,8 +3553,8 @@ class s2class {
 		$message_posttime = trim($message_posttime);
 
 		// apply filter to allow external content to be inserted or content manipulated
-		$message_post = apply_filters('s2_digest_email', $now, $prev, $last, $this->subscribe2_options['cron_order']);
-		$message_posttime = apply_filters('s2_digest_email', $now, $prev, $last, $this->subscribe2_options['cron_order']);
+		$message_post = apply_filters('s2_digest_email', $message_post, $now, $prev, $last, $this->subscribe2_options['cron_order']);
+		$message_posttime = apply_filters('s2_digest_email', $message_posttime, $now, $prev, $last, $this->subscribe2_options['cron_order']);
 
 		//sanity check - don't send a mail if the content is empty
 		if ( !$message_post && !$message_posttime && !$table && !$tablelinks ) {
@@ -3582,7 +3585,7 @@ class s2class {
 		// prepare recipients
 		if ( $preview != '' ) {
 			$this->myemail = $preview;
-			$this->myname = "Preview";
+			$this->myname = __('Digest Preview', 'subscribe2');
 			$this->mail(array($preview), $subject, $mailtext);
 		} else {
 			$public = $this->get_public();
