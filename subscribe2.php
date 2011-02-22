@@ -68,7 +68,7 @@ class s2class {
 			global $blog_id, $user_ID;
 			if ( !is_blog_user($blog_id) ) {
 				// if we are on multisite and the user is not a member of this blog change the link
-				$this->use_profile_admin = "<p class=\"s2_message\"><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a>" . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
+				$this->use_profile_admin = "<p class=\"s2_message\"><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a> " . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
 			}
 		}
 
@@ -77,7 +77,7 @@ class s2class {
 			global $blog_id, $user_ID;
 			if ( !is_blog_user($blog_id) ) {
 				// if we are on multisite and the user is not a member of this blog change the link
-				$this->use_profile_users = "<p class=\"s2_message\"><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a>" . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
+				$this->use_profile_users = "<p class=\"s2_message\"><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a> " . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
 			}
 		}
 
@@ -2383,7 +2383,7 @@ class s2class {
 						delete_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat);
 					}
 				}
-				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
+				delete_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 			} elseif ( $cats == 'digest' ) {
 				$all_cats = get_categories(array('hide_empty' => false));
 				foreach ( $all_cats as $cat ) {
@@ -2514,11 +2514,11 @@ class s2class {
 			$blogs_subscribed = array();
 			$blogs_notsubscribed = array();
 
-			foreach ( $blogs as $key => $blog ) {
+			foreach ( $blogs as $blog ) {
 				// switch to blog
 				switch_to_blog($blog['blog_id']);
 
-				// check that the plugin is active on the current blog
+				// check that the Subscribe2 plugin is active on the current blog
 				$current_plugins = get_option('active_plugins');
 				if ( !is_array($current_plugins) ) {
 					$current_plugins = (array)$current_plugins;
@@ -3009,7 +3009,8 @@ class s2class {
 		global $wpdb;
 		$blogs = $wpdb->get_results( $wpdb->prepare("SELECT blog_id, domain, path FROM $wpdb->blogs WHERE site_id = %d AND archived = '0' AND mature = '0' AND spam = '0' AND deleted = '0' ORDER BY registered DESC", $wpdb->siteid), ARRAY_A );
 
-		foreach ( (array) $blogs as $details ) {
+		foreach ( $blogs as $details ) {
+			//reindex the array so the key is the same as the blog_id
 			$blog_list[$details['blog_id']] = $details;
 		}
 

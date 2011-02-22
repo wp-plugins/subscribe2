@@ -73,7 +73,7 @@ Subscribe2 supports 4 potential email formats for Susbcribers so you will get a 
 
 = Why do I need to create a WordPress Page =
 
-Subscribe2 uses a filer system to display dynamic output to your readers. The token may result in the display of the subscription form, a subscription message, confirmation that an email has been sent, a prompt to log in. This information needs a static location for the output of the filter and a WordPress page is the ideal place for this to happen.
+Subscribe2 uses a filter system to display dynamic output to your readers. The token may result in the display of the subscription form, a subscription message, confirmation that an email has been sent, a prompt to log in. This information needs a static location for the output of the filter and a WordPress page is the ideal place for this to happen.
 
 If you decide to use Subscribe2 only using the widget you must still have at least one WordPress page on your site for Subscribe2 to work correctly.
 
@@ -87,7 +87,7 @@ If the above has not put you off then I spent some time writing a Mail Queue scr
 
 = Why is my admin address getting emails from Subscribe2? =
 
-This plugin sends emails to your subscribers using the BCC (Blind Carbon Copy) header in email messages. Each email is sent TO: the admin address. There may be emails for a plain text excerpt notification, plain text full text and HTML format emails and additionally if the BCCLIMIT has been set due to hosting restrictions duplicate copies of these emails will be sent to the admin address.
+This plugin sends emails to your subscribers using the BCC (Blind Carbon Copy) header in email messages. Each email is sent TO: the admin address. There may be emails for a plain text excerpt notification, plain text full text and HTML format emails and additionally if the number of recipients per email has been set due to hosting restrictions duplicate copies of these emails will be sent to the admin address.
 
 = I can't find my subscribers / the options / something else =
 
@@ -104,7 +104,7 @@ There are basically only 2 types of subscriber. Public Subscribers and Registere
 
 Public subscribers have provided their email address for email notification of your new posts. When they enter there address on your site they are sent an email asking them to confirm their request and added to a list of Unconfirmed Subscribers. Once they complete their request by clicking on the link in their email they will become Confirmed Subscribers. They will receive a limited email notification when new post is made or periodically (unless that post is assigned to one of the excluded categories you defined).  The general public will receive a plaintext email with an excerpt of the post: either the excerpt you created when making the post, the portion of text before a <!--more--> tag (if present), or the first 50 words or so of the post.
 
-Registered Users have registered with your WorPress blog (provided you have enabled this in the core WordPress settings). Registered users of the blog can elect to receive email notifications for specific categories (unless Digest email are select, then it is an opt in or out decision).  The Users->Subscription menu item will also allow them greater control to select the delivery format (plaintext or HTML), amount of message (excerpt or full post), and the categories to which they want to subscribe.  You, the blog owner, have the option (Options->Subscribe2) to allow registered users to subscribe to your excluded categories or not.
+Registered Users have registered with your WordPress blog (provided you have enabled this in the core WordPress settings). Registered users of the blog can elect to receive email notifications for specific categories (unless Digest email are select, then it is an opt in or out decision).  The Users->Subscription menu item will also allow them greater control to select the delivery format (plaintext or HTML), amount of message (excerpt or full post), and the categories to which they want to subscribe.  You, the blog owner, have the option (Options->Subscribe2) to allow registered users to subscribe to your excluded categories or not.
 
 **Note** You can send HTML emails to Public Subscribers with the paid [Subscribe2 HTML version](http://wpplugins.com/plugin/46/subscribe2-html) of the plugin.
 
@@ -182,6 +182,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Added filter to allow on-the-fly manipulation of the digest email
 * Added option choice to have emails send from the global admin email and addressed from the name of the blog
 * Change sending details for Preview emails so they can be more easily identified by type
+* Fixed a typo in a screen message to WordPressMU users
 
 = Version 6.1 by Matthew Robinson =
 
