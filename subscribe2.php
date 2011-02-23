@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 6.2
+Version: 6.3
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -236,7 +236,7 @@ class s2class {
 			// loop through all users
 			foreach ( $users as $user ) {
 				// get categories which the user is subscribed to (old ones)
-				$categories = get_usermeta($user, 's2_subscribed');
+				$categories = get_user_meta($user, 's2_subscribed', true);
 				$categories = explode(',', $categories);
 
 				// load blogs of user (only if we need them)
@@ -252,17 +252,17 @@ class s2class {
 					$subscribed_categories = array_intersect($categories, $blog_categories);
 					if ( !empty($subscribed_categories) ) {
 						foreach ( $subscribed_categories as $subscribed_category ) {
-							update_usermeta($user, $this->get_usermeta_keyname('s2_cat') . $subscribed_category, $subscribed_category);
+							update_user_meta($user, $this->get_usermeta_keyname('s2_cat') . $subscribed_category, $subscribed_category);
 						}
-						update_usermeta($user, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $subscribed_categories));
+						update_user_meta($user, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $subscribed_categories));
 					}
 					restore_current_blog();
 				}
 
 				// delete old user meta keys
-				delete_usermeta($user, 's2_subscribed');
+				delete_user_meta($user, 's2_subscribed');
 				foreach ( $categories as $cat ) {
-					delete_usermeta($user, 's2_cat' . $cat);
+					delete_user_meta($user, 's2_cat' . $cat);
 				}
 			}
 		}
@@ -1186,47 +1186,47 @@ class s2class {
 		if ( false !== $this->is_public($this->sanitize_email($user->user_email)) ) {
 			// delete this user from the public table, and subscribe them to all the categories
 			$this->delete($user->user_email);
-			update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
 			foreach ( explode(',', $cats) as $cat ) {
-				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
 			}
-			update_usermeta($user_ID, 's2_format', 'excerpt');
-			update_usermeta($user_ID, 's2_autosub', $this->subscribe2_options['autosub_def']);
+			update_user_meta($user_ID, 's2_format', 'excerpt');
+			update_user_meta($user_ID, 's2_autosub', $this->subscribe2_options['autosub_def']);
 		} else {
 			// create post format entries for all users
-			$check_format = get_usermeta($user_ID, 's2_format');
+			$check_format = get_user_meta($user_ID, 's2_format', true);
 			if ( empty($check_format) ) {
 				// ensure existing subscription options are not overwritten on upgrade
 				if ( in_array($this->subscribe2_options['autoformat'], array('html', 'html_excerpt', 'post', 'excerpt')) ) {
-					update_usermeta($user_ID, 's2_format', $this->subscribe2_options['autoformat']);
+					update_user_meta($user_ID, 's2_format', $this->subscribe2_options['autoformat']);
 				} else {
-					update_usermeta($user_ID, 's2_format', 'excerpt');
+					update_user_meta($user_ID, 's2_format', 'excerpt');
 				}
-				update_usermeta($user_ID, 's2_autosub', $this->subscribe2_options['autosub_def']);
+				update_user_meta($user_ID, 's2_autosub', $this->subscribe2_options['autosub_def']);
 				// if the are no existing subscriptions, create them if, by default if autosub is on
 				if ( 'yes' == $this->subscribe2_options['autosub'] || ( 'wpreg' == $this->subscribe2_options['autosub'] && 'on' == $_POST['subscribe'] ) ) {
-					update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
 					foreach ( explode(',', $cats) as $cat ) {
-						update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
+						update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
 					}
 				}
 			} else {
 				// if user is already registered update format remove 's2_excerpt' field and update 's2_format'
 				if ( 'html' == $check_format ) {
-					delete_usermeta($user_ID, 's2_excerpt');
+					delete_user_meta($user_ID, 's2_excerpt');
 				} elseif ( 'text' == $check_format ) {
-					update_usermeta($user_ID, 's2_format', get_usermeta($user_ID, 's2_excerpt'));
-					delete_usermeta($user_ID, 's2_excerpt');
+					update_user_meta($user_ID, 's2_format', get_user_meta($user_ID, 's2_excerpt'), true);
+					delete_user_meta($user_ID, 's2_excerpt');
 				}
 			}
-			$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+			$subscribed = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
 			if ( strstr($subscribed, '-1') ) {
 				// make sure we remove '-1' from any settings
 				$old_cats = explode(',', $subscribed);
 				$pos = array_search('-1', $old_cats);
 				unset($old_cats[$pos]);
 				$cats = implode(',', $old_cats);
-				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
 			}
 		}
 		return $user_ID;
@@ -1246,7 +1246,7 @@ class s2class {
 		$user_IDs = $wpdb->get_col($sql);
 
 		foreach ( $user_IDs as $user_ID ) {
-			$old_cats = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+			$old_cats = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
 			if ( !empty($old_cats) ) {
 				$old_cats = explode(',', $old_cats);
 				$newcats = array_unique(array_merge($cats, $old_cats));
@@ -1256,9 +1256,9 @@ class s2class {
 			if ( !empty($newcats) ) {
 				// add subscription to these cat IDs
 				foreach ( $newcats as $id ) {
-					update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id, "$id");
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id, "$id");
 				}
-				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $newcats));
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $newcats));
 			}
 			unset($newcats);
 		}
@@ -1278,20 +1278,20 @@ class s2class {
 		$user_IDs = $wpdb->get_col($sql);
 
 		foreach ( $user_IDs as $user_ID ) {
-			$old_cats = explode(',', get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
+			$old_cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 			$remain = array_diff($old_cats, $cats);
 			if ( !empty($remain) ) {
 				// remove subscription to these cat IDs and update s2_subscribed
 				foreach ( $cats as $id ) {
-					delete_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
+					delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
 				}
-				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
 			} else {
 				// remove subscription to these cat IDs and update s2_subscribed to ''
 				foreach ( $cats as $id ) {
-					delete_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
+					delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
 				}
-				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
 			}
 			unset($remain);
 		}
@@ -1355,12 +1355,12 @@ class s2class {
 				foreach ( $all_cats as $cat => $term ) {
 					$term_id = $term->term_id;
 					$cats[] = $term_id;
-					update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $term_id, $term_id);
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $term_id, $term_id);
 				}
 				if ( empty($cats) ) {
-					update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
 				} else {
-					update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
 				}
 
 				// don't restore_current_blog(); -> redirect to new subscription page
@@ -1375,16 +1375,16 @@ class s2class {
 				$user_ID = get_current_user_id();
 
 				// delete subscription to all categories on that blog
-				$cats = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				$cats = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
 				$cats = explode(',', $cats);
 				if ( !is_array($cats) ) {
 					$cats = array($cats);
 				}
 
 				foreach ( $cats as $id ) {
-					delete_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
+					delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
 				}
-				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
 
 				// add an action hook for external manipulation of blog and user data
 				do_action_ref_array('subscribe2_wpmu_unsubscribe', array($user_ID, $blog_id));
@@ -1433,14 +1433,14 @@ class s2class {
 			if ( '' == $user_IDs ) { return; }
 
 			foreach ( $user_IDs as $user_ID ) {
-				$old_cats = explode(',', get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
+				$old_cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 				if ( !is_array($old_cats) ) {
 					$old_cats = array($old_cats);
 				}
 				// add subscription to these cat IDs
-				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $new_category, "$new_category");
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $new_category, "$new_category");
 				$newcats = array_merge($old_cats, (array)$new_category);
-				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $newcats));
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $newcats));
 			}
 		} elseif ( 'exclude' == $this->subscribe2_options['show_autosub'] ) {
 			$excluded_cats = explode(',', $this->subscribe2_options['exclude']);
@@ -1458,14 +1458,14 @@ class s2class {
 		if ( '' == $user_IDs ) { return; }
 
 		foreach ( $user_IDs as $user_ID ) {
-			$old_cats = explode(',', get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
+			$old_cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 			if ( !is_array($old_cats) ) {
 				$old_cats = array($old_cats);
 			}
 			// add subscription to these cat IDs
-			update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $deleted_category, '');
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $deleted_category, '');
 			$remain = array_diff($old_cats, (array)$deleted_category);
-			update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
 		}
 	}
 
@@ -2371,46 +2371,46 @@ class s2class {
 			check_admin_referer('subscribe2-user_subscribers' . $s2nonce);
 
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Subscription preferences updated.', 'subscribe2') . "</strong></p></div>\n";
-			update_usermeta($user_ID, 's2_format', $_POST['s2_format']);
-			update_usermeta($user_ID, 's2_autosub', $_POST['new_category']);
+			update_user_meta($user_ID, 's2_format', $_POST['s2_format']);
+			update_user_meta($user_ID, 's2_autosub', $_POST['new_category']);
 
 			$cats = $_POST['category'];
 
 			if ( empty($cats) || $cats == '-1' ) {
-				$oldcats = explode(',', get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
+				$oldcats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 				if ( $oldcats ) {
 					foreach ( $oldcats as $cat ) {
-						delete_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat);
+						delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat);
 					}
 				}
-				delete_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 			} elseif ( $cats == 'digest' ) {
 				$all_cats = get_categories(array('hide_empty' => false));
 				foreach ( $all_cats as $cat ) {
 					('' == $catids) ? $catids = "$cat->term_id" : $catids .= ",$cat->term_id";
-					update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
 				}
-				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $catids);
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $catids);
 			} else {
 				 if ( !is_array($cats) ) {
 					$cats = array($_POST['category']);
 				}
-				$old_cats = explode(',', get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
+				$old_cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 				$remove = array_diff($old_cats, $cats);
 				$new = array_diff($cats, $old_cats);
 				if ( !empty($remove) ) {
 					// remove subscription to these cat IDs
 					foreach ( $remove as $id ) {
-						delete_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
+						delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
 					}
 				}
 				if ( !empty($new) ) {
 					// add subscription to these cat IDs
 					foreach ( $new as $id ) {
-						update_usermeta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id, $id);
+						update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id, $id);
 					}
 				}
-				update_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
 			}
 		}
 
@@ -2431,22 +2431,22 @@ class s2class {
 		if ( $this->subscribe2_options['email_freq'] == 'never' ) {
 			echo __('Receive email as', 'subscribe2') . ": &nbsp;&nbsp;";
 			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"html\"";
-			if ( 'html' == get_usermeta($user_ID, 's2_format') ) {
+			if ( 'html' == get_user_meta($user_ID, 's2_format', true) ) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('HTML - Full', 'subscribe2') ."</label>&nbsp;&nbsp;";
 			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"html_excerpt\" ";
-			if ( 'html_excerpt' == get_usermeta($user_ID, 's2_format') ) {
+			if ( 'html_excerpt' == get_user_meta($user_ID, 's2_format', true) ) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('HTML - Excerpt', 'subscribe2') . "</label>&nbsp;&nbsp;";
 			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"post\" ";
-			if ( 'post' == get_usermeta($user_ID, 's2_format') ) {
+			if ( 'post' == get_user_meta($user_ID, 's2_format', true) ) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('Plain Text - Full', 'subscribe2') . "</label>&nbsp;&nbsp;";
 			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"excerpt\" ";
-			if ( 'excerpt' == get_usermeta($user_ID, 's2_format') ) {
+			if ( 'excerpt' == get_user_meta($user_ID, 's2_format', true) ) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . "</label><br /><br />\r\n";
@@ -2454,12 +2454,12 @@ class s2class {
 			if ( $this->subscribe2_options['show_autosub'] == 'yes' ) {
 				echo __('Automatically subscribe me to newly created categories', 'subscribe2') . ': &nbsp;&nbsp;';
 				echo "<label><input type=\"radio\" name=\"new_category\" value=\"yes\" ";
-				if ( 'yes' == get_usermeta($user_ID, 's2_autosub') ) {
+				if ( 'yes' == get_user_meta($user_ID, 's2_autosub', true) ) {
 					echo "checked=\"checked\" ";
 				}
 				echo "/> " . __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
 				echo "<label><input type=\"radio\" name=\"new_category\" value=\"no\" ";
-				if ( 'no' == get_usermeta($user_ID, 's2_autosub') ) {
+				if ( 'no' == get_user_meta($user_ID, 's2_autosub', true) ) {
 					echo "checked=\"checked\" ";
 				}
 				echo "/> " . __('No', 'subscribe2') . "</label>";
@@ -2469,7 +2469,7 @@ class s2class {
 			// subscribed categories
 			if ( $this->s2_mu ) {
 				global $blog_id;
-				$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				$subscribed = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
 				// if we are subscribed to the current blog display an "unsubscribe" link
 				if ( !empty($subscribed) ) {
 					$unsubscribe_link = get_option('home') . "/wp-admin/?s2mu_unsubscribe=". $blog_id;
@@ -2483,18 +2483,18 @@ class s2class {
 			} else {
 				echo "<h2>" . __('Subscribed Categories', 'subscribe2') . "</h2>\r\n";
 			}
-			$this->display_category_form(explode(',', get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'))), $this->subscribe2_options['reg_override']);
+			$this->display_category_form(explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true)), $this->subscribe2_options['reg_override']);
 		} else {
 			// we're doing daily digests, so just show
 			// subscribe / unnsubscribe
 			echo __('Receive periodic summaries of new posts?', 'subscribe2') . ': &nbsp;&nbsp;';
 			echo "<label>";
 			echo "<input type=\"radio\" name=\"category\" value=\"digest\" ";
-			if ( get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')) ) {
+			if ( get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true) ) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('Yes', 'subscribe2') . "</label> <label><input type=\"radio\" name=\"category\" value=\"-1\" ";
-			if ( !get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed')) ) {
+			if ( !get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true) ) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('No', 'subscribe2');
@@ -2528,7 +2528,7 @@ class s2class {
 				}
 
 				// check if we're subscribed to the blog
-				$subscribed = get_usermeta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				$subscribed = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
 
 				$blogname = get_option('blogname');
 				if ( strlen($blogname) > 30 ) {
@@ -2961,7 +2961,7 @@ class s2class {
 				$user_ID = $this->get_user_id( $subscriber );
 				$user_info = get_userdata($user_ID);
 
-				$cats = explode(',', get_usermeta($user_info->ID, $this->get_usermeta_keyname('s2_subscribed')));
+				$cats = explode(',', get_user_meta($user_info->ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 				$subscribed_cats = '';
 				foreach ( $cat_ids as $cat ) {
 					(in_array($cat, $cats)) ? $subscribed_cats .= ",Yes" : $subscribed_cats .= ", No";
