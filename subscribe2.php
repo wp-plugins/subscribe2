@@ -30,6 +30,14 @@ You should have received a copy of the GNU General Public License
 along with Subscribe2. If not, see <http://www.gnu.org/licenses/>.
 */
 
+
+global $wp_version;
+if ( version_compare($wp_version, '3.0', '<') ) {
+	// Subscribe2 needs WordPress 3.0 or above, exit if not on a compatible version
+	$exit_msg = sprintf(__('This version of Subscribe2 requires WordPress 3.0 or greater. Please update %1$s or use an older version of %2$s.', 'subscribe2'), '<a href="http://codex.wordpress.org/Updating_WordPress">Wordpress</a>', '<a href="http://wordpress.org/extend/plugins/subscribe2/download/">Subscribe2</a>');
+	exit($exit_msg);
+}
+
 // our version number. Don't touch this or any line below
 // unless you know exactly what you are doing
 define( 'S2VERSION', '6.2' );
@@ -912,11 +920,21 @@ class s2class {
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
 					if ( empty($recipients) ) {
 						$role = 'administrator';
-						if ( !class_exists(WP_User_Search) ) {
-							require(ABSPATH . 'wp-admin/includes/user.php');
+						global $wp_version;
+						if ( version_compare($wp_version, '3.1', '<') ) {
+							// WordPress version is less than 3.1, use WP_User_Search class
+							if ( !class_exists(WP_User_Search) ) {
+								require(ABSPATH . 'wp-admin/includes/user.php');
+								$wp_user_query = new WP_User_Search( '', '', $role);
+							}
+						} else {
+							// WordPress version is 3.1 or greater, use WP_User_Query class
+							if ( !class_exists(WP_User_Query) ) {
+								require(ABSPATH . 'wp-includes/user.php');
+								$wp_user_query = new WP_User_Query( '', '', $role);
+							}
 						}
-						$wp_user_search = new WP_User_Search( '', '', $role);
-						$admins_string = implode(', ', $wp_user_search->get_results());
+						$admins_string = implode(', ', $wp_user_query->get_results());
 						$sql = "SELECT user_email FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
 						$recipients = $wpdb->get_col($sql);
 					}
@@ -940,11 +958,21 @@ class s2class {
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
 					if ( empty($recipients) ) {
 						$role = 'administrator';
-						if ( !class_exists(WP_User_Search) ) {
-							require(ABSPATH . 'wp-admin/includes/user.php');
+						global $wp_version;
+						if ( version_compare($wp_version, '3.1', '<') ) {
+							// WordPress version is less than 3.1, use WP_User_Search class
+							if ( !class_exists(WP_User_Search) ) {
+								require(ABSPATH . 'wp-admin/includes/user.php');
+								$wp_user_query = new WP_User_Search( '', '', $role);
+							}
+						} else {
+							// WordPress version is 3.1 or greater, use WP_User_Query class
+							if ( !class_exists(WP_User_Query) ) {
+								require(ABSPATH . 'wp-includes/user.php');
+								$wp_user_query = new WP_User_Query( '', '', $role);
+							}
 						}
-						$wp_user_search = new WP_User_Search( '', '', $role);
-						$admins_string = implode(', ', $wp_user_search->get_results());
+						$admins_string = implode(', ', $wp_user_query->get_results());
 						$sql = "SELECT user_email FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
 						$recipients = $wpdb->get_col($sql);
 					}
@@ -1493,11 +1521,21 @@ class s2class {
 		// handle issues from WordPress core where user_level is not set or set low
 		if ( empty($admin) ) {
 			$role = 'administrator';
-			if ( !class_exists(WP_User_Search) ) {
-				require(ABSPATH . 'wp-admin/includes/user.php');
-			}
-			$wp_user_search = new WP_User_Search( '', '', $role);
-			$results = $wp_user_search->get_results();
+			global $wp_version;
+				if ( version_compare($wp_version, '3.1', '<') ) {
+					// WordPress version is less than 3.1, use WP_User_Search class
+					if ( !class_exists(WP_User_Search) ) {
+						require(ABSPATH . 'wp-admin/includes/user.php');
+						$wp_user_query = new WP_User_Search( '', '', $role);
+					}
+				} else {
+					// WordPress version is 3.1 or greater, use WP_User_Query class
+					if ( !class_exists(WP_User_Query) ) {
+						require(ABSPATH . 'wp-includes/user.php');
+						$wp_user_query = new WP_User_Query( '', '', $role);
+					}
+				}
+			$results = $wp_user_query->get_query();
 			$admin = $results[0];
 		}
 
@@ -2507,8 +2545,9 @@ class s2class {
 
 		// list of subscribed blogs on wordpress mu
 		if ( $this->s2_mu && !isset($_GET['email']) ) {
-			global $blog_id;
+			global $blog_id, $current_user;
 			$s2blog_id = $blog_id;
+			get_currentuserinfo();
 			$blogs = $this->get_mu_blog_list();
 
 			$blogs_subscribed = array();
@@ -2559,7 +2598,7 @@ class s2class {
 						echo "<span class=\"buttons\">" . __('Viewing Settings Now', 'subscribe2') . "</span>\r\n";
 					} else {
 						echo "<span class=\"buttons\">";
-						if ( is_blog_user($blog['blog_id']) ) {
+						if ( is_user_member_of_blog($current_user->id, $blog['blog_id']) ) {
 							echo "<a href=\"". $blog['subscribe_page'] . "\">" . __('View Settings', 'subscribe2') . "</a>\r\n";
 						}
 						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_unsubscribe=" . $blog['blog_id'] . "\">" . __('Unsubscribe', 'subscribe2') . "</a></span>\r\n";
@@ -2580,7 +2619,7 @@ class s2class {
 						echo "<span class=\"buttons\">" . __('Viewing Settings Now', 'subscribe2') . "</span>\r\n";
 					} else {
 						echo "<span class=\"buttons\">";
-						if ( is_blog_user($blog['blog_id']) ) {
+						if ( is_user_member_of_blog($current_user->id, $blog['blog_id']) ) {
 							echo "<a href=\"". $blog['subscribe_page'] . "\">" . __('View Settings', 'subscribe2') . "</a>\r\n";
 						}
 						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_subscribe=" . $blog['blog_id'] . "\">" . __('Subscribe', 'subscribe2') . "</a></span>\r\n";
@@ -2821,11 +2860,21 @@ class s2class {
 		// handle issues from WordPress core where user_level is not set or set low
 		if ( empty($admins) ) {
 			$role = 'administrator';
-			if ( !class_exists(WP_User_Search) ) {
-				require(ABSPATH . 'wp-admin/includes/user.php');
+			global $wp_version;
+			if ( version_compare($wp_version, '3.1', '<') ) {
+				// WordPress version is less than 3.1, use WP_User_Search class
+				if ( !class_exists(WP_User_Search) ) {
+					require(ABSPATH . 'wp-admin/includes/user.php');
+					$wp_user_query = new WP_User_Search( '', '', $role);
+				}
+			} else {
+				// WordPress version is 3.1 or greater, use WP_User_Query class
+				if ( !class_exists(WP_User_Query) ) {
+					require(ABSPATH . 'wp-includes/user.php');
+					$wp_user_query = new WP_User_Query( '', '', $role);
+				}
 			}
-			$wp_user_search = new WP_User_Search( '', '', $role);
-			$admins_string = implode(', ', $wp_user_search->get_results());
+			$admins_string = implode(', ', $wp_user_query->get_results());
 			$sql = "SELECT ID, display_name FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
 			$admins = $wpdb->get_results($sql);
 		}
