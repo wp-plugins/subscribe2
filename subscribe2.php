@@ -919,24 +919,24 @@ class s2class {
 					$message = $this->email . " " . __('subscribed to email notifications!', 'subscribe2');
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
 					if ( empty($recipients) ) {
-						$role = 'administrator';
 						global $wp_version;
 						if ( version_compare($wp_version, '3.1', '<') ) {
 							// WordPress version is less than 3.1, use WP_User_Search class
 							if ( !class_exists(WP_User_Search) ) {
 								require(ABSPATH . 'wp-admin/includes/user.php');
-								$wp_user_query = new WP_User_Search( '', '', $role);
+								$wp_user_query = new WP_User_Search( '', '', 'administrator');
+								$admins_string = implode(', ', $wp_user_query->get_results());
+								$sql = "SELECT ID, display_name FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
+								$recipients = $wpdb->get_results($sql);
 							}
 						} else {
 							// WordPress version is 3.1 or greater, use WP_User_Query class
-							if ( !class_exists(WP_User_Query) ) {
-								require(ABSPATH . 'wp-includes/user.php');
-								$wp_user_query = new WP_User_Query( '', '', $role);
+							$role = array('fields' => array('user_email'), 'role' => 'administrator');
+							$wp_user_query = get_users( $role );
+							foreach ($wp_user_query as $user) {
+								$recipients[] = $user->user_email;
 							}
 						}
-						$admins_string = implode(', ', $wp_user_query->get_results());
-						$sql = "SELECT user_email FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
-						$recipients = $wpdb->get_col($sql);
 					}
 					$headers = $this->headers();
 					foreach ( $recipients as $recipient ) {
@@ -957,24 +957,24 @@ class s2class {
 					$message = $this->email . " " . __('unsubscribed from email notifications!', 'subscribe2');
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
 					if ( empty($recipients) ) {
-						$role = 'administrator';
 						global $wp_version;
 						if ( version_compare($wp_version, '3.1', '<') ) {
 							// WordPress version is less than 3.1, use WP_User_Search class
 							if ( !class_exists(WP_User_Search) ) {
 								require(ABSPATH . 'wp-admin/includes/user.php');
-								$wp_user_query = new WP_User_Search( '', '', $role);
+								$wp_user_query = new WP_User_Search( '', '', 'administrator');
+								$admins_string = implode(', ', $wp_user_query->get_results());
+								$sql = "SELECT ID, display_name FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
+								$recipients = $wpdb->get_results($sql);
 							}
 						} else {
 							// WordPress version is 3.1 or greater, use WP_User_Query class
-							if ( !class_exists(WP_User_Query) ) {
-								require(ABSPATH . 'wp-includes/user.php');
-								$wp_user_query = new WP_User_Query( '', '', $role);
+							$role = array('fields' => array('user_email'), 'role' => 'administrator');
+							$wp_user_query = get_users( $role );
+							foreach ($wp_user_query as $user) {
+								$recipients[] = $user->user_email;
 							}
 						}
-						$admins_string = implode(', ', $wp_user_query->get_results());
-						$sql = "SELECT user_email FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
-						$recipients = $wpdb->get_col($sql);
 					}
 					$headers = $this->headers();
 					foreach ( $recipients as $recipient ) {
@@ -1520,23 +1520,25 @@ class s2class {
 
 		// handle issues from WordPress core where user_level is not set or set low
 		if ( empty($admin) ) {
-			$role = 'administrator';
 			global $wp_version;
-				if ( version_compare($wp_version, '3.1', '<') ) {
-					// WordPress version is less than 3.1, use WP_User_Search class
-					if ( !class_exists(WP_User_Search) ) {
-						require(ABSPATH . 'wp-admin/includes/user.php');
-						$wp_user_query = new WP_User_Search( '', '', $role);
-					}
-				} else {
-					// WordPress version is 3.1 or greater, use WP_User_Query class
-					if ( !class_exists(WP_User_Query) ) {
-						require(ABSPATH . 'wp-includes/user.php');
-						$wp_user_query = new WP_User_Query( '', '', $role);
-					}
+			if ( version_compare($wp_version, '3.1', '<') ) {
+				// WordPress version is less than 3.1, use WP_User_Search class
+				if ( !class_exists(WP_User_Search) ) {
+					require(ABSPATH . 'wp-admin/includes/user.php');
+					$wp_user_query = new WP_User_Search( '', '', 'administrator');
+					$admins_string = implode(', ', $wp_user_query->get_results());
+					$sql = "SELECT ID, display_name FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
+					$admin = $wpdb->get_results($sql);
 				}
-			$results = $wp_user_query->get_query();
-			$admin = $results[0];
+			} else {
+				// WordPress version is 3.1 or greater, use WP_User_Query class
+				$role = array('role' => 'administrator');
+				$wp_user_query = get_users( $role );
+				foreach ($wp_user_query as $user) {
+					$admin[] = $user;
+				}
+			}
+			$admin = $admin[0];
 		}
 
 		return $admin;
@@ -2859,24 +2861,24 @@ class s2class {
 
 		// handle issues from WordPress core where user_level is not set or set low
 		if ( empty($admins) ) {
-			$role = 'administrator';
 			global $wp_version;
 			if ( version_compare($wp_version, '3.1', '<') ) {
 				// WordPress version is less than 3.1, use WP_User_Search class
 				if ( !class_exists(WP_User_Search) ) {
 					require(ABSPATH . 'wp-admin/includes/user.php');
-					$wp_user_query = new WP_User_Search( '', '', $role);
+					$wp_user_query = new WP_User_Search( '', '', 'administrator');
+					$admins_string = implode(', ', $wp_user_query->get_results());
+					$sql = "SELECT ID, display_name FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
+					$admins = $wpdb->get_results($sql);
 				}
 			} else {
 				// WordPress version is 3.1 or greater, use WP_User_Query class
-				if ( !class_exists(WP_User_Query) ) {
-					require(ABSPATH . 'wp-includes/user.php');
-					$wp_user_query = new WP_User_Query( '', '', $role);
+				$args = array('fields' => array('ID', 'display_name'), 'role' => 'administrator');
+				$wp_user_query = get_users( $args );
+				foreach ($wp_user_query as $user) {
+					$admins[] = $user;
 				}
 			}
-			$admins_string = implode(', ', $wp_user_query->get_results());
-			$sql = "SELECT ID, display_name FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
-			$admins = $wpdb->get_results($sql);
 		}
 
 		if ( $inc_author ) {
