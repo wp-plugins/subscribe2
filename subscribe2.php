@@ -1493,6 +1493,8 @@ class s2class {
 	*/
 	function new_category($new_category='') {
 		if ( 'no' == $this->subscribe2_options['show_autosub'] ) { return; }
+		// don't subscribe to individual new categories if we are doing digest emails
+		if ( $this->subscribe2_options['email_freq'] != 'never' ) { return; }
 		global $wpdb;
 
 		if ( 'yes' == $this->subscribe2_options['show_autosub'] ) {

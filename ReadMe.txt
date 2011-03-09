@@ -174,7 +174,8 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 = Version 6.3 by Matthew Robinson =
 
-* Stopped using deprecated get_usermeta(), update_usermeta() and delete_usermeta() functions. Subscribe2 now requires WordPress 3.0 as a minimum.
+* Stopped using deprecated get_usermeta(), update_usermeta() and delete_usermeta() functions.
+8 Fixed a bug where the creating of a new category would re-subscribed digest email users incorrectly.
 
 = Version 6.2 by Matthew Robinson =
 
