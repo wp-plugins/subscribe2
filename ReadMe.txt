@@ -2,8 +2,8 @@
 Contributors: MattyRob, Skippy, RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
-Requires at least: 3.0
-Tested up to: 3.0.5
+Requires at least: 2.8
+Tested up to: 3.1
 Stable tag: 6.2
 
 Sends a list of subscribers an email notification when new posts are published to your blog
@@ -174,8 +174,10 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 = Version 6.3 by Matthew Robinson =
 
-* Stopped using deprecated get_usermeta(), update_usermeta() and delete_usermeta() functions.
-8 Fixed a bug where the creating of a new category would re-subscribed digest email users incorrectly.
+* Stopped using deprecated get_usermeta(), update_usermeta() and delete_usermeta() functions in WordPress 3.1
+* Use WP_User_Query class and functions in WordPress 3.1
+* Stop using buggy is_blog_user() multisite function
+* Fixed a bug where the creating of a new category would re-subscribed digest email users incorrectly
 
 = Version 6.2 by Matthew Robinson =
 
