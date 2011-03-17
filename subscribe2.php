@@ -40,7 +40,7 @@ if ( version_compare($wp_version, '2.8', '<') ) {
 
 // our version number. Don't touch this or any line below
 // unless you know exactly what you are doing
-define( 'S2VERSION', '6.2' );
+define( 'S2VERSION', '6.3' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', trailingslashit(plugin_basename(dirname(__FILE__))) );
 define( 'S2URL', plugin_dir_url(dirname(__FILE__)) . S2DIR );
