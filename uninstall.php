@@ -1,5 +1,5 @@
 <?php
-if(!defined( 'ABSPATH') && !defined('WP_UNINSTALL_PLUGIN')) {
+if( !defined('ABSPATH') && !defined('WP_UNINSTALL_PLUGIN') ) {
 	exit();
 } else {
 	global $wpdb, $table_prefix;
@@ -13,8 +13,8 @@ if(!defined( 'ABSPATH') && !defined('WP_UNINSTALL_PLUGIN')) {
 	wp_clear_scheduled_hook('s2_digest_cron');
 	// delete usermeta data for registered users
 	$users = $wpdb->get_col("SELECT ID FROM $wpdb->users");
-	if (!empty($users)) {
-		foreach ($users as $user) {
+	if ( !empty($users) ) {
+		foreach ( $users as $user ) {
 			$cats = explode(',', get_usermeta($user, 's2_subscribed'));
 			if ($cats) {
 				foreach ($cats as $cat) {
@@ -26,6 +26,6 @@ if(!defined( 'ABSPATH') && !defined('WP_UNINSTALL_PLUGIN')) {
 	}
 	// drop the subscribe2 table
 	$sql = "DROP TABLE IF EXISTS `" . $public . "`";
-	mysql_query($sql);
+	$wpdb->query($sql);
 }
 ?>
