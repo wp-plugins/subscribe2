@@ -1134,7 +1134,6 @@ class s2class {
 			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'" . $AND;
 		}
 		$result = $wpdb->get_col($sql);
-		$result = $wpdb->get_col($sql);
 		if ( $result ) {
 			$ids = implode(',', $result);
 			return $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN ($ids)");
