@@ -673,7 +673,7 @@ class s2class {
 			// next we send html excerpt content emails
 			// apply filter to html excerpt recipient list to allow manipulation, also pass $post data so this can be queried
 			$recipients = apply_filters('s2_html_excerpt', $this->get_registered("cats=$post_cats_string&format=html_excerpt"), $post);
-			$this->mail(, $subject, $html_excerpt_body, 'html');
+			$this->mail($recipients, $subject, $html_excerpt_body, 'html');
 
 			// finally we send html full content emails
 			// apply filter to html full recipient list to allow manipulation, also pass $post data so this can be queried
