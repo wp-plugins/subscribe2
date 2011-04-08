@@ -661,16 +661,24 @@ class s2class {
 			} else {
 				$recipients = array_merge((array)$public, (array)$registered);
 			}
+			// apply filter to plaintext excerpt recipient list to allow manipulation, also pass $post data so this can be queried
+			$recipients = apply_filters('s2_plaintext_excerpt', $recipients, $post);
 			$this->mail($recipients, $subject, $excerpt_body);
 
 			// next we send plaintext full content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=post"), $subject, $full_body);
+			// apply filter to plaintext full recipient list to allow manipulation, also pass $post data so this can be queried
+			$recipients = apply_filters('s2_plaintext_full', $this->get_registered("cats=$post_cats_string&format=post"), $post);
+			$this->mail($recipients, $subject, $full_body);
 
 			// next we send html excerpt content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=html_excerpt"), $subject, $html_excerpt_body, 'html');
+			// apply filter to html excerpt recipient list to allow manipulation, also pass $post data so this can be queried
+			$recipients = apply_filters('s2_html_excerpt', $this->get_registered("cats=$post_cats_string&format=html_excerpt"), $post);
+			$this->mail(, $subject, $html_excerpt_body, 'html');
 
 			// finally we send html full content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=html"), $subject, $html_body, 'html');
+			// apply filter to html full recipient list to allow manipulation, also pass $post data so this can be queried
+			$recipients = apply_filters('s2_html_full', $this->get_registered("cats=$post_cats_string&format=html"), $post);
+			$this->mail($recipients, $subject, $html_body, 'html');
 		}
 	} // end publish()
 
@@ -1126,6 +1134,7 @@ class s2class {
 			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'" . $AND;
 		}
 		$result = $wpdb->get_col($sql);
+		$result = $wpdb->get_col($sql);
 		if ( $result ) {
 			$ids = implode(',', $result);
 			return $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN ($ids)");
@@ -1386,7 +1395,7 @@ class s2class {
 					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $term_id, $term_id);
 				}
 				if ( empty($cats) ) {
-					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
+					$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 				} else {
 					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
 				}
@@ -1412,7 +1421,7 @@ class s2class {
 				foreach ( $cats as $id ) {
 					$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
 				}
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), '');
+				$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 
 				// add an action hook for external manipulation of blog and user data
 				do_action_ref_array('subscribe2_wpmu_unsubscribe', array($user_ID, $blog_id));
@@ -1498,18 +1507,24 @@ class s2class {
 		global $wpdb;
 
 		if ( 'yes' == $this->subscribe2_options['show_autosub'] ) {
-			$sql = "SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE $wpdb->usermeta.meta_key='s2_autosub' AND $wpdb->usermeta.meta_value='yes'";
+			if ( $this->s2_mu ) {
+				$sql = "SELECT DISTINCT a.user_id FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b WHERE a.user_id = b.user_id AND a.meta_key='s2_autosub' AND a.meta_value='yes' AND b.meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'";
+			} else {
+				$sql = "SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE $wpdb->usermeta.meta_key='s2_autosub' AND $wpdb->usermeta.meta_value='yes'";
+			}
 			$user_IDs = $wpdb->get_col($sql);
 			if ( '' == $user_IDs ) { return; }
 
 			foreach ( $user_IDs as $user_ID ) {
-				$old_cats = explode(',', $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
-				if ( !is_array($old_cats) ) {
-					$old_cats = array($old_cats);
+				$old_cats = $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				if ( empty($old_cats) ) {
+					$newcats = (array)$new_category;
+				} else {
+					$old_cats = explode(',', $old_cats);
+					$newcats = array_merge($old_cats, (array)$new_category);
 				}
 				// add subscription to these cat IDs
 				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $new_category, "$new_category");
-				$newcats = array_merge($old_cats, (array)$new_category);
 				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $newcats));
 			}
 		} elseif ( 'exclude' == $this->subscribe2_options['show_autosub'] ) {
@@ -1523,7 +1538,11 @@ class s2class {
 	function delete_category($deleted_category='') {
 		global $wpdb;
 
-		$sql = "SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$deleted_category'";
+		if ( $this->s2_mu ) {
+			$sql = "SELECT DISTINCT a.user_id FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b WHERE a.user_id = b.user_id AND a.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$deleted_category' AND b.meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'";
+		} else {
+			$sql = "SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$deleted_category'";
+		}
 		$user_IDs = $wpdb->get_col($sql);
 		if ( '' == $user_IDs ) { return; }
 
@@ -1533,7 +1552,7 @@ class s2class {
 				$old_cats = array($old_cats);
 			}
 			// add subscription to these cat IDs
-			$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $deleted_category, '');
+			$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $deleted_category);
 			$remain = array_diff($old_cats, (array)$deleted_category);
 			$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
 		}
@@ -2457,6 +2476,7 @@ class s2class {
 			$this->update_user_meta($user_ID, 's2_autosub', $_POST['new_category']);
 
 			$cats = $_POST['category'];
+			sort($cats);
 
 			if ( empty($cats) || $cats == '-1' ) {
 				$oldcats = explode(',', $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
