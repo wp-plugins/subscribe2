@@ -661,24 +661,16 @@ class s2class {
 			} else {
 				$recipients = array_merge((array)$public, (array)$registered);
 			}
-			// apply filter to plaintext excerpt recipient list to allow manipulation, also pass $post data so this can be queried
-			$recipients = apply_filters('s2_plaintext_excerpt', $recipients, $post);
 			$this->mail($recipients, $subject, $excerpt_body);
 
 			// next we send plaintext full content emails
-			// apply filter to plaintext full recipient list to allow manipulation, also pass $post data so this can be queried
-			$recipients = apply_filters('s2_plaintext_full', $this->get_registered("cats=$post_cats_string&format=post"), $post);
-			$this->mail($recipients, $subject, $full_body);
+			$this->mail($this->get_registered("cats=$post_cats_string&format=post"), $subject, $full_body);
 
 			// next we send html excerpt content emails
-			// apply filter to html excerpt recipient list to allow manipulation, also pass $post data so this can be queried
-			$recipients = apply_filters('s2_html_excerpt', $this->get_registered("cats=$post_cats_string&format=html_excerpt"), $post);
-			$this->mail($recipients, $subject, $html_excerpt_body, 'html');
+			$this->mail($this->get_registered("cats=$post_cats_string&format=html_excerpt"), $subject, $html_excerpt_body, 'html');
 
 			// finally we send html full content emails
-			// apply filter to html full recipient list to allow manipulation, also pass $post data so this can be queried
-			$recipients = apply_filters('s2_html_full', $this->get_registered("cats=$post_cats_string&format=html"), $post);
-			$this->mail($recipients, $subject, $html_body, 'html');
+			$this->mail($this->get_registered("cats=$post_cats_string&format=html"), $subject, $html_body, 'html');
 		}
 	} // end publish()
 
@@ -1136,8 +1128,12 @@ class s2class {
 		$result = $wpdb->get_col($sql);
 		if ( $result ) {
 			$ids = implode(',', $result);
-			return $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN ($ids)");
+			$registered = $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN ($ids)");
 		}
+
+		// apply filter to registered users to add or remove additional addresses, pass args too for additional control
+		$registered = apply_filters('s2_registered_subscribers', $registered, $args);
+		return $registered;
 	} // end get_registered()
 
 	/**

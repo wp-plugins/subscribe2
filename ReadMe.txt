@@ -172,6 +172,11 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 == Changelog ==
 
+= Version 6.4 by Matthew Robinson =
+
+* Fixed a type on the Settings page - thanks to Deborah Hanchey
+* Introduced 's2_registered_subscribers' filter to allow other plugins to dynamically add or remove email addresses to the 'registered' array
+
 = Version 6.3 by Matthew Robinson =
 
 * Stopped using deprecated get_usermeta(), update_usermeta() and delete_usermeta() functions in WordPress 3.1
