@@ -204,8 +204,8 @@ class s2class {
 			require_once(ABSPATH . 'wp-admin/install-helper.php');
 		}
 		$date = date('Y-m-d');
-		maybe_add_column($this->public, 'date', "ALTER TABLE $this->public ADD date DATE DEFAULT '$date' NOT NULL AFTER active;");
-		maybe_add_column($this->public, 'ip', "ALTER TABLE $this->public ADD ip char(64) DEFAULT 'admin' NOT NULL AFTER date;");
+		maybe_add_column($this->public, 'date', "ALTER TABLE $this->public ADD date DATE DEFAULT '$date' NOT NULL AFTER active");
+		maybe_add_column($this->public, 'ip', "ALTER TABLE $this->public ADD ip char(64) DEFAULT 'admin' NOT NULL AFTER date");
 
 		// let's take the time to check process registered users
 		// existing public subscribers are subscribed to all categories
