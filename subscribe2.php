@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 6.3
+Version: 6.4
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -30,7 +30,6 @@ You should have received a copy of the GNU General Public License
 along with Subscribe2. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 global $wp_version;
 if ( version_compare($wp_version, '2.8', '<') ) {
 	// Subscribe2 needs WordPress 2.8 or above, exit if not on a compatible version
@@ -40,7 +39,7 @@ if ( version_compare($wp_version, '2.8', '<') ) {
 
 // our version number. Don't touch this or any line below
 // unless you know exactly what you are doing
-define( 'S2VERSION', '6.3' );
+define( 'S2VERSION', '6.4' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', trailingslashit(plugin_basename(dirname(__FILE__))) );
 define( 'S2URL', plugin_dir_url(dirname(__FILE__)) . S2DIR );
@@ -590,8 +589,8 @@ class s2class {
 		if ( function_exists('strip_shortcodes') ) {
 			$plaintext = strip_shortcodes($plaintext);
 		}
-		$gallid = '[gallery id="' . $post->ID . '"]';
-		$content = str_replace('[gallery]', $gallid, $post->post_content);
+		$gallid = '[gallery id="' . $post->ID . '"';
+		$content = str_replace('[gallery', $gallid, $post->post_content);
 		$content = apply_filters('the_content', $content);
 		$content = str_replace("]]>", "]]&gt", $content);
 		$excerpt = $post->post_excerpt;
@@ -1205,6 +1204,7 @@ class s2class {
 			}
 		}
 
+		$cats = '';
 		foreach ( $all_cats as $cat ) {
 			('' == $cats) ? $cats = "$cat->term_id" : $cats .= ",$cat->term_id";
 		}
@@ -1370,7 +1370,15 @@ class s2class {
 				}
 
 				// subscribe to all categories by default
-				$all_cats = get_categories(array('hide_empty' => false));
+				$all_cats = array();
+				$s2_taxonomies = array('category');
+				$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
+
+				foreach( $s2_taxonomies as $taxonomy ) {
+					if ( $this->s2_taxonomy_exists($taxonomy) ) {
+						$all_cats = array_merge($all_cats, get_categories(array('hide_empty' => false, 'orderby' => 'slug', 'taxonomy' => $taxonomy)));
+					}
+				}
 
 				if ( 0 == $this->subscribe2_options['reg_override'] ) {
 					// registered users are not allowed to subscribe to excluded categories
@@ -1490,6 +1498,61 @@ class s2class {
 
 		return $user_meta;
 	} // end delete_user_meta()
+
+	/**
+	Get objects parents
+	Uses get_ancestors in WordPress 3.1+ and copies this function in lower versions
+	Can be dropped and calls substituted when Subscribe2 requires WordPress 3.1+
+	*/
+	function get_parents($object_id = 0, $object_type = '') {
+		if ( function_exists('get_ancestors') ) {
+			return get_ancestors($object_id, $object_type);
+		} else {
+			// code copied directly from wp-includes/taxonomy.php
+			// get_ancestors() function
+			$object_id = (int) $object_id;
+
+			$ancestors = array();
+
+			if ( empty( $object_id ) ) {
+				return apply_filters('get_ancestors', $ancestors, $object_id, $object_type);
+			}
+
+			if ( is_taxonomy_hierarchical( $object_type ) ) {
+				$term = get_term($object_id, $object_type);
+				while ( ! is_wp_error($term) && ! empty( $term->parent ) && ! in_array( $term->parent, $ancestors ) ) {
+					$ancestors[] = (int) $term->parent;
+					$term = get_term($term->parent, $object_type);
+				}
+			} elseif ( null !== get_post_type_object( $object_type ) ) {
+				$object = get_post($object_id);
+				if ( ! is_wp_error( $object ) && isset( $object->ancestors ) && is_array( $object->ancestors ) )
+					$ancestors = $object->ancestors;
+				else {
+					while ( ! is_wp_error($object) && ! empty( $object->post_parent ) && ! in_array( $object->post_parent, $ancestors ) ) {
+						$ancestors[] = (int) $object->post_parent;
+						$object = get_post($object->post_parent);
+					}
+				}
+			}
+
+			return apply_filters('get_ancestors', $ancestors, $object_id, $object_type);
+		}
+	} // end get_parents()
+
+	/**
+	Check if taxonomy exists
+	Uses taxonomy_exists in WordPress 3.0+ and copies this function in lower versions
+	Can be dropped and calls substituted when Subscribe2 requires WordPress 3.0+
+	*/
+	function s2_taxonomy_exists($taxonomy) {
+		if ( function_exists('taxonomy_exists') ) {
+			return taxonomy_exists($taxonomy);
+		} else {
+			global $wp_taxonomies;
+			return isset( $wp_taxonomies[$taxonomy] );
+		}
+	} // end s2_taxonomy_exists()
 
 	/**
 	Autosubscribe registered users to newly created categories
@@ -2467,8 +2530,22 @@ class s2class {
 			check_admin_referer('subscribe2-user_subscribers' . $s2nonce);
 
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Subscription preferences updated.', 'subscribe2') . "</strong></p></div>\n";
-			$this->update_user_meta($user_ID, 's2_format', $_POST['s2_format']);
-			$this->update_user_meta($user_ID, 's2_autosub', $_POST['new_category']);
+			if ( isset($_POST['s2_format']) ) {
+				$this->update_user_meta($user_ID, 's2_format', $_POST['s2_format']);
+			} else {
+				// value has not been set so use default
+				$this->update_user_meta($user_ID, 's2_format', 'excerpt');
+			}
+			if ( isset($_POST['new_category']) ) {
+				$this->update_user_meta($user_ID, 's2_autosub', $_POST['new_category']);
+			} else {
+				// value has not been passed so use Settings defaults
+				if ( $this->subscribe2_options['show_autosub'] == 'yes' && $this->subscribe2_options['autosub_def'] == 'yes' ) {
+					$this->update_user_meta($user_ID, 's2_autosub', 'yes');
+				} else {
+					$this->update_user_meta($user_ID, 's2_autosub', 'no');
+				}
+			}
 
 			$cats = $_POST['category'];
 			sort($cats);
@@ -2782,7 +2859,15 @@ class s2class {
 	function display_category_form($selected = array(), $override = 1) {
 		global $wpdb;
 
-		$all_cats = get_categories(array('hide_empty' => false, 'orderby' => 'slug'));
+		$all_cats = array();
+		$s2_taxonomies = array('category');
+		$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
+
+		foreach( $s2_taxonomies as $taxonomy ) {
+			if ( $this->s2_taxonomy_exists($taxonomy) ) {
+				$all_cats = array_merge($all_cats, get_categories(array('hide_empty' => false, 'orderby' => 'slug', 'taxonomy' => $taxonomy)));
+			}
+		}
 		$exclude = explode(',', $this->subscribe2_options['exclude']);
 
 		if ( 0 == $override ) {
@@ -2806,23 +2891,33 @@ class s2class {
 		echo "<tr valign=\"top\"><td width=\"50%\" align=\"left\">\r\n";
 		foreach ( $all_cats as $cat ) {
 			 if ( $i >= $half && 0 == $j ){
-						echo "</td><td width=\"50%\" align=\"left\">\r\n";
-						$j++;
+				echo "</td><td width=\"50%\" align=\"left\">\r\n";
+				$j++;
+			}
+			$catName = '';
+			$parents = array_reverse( $this->get_parents($cat->term_id, $cat->taxonomy) );
+			if ( $parents ) {
+				foreach ( $parents as $parent ) {
+					$parent = get_term($parent, $cat->taxonomy);
+					$catName .= $parent->name . ' &raquo; ';
 				}
-				if ( 0 == $j ) {
-						echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
-						if ( in_array($cat->term_id, $selected) ) {
-								echo " checked=\"checked\"";
-						}
-						echo " /> <abbr title=\"" . $cat->slug . "\">" . rtrim(get_category_parents($cat->term_id, false, ' &#187; '), ' &#187; ') . "</abbr></label><br />\r\n";
-					} else {
-						echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
-						if ( in_array($cat->term_id, $selected) ) {
-									echo " checked=\"checked\"";
-						}
-						echo " /> <abbr title=\"" . $cat->slug . "\">" . rtrim(get_category_parents($cat->term_id, false, ' &#187; '), ' &#187; ') . "</abbr></label><br />\r\n";
+			}
+			$catName .= $cat->name;
+
+			if ( 0 == $j ) {
+				echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
+				if ( in_array($cat->term_id, $selected) ) {
+						echo " checked=\"checked\"";
 				}
-				$i++;
+				echo " /> <abbr title=\"" . $cat->slug . "\">" . $catName . "</abbr></label><br />\r\n";
+			} else {
+				echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
+				if ( in_array($cat->term_id, $selected) ) {
+							echo " checked=\"checked\"";
+				}
+				echo " /> <abbr title=\"" . $cat->slug . "\">" . $catName . "</abbr></label><br />\r\n";
+			}
+			$i++;
 		}
 		echo "</td></tr>\r\n";
 		echo "</table>\r\n";

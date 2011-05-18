@@ -142,6 +142,27 @@ In order to force sending you'd need to change the date of publication on the po
 
 If you opt for the latter way look in the options table for the subscribe2_options settings (it's an array) and you'll need to change the 'last_s2cron' value to a timestamp for last week. Then force the cron event to run again with [WP-Crontrol](http://wordpress.org/extend/plugins/wp-crontrol/).
 
+= How do I make use of the support for Custom Post Types =
+
+In a plugin file for your site or perhaps functions.php in your theme add the following code where 'my_post_type' is change to the name of your custom post type.
+
+function my_post_types($types) {
+	$types[] = 'my_post_type';
+	return $types;
+}
+add_filter('s2_post_types', 'my_post_types');
+
+= How can I make use of the support for Custom Taxonomies =
+
+In a plugin file for your site or perhaps functions.php in your theme add the following code where 'my_
+taxonomy_type' is change to the name of your custom taxonomy type.
+
+function my_taxonomy_types($taxonomies) {
+	$taxonomies[] = 'my_taxonomy_type';
+	return $taxonomies;
+}
+add_filter('s2_taxonomies', 'my_taxonomy_types');
+
 = Can I suggest you add X as a feature =
 
 I'm open to suggestions but since the software is written by me for use on my site and then shared for free because others may find it useful as it comes don't expect your suggestion to be implemented unless I'll find it useful.
@@ -176,6 +197,9 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 * Fixed a type on the Settings page - thanks to Deborah Hanchey
 * Introduced 's2_registered_subscribers' filter to allow other plugins to dynamically add or remove email addresses to the 'registered' array
+* Removed trailing semi colons from the maybe_add_column function calls
+* Improved handling of [gallery] shortcode where no post id is defined for HTML emails
+* Added support for Custom Taxonomies
 
 = Version 6.3 by Matthew Robinson =
 
