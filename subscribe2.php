@@ -1130,6 +1130,8 @@ class s2class {
 			$registered = $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN ($ids)");
 		}
 
+		if ( empty($registered) ) { return false; }
+
 		// apply filter to registered users to add or remove additional addresses, pass args too for additional control
 		$registered = apply_filters('s2_registered_subscribers', $registered, $args);
 		return $registered;
@@ -2817,11 +2819,9 @@ class s2class {
 				global $phpmailer;
 				$message = $this->mail_failed . $phpmailer->ErrorInfo;
 			}
-		}
-
-		if ( '' != $message ) {
 			echo "<div id=\"message\" class=\"updated\"><strong><p>" . $message . "</p></strong></div>\r\n";
 		}
+
 		// show our form
 		echo "<div class=\"wrap\">";
 		screen_icon();
@@ -2834,6 +2834,9 @@ class s2class {
 			$subject = $_POST['subject'];
 		} else {
 			$subject = __('A message from', 'subscribe2') . " " . get_option('blogname');
+		}
+		if ( !isset($_POST['content']) ) {
+			$body = '';
 		}
 		echo "<p>" . __('Subject', 'subscribe2') . ": <input type=\"text\" size=\"69\" name=\"subject\" value=\"" . $subject . "\" /> <br /><br />";
 		echo "<textarea rows=\"12\" cols=\"75\" name=\"content\">" . $body . "</textarea>";
@@ -3572,7 +3575,7 @@ class s2class {
 		echo "<script type=\"text/javascript\">\r\n";
 		echo "//<![CDATA[\r\n";
 		echo "function s2_insert_token() {
-			buttonsnap_settext('<!--subscribe2-->');
+			buttonsnap_settext('[subscribe2]');
 		}\r\n";
 		echo "//]]>\r\n";
 		echo "</script>\r\n";

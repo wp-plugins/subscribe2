@@ -200,6 +200,8 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Removed trailing semi colons from the maybe_add_column function calls
 * Improved handling of [gallery] shortcode where no post id is defined for HTML emails
 * Added support for Custom Taxonomies
+* Updated editor buttons to insert shortcode instead of token
+* Fixed some PHP notices about undeclared variables
 
 = Version 6.3 by Matthew Robinson =
 

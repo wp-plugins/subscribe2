@@ -58,7 +58,7 @@ if (!isset($this->subscribe2_options['email_freq'])) {
 	$this->subscribe2_options['email_freq'] = "never";
 } // option for sending emails per-post or as a digest email on a cron schedule
 
-if (!isset($this->subscribe2_options['cron_order'])) }
+if (!isset($this->subscribe2_options['cron_order'])) {
 	$this->subscribe2_options['cron_order'] = "desc";
 } // option for ordering of posts in digest email
 
