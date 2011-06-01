@@ -155,7 +155,7 @@ class s2class {
 	Insert Javascript into admin_header
 	*/
 	function checkbox_form_js() {
-		wp_enqueue_script('s2_checkbox', S2URL . 'include/s2_checkbox.js', array('jquery'), '1.0');
+		wp_enqueue_script('s2_checkbox', S2URL . 'include/s2_checkbox.js', array('jquery'), '1.1');
 	} //end checkbox_form_js()
 
 	function user_admin_css() {
@@ -235,6 +235,17 @@ class s2class {
 		if ( $this->subscribe2_options['autoformat'] == 'full' ) {
 			$this->subscribe2_options['autoformat'] = 'post';
 		}
+		// change old CAPITALISED keywords to those in {PARENTHESES}; since version 6.4
+		$keywords = array('BLOGNAME', 'BLOGLINK', 'TITLE', 'POST', 'POSTTIME', 'TABLE', 'TABLELINKS', 'PERMALINK', 'TINYLINK', 'DATE', 'TIME', 'MYNAME', 'EMAIL', 'AUTHORNAME', 'LINK', 'CATS', 'TAGS', 'COUNT', 'ACTION');
+		$keyword = implode('|', $keywords);
+		$regex = '/(?<!\{)\b('.$keyword.')\b(?!\{)/xm';
+		$replace = '{\1}';
+		$this->subscribe2_options['mailtext'] = preg_replace($regex, $replace, $this->subscribe2_options['mailtext']);
+		$this->subscribe2_options['notification_subject'] = preg_replace($regex, $replace, $this->subscribe2_options['notification_subject']);
+		$this->subscribe2_options['confirm_email'] = preg_replace($regex, $replace, $this->subscribe2_options['confirm_email']);
+		$this->subscribe2_options['confirm_subject'] = preg_replace($regex, $replace, $this->subscribe2_options['confirm_subject']);
+		$this->subscribe2_options['remind_email'] = preg_replace($regex, $replace, $this->subscribe2_options['remind_email']);
+		$this->subscribe2_options['remind_subject'] = preg_replace($regex, $replace, $this->subscribe2_options['remind_subject']);
 		update_option('subscribe2_options', $this->subscribe2_options);
 
 		// upgrade old wpmu user meta data to new
@@ -285,6 +296,7 @@ class s2class {
 				$wpdb->get_results("UPDATE $this->public SET email='$new_email' WHERE CAST(email as binary)='$email'");
 			}
 		}
+		return;
 	} // end upgrade()
 
 	/**
@@ -306,28 +318,28 @@ class s2class {
 		if ( '' == $string ) {
 			return;
 		}
-		$string = str_replace("BLOGNAME", html_entity_decode(get_option('blogname'), ENT_QUOTES), $string);
-		$string = str_replace("BLOGLINK", get_option('home'), $string);
-		$string = str_replace("TITLE", stripslashes($this->post_title), $string);
+		$string = str_replace("{BLOGNAME}", html_entity_decode(get_option('blogname'), ENT_QUOTES), $string);
+		$string = str_replace("{BLOGLINK}", get_option('home'), $string);
+		$string = str_replace("{TITLE}", stripslashes($this->post_title), $string);
 		$link = "<a href=\"" . $this->permalink . "\">" . $this->permalink . "</a>";
-		$string = str_replace("PERMALINK", $link, $string);
-		if ( strstr($string, "TINYLINK") ) {
+		$string = str_replace("{PERMALINK}", $link, $string);
+		if ( strstr($string, "{TINYLINK}") ) {
 			$tinylink = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode($this->permalink));
 			if ( $tinylink !== 'Error' || $tinylink != false ) {
 				$tlink = "<a href=\"" . $tinylink . "\">" . $tinylink . "</a>";
-				$string = str_replace("TINYLINK", $tlink, $string);
+				$string = str_replace("{TINYLINK}", $tlink, $string);
 			} else {
-				$string = str_replace("TINYLINK", $link, $string);
+				$string = str_replace("{TINYLINK}", $link, $string);
 			}
 		}
-		$string = str_replace("DATE", $this->post_date, $string);
-		$string = str_replace("TIME", $this->post_time, $string);
-		$string = str_replace("MYNAME", stripslashes($this->myname), $string);
-		$string = str_replace("EMAIL", $this->myemail, $string);
-		$string = str_replace("AUTHORNAME", stripslashes($this->authorname), $string);
-		$string = str_replace("CATS", $this->post_cat_names, $string);
-		$string = str_replace("TAGS", $this->post_tag_names, $string);
-		$string = str_replace("COUNT", $this->post_count, $string);
+		$string = str_replace("{DATE}", $this->post_date, $string);
+		$string = str_replace("{TIME}", $this->post_time, $string);
+		$string = str_replace("{MYNAME}", stripslashes($this->myname), $string);
+		$string = str_replace("{EMAIL}", $this->myemail, $string);
+		$string = str_replace("{AUTHORNAME}", stripslashes($this->authorname), $string);
+		$string = str_replace("{CATS}", $this->post_cat_names, $string);
+		$string = str_replace("{TAGS}", $this->post_tag_names, $string);
+		$string = str_replace("{COUNT}", $this->post_count, $string);
 
 		return $string;
 	} // end substitute()
@@ -617,9 +629,8 @@ class s2class {
 			// no excerpt, is there a <!--more--> ?
 			if ( false !== strpos($content, '<!--more-->') ) {
 				list($html_excerpt, $more) = explode('<!--more-->', $content, 2);
-				// strip leading and trailing whitespace
-				$html_excerpt = balanceTags($html_excerpt);
-				$html_excerpt = trim($html_excerpt);
+				// balance HTML tags and then strip leading and trailing whitespace
+				$html_excerpt = trim(balanceTags($html_excerpt));
 			} else {
 				// no <!--more-->, so grab the first 55 words
 				$words = explode(' ', $content, $this->excerpt_length + 1);
@@ -627,18 +638,19 @@ class s2class {
 					array_pop($words);
 					array_push($words, '[...]');
 					$html_excerpt = implode(' ', $words);
+					// balance HTML tags and then strip leading and trailing whitespace
 					$html_excerpt = trim(balanceTags($html_excerpt));
 				}
 			}
 		}
 
 		// prepare mail body texts
-		$excerpt_body = str_replace("POST", $excerpt, $mailtext);
-		$full_body = str_replace("POST", strip_tags($plaintext), $mailtext);
+		$excerpt_body = str_replace("{POST}", $excerpt, $mailtext);
+		$full_body = str_replace("{POST}", strip_tags($plaintext), $mailtext);
 		$html_body = str_replace("\r\n", "<br />\r\n", $mailtext);
-		$html_body = str_replace("POST", $content, $html_body);
+		$html_body = str_replace("{POST}", $content, $html_body);
 		$html_excerpt_body = str_replace("\r\n", "<br />\r\n", $mailtext);
-		$html_excerpt_body = str_replace("POST", $html_excerpt, $html_excerpt_body);
+		$html_excerpt_body = str_replace("{POST}", $html_excerpt, $html_excerpt_body);
 
 		if ( $preview != '' ) {
 			$this->myemail = $preview;
@@ -721,16 +733,16 @@ class s2class {
 		} else {
 			$body = $this->substitute(stripslashes($this->subscribe2_options['confirm_email']));
 			if ( 'add' == $what ) {
-				$body = str_replace("ACTION", $this->subscribe, $body);
-				$subject = str_replace("ACTION", $this->subscribe, $this->subscribe2_options['confirm_subject']);
+				$body = str_replace("{ACTION}", $this->subscribe, $body);
+				$subject = str_replace("{ACTION}", $this->subscribe, $this->subscribe2_options['confirm_subject']);
 			} elseif ( 'del' == $what ) {
-				$body = str_replace("ACTION", $this->unsubscribe, $body);
-				$subject = str_replace("ACTION", $this->unsubscribe, $this->subscribe2_options['confirm_subject']);
+				$body = str_replace("{ACTION}", $this->unsubscribe, $body);
+				$subject = str_replace("{ACTION}", $this->unsubscribe, $this->subscribe2_options['confirm_subject']);
 			}
 			$subject = html_entity_decode($this->substitute(stripslashes($subject)), ENT_QUOTES);
 		}
 
-		$body = str_replace("LINK", $link, $body);
+		$body = str_replace("{LINK}", $link, $body);
 
 		if ( $is_remind == true && function_exists('wpmq_mail') ) {
 			// could be sending lots of reminders so queue them if wpmq is enabled
@@ -2302,25 +2314,25 @@ class s2class {
 		echo "<h3>" . __('Message substitutions', 'subscribe2') . "</h3>\r\n";
 		echo "<dl>";
 		echo "<dt><b><em style=\"color: red\">" . __('IF THE FOLLOWING KEYWORDS ARE ALSO IN YOUR POST THEY WILL BE SUBSTITUTED' ,'subscribe2') . "</em></b></dt><dd></dd>\r\n";
-		echo "<dt><b>BLOGNAME</b></dt><dd>" . get_option('blogname') . "</dd>\r\n";
-		echo "<dt><b>BLOGLINK</b></dt><dd>" . get_option('home') . "</dd>\r\n";
-		echo "<dt><b>TITLE</b></dt><dd>" . __("the post's title<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>POST</b></dt><dd>" . __("the excerpt or the entire post<br />(<i>based on the subscriber's preferences</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>POSTTIME</b></dt><dd>" . __("the excerpt of the post and the time it was posted<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>TABLE</b></dt><dd>" . __("a list of post titles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>TABLELINKS</b></dt><dd>" . __("a list of post titles followed by links to the atricles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>PERMALINK</b></dt><dd>" . __("the post's permalink<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>TINYLINK</b></dt><dd>" . __("the post's permalink after conversion by TinyURL<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>DATE</b></dt><dd>" . __("the date the post was made<br />(<i>for per-post emails only</i>)", "subscribe2") . "</dd>\r\n";
-		echo "<dt><b>TIME</b></dt><dd>" . __("the time the post was made<br />(<i>for per-post emails only</i>)", "subscribe2") . "</dd>\r\n";
-		echo "<dt><b>MYNAME</b></dt><dd>" . __("the admin or post author's name", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>EMAIL</b></dt><dd>" . __("the admin or post author's email", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>AUTHORNAME</b></dt><dd>" . __("the post author's name", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>LINK</b></dt><dd>" . __("the generated link to confirm a request<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>ACTION</b></dt><dd>" . __("Action performed by LINK in confirmation email<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>CATS</b></dt><dd>" . __("the post's assigned categories", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>TAGS</b></dt><dd>" . __("the post's assigned Tags", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>COUNT</b></dt><dd>" . __("the number of posts included in the digest email<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{BLOGNAME}</b></dt><dd>" . get_option('blogname') . "</dd>\r\n";
+		echo "<dt><b>{BLOGLINK}</b></dt><dd>" . get_option('home') . "</dd>\r\n";
+		echo "<dt><b>{TITLE}</b></dt><dd>" . __("the post's title<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{POST}</b></dt><dd>" . __("the excerpt or the entire post<br />(<i>based on the subscriber's preferences</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{POSTTIME}</b></dt><dd>" . __("the excerpt of the post and the time it was posted<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{TABLE}</b></dt><dd>" . __("a list of post titles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{TABLELINKS}</b></dt><dd>" . __("a list of post titles followed by links to the atricles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{PERMALINK}</b></dt><dd>" . __("the post's permalink<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{TINYLINK}</b></dt><dd>" . __("the post's permalink after conversion by TinyURL<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{DATE}</b></dt><dd>" . __("the date the post was made<br />(<i>for per-post emails only</i>)", "subscribe2") . "</dd>\r\n";
+		echo "<dt><b>{TIME}</b></dt><dd>" . __("the time the post was made<br />(<i>for per-post emails only</i>)", "subscribe2") . "</dd>\r\n";
+		echo "<dt><b>{MYNAME}</b></dt><dd>" . __("the admin or post author's name", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{EMAIL}</b></dt><dd>" . __("the admin or post author's email", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{AUTHORNAME}</b></dt><dd>" . __("the post author's name", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{LINK}</b></dt><dd>" . __("the generated link to confirm a request<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{ACTION}</b></dt><dd>" . __("Action performed by LINK in confirmation email<br />(<i>only used in the confirmation email template</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{CATS}</b></dt><dd>" . __("the post's assigned categories", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{TAGS}</b></dt><dd>" . __("the post's assigned Tags", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{COUNT}</b></dt><dd>" . __("the number of posts included in the digest email<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "</dl></td></tr><tr><td>";
 		echo __('Subscribe / Unsubscribe confirmation email', 'subscribe2') . ":<br />\r\n";
 		echo __('Subject Line', 'subscribe2') . ": ";
@@ -3698,7 +3710,7 @@ class s2class {
 			('' == $tablelinks) ? $tablelinks .= "* " . $post_title : $tablelinks .= "\r\n* " . $post_title;
 			$message_post .= $post_title;
 			$message_posttime .= $post_title;
-			if ( strstr($mailtext, "AUTHORNAME") ) {
+			if ( strstr($mailtext, "{AUTHORNAME}") ) {
 				$author = get_userdata($post->post_author);
 				if ( $author->display_name != '' ) {
 					$message_post .= " (" . __('Author', 'subscribe2') . ": " . $author->display_name . ")";
@@ -3712,12 +3724,12 @@ class s2class {
 			$message_post .= get_permalink($post->ID) . "\r\n";
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
 			$message_posttime .= get_permalink($post->ID) . "\r\n";
-			if ( strstr($mailtext, "CATS") ) {
+			if ( strstr($mailtext, "{CATS}") ) {
 				$post_cat_names = implode(', ', wp_get_post_categories($post->ID, array('fields' => 'names')));
 				$message_post .= __('Posted in', 'subscribe2') . ": " . $post_cat_names . "\r\n";
 				$message_posttime .= __('Posted in', 'subscribe2') . ": " . $post_cat_names . "\r\n";
 			}
-			if ( strstr($mailtext, "TAGS") ) {
+			if ( strstr($mailtext, "{TAGS}") ) {
 				$post_tag_names = implode(', ', wp_get_post_tags($post->ID, array('fields' => 'names')));
 				if ( $post_tag_names != '' ) {
 					$message_post .= __('Tagged as', 'subscribe2') . ": " . $post_tag_names . "\r\n";
@@ -3783,10 +3795,10 @@ class s2class {
 		$display = $scheds[$email_freq]['display'];
 		( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(get_option('blogname')) . "] ";
 		$subject .= $display . " " . __('Digest Email', 'subscribe2');
-		$mailtext = str_replace("TABLELINKS", $tablelinks, $mailtext);
-		$mailtext = str_replace("TABLE", $table, $mailtext);
-		$mailtext = str_replace("POSTTIME", $message_posttime, $mailtext);
-		$mailtext = str_replace("POST", $message_post, $mailtext);
+		$mailtext = str_replace("{TABLELINKS}", $tablelinks, $mailtext);
+		$mailtext = str_replace("{TABLE}", $table, $mailtext);
+		$mailtext = str_replace("{POSTTIME}", $message_posttime, $mailtext);
+		$mailtext = str_replace("{POST}", $message_post, $mailtext);
 		$mailtext = stripslashes($this->substitute($mailtext));
 
 		// prepare recipients
