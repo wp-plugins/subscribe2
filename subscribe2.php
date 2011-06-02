@@ -2543,7 +2543,6 @@ class s2class {
 		if ( isset($_POST['s2_admin']) && 'user' == $_POST['s2_admin'] ) {
 			check_admin_referer('subscribe2-user_subscribers' . $s2nonce);
 
-			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Subscription preferences updated.', 'subscribe2') . "</strong></p></div>\n";
 			if ( isset($_POST['s2_format']) ) {
 				$this->update_user_meta($user_ID, 's2_format', $_POST['s2_format']);
 			} else {
@@ -2600,6 +2599,7 @@ class s2class {
 				}
 				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
 			}
+			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Subscription preferences updated.', 'subscribe2') . "</strong></p></div>\n";
 		}
 
 		// show our form
