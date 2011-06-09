@@ -630,7 +630,7 @@ class s2class {
 			if ( false !== strpos($content, '<!--more-->') ) {
 				list($html_excerpt, $more) = explode('<!--more-->', $content, 2);
 				// balance HTML tags and then strip leading and trailing whitespace
-				$html_excerpt = trim(balanceTags($html_excerpt));
+				$html_excerpt = trim(balanceTags($html_excerpt, 1));
 			} else {
 				// no <!--more-->, so grab the first 55 words
 				$words = explode(' ', $content, $this->excerpt_length + 1);
@@ -639,7 +639,7 @@ class s2class {
 					array_push($words, '[...]');
 					$html_excerpt = implode(' ', $words);
 					// balance HTML tags and then strip leading and trailing whitespace
-					$html_excerpt = trim(balanceTags($html_excerpt));
+					$html_excerpt = trim(balanceTags($html_excerpt, 1));
 				}
 			}
 		}
@@ -701,9 +701,7 @@ class s2class {
 	*/
 	function send_confirm($what = '', $is_remind = false) {
 		if ( $this->filtered == 1 ) { return true; }
-		if ( !$this->email || !$what ) {
-			return false;
-		}
+		if ( !$this->email || !$what ) { return false; }
 		$id = $this->get_id($this->email);
 		if ( !$id ) {
 			return false;
@@ -3483,36 +3481,49 @@ class s2class {
 	Function to add js files to admin header
 	*/
 	function widget_s2counter_js() {
-		echo '<script type="text/javascript" src="' . S2URL . 'include/colorpicker/js/colorpicker.js"></script>' . "\r\n";
-		echo "<script type=\"text/javascript\">
-			jQuery(document).ready(function() {
-				jQuery('.colorpickerField').focusin(function() {
-					jQuery(this).ColorPickerShow();
-				});
-				jQuery('.colorpickerField').focusout(function() {
-					jQuery(this).ColorPickerHide();
-				});
-				jQuery('.colorpickerField').ColorPicker({
-					onSubmit: function(hsb, hex, rgb, el) {
-						jQuery(el).val(hex);
-						jQuery(el).ColorPickerHide();
-					},
-					onBeforeShow: function () {
+		// ensure we only add colorpicker js to widgets page
+		if ( stripos($_SERVER['REQUEST_URI'], 'widgets.php' ) !== false ) {
+			echo '<script type="text/javascript" src="' . S2URL . 'include/colorpicker/js/colorpicker.js"></script>' . "\r\n";
+			echo "<script type=\"text/javascript\">
+				jQuery(document).ready(function() {
+					jQuery('.colorpickerField').focusin(function() {
+						jQuery(this).ColorPickerShow();
+					});
+					jQuery('.colorpickerField').ColorPicker({
+						onBeforeShow: function () {
+							jQuery(this).ColorPickerSetColor(this.value);
+						},
+						onShow: function (colpkr) {
+							jQuery(colpkr).fadeIn(500);
+							return false;
+						},
+						onHide: function (colpkr) {
+							jQuery(colpkr).fadeOut(500);
+							return false;
+						},
+						onSubmit: function(hsb, hex, rgb, el) {
+							a = hex.toUpperCase();
+							jQuery(el).val(a);
+							jQuery('.colorpicker').fadeOut(500);
+							return false;
+						}
+					})
+					.bind('keyup', function(){
 						jQuery(this).ColorPickerSetColor(this.value);
-					}
-				})
-				.bind('keyup', function(){
-					jQuery(this).ColorPickerSetColor(this.value);
+					});
 				});
-			});
-			</script>";
+				</script>";
+			}
 	} // end widget_s2_counter_js()
 
 	/**
 	Function to add css files to admin header
 	*/
 	function widget_s2counter_css() {
-		echo '<link rel="stylesheet" href="' . S2URL . 'include/colorpicker/css/colorpicker.css" type="text/css" />' . "\r\n";
+		// ensure we only add colorpicker css to widgets page
+		if ( stripos($_SERVER['REQUEST_URI'], 'widgets.php' ) !== false ) {
+			echo '<link rel="stylesheet" href="' . S2URL . 'include/colorpicker/css/colorpicker.css" type="text/css" />' . "\r\n";
+		}
 	} // end widget_s2counter_css
 
 	function namechange_subscribe2_widget() {
