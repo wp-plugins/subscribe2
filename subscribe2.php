@@ -155,7 +155,7 @@ class s2class {
 	Insert Javascript into admin_header
 	*/
 	function checkbox_form_js() {
-		wp_enqueue_script('s2_checkbox', S2URL . 'include/s2_checkbox.js', array('jquery'), '1.1');
+		wp_enqueue_script('s2_checkbox', S2URL . 'include/s2_checkbox' . $this->script_debug . '.js', array('jquery'), '1.1');
 	} //end checkbox_form_js()
 
 	function user_admin_css() {
@@ -163,7 +163,7 @@ class s2class {
 	}
 
 	function option_form_js() {
-		wp_enqueue_script('s2_edit', S2URL . 'include/s2_edit.js', array('jquery'), '1.0');
+		wp_enqueue_script('s2_edit', S2URL . 'include/s2_edit' . $this->script_debug . '.js', array('jquery'), '1.0');
 	} // end option_form_js()
 
 /* ===== Install, upgrade, reset ===== */
@@ -3478,53 +3478,16 @@ class s2class {
 	} // end counter_widget()
 
 	/**
-	Function to add js files to admin header
+	Function to add css and js files to admin header
 	*/
-	function widget_s2counter_js() {
+	function widget_s2counter_css_and_js() {
 		// ensure we only add colorpicker js to widgets page
 		if ( stripos($_SERVER['REQUEST_URI'], 'widgets.php' ) !== false ) {
-			echo '<script type="text/javascript" src="' . S2URL . 'include/colorpicker/js/colorpicker.js"></script>' . "\r\n";
-			echo "<script type=\"text/javascript\">
-				jQuery(document).ready(function() {
-					jQuery('.colorpickerField').focusin(function() {
-						jQuery(this).ColorPickerShow();
-					});
-					jQuery('.colorpickerField').ColorPicker({
-						onBeforeShow: function () {
-							jQuery(this).ColorPickerSetColor(this.value);
-						},
-						onShow: function (colpkr) {
-							jQuery(colpkr).fadeIn(500);
-							return false;
-						},
-						onHide: function (colpkr) {
-							jQuery(colpkr).fadeOut(500);
-							return false;
-						},
-						onSubmit: function(hsb, hex, rgb, el) {
-							a = hex.toUpperCase();
-							jQuery(el).val(a);
-							jQuery('.colorpicker').fadeOut(500);
-							return false;
-						}
-					})
-					.bind('keyup', function(){
-						jQuery(this).ColorPickerSetColor(this.value);
-					});
-				});
-				</script>";
-			}
-	} // end widget_s2_counter_js()
-
-	/**
-	Function to add css files to admin header
-	*/
-	function widget_s2counter_css() {
-		// ensure we only add colorpicker css to widgets page
-		if ( stripos($_SERVER['REQUEST_URI'], 'widgets.php' ) !== false ) {
-			echo '<link rel="stylesheet" href="' . S2URL . 'include/colorpicker/css/colorpicker.css" type="text/css" />' . "\r\n";
+			wp_enqueue_style('colorpicker', S2URL . 'include/colorpicker/css/colorpicker.css', '', '20090523'); // colorpicker css
+			wp_enqueue_script('colorpicker_js', S2URL . 'include/colorpicker/js/colorpicker.js', array('jquery'), '20090523'); // colorpicker js
+			wp_enqueue_script('s2_colorpicker', S2URL . 'include/s2_colorpicker' . $this->script_debug . '.js', array('colorpicker_js'), '1.1'); //my js
 		}
-	} // end widget_s2counter_css
+	} // end widget_s2_counter_css_and_js()
 
 	function namechange_subscribe2_widget() {
 		// rename WPMU widgets without requiring user to re-enable
@@ -3833,6 +3796,8 @@ class s2class {
 	function s2init() {
 		// load the options
 		$this->subscribe2_options = get_option('subscribe2_options');
+		// if SCRIPT_DEBUG is true, use dev scripts
+		$this->script_debug = ( defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ) ? '.dev' : '';
 
 		add_action('init', array(&$this, 'subscribe2'));
 		if ( '1' == $this->subscribe2_options['show_button'] ) {
@@ -3846,8 +3811,7 @@ class s2class {
 
 		// add action to display counter widget if option is enabled
 		if ( '1' == $this->subscribe2_options['counterwidget'] ) {
-			add_action('admin_print_styles', array(&$this, 'widget_s2counter_css'), 20);
-			add_action('admin_print_scripts', array(&$this, 'widget_s2counter_js'), 20);
+			add_action('admin_init', array(&$this, 'widget_s2counter_css_and_js'));
 			add_action('widgets_init', array(&$this, 'counter_widget'));
 		}
 
