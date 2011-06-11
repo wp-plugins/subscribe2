@@ -39,7 +39,7 @@ class S2_Counter_widget extends WP_Widget {
 	*/
 	function update($new_instance, $old_instance) {
 		$instance = $old_instance;
-		$instance['title'] = strip_tags(stripslashes($new_instance['title']));				
+		$instance['title'] = strip_tags(stripslashes($new_instance['title']));
 		$instance['s2w_bg'] = strip_tags(stripslashes($new_instance['s2w_bg']));
 		$instance['s2w_fg'] = strip_tags(stripslashes($new_instance['s2w_fg']));
 		$instance['s2w_width'] = strip_tags(stripslashes($new_instance['s2w_width']));
@@ -70,8 +70,8 @@ class S2_Counter_widget extends WP_Widget {
 		$s2w_height = htmlspecialchars($instance['s2w_height'], ENT_QUOTES);
 		$s2w_font = htmlspecialchars($instance['s2w_font'], ENT_QUOTES);
 		echo "<div>\r\n";
-		echo "<fieldset><legend>" . __('Widget Title', 'subscribe2') . "</legend>\r\n";
-		echo "<label><input type=\"text\" name=\"" . $this->get_field_name('title') . "\" id=\"" . $this->get_field_id('title') . "\" value=\"" . $s2w_title . "\" /></label>\r\n";
+		echo "<fieldset><legend><label for=\"" . $this->get_field_id('title') . "\">" . __('Widget Title', 'subscribe2') . "</label></legend>\r\n";
+		echo "<input type=\"text\" name=\"" . $this->get_field_name('title') . "\" id=\"" . $this->get_field_id('title') . "\" value=\"" . $s2w_title . "\" />\r\n";
 		echo "</fieldset>\r\n";
 
 		echo "<fieldset>\r\n";
@@ -85,12 +85,12 @@ class S2_Counter_widget extends WP_Widget {
 		echo "<fieldset>\r\n";
 		echo "<legend>" . __('Width, Height and Font Size', 'subscribe2') . "</legend>\r\n";
 		echo "<table style=\"border:0; padding:0; margin:0 0 12px 0; border-collapse:collapse;\" align=\"center\">\r\n";
-		echo "<tr><td>" . __('Width', 'subscribe2') . "</td>\r\n";
-		echo "<td><label><input type=\"text\" name=\"" . $this->get_field_name('s2w_width') . "\" id=\"" . $this->get_field_id('s2w_width') . "\" value=\"" . $s2w_width . "\" /></label></td></tr>\r\n";
-		echo "<tr><td>" . __('Height', 'subscribe2') . "</td>\r\n";
-		echo "<td><label><input type=\"text\" name=\"" . $this->get_field_name('s2w_height') . "\" id=\"" . $this->get_field_id('s2w_height') . "\" value=\"" . $s2w_height . "\" /></label></td></tr>\r\n";
-		echo "<tr><td>" . __('Font', 'subscribe2') . "</td>\r\n";
-		echo "<td><label><input type=\"text\" name=\"" . $this->get_field_name('s2w_font') . "\" id=\"" . $this->get_field_id('s2w_font') . "\" value=\"" . $s2w_font . "\" /></label></td></tr>\r\n";
+		echo "<tr><td><label for=\"" . $this->get_field_id('s2w_width') . "\">" . __('Width', 'subscribe2') . "</label></td>\r\n";
+		echo "<td><input type=\"text\" name=\"" . $this->get_field_name('s2w_width') . "\" id=\"" . $this->get_field_id('s2w_width') . "\" value=\"" . $s2w_width . "\" /></td></tr>\r\n";
+		echo "<tr><td><label for=\"" . $this->get_field_id('s2w_height') . "\">" . __('Height', 'subscribe2') . "</label></td>\r\n";
+		echo "<td><input type=\"text\" name=\"" . $this->get_field_name('s2w_height') . "\" id=\"" . $this->get_field_id('s2w_height') . "\" value=\"" . $s2w_height . "\" /></td></tr>\r\n";
+		echo "<tr><td><label for=\"" . $this->get_field_id('s2w_font') . "\">" . __('Font', 'subscribe2') . "</label></td>\r\n";
+		echo "<td><input type=\"text\" name=\"" . $this->get_field_name('s2w_font') . "\" id=\"" . $this->get_field_id('s2w_font') . "\" value=\"" . $s2w_font . "\" /></td></tr>\r\n";
 		echo "</table></fieldset></div>\r\n";
 	}
 }// end S2_Counter_widget class
