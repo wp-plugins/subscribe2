@@ -3484,8 +3484,8 @@ class s2class {
 		// ensure we only add colorpicker js to widgets page
 		if ( stripos($_SERVER['REQUEST_URI'], 'widgets.php' ) !== false ) {
 			wp_enqueue_style('colorpicker', S2URL . 'include/colorpicker/css/colorpicker.css', '', '20090523'); // colorpicker css
-			wp_enqueue_script('colorpicker_js', S2URL . 'include/colorpicker/js/colorpicker.js', array('jquery'), '20090523'); // colorpicker js
-			wp_enqueue_script('s2_colorpicker', S2URL . 'include/s2_colorpicker' . $this->script_debug . '.js', array('colorpicker_js'), '1.1'); //my js
+			wp_enqueue_script('colorpicker_js', S2URL . 'include/colorpicker/js/colorpicker' . $this->script_debug . '.js', array('jquery'), '20090523'); // colorpicker js
+			wp_enqueue_script('s2_colorpicker', S2URL . 'include/s2_colorpicker' . $this->script_debug . '.js', array('colorpicker_js'), '1.3'); //my js
 		}
 	} // end widget_s2_counter_css_and_js()
 
