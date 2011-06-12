@@ -205,7 +205,8 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Updated editor buttons to insert shortcode instead of token
 * Fixed some PHP notices about undeclared variables
 * Compressed some of the javascript code includes to reduce download time
-* Fixed the Counter Widget ColorPicker
+* Fixes to the Counter Widget ColorPicker jQuery code
+* Fixes to the Counter Widget label tags
 
 = Version 6.3 by Matthew Robinson =
 
