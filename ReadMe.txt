@@ -3,7 +3,7 @@ Contributors: MattyRob, Skippy, RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 2.8
-Tested up to: 3.1
+Tested up to: 3.2-beta2
 Stable tag: 6.3
 
 Sends a list of subscribers an email notification when new posts are published to your blog

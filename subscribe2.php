@@ -1899,7 +1899,8 @@ class s2class {
 		// show the selected subscribers
 		$alternate = '';
 		echo "<table cellpadding=\"2\" cellspacing=\"2\" width=\"100%\">";
-		echo "<tr class=\"alternate\"><td width=\"50%\"><input type=\"text\" name=\"searchterm\" value=\"\" />&nbsp;\r\n";
+		$searchterm = ( $_POST['searchterm'] ) ? $_POST['searchterm'] : '';
+		echo "<tr class=\"alternate\"><td width=\"50%\"><input type=\"text\" name=\"searchterm\" value=\"" . $searchterm . "\" />&nbsp;\r\n";
 		echo "<input type=\"submit\" class=\"button-secondary\" name=\"search\" value=\"" . __('Search Subscribers', 'subscribe2') . "\" /></td>\r\n";
 		if ( $reminderform ) {
 			echo "<td width=\"25%\" align=\"right\"><input type=\"hidden\" name=\"reminderemails\" value=\"" . $reminderemails . "\" />\r\n";
