@@ -77,9 +77,9 @@ class S2_Counter_widget extends WP_Widget {
 		echo "<fieldset>\r\n";
 		echo "<legend>" . __('Color Scheme', 'subscribe2') . "</legend>\r\n";
 		echo "<label>\r\n";
-		echo "<input type=\"text\" name=\"" . $this->get_field_name('s2w_bg') . "\" id=\"" . $this->get_field_id('s2w_bg') . "\" maxlength=\"7\" value=\"" . $s2w_bg . "\" class=\"colorpickerField\" style=\"width:60px;\" /> " . __('Body', 'subscribe2') . "</label><br />\r\n";
+		echo "<input type=\"text\" name=\"" . $this->get_field_name('s2w_bg') . "\" id=\"" . $this->get_field_id('s2w_bg') . "\" maxlength=\"6\" value=\"" . $s2w_bg . "\" class=\"colorpickerField\" style=\"width:60px;\" /> " . __('Body', 'subscribe2') . "</label><br />\r\n";
 		echo "<label>\r\n";
-		echo "<input type=\"text\" name=\"" . $this->get_field_name('s2w_fg') . "\" id=\"" . $this->get_field_id('s2w_fg') . "\" maxlength=\"7\" value=\"" . $s2w_fg . "\" class=\"colorpickerField\" style=\"width:60px;\" /> " . __('Text', 'subsribe2') . "</label><br />\r\n";
+		echo "<input type=\"text\" name=\"" . $this->get_field_name('s2w_fg') . "\" id=\"" . $this->get_field_id('s2w_fg') . "\" maxlength=\"6\" value=\"" . $s2w_fg . "\" class=\"colorpickerField\" style=\"width:60px;\" /> " . __('Text', 'subsribe2') . "</label><br />\r\n";
 		echo "</fieldset>";
 
 		echo "<fieldset>\r\n";
