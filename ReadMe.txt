@@ -197,6 +197,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 * Wrapped all KEYWORDS in curly brackets {} so capitalised keywords can be used incontent without being replaced
 * Added support for Custom Taxonomies - thanks to Ian Dunn
+* Added feature to allow commenters on your blog to subscribe when commenting (requires WordPress 2.9+)
 * Improved and updated some of the jQuery ready for WordPress 3.2
 * Introduced 's2_registered_subscribers' filter to allow other plugins to dynamically add or remove email addresses to the 'registered' array - thanks to Allan Tan
 * Improved handling of [gallery] shortcode where no post id is defined for HTML emails - thanks to Chris Grady

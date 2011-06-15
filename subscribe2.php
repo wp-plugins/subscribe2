@@ -2011,7 +2011,7 @@ class s2class {
 	Our options page
 	*/
 	function options_menu() {
-		global $s2nonce, $wpdb;
+		global $s2nonce, $wpdb, $wp_version;
 
 		// send error message if no WordPress page exists
 		$sql = "SELECT ID FROM $wpdb->posts WHERE post_type='page' AND post_status='publish' LIMIT 1";
@@ -2178,6 +2178,7 @@ class s2class {
 				$this->subscribe2_options['autoformat'] = $_POST['autoformat'];
 				$this->subscribe2_options['show_autosub'] = $_POST['show_autosub'];
 				$this->subscribe2_options['autosub_def'] = $_POST['autosub_def'];
+				$this->subscribe2_options['comment_subs'] = $_POST['comment_subs'];
 
 				//barred domains
 				$this->subscribe2_options['barred'] = $_POST['barred'];
@@ -2500,6 +2501,28 @@ class s2class {
 			echo " checked=\"checked\"";
 		}
 		echo " />" . __('No', 'subscribe2');
+		if ( version_compare($wp_version, '2.9', '>') ) {
+			// comment meta was introduced in WP2.9, don't display this if we are on a lower version
+			echo"</label><br /><br />";
+			echo __('Display checkbox to allow subscriptions from the comment form', 'subscribe2') . ": <br />\r\n";
+			if ( version_compare($wp_version, '3.0', '>') ) {
+				echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"before\"";
+				if ( 'before' == $this->subscribe2_options['comment_subs'] ) {
+					echo " checked=\"checked\"";
+				}
+				echo " />" . __('Before the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp;";
+			}
+			echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"after\"";
+			if ( 'after' == $this->subscribe2_options['comment_subs'] ) {
+				echo " checked=\"checked\"";
+			}
+			echo " />" . __('After the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp;";
+			echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"no\"";
+			if ( 'no' == $this->subscribe2_options['comment_subs'] ) {
+				echo " checked=\"checked\"";
+			}
+			echo " />" . __('No', 'subscribe2');
+		}
 		echo"</label></p>";
 
 		//barred domains
@@ -3322,6 +3345,64 @@ class s2class {
 		}
 	} // end s2_meta_box_handler()
 
+/* ===== comment subscriber functions ===== */
+	/**
+	Display check box on comment page
+	*/
+	function s2_comment_meta_form() {
+		if ( is_user_logged_in() ) {
+			echo $this->use_profile_admin;
+		} else {
+			echo "<label><input type=\"checkbox\" name=\"s2_comment_request\" value=\"1\" />" . __('Check here to Subscribe to notifications for new posts', 'subscribe2') . "</label>";
+		}
+	} // end s2_comment_meta_form()
+
+	/**
+	Process comment meta data
+	*/
+	function s2_comment_meta($comment_ID) {
+		if ( $_POST['s2_comment_request'] == '1' ) {
+			add_comment_meta($comment_ID, 's2_comment_request', $_POST['s2_comment_request']);
+		}
+	} // end s2_comment_meta()
+
+	/**
+	Action subscribe requests made on comment forms when comments are approved
+	*/
+	function comment_status($comment_ID = 0, $comment_status = 0){
+	    global $wpdb;
+
+		// get meta data
+		$subscribe = get_comment_meta($comment_ID, 's2_comment_request', true);
+		if ( $subscribe != '1' ) { return $comment_ID; }
+
+		// Retrieve the information about the comment
+		$sql = "SELECT comment_author_email, comment_approved FROM $wpdb->comments WHERE comment_ID='$comment_ID' LIMIT 1";
+		$comment = $wpdb->get_row($sql, OBJECT);
+		if ( empty($comment) ) { return $comment_ID; }
+
+		switch ($comment->comment_approved){
+			case '0': // Unapproved
+				break;
+			case '1': // Approved
+				$is_public = $this->is_public($comment->comment_author_email);
+				if ( $is_public == 0 ) {
+					$this->toggle($comment->comment_author_email);
+				}
+				$is_registered = $this->is_registered($comment->comment_author_email);
+				if ( !$is_public && !$is_registered ) {
+					$this->activate($comment->comment_author_email);
+				}
+				delete_comment_meta($comment_ID, 's2_comment_request');
+				break;
+			default: // post is trash, spam or deleted
+				delete_comment_meta($comment_ID, 's2_comment_request');
+				break;
+		}
+
+		return $comment_ID;
+	} // end comment_status()
+
 /* ===== template and filter functions ===== */
 	/**
 	Display our form; also handles (un)subscribe requests
@@ -3910,6 +3991,17 @@ class s2class {
 				add_action('draft_to_private', array(&$this, 'publish'));
 				add_action('pending_to_private', array(&$this, 'publish'));
 			}
+		}
+
+		// add actions for comment subscribers
+		if ( 'no' != $this->subscribe2_options['comment_subs'] ) {
+			if ( 'before' == $this->subscribe2_options['comment_subs'] ) {
+				add_action('comment_form_after_fields', array(&$this, 's2_comment_meta_form'));
+			} else {
+				add_action('comment_form', array(&$this, 's2_comment_meta_form'));
+			}
+			add_action('comment_post', array(&$this, 's2_comment_meta'), 1);
+			add_action('wp_set_comment_status', array(&$this, 'comment_status'));
 		}
 
 		// load our strings

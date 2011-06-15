@@ -26,6 +26,10 @@ if (!isset($this->subscribe2_options['autosub_def'])) {
 	$this->subscribe2_options['autosub_def'] = "yes";
 } // option for user default auto-subscription to new categories
 
+if (!isset($this->subscribe2_options['comment_subs'])) {
+	$this->subscribe2_options['comment_subs'] = "no";
+} // option for commenters to subscribe as public subscribers
+
 if(!isset($this->subscribe2_options['bcclimit'])) {
 	$this->subscribe2_options['bcclimit'] = 0;
 } // option for default bcc limit on email notifications
