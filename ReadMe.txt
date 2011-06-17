@@ -208,6 +208,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Compressed some of the javascript code includes to reduce download time
 * Fixes to the Counter Widget ColorPicker jQuery code
 * Fixes to the Counter Widget label tags
+* Fixed a bug in the new_category function that was introduced in version 6.3 - thanks to crashtest
 
 = Version 6.3 by Matthew Robinson =
 
