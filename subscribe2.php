@@ -1601,7 +1601,7 @@ class s2class {
 			$excluded_cats = explode(',', $this->subscribe2_options['exclude']);
 			$excluded_cats[] = $new_category;
 			$this->subscribe2_options['exclude'] = implode(',', $excluded_cats);
-			$this->update_option('subscribe2_options', $this->subscribe2_options);
+			update_option('subscribe2_options', $this->subscribe2_options);
 		}
 	} // end new_category()
 
