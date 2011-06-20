@@ -3,7 +3,7 @@ Contributors: MattyRob, Skippy, RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 2.8
-Tested up to: 3.2-beta2
+Tested up to: 3.2-RC1
 Stable tag: 6.3
 
 Sends a list of subscribers an email notification when new posts are published to your blog
@@ -209,6 +209,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fixes to the Counter Widget ColorPicker jQuery code
 * Fixes to the Counter Widget label tags
 * Fixed a bug in the new_category function that was introduced in version 6.3 - thanks to crashtest
+8 Improved the user experience when clicking Subscribe and Unsubscribe links in the WordPress MultiSite interface - thanks to Huyz
 
 = Version 6.3 by Matthew Robinson =
 

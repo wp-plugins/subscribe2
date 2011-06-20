@@ -263,8 +263,8 @@ class s2class {
 					$blogs = get_blogs_of_user($user, true);
 				}
 
-				foreach ( $blogs as $blog_id => $blog ) {
-					switch_to_blog($blog_id);
+				foreach ( $blogs as $blog ) {
+					switch_to_blog($blog->userblog_id);
 
 					$blog_categories = (array)$wpdb->get_col("SELECT term_id FROM $wpdb->term_taxonomy WHERE taxonomy = 'category'");
 					$subscribed_categories = array_intersect($categories, $blog_categories);
@@ -1363,22 +1363,20 @@ class s2class {
 	Handles subscriptions and unsubscriptions for different blogs on WPMU installs
 	*/
 	function wpmu_subscribe() {
-		$redirect_to_subscriptionpage = false;
-
 		// subscribe to new blog
 		if ( !empty($_GET['s2mu_subscribe']) ) {
-			$blog_id = intval($_GET['s2mu_subscribe']);
-			if ( $blog_id >= 0 ) {
-				switch_to_blog($blog_id);
+			$sub_id = intval($_GET['s2mu_subscribe']);
+			if ( $sub_id >= 0 ) {
+				switch_to_blog($sub_id);
 
 				$user_ID = get_current_user_id();
 
 				// if user is not a user of the current blog
-				if ( !is_blog_user($blog_id) ) {
+				if ( !is_blog_user($sub_id) ) {
 					// add user to current blog as subscriber
-					add_user_to_blog($blog_id, $user_ID, 'subscriber');
+					add_user_to_blog($sub_id, $user_ID, 'subscriber');
 					// add an action hook for external manipulation of blog and user data
-					do_action_ref_array('subscribe2_wpmu_subscribe', array($user_ID, $blog_id));
+					do_action_ref_array('subscribe2_wpmu_subscribe', array($user_ID, $sub_id));
 				}
 
 				// subscribe to all categories by default
@@ -1414,15 +1412,12 @@ class s2class {
 				} else {
 					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
 				}
-
-				// don't restore_current_blog(); -> redirect to new subscription page
-				$redirect_to_subscriptionpage = true;
 			}
 		} elseif ( !empty($_GET['s2mu_unsubscribe']) ) {
 			// unsubscribe from a blog
-			$blog_id = intval($_GET['s2mu_unsubscribe']);
-			if ( $blog_id >= 0 ) {
-				switch_to_blog($blog_id);
+			$unsub_id = intval($_GET['s2mu_unsubscribe']);
+			if ( $unsub_id >= 0 ) {
+				switch_to_blog($unsub_id);
 
 				$user_ID = get_current_user_id();
 
@@ -1439,35 +1434,32 @@ class s2class {
 				$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 
 				// add an action hook for external manipulation of blog and user data
-				do_action_ref_array('subscribe2_wpmu_unsubscribe', array($user_ID, $blog_id));
+				do_action_ref_array('subscribe2_wpmu_unsubscribe', array($user_ID, $unsub_id));
 
 				restore_current_blog();
-				$redirect_to_subscriptionpage = true;
 			}
 		}
 
-		if ( $redirect_to_subscriptionpage == true ) {
-			if ( !is_user_member_of_blog($user_ID) ) {
-				$user_blogs = get_active_blog_for_user($user_ID);
-				if ( is_array($user_blogs) ) {
-					switch_to_blog(key($user_blogs));
-				} else {
-					// no longer a member of a blog
-					wp_redirect(get_option('siteurl')); // redirect to front page
-					exit();
-				}
-			}
-
-			// redirect to profile page
-			if ( current_user_can('manage_options') ) {
-				$url = get_option('siteurl') . '/wp-admin/users.php?page=s2_users';
-				wp_redirect($url);
-				exit();
+		if ( !is_user_member_of_blog($user_ID) ) {
+			$user_blogs = get_active_blog_for_user($user_ID);
+			if ( is_array($user_blogs) ) {
+				switch_to_blog(key($user_blogs));
 			} else {
-				$url = get_option('siteurl') . '/wp-admin/profile.php?page=s2_users';
-				wp_redirect($url);
+				// no longer a member of a blog
+				wp_redirect(get_option('siteurl')); // redirect to front page
 				exit();
 			}
+		}
+
+		// redirect to profile page
+		if ( current_user_can('manage_options') ) {
+			$url = get_option('siteurl') . '/wp-admin/users.php?page=s2_users';
+			wp_redirect($url);
+			exit();
+		} else {
+			$url = get_option('siteurl') . '/wp-admin/profile.php?page=s2_users';
+			wp_redirect($url);
+			exit();
 		}
 	} // end wpmu_subscribe()
 
@@ -2682,11 +2674,11 @@ class s2class {
 				$subscribed = $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 				// if we are subscribed to the current blog display an "unsubscribe" link
 				if ( !empty($subscribed) ) {
-					$unsubscribe_link = get_option('home') . "/wp-admin/?s2mu_unsubscribe=". $blog_id;
+					$unsubscribe_link = esc_url( add_query_arg('s2mu_unsubscribe', $blog_id) );
 					echo "<p><a href=\"". $unsubscribe_link ."\" class=\"button\">" . __('Unsubscribe me from this blog', 'subscribe2') . "</a></p>";
 				} else {
 					// else we show a "subscribe" link
-					$subscribe_link = get_option('home') . "/wp-admin/?s2mu_subscribe=". $blog_id;
+					$subscribe_link = esc_url( add_query_arg('s2mu_subscribe', $blog_id) );
 					echo "<p><a href=\"". $subscribe_link ."\" class=\"button\">" . __('Subscribe to all categories', 'subscribe2') . "</a></p>";
 				}
 				echo "<h2>" . __('Subscribed Categories on', 'subscribe2') . " " . get_option('blogname') . " </h2>\r\n";
@@ -2773,7 +2765,7 @@ class s2class {
 						if ( is_user_member_of_blog($current_user->id, $blog['blog_id']) ) {
 							echo "<a href=\"". $blog['subscribe_page'] . "\">" . __('View Settings', 'subscribe2') . "</a>\r\n";
 						}
-						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_unsubscribe=" . $blog['blog_id'] . "\">" . __('Unsubscribe', 'subscribe2') . "</a></span>\r\n";
+						echo "<a href=\"" . esc_url( add_query_arg('s2mu_unsubscribe', $blog['blog_id']) ) . "\">" . __('Unsubscribe', 'subscribe2') . "</a></span>\r\n";
 					}
 					echo "<div class=\"additional_info\">" . $blog['description'] . "</div>\r\n";
 					echo "</li>";
@@ -2794,7 +2786,7 @@ class s2class {
 						if ( is_user_member_of_blog($current_user->id, $blog['blog_id']) ) {
 							echo "<a href=\"". $blog['subscribe_page'] . "\">" . __('View Settings', 'subscribe2') . "</a>\r\n";
 						}
-						echo "<a href=\"" . $blog['blogurl'] . "/wp-admin/?s2mu_subscribe=" . $blog['blog_id'] . "\">" . __('Subscribe', 'subscribe2') . "</a></span>\r\n";
+						echo "<a href=\"" . esc_url( add_query_arg('s2mu_subscribe', $blog['blog_id']) ) . "\">" . __('Subscribe', 'subscribe2') . "</a></span>\r\n";
 					}
 					echo "<div class=\"additional_info\">" . $blog['description'] . "</div>\r\n";
 					echo "</li>";
