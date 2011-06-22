@@ -1203,7 +1203,17 @@ class s2class {
 
 		if ( 0 == $user_ID ) { return $user_ID; }
 		$user = get_userdata($user_ID);
-		$all_cats = get_categories(array('hide_empty' => false));
+
+		// subscribe to all categories by default
+		$all_cats = array();
+		$s2_taxonomies = array('category');
+		$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
+
+		foreach( $s2_taxonomies as $taxonomy ) {
+			if ( $this->s2_taxonomy_exists($taxonomy) ) {
+				$all_cats = array_merge($all_cats, get_categories(array('hide_empty' => false, 'orderby' => 'slug', 'taxonomy' => $taxonomy)));
+			}
+		}
 
 		// Are registered users are allowed to subscribe to excluded categories?
 		if ( 0 == $this->subscribe2_options['reg_override'] || 'no' == $this->subscribe2_options['newreg_override'] ) {
@@ -1248,7 +1258,7 @@ class s2class {
 				}
 				$this->update_user_meta($user_ID, 's2_autosub', $this->subscribe2_options['autosub_def']);
 				// if the are no existing subscriptions, create them if, by default if autosub is on
-				if ( 'yes' == $this->subscribe2_options['autosub'] || ( 'wpreg' == $this->subscribe2_options['autosub'] && 'on' == $_POST['subscribe'] ) ) {
+				if ( 'yes' == $this->subscribe2_options['autosub'] || ( 'wpreg' == $this->subscribe2_options['autosub'] && 'on' == $_POST['reg_subscribe'] ) ) {
 					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
 					foreach ( explode(',', $cats) as $cat ) {
 						$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
@@ -3271,7 +3281,7 @@ class s2class {
 		if ( 'wpreg' == $this->subscribe2_options['autosub'] ) {
 			echo "<p>\r\n<label>";
 			echo __('Check here to Subscribe to email notifications for new posts', 'subscribe2') . ":<br />\r\n";
-			echo "<input type=\"checkbox\" name=\"subscribe\"";
+			echo "<input type=\"checkbox\" name=\"reg_subscribe\"";
 			if ( 'yes' == $this->subscribe2_options['wpregdef'] ) {
 				echo " checked=\"checked\"";
 			}
@@ -3281,17 +3291,6 @@ class s2class {
 			echo "<p>\r\n<center>\r\n";
 			echo __('By registering with this blog you are also agreeing to receive email notifications for new posts but you can unsubscribe at anytime', 'subscribe2') . ".<br />\r\n";
 			echo "</center></p>\r\n";
-		}
-	}
-
-	/**
-	Process function to add action if user selects to subscribe to posts during registration
-	*/
-	function register_post() {
-		if ( 'on' == $_POST['subscribe'] ) {
-			$user = get_userdatabylogin($_POST['user_login']);
-			if ( 0 == $user->ID ) { return; }
-			$this->register($user->ID);
 		}
 	}
 
@@ -3600,7 +3599,6 @@ class s2class {
 	} // end add_minimeta()
 
 /* ===== Write Toolbar Button Functions ===== */
-
 	/**
 	Register our button in the QuickTags bar
 	*/
@@ -3984,6 +3982,8 @@ class s2class {
 				add_action('pending_to_private', array(&$this, 'publish'));
 			}
 		}
+		// uncomment this to enable notifications for blogs made via email
+		//add_action('publish_phone', array(&$this, 'publish_phone'));
 
 		// add actions for comment subscribers
 		if ( 'no' != $this->subscribe2_options['comment_subs'] ) {
