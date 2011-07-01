@@ -3335,33 +3335,23 @@ class s2class {
 	function register_form() {
 		if ( 'no' == $this->subscribe2_options['autosub'] ) { return; }
 		if ( 'wpreg' == $this->subscribe2_options['autosub'] ) {
-			$register_form = "<p>\r\n<label>";
-			$register_form .= __('Check here to Subscribe to email notifications for new posts', 'subscribe2') . ":<br />\r\n";
-			$register_form .= "<input type=\"checkbox\" name=\"reg_subscribe\"";
+			echo "<p>\r\n<label>";
+			echo __('Check here to Subscribe to email notifications for new posts', 'subscribe2') . ":<br />\r\n";
+			echo "<input type=\"checkbox\" name=\"reg_subscribe\"";
 			if ( 'yes' == $this->subscribe2_options['wpregdef'] ) {
-				$register_form .= " checked=\"checked\"";
+				echo " checked=\"checked\"";
 			}
-			$register_form .= " /></label>\r\n";
-			$register_form .= "</p>\r\n";
+			echo " /></label>\r\n";
+			echo "</p>\r\n";
 		} elseif ( 'yes' == $this->subscribe2_options['autosub'] ) {
-			$register_form = "<p>\r\n<center>\r\n";
-			$register_form .= __('By registering with this blog you are also agreeing to receive email notifications for new posts but you can unsubscribe at anytime', 'subscribe2') . ".<br />\r\n";
-			$register_form .= "</center></p>\r\n";
+			echo "<p>\r\n<center>\r\n";
+			echo __('By registering with this blog you are also agreeing to receive email notifications for new posts but you can unsubscribe at anytime', 'subscribe2') . ".<br />\r\n";
+			echo "</center></p>\r\n";
 		}
-		$register_form = apply_filters('s2_register_form', $register_form);
-		echo $register_form;
 	} // end register_form()
 
 	/**
-	Create a hook to process registration form data
-	*/
-	function s2_register_post($user_ID) {
-		do_action('s2_register_post', $user_ID);
-	} // end s2_register_post()
-
-	/**
-	Default action for the 's2_register_post' action
-	This needs to be de-registered and replaced if 's2_regiser_form' filter is used
+	Process function to add action if user selects to subscribe to posts during registration
 	*/
 	function register_post($user_ID = 0) {
 		global $_POST;
@@ -4073,10 +4063,7 @@ class s2class {
 
 		// add actions for automatic subscription based on option settings
 		add_action('register_form', array(&$this, 'register_form'));
-		// s2_register_post creates an s2 hook for the registration process
-		add_action('user_register', array(&$this, 's2_register_post'));
-		// this is the default subscribe2 hook for the form
-		add_action('s2_register_post', array(&$this, 'register_post'));
+		add_action('user_register', array(&$this, 'register_post'));
 		if ( $this->s2_mu ) {
 			add_action('add_user_to_blog', array(&$this, 'wpmu_add_user'), 10);
 			add_action('remove_user_from_blog', array(&$this, 'wpmu_remove_user'), 10);
