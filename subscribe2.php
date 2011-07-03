@@ -2110,6 +2110,11 @@ class s2class {
 				$email_freq = $_POST['email_freq'];
 				$scheduled_time = wp_next_scheduled('s2_digest_cron');
 				if ( $email_freq != $this->subscribe2_options['email_freq'] || $_POST['hour'] != date('H', $scheduled_time) ) {
+					// make sure the timezone strings are right
+					if ( date_default_timezone_get() != get_option('timezone_string') ) {
+						date_default_timezone_set(get_option('timezone_string'));
+					}
+
 					$this->subscribe2_options['email_freq'] = $email_freq;
 					wp_clear_scheduled_hook('s2_digest_cron');
 					$scheds = (array)wp_get_schedules();
