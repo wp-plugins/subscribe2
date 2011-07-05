@@ -2,7 +2,7 @@
 if( !defined('ABSPATH') && !defined('WP_UNINSTALL_PLUGIN') ) {
 	exit();
 } else {
-	global $wpdb, $table_prefix;
+	global $wpdb, $table_prefix, $mysubscribe2;
 	// get name of subscribe2 table
 	$public = $table_prefix . "subscribe2";
 	// delete entry from wp_options table
@@ -14,14 +14,16 @@ if( !defined('ABSPATH') && !defined('WP_UNINSTALL_PLUGIN') ) {
 	// delete usermeta data for registered users
 	$users = $wpdb->get_col("SELECT ID FROM $wpdb->users");
 	if ( !empty($users) ) {
-		foreach ( $users as $user ) {
-			$cats = explode(',', get_usermeta($user, 's2_subscribed'));
+		foreach ( $users as $user_ID ) {
+			$cats = explode(',', $mysubscribe2->get_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_subscribed')));
 			if ($cats) {
 				foreach ($cats as $cat) {
-					delete_usermeta($user, "s2_cat" . $cat);
+					$mysubscribe2->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat);
 				}
 			}
-			delete_usermeta($user, 's2_subscribed');
+			$mysubscribe2->delete_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_subscribed'));
+			$mysubscribe2->delete_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_format'));
+			$mysubscribe2->delete_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_autosub'));
 		}
 	}
 	// drop the subscribe2 table

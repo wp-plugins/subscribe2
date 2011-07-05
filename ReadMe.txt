@@ -3,8 +3,8 @@ Contributors: MattyRob, Skippy, RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 2.8
-Tested up to: 3.2-RC1
-Stable tag: 6.3
+Tested up to: 3.2
+Stable tag: 6.4
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -182,7 +182,7 @@ WordPress 2.0.x requires Subscribe2 from the 2.x stable branch. The most recent 
 = Why doesn't the form appear in my WordPress page? =
 This is usually caused by one of two things. Firstly, it is possible that the form is there but because you haven't logged out of WordPress yourself you are seeing a message about managing your profile instead. Log out of WordPress and it will appear as the subscription form you are probably expecting.
 
-Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correctly entered in your page with a blank line above and below. The easient way to do this is to deactivate the plugin, visit your WordPress page and view the source. The token should be contained in the source code of the page. If it is not there you either have not correctly entered the token or you have another plugin that is stripping the token from the page code.
+Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correctly entered in your page with a blank line above and below. The easiest way to do this is to deactivate the plugin, visit your WordPress page and view the source. The token should be contained in the source code of the page. If it is not there you either have not correctly entered the token or you have another plugin that is stripping the token from the page code.
 
 == Screenshots ==
 
@@ -209,7 +209,12 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fixes to the Counter Widget ColorPicker jQuery code
 * Fixes to the Counter Widget label tags
 * Fixed a bug in the new_category function that was introduced in version 6.3 - thanks to crashtest
-8 Improved the user experience when clicking Subscribe and Unsubscribe links in the WordPress MultiSite interface - thanks to Huyz
+* Improved the user experience when clicking Subscribe and Unsubscribe links in the WordPress MultiSite interface - thanks to Huyz
+* Improved the Bulk Manage section to take into account the digest notification setting
+* Added ability to filter the text or input fields displayed by Subscribe2 on the WordPress Registration page and also allow custom processing of that data
+* Updated the uninstall script
+* Updated some of the code comments to aid reviewing
+* Other minor improvements and fixes
 
 = Version 6.3 by Matthew Robinson =
 
