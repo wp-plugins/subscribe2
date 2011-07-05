@@ -193,6 +193,10 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 == Changelog ==
 
+= Version 6.5 by Matthew Robinson =
+
+*
+
 = Version 6.4 by Matthew Robinson =
 
 * Wrapped all KEYWORDS in curly brackets {} so capitalised keywords can be used incontent without being replaced
