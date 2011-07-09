@@ -36,9 +36,12 @@ if ( version_compare($wp_version, '2.8', '<') ) {
 	$exit_msg = sprintf(__('This version of Subscribe2 requires WordPress 2.8 or greater. Please update %1$s or use an older version of %2$s.', 'subscribe2'), '<a href="http://codex.wordpress.org/Updating_WordPress">Wordpress</a>', '<a href="http://wordpress.org/extend/plugins/subscribe2/download/">Subscribe2</a>');
 	exit($exit_msg);
 }
-if ( version_compare($wp_version, '3.0', '<') && is_multisite() ) {
-	// Subscribe2 needs WordPress MultiSite 3.0 or above, exit if not on a compatible version
-	$exit_msg = sprintf(__('This version of Subscribe2 requires WordPress Multisite 3.0 or greater. Please update %1$s or use an older version of %2$s.', 'subscribe2'), '<a href="http://codex.wordpress.org/Updating_WordPress">Wordpress</a>', '<a href="http://wordpress.org/extend/plugins/subscribe2/download/">Subscribe2</a>');
+if ( version_compare($wp_version, '3.0', '<') ) {
+	global $wpmu_version;
+	if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
+		// Subscribe2 needs WordPress MultiSite 3.0 or above, exit if not on a compatible version
+		$exit_msg = sprintf(__('This version of Subscribe2 requires WordPress Multisite 3.0 or greater. Please update %1$s or use an older version of %2$s.', 'subscribe2'), '<a href="http://codex.wordpress.org/Updating_WordPress">Wordpress</a>', '<a href="http://wordpress.org/extend/plugins/subscribe2/download/">Subscribe2</a>');
+	}
 }
 
 // our version number. Don't touch this or any line below
@@ -222,6 +225,9 @@ class s2class {
 				} elseif ( 'text' == $check_format ) {
 					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), $this->get_user_meta($user_ID, 's2_excerpt'), true);
 					$this->delete_user_meta($user_ID, 's2_excerpt');
+				} elseif ( empty($check_format) ) {
+					// no prior settings so create them
+					$this->register($user_ID);
 				}
 				$subscribed = $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 				if ( strstr($subscribed, '-1') ) {
