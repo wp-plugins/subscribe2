@@ -195,7 +195,9 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 = Version 6.5 by Matthew Robinson =
 
-*
+* Fix for Multisite / MU detection for WordPress versions prior to 3.0
+* Fix in the upgrade() function to insert database entires for Registered Users on first time install
+* Fix for the uninstaller script to allow use on regular and Multisite WordPress 
 
 = Version 6.4 by Matthew Robinson =
 

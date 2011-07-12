@@ -3307,7 +3307,7 @@ class s2class {
 		}
 		// Not MU or not a prefixed option name
 		return $metaname;
-	}
+	} // end get_usermeta_keyname()
 
 	/**
 	Obtain a list of current WordPress multiuser blogs

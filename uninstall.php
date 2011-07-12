@@ -1,8 +1,9 @@
 <?php
 if( !defined('ABSPATH') && !defined('WP_UNINSTALL_PLUGIN') ) {
+	// Make sure not to call this file directly
 	exit();
 } else {
-	global $wpdb, $table_prefix, $mysubscribe2;
+	global $wpdb, $table_prefix;
 	// get name of subscribe2 table
 	$public = $table_prefix . "subscribe2";
 	// delete entry from wp_options table
@@ -12,20 +13,13 @@ if( !defined('ABSPATH') && !defined('WP_UNINSTALL_PLUGIN') ) {
 	// remove and scheduled events
 	wp_clear_scheduled_hook('s2_digest_cron');
 	// delete usermeta data for registered users
-	$users = $wpdb->get_col("SELECT ID FROM $wpdb->users");
-	if ( !empty($users) ) {
-		foreach ( $users as $user_ID ) {
-			$cats = explode(',', $mysubscribe2->get_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_subscribed')));
-			if ($cats) {
-				foreach ($cats as $cat) {
-					$mysubscribe2->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat);
-				}
-			}
-			$mysubscribe2->delete_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_subscribed'));
-			$mysubscribe2->delete_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_format'));
-			$mysubscribe2->delete_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_autosub'));
-		}
-	}
+	// use LIKE and % wildcard as meta_key names are prepended on WPMU 
+	// and s2_cat is appended with category ID integer
+	$wpdb->query("DELETE from $wpdb->usermeta WHERE meta_key LIKE '%s2_cat%'");
+	$wpdb->query("DELETE from $wpdb->usermeta WHERE meta_key LIKE '%s2_subscribed'");
+	$wpdb->query("DELETE from $wpdb->usermeta WHERE meta_key LIKE '%s2_format'");
+	$wpdb->query("DELETE from $wpdb->usermeta WHERE meta_key LIKE '%s2_autosub'");
+
 	// drop the subscribe2 table
 	$sql = "DROP TABLE IF EXISTS `" . $public . "`";
 	$wpdb->query($sql);
