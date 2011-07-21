@@ -722,17 +722,6 @@ class s2class {
 	} // end publish()
 
 	/**
-	Hook Subscribe2 into posts published via email
-	*/
-	function publish_phone($id) {
-		if ( !$id ) { return; }
-
-		$post = get_post($id);
-		$this->publish($post);
-		return $post;
-	} // end publish_phone()
-
-	/**
 	Send confirmation email to a public subscriber
 	*/
 	function send_confirm($what = '', $is_remind = false) {
@@ -2120,7 +2109,6 @@ class s2class {
 					if ( date_default_timezone_get() != get_option('timezone_string') ) {
 						date_default_timezone_set(get_option('timezone_string'));
 					}
-
 					$this->subscribe2_options['email_freq'] = $email_freq;
 					wp_clear_scheduled_hook('s2_digest_cron');
 					$scheds = (array)wp_get_schedules();
@@ -2633,7 +2621,6 @@ class s2class {
 			}
 
 			$cats = $_POST['category'];
-			sort($cats);
 
 			if ( empty($cats) || $cats == '-1' ) {
 				$oldcats = explode(',', $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
@@ -2652,8 +2639,9 @@ class s2class {
 				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $catids);
 			} else {
 				 if ( !is_array($cats) ) {
-					$cats = array($_POST['category']);
+					$cats = (array)$_POST['category'];
 				}
+				sort($cats);
 				$old_cats = explode(',', $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
 				$remove = array_diff($old_cats, $cats);
 				$new = array_diff($cats, $old_cats);
@@ -4095,8 +4083,6 @@ class s2class {
 				add_action('pending_to_private', array(&$this, 'publish'));
 			}
 		}
-		// Enable notifications for blogs made via email
-		add_action('publish_phone', array(&$this, 'publish_phone'));
 
 		// add actions for comment subscribers
 		if ( 'no' != $this->subscribe2_options['comment_subs'] ) {
