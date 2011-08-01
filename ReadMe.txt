@@ -173,9 +173,11 @@ By default Public Subscribers get plain text emails and only Registered Subscrib
 
 = Which version should I be using, I'm on WordPress x.x.x? =
 
-WordPress 2.3 and up require Subscribe2 from the 4.x or 5.x stable branch. The most recent version is hosted via [Wordpress.org](http://wordpress.org/extend/plugins/subscribe2/).
+WordPress 2.8 and up requires Subscribe2 from the 6.x stable branch. The most recent version is hosted via [Wordpress.org](http://wordpress.org/extend/plugins/subscribe2/).
 
-WordPress 2.1.x and 2.2.x require Subscribe2 from the 3.x stable. The most recent version is [3.8](http://downloads.wordpress.org/plugin/subscribe2.3.8.zip).
+WordPress 2.3.x through to 2.7.x require Subscribe2 from the 4.x or 5.x stable branch. The most recent version is [5.9](http://downloads.wordpress.org/plugin/subscribe2.5.9.zip).
+
+WordPress 2.1.x and 2.2.x require Subscribe2 from the 3.x stable branch. The most recent version is [3.8](http://downloads.wordpress.org/plugin/subscribe2.3.8.zip).
 
 WordPress 2.0.x requires Subscribe2 from the 2.x stable branch. The most recent version is [2.22](http://downloads.wordpress.org/plugin/subscribe2.2.22.zip).
 
@@ -197,7 +199,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 * Fix for Multisite / MU detection for WordPress versions prior to 3.0
 * Fix in the upgrade() function to insert database entires for Registered Users on first time install
-* Fix for the uninstaller script to allow use on regular and Multisite WordPress 
+* Fix for the uninstaller script to allow use on regular and Multisite WordPress
 
 = Version 6.4 by Matthew Robinson =
 
@@ -217,7 +219,6 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fixed a bug in the new_category function that was introduced in version 6.3 - thanks to crashtest
 * Improved the user experience when clicking Subscribe and Unsubscribe links in the WordPress MultiSite interface - thanks to Huyz
 * Improved the Bulk Manage section to take into account the digest notification setting
-* Added ability to filter the text or input fields displayed by Subscribe2 on the WordPress Registration page and also allow custom processing of that data
 * Updated the uninstall script
 * Updated some of the code comments to aid reviewing
 * Other minor improvements and fixes
