@@ -211,7 +211,6 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fixed a bug in the new_category function that was introduced in version 6.3 - thanks to crashtest
 * Improved the user experience when clicking Subscribe and Unsubscribe links in the WordPress MultiSite interface - thanks to Huyz
 * Improved the Bulk Manage section to take into account the digest notification setting
-* Added ability to filter the text or input fields displayed by Subscribe2 on the WordPress Registration page and also allow custom processing of that data
 * Updated the uninstall script
 * Updated some of the code comments to aid reviewing
 * Other minor improvements and fixes
