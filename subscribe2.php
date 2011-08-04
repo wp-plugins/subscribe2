@@ -1147,7 +1147,7 @@ class s2class {
 		// specific category subscribers
 		if ( '' != $r['cats'] ) {
 			$JOIN .= "INNER JOIN $wpdb->usermeta AS c ON a.user_id = c.user_id ";
-			$all = '';
+			$and = '';
 			foreach ( explode(',', $r['cats']) as $cat ) {
 				('' == $and) ? $and = "c.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'" : $and .= " OR c.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'";
 			}
@@ -2976,7 +2976,7 @@ class s2class {
 		$j = 0;
 		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"5\" class=\"editform\">\r\n";
 		echo "<tr><td align=\"left\" colspan=\"2\">\r\n";
-		echo "<label><input type=\"checkbox\" name=\"checkall\" value=\"cat_checkall\" /> " . __('Select / Unselect All', 'subscribe2') . "</label>\r\n";
+		echo "<label><input type=\"checkbox\" name=\"checkall\" value=\"checkall_cat\" /> " . __('Select / Unselect All', 'subscribe2') . "</label>\r\n";
 		echo "</td></tr>\r\n";
 		echo "<tr valign=\"top\"><td width=\"50%\" align=\"left\">\r\n";
 		foreach ( $all_cats as $cat ) {
@@ -2995,13 +2995,13 @@ class s2class {
 			$catName .= $cat->name;
 
 			if ( 0 == $j ) {
-				echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
+				echo "<label><input class=\"checkall_cat\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 				if ( in_array($cat->term_id, $selected) ) {
 						echo " checked=\"checked\"";
 				}
 				echo " /> <abbr title=\"" . $cat->slug . "\">" . $catName . "</abbr></label><br />\r\n";
 			} else {
-				echo "<label><input class=\"cat_checkall\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
+				echo "<label><input class=\"checkall_cat\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
 				if ( in_array($cat->term_id, $selected) ) {
 							echo " checked=\"checked\"";
 				}
