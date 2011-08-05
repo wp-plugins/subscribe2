@@ -666,7 +666,7 @@ class s2class {
 			if ( false !== strpos($content, '<!--more-->') ) {
 				list($html_excerpt, $more) = explode('<!--more-->', $content, 2);
 				// balance HTML tags and then strip leading and trailing whitespace
-				$html_excerpt = trim(balanceTags($html_excerpt, 1));
+				$html_excerpt = trim(balanceTags($html_excerpt, true));
 			} else {
 				// no <!--more-->, so grab the first 55 words
 				$words = explode(' ', $content, $this->excerpt_length + 1);
@@ -675,7 +675,9 @@ class s2class {
 					array_push($words, '[...]');
 					$html_excerpt = implode(' ', $words);
 					// balance HTML tags and then strip leading and trailing whitespace
-					$html_excerpt = trim(balanceTags($html_excerpt, 1));
+					$html_excerpt = trim(balanceTags($html_excerpt, true));
+				} else {
+					$html_excerpt = $content;
 				}
 			}
 		}
@@ -1147,7 +1149,7 @@ class s2class {
 		// specific category subscribers
 		if ( '' != $r['cats'] ) {
 			$JOIN .= "INNER JOIN $wpdb->usermeta AS c ON a.user_id = c.user_id ";
-			$and = '';
+			$all = '';
 			foreach ( explode(',', $r['cats']) as $cat ) {
 				('' == $and) ? $and = "c.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'" : $and .= " OR c.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'";
 			}
@@ -2980,7 +2982,7 @@ class s2class {
 		echo "</td></tr>\r\n";
 		echo "<tr valign=\"top\"><td width=\"50%\" align=\"left\">\r\n";
 		foreach ( $all_cats as $cat ) {
-			 if ( $i >= $half && 0 == $j ){
+			if ( $i >= $half && 0 == $j ){
 				echo "</td><td width=\"50%\" align=\"left\">\r\n";
 				$j++;
 			}
