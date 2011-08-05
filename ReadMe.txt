@@ -200,10 +200,13 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fix for Multisite / MU detection for WordPress versions prior to 3.0
 * Fix in the upgrade() function to insert database entires for Registered Users on first time install
 * Fix for the uninstaller script to allow use on regular and Multisite WordPress
+* Fix for blank post detail on HTML Excerpt notifications when the post content is brief
+* Fix for some PHP notices
+* Minor code layout changes
 
 = Version 6.4 by Matthew Robinson =
 
-* Wrapped all KEYWORDS in curly brackets {} so capitalised keywords can be used incontent without being replaced
+* Wrapped all KEYWORDS in curly brackets {} so capitalised keywords can be used in content without being replaced
 * Added support for Custom Taxonomies - thanks to Ian Dunn
 * Added feature to allow commenters on your blog to subscribe when commenting (requires WordPress 2.9+)
 * Improved and updated some of the jQuery ready for WordPress 3.2
