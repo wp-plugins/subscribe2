@@ -195,7 +195,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 = Version 6.4 by Matthew Robinson =
 
-* Wrapped all KEYWORDS in curly brackets {} so capitalised keywords can be used incontent without being replaced
+* Wrapped all KEYWORDS in curly brackets {} so capitalised keywords can be used in content without being replaced
 * Added support for Custom Taxonomies - thanks to Ian Dunn
 * Added feature to allow commenters on your blog to subscribe when commenting (requires WordPress 2.9+)
 * Improved and updated some of the jQuery ready for WordPress 3.2
