@@ -2640,7 +2640,7 @@ class s2class {
 				}
 				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $catids);
 			} else {
-				 if ( !is_array($cats) ) {
+				if ( !is_array($cats) ) {
 					$cats = (array)$_POST['category'];
 				}
 				sort($cats);
@@ -3460,7 +3460,7 @@ class s2class {
 	Action subscribe requests made on comment forms when comments are approved
 	*/
 	function comment_status($comment_ID = 0, $comment_status = 0){
-	    global $wpdb;
+		global $wpdb;
 
 		// get meta data
 		$subscribe = get_comment_meta($comment_ID, 's2_comment_request', true);
@@ -3886,7 +3886,7 @@ class s2class {
 
 			$excerpt = $post->post_excerpt;
 			if ( '' == $excerpt ) {
-				 // no excerpt, is there a <!--more--> ?
+				// no excerpt, is there a <!--more--> ?
 				if ( false !== strpos($post->post_content, '<!--more-->') ) {
 					list($excerpt, $more) = explode('<!--more-->', $post->post_content, 2);
 					$excerpt = strip_tags($excerpt);
