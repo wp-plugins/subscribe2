@@ -167,7 +167,7 @@ class s2class {
 
 	function user_admin_css() {
 		wp_enqueue_style('s2_user_admin', S2URL . 'include/s2_user_admin.css', array(), '1.0');
-	}
+	} // end user_admin_css()
 
 	function option_form_js() {
 		wp_enqueue_script('s2_edit', S2URL . 'include/s2_edit' . $this->script_debug . '.js', array('jquery'), '1.0');
@@ -915,7 +915,7 @@ class s2class {
 		} else {
 			return false;
 		}
-	} //end is_barred()
+	} // end is_barred()
 
 	/**
 	Confirm request from the link emailed to the user and email the admin
@@ -1013,6 +1013,7 @@ class s2class {
 						}
 					}
 					$headers = $this->headers();
+					// send individual emails so we don't reveal admin emails to each other
 					foreach ( $recipients as $recipient ) {
 						@wp_mail($recipient, $subject, $message, $headers);
 					}
@@ -1041,7 +1042,7 @@ class s2class {
 		} else {
 			return false;
 		}
-	} // end is_public
+	} // end is_public()
 
 	/**
 	Is the supplied email address a registered user of the blog?
@@ -1111,7 +1112,7 @@ class s2class {
 				return $wpdb->get_col("SELECT user_email FROM $wpdb->users");
 			}
 		}
-	}
+	} // end get_all_registered()
 
 	/**
 	Return an array of registered subscribers
@@ -1149,7 +1150,7 @@ class s2class {
 		// specific category subscribers
 		if ( '' != $r['cats'] ) {
 			$JOIN .= "INNER JOIN $wpdb->usermeta AS c ON a.user_id = c.user_id ";
-			$all = '';
+			$and = '';
 			foreach ( explode(',', $r['cats']) as $cat ) {
 				('' == $and) ? $and = "c.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'" : $and .= " OR c.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'";
 			}
@@ -1646,7 +1647,7 @@ class s2class {
 			$remain = array_diff($old_cats, (array)$deleted_category);
 			$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
 		}
-	}
+	} // end delete_category()
 
 	/**
 	Get admin data from record 1 or first user with admin rights
@@ -2118,6 +2119,7 @@ class s2class {
 					if ( $interval == 0 ) {
 						// if we are on per-post emails remove last_cron entry
 						unset($this->subscribe2_options['last_s2cron']);
+						unset($this->subscribe2_options['previous_s2cron']);
 					} else {
 						// if we are using digest schedule the event and prime last_cron as now
 						$time = time() + $interval;
@@ -3661,8 +3663,10 @@ class s2class {
 		}
 	} // end widget_s2_counter_css_and_js()
 
+	/**
+	Rename WPMU widgets on upgrade without requiring user to re-enable
+	*/
 	function namechange_subscribe2_widget() {
-		// rename WPMU widgets without requiring user to re-enable
 		global $wpdb;
 		$blogs = $wpdb->get_col("SELECT blog_id FROM {$wpdb->blogs}");
 
@@ -3720,12 +3724,12 @@ class s2class {
 		$path = S2URL . 'tinymce3/editor_plugin.js';
 		$arr['subscribe2'] = $path;
 		return $arr;
-	}
+	} // end mce3_plugin()
 
 	function mce3_button($arr) {
 		$arr[] = 'subscribe2';
 		return $arr;
-	}
+	} // end mce3_button()
 
 	function s2_edit_form() {
 		echo "<!-- Start Subscribe2 Quicktags Javascript -->\r\n";
@@ -3737,7 +3741,7 @@ class s2class {
 		echo "//]]>\r\n";
 		echo "</script>\r\n";
 		echo "<!-- End Subscribe2 Quicktags Javascript -->\r\n";
-	}
+	} // end s2_edit_form()
 
 /* ===== wp-cron functions ===== */
 	/**
@@ -3958,7 +3962,7 @@ class s2class {
 			$recipients = array_merge((array)$public, (array)$registered);
 			$this->mail($recipients, $subject, $mailtext);
 		}
-	} // end subscribe2_cron
+	} // end subscribe2_cron()
 
 /* ===== Our constructor ===== */
 	/**
@@ -4048,6 +4052,7 @@ class s2class {
 		if ( '1' == $this->subscribe2_options['show_meta'] ) {
 			add_action('wp_meta', array(&$this, 'add_minimeta'), 0);
 		}
+
 		// Add filters for Ozh Admin Menu
 		if ( function_exists('wp_ozh_adminmenu') ) {
 			add_filter('ozh_adminmenu_icon_s2_posts', array(&$this, 'ozh_s2_icon'));
