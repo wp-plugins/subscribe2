@@ -1389,7 +1389,7 @@ class s2class {
 
 			foreach ( $user_IDs as $user_ID ) {
 				foreach ( $all_cats as $cat ) {
-					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id);
+					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
 				}
 				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats_string);
 			}
