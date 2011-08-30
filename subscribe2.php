@@ -3096,7 +3096,7 @@ class s2class {
 	} // end display_subscriber_dropdown()
 
 	/**
-	Display a drop down lisy of administrator level users and
+	Display a drop down list of administrator level users and
 	optionally include a choice for Post Author
 	*/
 	function admin_dropdown($inc_author = false) {
