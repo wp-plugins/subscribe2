@@ -59,7 +59,7 @@ if ( !in_array(ini_get('safe_mode'), $safe_mode) && ini_get('max_execution_time'
 
 /* Include buttonsnap library by Owen Winckler */
 if ( !class_exists('buttonsnap') ) {
-	require( WP_CONTENT_DIR . '/plugins/' . S2DIR . 'include/buttonsnap.php' );
+	require( S2PATH . 'include/buttonsnap.php' );
 }
 
 $mysubscribe2 = new s2class;
@@ -3639,7 +3639,7 @@ class s2class {
 	Register the form widget
 	*/
 	function subscribe2_widget() {
-		require_once( WP_CONTENT_DIR . '/plugins/' . S2DIR . 'include/widget.php');
+		require_once( S2PATH . 'include/widget.php');
 		register_widget('S2_Form_widget');
 	} // end subscribe2_widget()
 
@@ -3647,7 +3647,7 @@ class s2class {
 	Register the counter widget
 	*/
 	function counter_widget() {
-		require_once( WP_CONTENT_DIR . '/plugins/' . S2DIR . 'include/counterwidget.php');
+		require_once( S2PATH . 'include/counterwidget.php');
 		register_widget('S2_Counter_widget');
 	} // end counter_widget()
 

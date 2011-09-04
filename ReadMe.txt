@@ -219,6 +219,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fix for some PHP notices
 * Fix to remove all cron settings when options are reverted to per-post
 * Minor code layout changes and comment updates
+* Dropped use of WP_CONTENT_DIR to fix issues on site where wp-content/ folder has been moved
 
 = Version 6.4 by Matthew Robinson =
 
