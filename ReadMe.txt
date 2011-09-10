@@ -3,8 +3,8 @@ Contributors: MattyRob, Skippy, RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 2.8
-Tested up to: 3.2-RC1
-Stable tag: 6.3
+Tested up to: 3.2.1
+Stable tag: 6.5
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -27,6 +27,20 @@ If you want to send full content HTML emails to Public Subscribers too then upgr
 
 == Installation ==
 
+AUTOMATIC INSTALLATION
+1. Log in to your WordPress blog and visit Plugins->Add New.
+2. Search for Subscribe2, click "Install Now" and then Activate the Plugin
+3. Click the "Settings" admin menu link, and select "Subscribe2".
+4. Configure the options to taste, including the email template and any categories which should be excluded from notification
+5. Click the "Tools" admin menu link, and select "Subscribers".
+6. Manually subscribe people as you see fit.
+7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the subscribe2 token.  Or, if you prefer, you may manually insert the subscribe2 shortcode or token:
+	[subscribe2] or the HTML invisible <!--subscribe2-->
+	***Ensure the token is on a line by itself and that it has a blank line above and below.***
+This token will automatically be replaced by dynamic subscription information and will display all forms and messages as necessary.
+8. In the WordPress "Settings" area for Subscribe2 select the page name in the "Appearance" section that of the WordPress page created in step 7.
+
+MANUAL INSTALLATION
 1. Copy the entire /subscribe2/ directory into your /wp-content/plugins/ directory.
 2. Activate the plugin.
 3. Click the "Settings" admin menu link, and select "Subscribe2".
@@ -173,16 +187,18 @@ By default Public Subscribers get plain text emails and only Registered Subscrib
 
 = Which version should I be using, I'm on WordPress x.x.x? =
 
-WordPress 2.3 and up require Subscribe2 from the 4.x or 5.x stable branch. The most recent version is hosted via [Wordpress.org](http://wordpress.org/extend/plugins/subscribe2/).
+WordPress 2.8 and up requires Subscribe2 from the 6.x stable branch. The most recent version is hosted via [Wordpress.org](http://wordpress.org/extend/plugins/subscribe2/).
 
-WordPress 2.1.x and 2.2.x require Subscribe2 from the 3.x stable. The most recent version is [3.8](http://downloads.wordpress.org/plugin/subscribe2.3.8.zip).
+WordPress 2.3.x through to 2.7.x require Subscribe2 from the 4.x or 5.x stable branch. The most recent version is [5.9](http://downloads.wordpress.org/plugin/subscribe2.5.9.zip).
+
+WordPress 2.1.x and 2.2.x require Subscribe2 from the 3.x stable branch. The most recent version is [3.8](http://downloads.wordpress.org/plugin/subscribe2.3.8.zip).
 
 WordPress 2.0.x requires Subscribe2 from the 2.x stable branch. The most recent version is [2.22](http://downloads.wordpress.org/plugin/subscribe2.2.22.zip).
 
 = Why doesn't the form appear in my WordPress page? =
 This is usually caused by one of two things. Firstly, it is possible that the form is there but because you haven't logged out of WordPress yourself you are seeing a message about managing your profile instead. Log out of WordPress and it will appear as the subscription form you are probably expecting.
 
-Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correctly entered in your page with a blank line above and below. The easient way to do this is to deactivate the plugin, visit your WordPress page and view the source. The token should be contained in the source code of the page. If it is not there you either have not correctly entered the token or you have another plugin that is stripping the token from the page code.
+Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correctly entered in your page with a blank line above and below. The easiest way to do this is to deactivate the plugin, visit your WordPress page and view the source. The token should be contained in the source code of the page. If it is not there you either have not correctly entered the token or you have another plugin that is stripping the token from the page code.
 
 == Screenshots ==
 
@@ -193,9 +209,21 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 == Changelog ==
 
+= Version 6.5 by Matthew Robinson =
+
+* Fix for Multisite / MU detection for WordPress versions prior to 3.0
+* Fix in the upgrade() function to insert database entires for Registered Users on first time install
+* Fix for the uninstaller script to allow use on regular and Multisite WordPress
+* Updated uninstaller to remove any postmeta entries on uninstall
+* Fix for blank post detail on HTML Excerpt notifications when the post content is brief
+* Fix for some PHP notices
+* Fix to remove all cron settings when options are reverted to per-post
+* Minor code layout changes and comment updates
+* Dropped use of WP_CONTENT_DIR to fix issues on site where wp-content/ folder has been moved
+
 = Version 6.4 by Matthew Robinson =
 
-* Wrapped all KEYWORDS in curly brackets {} so capitalised keywords can be used incontent without being replaced
+* Wrapped all KEYWORDS in curly brackets {} so capitalised keywords can be used in content without being replaced
 * Added support for Custom Taxonomies - thanks to Ian Dunn
 * Added feature to allow commenters on your blog to subscribe when commenting (requires WordPress 2.9+)
 * Improved and updated some of the jQuery ready for WordPress 3.2
@@ -209,7 +237,11 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fixes to the Counter Widget ColorPicker jQuery code
 * Fixes to the Counter Widget label tags
 * Fixed a bug in the new_category function that was introduced in version 6.3 - thanks to crashtest
-8 Improved the user experience when clicking Subscribe and Unsubscribe links in the WordPress MultiSite interface - thanks to Huyz
+* Improved the user experience when clicking Subscribe and Unsubscribe links in the WordPress MultiSite interface - thanks to Huyz
+* Improved the Bulk Manage section to take into account the digest notification setting
+* Updated the uninstall script
+* Updated some of the code comments to aid reviewing
+* Other minor improvements and fixes
 
 = Version 6.3 by Matthew Robinson =
 

@@ -9,7 +9,7 @@ jQuery(document).ready(function(){
 		});
 	});
 	// function to check or uncheck 'checkall' box when individual boxes are toggled
-	jQuery('input[class="cat_checkall"]').click(function(){
+	jQuery('input[class^="checkall"]').click(function(){
 		var checked_status = true;
 		jQuery('input[class="' + this.className + '"]').each(function(){
 			if ((this.checked == true) && (checked_status == true)){
@@ -28,7 +28,7 @@ jQuery(document).ready(function(){
 	});
 	// function to check or uncheck 'checkall' box when page is loaded
 	var checked_status = true;
-	jQuery('input[class="cat_checkall"]').each(function(){
+	jQuery('input[class^="checkall"]').each(function(){
 		if ((this.checked == true) && (checked_status == true)){
 			checked_status = true;
 		} else {

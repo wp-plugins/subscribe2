@@ -3,7 +3,8 @@
 BUTTONSNAP CLASS LIBRARY By Owen Winkler
 http://asymptomatic.net
 WordPress Downloads are at http://redalt.com/downloads
-Version: 1.3.1
+Version: 1.3.2
+Updated get_settings() to get_option() as former is deprecated - Matthew Robinson August 2011
 *******************************************************************************/
 
 if (!class_exists('buttonsnap')) :
@@ -12,14 +13,14 @@ class buttonsnap
 	var $script_output = false;
 	var $buttons = array('post'=>array(),'page'=>array(),'any'=>array());
 	var $markers = array();
-	
+
 	function sink_hooks()
 	{
 		add_action('edit_form_advanced', array(&$this, 'edit_form_advanced'));
 		add_action('edit_page_form', array(&$this, 'edit_page_form'));
 		add_filter('mce_plugins', array(&$this, 'mce_plugins'));
 	}
-	
+
 	function go_solo()
 	{
 		$dispatch = isset($_POST['buttonsnapdispatch']) ? $_POST['buttonsnapdispatch'] : @$_GET['buttonsnapdispatch'];
@@ -35,7 +36,7 @@ class buttonsnap
 			die();
 		}
 	}
-	
+
 	function edit_form_advanced()
 	{
 		if (!$this->script_output) {
@@ -43,7 +44,7 @@ class buttonsnap
 			$this->script_output = true;
 		}
 	}
-	
+
 	function edit_page_form()
 	{
 		if (!$this->script_output) {
@@ -51,11 +52,11 @@ class buttonsnap
 			$this->script_output = true;
 		}
 	}
-	
+
 	function mce_plugins($plugins)
 	{
 		if (count($this->markers) > 0) {
-		
+
 			echo "var buttonsnap_markers = new Array(\n";
 			$comma = '';
 			foreach ($this->markers as $k => $v) {
@@ -70,7 +71,7 @@ class buttonsnap
 				$comma = "\n,";
 			}
 			echo "\n);\n";
-			
+
 ?>
 
 function TinyMCE_buttonsnap_initInstance(inst) {
@@ -129,9 +130,9 @@ function TinyMCE_buttonsnap_cleanup(type, content) {
 		case "initial_editor_insert":
 			content = TinyMCE_buttonsnap_cleanup("insert_to_editor", content);
 			alert('foo');
-			
+
 			break;
-	
+
 		case "insert_to_editor":
 			var startPos = 0;
 
@@ -145,7 +146,7 @@ function TinyMCE_buttonsnap_cleanup(type, content) {
 					content += ' width="100%" height="10px" ';
 					content += 'alt="" class="' + buttonsnap_classes[z] + '" />';
 					content += contentAfter;
-	
+
 					startPos++;
 				}
 			}
@@ -160,9 +161,9 @@ function TinyMCE_buttonsnap_cleanup(type, content) {
 				for(z=0;z<buttonsnap_classes.length;z++) {
 					if (attribs['class'] == buttonsnap_classes[z]) {
 						endPos += 2;
-		
+
 						var embedHTML = '<!--' + buttonsnap_markers[z] + '-->';
-		
+
 						// Insert embed/object chunk
 						chunkBefore = content.substring(0, startPos);
 						chunkAfter = content.substring(endPos);
@@ -182,12 +183,12 @@ function TinyMCE_buttonsnap_cleanup(type, content) {
 		}
 		return $plugins;
 	}
-	
+
 	function output_script($type = 'any')
 	{
 		echo '<script type="text/javascript">
 		var buttonsnap_request_uri = "' . $this->plugin_uri() . '";
-		var buttonsnap_wproot = "' . get_settings('siteurl') . '";
+		var buttonsnap_wproot = "' . get_option('siteurl') . '";
 		</script>' . "\n";
 echo <<< ENDSCRIPT
 
@@ -240,13 +241,13 @@ function buttonsnap_newbutton(src, alt) {
 		anchor.title = alt;
 		anchor.id = 'ed_' + alt;
 		qttoolbar.appendChild(anchor);
-	}	
+	}
 	return anchor;
 }
 function buttonsnap_newseparator() {
 	if(window.tinyMCE) {
 		var sep = document.createElement('IMG');
-		
+
 		sep.setAttribute('src', buttonsnap_wproot + '/wp-includes/js/tinymce/themes/advanced/images/spacer.gif');
 		sep.className = 'mceSeparatorLine';
 		sep.setAttribute('class', 'mceSeparatorLine');
@@ -271,7 +272,7 @@ function buttonsnap_ajax(dispatch) {
 	if(window.tinyMCE) {
 		selection = tinyMCE.getInstanceById('content').getSelectedText();
 	}
-	else {	
+	else {
 		if (document.selection) {
 			document.getElementById('content').focus();
 		  sel = document.selection.createRange();
@@ -309,7 +310,7 @@ function buttonsnap_addbuttons () {
 	}
 	try {
 ENDSCRIPT;
-		
+
 		switch($type) {
 		case 'any':
 			$this->buttons['any'] = array_merge($this->buttons['post'], $this->buttons['page'], $this->buttons['any']);
@@ -318,7 +319,7 @@ ENDSCRIPT;
 			$this->buttons[$type] = array_merge($this->buttons[$type], $this->buttons['any']);
 		}
 		$usebuttons = $this->buttons[$type];
-		
+
 		foreach ($usebuttons as $button) {
 			if($button['type'] == 'separator') {
 				echo "buttonsnap_newseparator();\n";
@@ -350,13 +351,13 @@ echo <<< MORESCRIPT
 
 MORESCRIPT;
 	}
-	
+
 	function textbutton($imgsrc, $alttext, $inserted, $type="any")
 	{
 		$this->buttons[$type][] = array('type'=>'text', 'src'=>$imgsrc, 'alt'=>$alttext, 'text'=>$inserted);
 		return $this->buttons;
 	}
-	
+
 	function jsbutton($imgsrc, $alttext, $js, $type="any")
 	{
 		$this->buttons[$type][] = array('type'=>'js', 'src'=>$imgsrc, 'alt'=>$alttext, 'js'=>$js);
@@ -368,30 +369,30 @@ MORESCRIPT;
 		$this->buttons[$type][] = array('type'=>'ajax', 'src'=>$imgsrc, 'alt'=>$alttext, 'hook'=>$hook);
 		return $this->buttons;
 	}
-	
+
 	function separator($type="any")
 	{
 		$this->buttons[$type][] = array('type'=>'separator');
 		return $this->buttons;
 	}
-	
+
 	function register_marker($marker, $cssclass)
 	{
 		$this->markers[$marker] = $cssclass;
 	}
-	
-	function basename($src='') 
+
+	function basename($src='')
 	{
 		if($src == '') $src = __FILE__;
 		$name = preg_replace('/^.*wp-content[\\\\\/]plugins[\\\\\/]/', '', $src);
 		return str_replace('\\', '/', $name);
 	}
-	
+
 	function plugin_uri($src = '')
 	{
-		return get_settings('siteurl') . '/wp-content/plugins/' . $this->basename($src); 
+		return get_option('siteurl') . '/wp-content/plugins/' . $this->basename($src);
 	}
-	
+
 	function include_up($filename) {
 		$c=0;
 		while(!is_file($filename)) {
