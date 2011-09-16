@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 6.5
+Version: 7.0-beta
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -31,27 +31,20 @@ along with Subscribe2. If not, see <http://www.gnu.org/licenses/>.
 */
 
 global $wp_version;
-if ( version_compare($wp_version, '2.8', '<') ) {
-	// Subscribe2 needs WordPress 2.8 or above, exit if not on a compatible version
-	$exit_msg = sprintf(__('This version of Subscribe2 requires WordPress 2.8 or greater. Please update %1$s or use an older version of %2$s.', 'subscribe2'), '<a href="http://codex.wordpress.org/Updating_WordPress">Wordpress</a>', '<a href="http://wordpress.org/extend/plugins/subscribe2/download/">Subscribe2</a>');
+if ( version_compare($wp_version, '3.1', '<') ) {
+	// Subscribe2 needs WordPress 3.1 or above, exit if not on a compatible version
+	$exit_msg = sprintf(__('This version of Subscribe2 requires WordPress 3.1 or greater. Please update %1$s or use an older version of %2$s.', 'subscribe2'), '<a href="http://codex.wordpress.org/Updating_WordPress">Wordpress</a>', '<a href="http://wordpress.org/extend/plugins/subscribe2/download/">Subscribe2</a>');
 	exit($exit_msg);
-}
-if ( version_compare($wp_version, '3.0', '<') ) {
-	global $wpmu_version;
-	if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
-		// Subscribe2 needs WordPress MultiSite 3.0 or above, exit if not on a compatible version
-		$exit_msg = sprintf(__('This version of Subscribe2 requires WordPress Multisite 3.0 or greater. Please update %1$s or use an older version of %2$s.', 'subscribe2'), '<a href="http://codex.wordpress.org/Updating_WordPress">Wordpress</a>', '<a href="http://wordpress.org/extend/plugins/subscribe2/download/">Subscribe2</a>');
-	}
 }
 
 // our version number. Don't touch this or any line below
 // unless you know exactly what you are doing
-define( 'S2VERSION', '6.5' );
+define( 'S2VERSION', '7.0' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
-define( 'S2DIR', trailingslashit(plugin_basename(dirname(__FILE__))) );
+define( 'S2DIR', trailingslashit(dirname(plugin_basename(__FILE__))) );
 define( 'S2URL', plugin_dir_url(dirname(__FILE__)) . S2DIR );
 
-// Set minimum execution time to 5 minutes - won't affect safe mode
+// Set maximum execution time to 5 minutes - won't affect safe mode
 $safe_mode = array('On', 'ON', 'on', 1);
 if ( !in_array(ini_get('safe_mode'), $safe_mode) && ini_get('max_execution_time') < 300 ) {
 	@ini_set('max_execution_time', 300);
@@ -77,21 +70,12 @@ class s2class {
 
 		$this->please_log_in = "<p class=\"s2_message\">" . __('To manage your subscription options please', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-login.php\">" . __('login', 'subscribe2') . "</a>.</p>";
 
-		$this->use_profile_admin = "<p class=\"s2_message\">" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=s2_users\">" . __('profile', 'subscribe2') . "</a>.</p>";
+		$this->profile = "<p class=\"s2_message\">" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/admin.php?page=s2\">" . __('profile', 'subscribe2') . "</a>.</p>";
 		if ( $this->s2_mu === true ) {
 			global $blog_id, $user_ID;
 			if ( !is_blog_user($blog_id) ) {
 				// if we are on multisite and the user is not a member of this blog change the link
 				$this->use_profile_admin = "<p class=\"s2_message\"><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a> " . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
-			}
-		}
-
-		$this->use_profile_users = "<p class=\"s2_message\">" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/profile.php?page=s2_users\">" . __('profile', 'subscribe2') . "</a>.</p>";
-		if ( $this->s2_mu === true ) {
-			global $blog_id, $user_ID;
-			if ( !is_blog_user($blog_id) ) {
-				// if we are on multisite and the user is not a member of this blog change the link
-				$this->use_profile_users = "<p class=\"s2_message\"><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a> " . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
 			}
 		}
 
@@ -134,19 +118,21 @@ class s2class {
 	Hook the menu
 	*/
 	function admin_menu() {
-		$s2management = add_management_page(__('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", 's2_tools', array(&$this, 'manage_menu'));
+		add_menu_page (__('Subscribe2', 'subscribe2'), __('Subscribe2', 'subscribe2'), "read", 's2', NULL, S2URL . 'include/email_edit.png');
+
+		$s2user = add_submenu_page('s2', __('Your Subscriptions', 'subscribe2'), __('Your Subscriptions', 'subscribe2'), "read", 's2', array(&$this, 'user_menu'), S2URL . 'include/email_edit.png');
+		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
+		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
+
+		$s2management = add_submenu_page('s2', __('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", 's2_tools', array(&$this, 'manage_menu'));
 		add_action("admin_print_scripts-$s2management", array(&$this, 'checkbox_form_js'));
 
-		$s2options = add_options_page(__('Subscribe2 Options', 'subscribe2'), __('Subscribe2', 'subscribe2'), "manage_options", 's2_settings', array(&$this, 'options_menu'));
+		$s2options = add_submenu_page('s2', __('Settings', 'subscribe2'), __('Settings', 'subscribe2'), "manage_options", 's2_settings', array(&$this, 'options_menu'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'option_form_js'));
 		add_filter('plugin_row_meta', array(&$this, 'plugin_links'), 10, 2);
 
-		$s2user = add_users_page(__('Your Subscriptions', 'subscribe2'), __('Your Subscriptions', 'subscribe2'), "read", 's2_users', array(&$this, 'user_menu'));
-		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
-		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
-
-		add_submenu_page('post-new.php', __('Mail Subscribers', 'subscribe2'), __('Mail Subscribers', 'subscribe2'), "publish_posts", 's2_posts', array(&$this, 'write_menu'));
+		add_submenu_page('s2', __('Send Email', 'subscribe2'), __('Send Email', 'subscribe2'), "publish_posts", 's2_posts', array(&$this, 'write_menu'));
 
 		$s2nonce = md5('subscribe2');
 	} // end admin_menu()
@@ -218,25 +204,29 @@ class s2class {
 		$users = $this->get_all_registered('ID');
 		if ( !empty($users) ) {
 			foreach ( $users as $user_ID ) {
-				$check_format = $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'));
+				$check_format = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), true);
 				// if user is already registered update format remove 's2_excerpt' field and update 's2_format'
 				if ( 'html' == $check_format ) {
-					$this->delete_user_meta($user_ID, 's2_excerpt');
+					delete_user_meta($user_ID, 's2_excerpt');
 				} elseif ( 'text' == $check_format ) {
-					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), $this->get_user_meta($user_ID, 's2_excerpt'), true);
-					$this->delete_user_meta($user_ID, 's2_excerpt');
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), get_user_meta($user_ID, 's2_excerpt'));
+					delete_user_meta($user_ID, 's2_excerpt');
 				} elseif ( empty($check_format) ) {
 					// no prior settings so create them
 					$this->register($user_ID);
 				}
-				$subscribed = $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				$subscribed = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
 				if ( strstr($subscribed, '-1') ) {
 					// make sure we remove '-1' from any settings
 					$old_cats = explode(',', $subscribed);
 					$pos = array_search('-1', $old_cats);
 					unset($old_cats[$pos]);
 					$cats = implode(',', $old_cats);
-					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
+				}
+				$check_authors = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), true);
+				if ( empty($check_authors) ) {
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), '');
 				}
 			}
 		}
@@ -280,10 +270,10 @@ class s2class {
 			// loop through all users
 			foreach ( $users as $user_ID ) {
 				// get categories which the user is subscribed to (old ones)
-				$categories = $this->get_user_meta($user_ID, 's2_subscribed');
+				$categories = get_user_meta($user_ID, 's2_subscribed', true);
 				$categories = explode(',', $categories);
-				$format = $this->get_user_meta($user_ID, 's2_format');
-				$autosub = $this->get_user_meta($user_ID, 's2_autosub');
+				$format = get_user_meta($user_ID, 's2_format', true);
+				$autosub = get_user_meta($user_ID, 's2_autosub', true);
 
 				// load blogs of user (only if we need them)
 				$blogs = array();
@@ -298,25 +288,25 @@ class s2class {
 					$subscribed_categories = array_intersect($categories, $blog_categories);
 					if ( !empty($subscribed_categories) ) {
 						foreach ( $subscribed_categories as $subscribed_category ) {
-							$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $subscribed_category, $subscribed_category);
+							update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $subscribed_category, $subscribed_category);
 						}
-						$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $subscribed_categories));
+						update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $subscribed_categories));
 					}
 					if ( !empty($format) ) {
-						$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), $format);
+						update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), $format);
 					}
 					if ( !empty($autosub) ) {
-						$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), $autosub);
+						update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), $autosub);
 					}
 					restore_current_blog();
 				}
 
 				// delete old user meta keys
-				$this->delete_user_meta($user_ID, 's2_subscribed');
-				$this->delete_user_meta($user_ID, 's2_format');
-				$this->delete_user_meta($user_ID, 's2_autosub');
+				delete_user_meta($user_ID, 's2_subscribed');
+				delete_user_meta($user_ID, 's2_format');
+				delete_user_meta($user_ID, 's2_autosub');
 				foreach ( $categories as $cat ) {
-					$this->delete_user_meta($user_ID, 's2_cat' . $cat);
+					delete_user_meta($user_ID, 's2_cat' . $cat);
 				}
 			}
 		}
@@ -357,10 +347,10 @@ class s2class {
 		$string = str_replace("{BLOGNAME}", html_entity_decode(get_option('blogname'), ENT_QUOTES), $string);
 		$string = str_replace("{BLOGLINK}", get_option('home'), $string);
 		$string = str_replace("{TITLE}", stripslashes($this->post_title), $string);
-		$link = "<a href=\"" . $this->permalink . "\">" . $this->permalink . "</a>";
+		$link = "<a href=\"" . $this->get_tracking_link($this->permalink) . "\">" . $this->get_tracking_link($this->permalink) . "</a>";
 		$string = str_replace("{PERMALINK}", $link, $string);
 		if ( strstr($string, "{TINYLINK}") ) {
-			$tinylink = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode($this->permalink));
+			$tinylink = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode($this->get_tracking_link($this->permalink)));
 			if ( $tinylink !== 'Error' || $tinylink != false ) {
 				$tlink = "<a href=\"" . $tinylink . "\">" . $tinylink . "</a>";
 				$string = str_replace("{TINYLINK}", $tlink, $string);
@@ -512,6 +502,19 @@ class s2class {
 
 		return $headers;
 	} // end headers()
+
+	/**
+	Function to add UTM tracking details to links
+	*/
+	function get_tracking_link($link) {
+		if ( !empty($this->subscribe2_options['tracking']) ) {
+				$delimiter = '?';
+				if ( strpos($link, $delimiter) > 0 ) { $delimiter = '&'; }
+				return $link . $delimiter . $this->subscribe2_options['tracking'];
+		} else {
+				return $link;
+		}
+	} // end get_tracking_link()
 
 	/**
 	Sends an email notification of a new post
@@ -955,26 +958,14 @@ class s2class {
 					$message = $this->email . " " . __('subscribed to email notifications!', 'subscribe2');
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
 					if ( empty($recipients) ) {
-						global $wp_version;
-						if ( version_compare($wp_version, '3.1', '<') ) {
-							// WordPress version is less than 3.1, use WP_User_Search class
-							if ( !class_exists(WP_User_Search) ) {
-								require(ABSPATH . 'wp-admin/includes/user.php');
-								$wp_user_query = new WP_User_Search( '', '', 'administrator');
-								$admins_string = implode(', ', $wp_user_query->get_results());
-								$sql = "SELECT ID, display_name FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
-								$recipients = $wpdb->get_results($sql);
-							}
-						} else {
-							// WordPress version is 3.1 or greater, use WP_User_Query class
-							$role = array('fields' => array('user_email'), 'role' => 'administrator');
-							$wp_user_query = get_users( $role );
-							foreach ($wp_user_query as $user) {
-								$recipients[] = $user->user_email;
-							}
+						$role = array('fields' => array('user_email'), 'role' => 'administrator');
+						$wp_user_query = get_users( $role );
+						foreach ($wp_user_query as $user) {
+							$recipients[] = $user->user_email;
 						}
 					}
 					$headers = $this->headers();
+					// send individual emails so we don't reveal admin emails to each other
 					foreach ( $recipients as $recipient ) {
 						@wp_mail($recipient, $subject, $message, $headers);
 					}
@@ -993,23 +984,10 @@ class s2class {
 					$message = $this->email . " " . __('unsubscribed from email notifications!', 'subscribe2');
 					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
 					if ( empty($recipients) ) {
-						global $wp_version;
-						if ( version_compare($wp_version, '3.1', '<') ) {
-							// WordPress version is less than 3.1, use WP_User_Search class
-							if ( !class_exists(WP_User_Search) ) {
-								require(ABSPATH . 'wp-admin/includes/user.php');
-								$wp_user_query = new WP_User_Search( '', '', 'administrator');
-								$admins_string = implode(', ', $wp_user_query->get_results());
-								$sql = "SELECT ID, display_name FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
-								$recipients = $wpdb->get_results($sql);
-							}
-						} else {
-							// WordPress version is 3.1 or greater, use WP_User_Query class
-							$role = array('fields' => array('user_email'), 'role' => 'administrator');
-							$wp_user_query = get_users( $role );
-							foreach ($wp_user_query as $user) {
-								$recipients[] = $user->user_email;
-							}
+						$role = array('fields' => array('user_email'), 'role' => 'administrator');
+						$wp_user_query = get_users( $role );
+						foreach ($wp_user_query as $user) {
+							$recipients[] = $user->user_email;
 						}
 					}
 					$headers = $this->headers();
@@ -1092,21 +1070,36 @@ class s2class {
 	} // end get_public()
 
 	/**
-	Return an array of all subscribers
+	Collect an array of all author level users and above
 	*/
-	function get_all_registered($id = '') {
+	function get_authors() {
+		if ( '' == $this->all_authors ) {
+			$role = array('fields' => array('ID', 'display_name'), 'role' => 'administrator');
+			$administrators = get_users( $role );
+			$role = array('fields' => array('ID', 'display_name'), 'role' => 'editor');
+			$editors = get_users( $role );
+			$role = array('fields' => array('ID', 'display_name'), 'role' => 'author');
+			$authors = get_users( $role );
+
+			$this->all_authors = array_merge($administrators, $editors, $authors);
+		}
+		return $this->all_authors;
+	} // end get_authors()
+
+	/**
+	Return an array of all subscribers emails or IDs
+	*/
+	function get_all_registered($return = 'email') {
 		global $wpdb;
 
 		if ( $this->s2_mu ) {
-			if ( $id ) {
+			if ( $return === 'ID' ) {
 				return $wpdb->get_col("SELECT user_id FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
 			} else {
-				$result = $wpdb->get_col("SELECT user_id FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
-				$ids = implode(',', $result);
-				return $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN ($ids)");
+				return $wpdb->get_col("SELECT a.user_email FROM $wpdb->users AS a INNER JOIN $wpdb->usermeta AS b ON a.ID = b.user_id WHERE b.meta_key='" . $wpdb->prefix . "capabilities'");
 			}
 		} else {
-			if ( $id ) {
+			if ( $return === 'ID' ) {
 				return $wpdb->get_col("SELECT ID FROM $wpdb->users");
 			} else {
 				return $wpdb->get_col("SELECT user_email FROM $wpdb->users");
@@ -1123,6 +1116,7 @@ class s2class {
 
 		$format = '';
 		$cats = '';
+		$authors = '';
 		$subscribers = array();
 
 		parse_str($args, $r);
@@ -1130,6 +1124,8 @@ class s2class {
 			$r['format'] = 'all';
 		if ( !isset($r['cats']) )
 			$r['cats'] = '';
+		if ( !isset($r['author']) )
+			$r['author'] = '';
 
 		$JOIN = ''; $AND = '';
 		// text or HTML subscribers
@@ -1155,6 +1151,12 @@ class s2class {
 				('' == $and) ? $and = "c.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'" : $and .= " OR c.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$cat'";
 			}
 			$AND .= " AND ($and)";
+		}
+
+		// specific authors
+		if ( '' != $r['author'] ) {
+			$JOIN .= "INNER JOIN $wpdb->usermeta AS d ON a.user_id = d.user_id ";
+			$AND .= " AND (d.meta_key='" . $this->get_usermeta_keyname('s2_authors') . " AND NOT FIND_IN_SET(" . $r['author'] . ", d.meta_value))";
 		}
 
 		if ( $this->s2_mu ) {
@@ -1253,25 +1255,25 @@ class s2class {
 		if ( false !== $this->is_public($this->sanitize_email($user->user_email)) ) {
 			// delete this user from the public table, and subscribe them to all the categories
 			$this->delete($user->user_email);
-			$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
 			foreach ( explode(',', $cats) as $cat ) {
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, $cat);
 			}
-			$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), 'excerpt');
-			$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), $this->subscribe2_options['autosub_def']);
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), 'excerpt');
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), $this->subscribe2_options['autosub_def']);
 		} else {
 			// create post format entries for all users
 			if ( in_array($this->subscribe2_options['autoformat'], array('html', 'html_excerpt', 'post', 'excerpt')) ) {
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), $this->subscribe2_options['autoformat']);
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), $this->subscribe2_options['autoformat']);
 			} else {
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), 'excerpt');
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), 'excerpt');
 			}
-			$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), $this->subscribe2_options['autosub_def']);
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), $this->subscribe2_options['autosub_def']);
 			// if the are no existing subscriptions, create them if we have consent
 			if (  true === $consent ) {
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
 				foreach ( explode(',', $cats) as $cat ) {
-					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, "$cat");
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, $cat);
 				}
 			}
 		}
@@ -1292,7 +1294,7 @@ class s2class {
 		$user_IDs = $wpdb->get_col($sql);
 
 		foreach ( $user_IDs as $user_ID ) {
-			$old_cats = $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+			$old_cats = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
 			if ( !empty($old_cats) ) {
 				$old_cats = explode(',', $old_cats);
 				$newcats = array_unique(array_merge($cats, $old_cats));
@@ -1302,9 +1304,9 @@ class s2class {
 			if ( !empty($newcats) ) {
 				// add subscription to these cat IDs
 				foreach ( $newcats as $id ) {
-					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id, "$id");
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id, $id);
 				}
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $newcats));
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $newcats));
 			}
 			unset($newcats);
 		}
@@ -1324,20 +1326,20 @@ class s2class {
 		$user_IDs = $wpdb->get_col($sql);
 
 		foreach ( $user_IDs as $user_ID ) {
-			$old_cats = explode(',', $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
+			$old_cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 			$remain = array_diff($old_cats, $cats);
 			if ( !empty($remain) ) {
 				// remove subscription to these cat IDs and update s2_subscribed
 				foreach ( $cats as $id ) {
-					$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
+					delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
 				}
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
 			} else {
 				// remove subscription to these cat IDs and update s2_subscribed to ''
 				foreach ( $cats as $id ) {
-					$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
+					delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
 				}
-				$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 			}
 			unset($remain);
 		}
@@ -1389,17 +1391,17 @@ class s2class {
 
 			foreach ( $user_IDs as $user_ID ) {
 				foreach ( $all_cats as $cat ) {
-					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
 				}
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats_string);
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats_string);
 			}
 		} elseif ( $digest == '-1' ) {
 			foreach ( $user_IDs as $user_ID ) {
-				$cats = explode(',', $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
+				$cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 				foreach ( $cats as $id ) {
-					$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
+					delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
 				}
-				$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 			}
 		}
 	} // end digest_change()
@@ -1434,12 +1436,12 @@ class s2class {
 				$cats_string = '';
 				foreach ( $all_cats as $cat ) {
 					('' == $cats_string) ? $cats_string = "$cat->term_id" : $cats_string .= ",$cat->term_id";
-					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
 				}
 				if ( empty($cats_string) ) {
-					$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+					delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 				} else {
-					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats_string);
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats_string);
 				}
 			}
 		} elseif ( !empty($_GET['s2mu_unsubscribe']) ) {
@@ -1451,16 +1453,16 @@ class s2class {
 				$user_ID = get_current_user_id();
 
 				// delete subscription to all categories on that blog
-				$cats = $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				$cats = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
 				$cats = explode(',', $cats);
 				if ( !is_array($cats) ) {
 					$cats = array($cats);
 				}
 
 				foreach ( $cats as $id ) {
-					$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
+					delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
 				}
-				$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 
 				// add an action hook for external manipulation of blog and user data
 				do_action_ref_array('subscribe2_wpmu_unsubscribe', array($user_ID, $unsub_id));
@@ -1493,101 +1495,6 @@ class s2class {
 	} // end wpmu_subscribe()
 
 	/**
-	Filter the usermeta function to allow backwards compatibility to WordPress 2.8 and 2.9
-	WordPress 3.0 replaced all *_usermeta() functions with *_user_meta counterparts
-	*/
-	function get_user_meta($user_ID, $keyname) {
-		global $wp_version;
-		if ( version_compare($wp_version, '3.0', '<') ) {
-			// WordPress version is less than 3.0, use get_usermeta
-			$user_meta = get_usermeta($user_ID, $keyname);
-		} else {
-			$user_meta = get_user_meta($user_ID, $keyname, true);
-		}
-
-		return $user_meta;
-	} // end get_user_meta()
-
-	function update_user_meta($user_ID, $keyname, $value) {
-		global $wp_version;
-		if ( version_compare($wp_version, '3.0', '<') ) {
-			// WordPress version is less than 3.0, use update_usermeta
-			$user_meta = update_usermeta($user_ID, $keyname, $value);
-		} else {
-			$user_meta = update_user_meta($user_ID, $keyname, $value);
-		}
-
-		return $user_meta;
-	} // end update_user_meta()
-
-	function delete_user_meta($user_ID, $keyname) {
-		global $wp_version;
-		if ( version_compare($wp_version, '3.0', '<') ) {
-			// WordPress version is less than 3.0, use delete_usermeta
-			$user_meta = delete_usermeta($user_ID, $keyname);
-		} else {
-			$user_meta = delete_user_meta($user_ID, $keyname);
-		}
-
-		return $user_meta;
-	} // end delete_user_meta()
-
-	/**
-	Get objects parents
-	Uses get_ancestors in WordPress 3.1+ and copies this function in lower versions
-	Can be dropped and calls substituted when Subscribe2 requires WordPress 3.1+
-	*/
-	function get_parents($object_id = 0, $object_type = '') {
-		if ( function_exists('get_ancestors') ) {
-			return get_ancestors($object_id, $object_type);
-		} else {
-			// code copied directly from wp-includes/taxonomy.php
-			// get_ancestors() function
-			$object_id = (int) $object_id;
-
-			$ancestors = array();
-
-			if ( empty( $object_id ) ) {
-				return apply_filters('get_ancestors', $ancestors, $object_id, $object_type);
-			}
-
-			if ( is_taxonomy_hierarchical( $object_type ) ) {
-				$term = get_term($object_id, $object_type);
-				while ( ! is_wp_error($term) && ! empty( $term->parent ) && ! in_array( $term->parent, $ancestors ) ) {
-					$ancestors[] = (int) $term->parent;
-					$term = get_term($term->parent, $object_type);
-				}
-			} elseif ( null !== get_post_type_object( $object_type ) ) {
-				$object = get_post($object_id);
-				if ( ! is_wp_error( $object ) && isset( $object->ancestors ) && is_array( $object->ancestors ) )
-					$ancestors = $object->ancestors;
-				else {
-					while ( ! is_wp_error($object) && ! empty( $object->post_parent ) && ! in_array( $object->post_parent, $ancestors ) ) {
-						$ancestors[] = (int) $object->post_parent;
-						$object = get_post($object->post_parent);
-					}
-				}
-			}
-
-			return apply_filters('get_ancestors', $ancestors, $object_id, $object_type);
-		}
-	} // end get_parents()
-
-	/**
-	Check if taxonomy exists
-	Uses taxonomy_exists in WordPress 3.0+ and copies this function in lower versions
-	Can be dropped and calls substituted when Subscribe2 requires WordPress 3.0+
-	*/
-	function s2_taxonomy_exists($taxonomy) {
-		if ( function_exists('taxonomy_exists') ) {
-			return taxonomy_exists($taxonomy);
-		} else {
-			global $wp_taxonomies;
-			return isset( $wp_taxonomies[$taxonomy] );
-		}
-	} // end s2_taxonomy_exists()
-
-	/**
 	Autosubscribe registered users to newly created categories
 	if registered user has selected this option
 	*/
@@ -1607,7 +1514,7 @@ class s2class {
 			if ( '' == $user_IDs ) { return; }
 
 			foreach ( $user_IDs as $user_ID ) {
-				$old_cats = $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				$old_cats = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
 				if ( empty($old_cats) ) {
 					$newcats = (array)$new_category;
 				} else {
@@ -1615,8 +1522,8 @@ class s2class {
 					$newcats = array_merge($old_cats, (array)$new_category);
 				}
 				// add subscription to these cat IDs
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $new_category, "$new_category");
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $newcats));
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $new_category, $new_category);
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $newcats));
 			}
 		} elseif ( 'exclude' == $this->subscribe2_options['show_autosub'] ) {
 			$excluded_cats = explode(',', $this->subscribe2_options['exclude']);
@@ -1638,14 +1545,14 @@ class s2class {
 		if ( '' == $user_IDs ) { return; }
 
 		foreach ( $user_IDs as $user_ID ) {
-			$old_cats = explode(',', $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
+			$old_cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 			if ( !is_array($old_cats) ) {
 				$old_cats = array($old_cats);
 			}
 			// add subscription to these cat IDs
-			$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $deleted_category);
+			delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $deleted_category);
 			$remain = array_diff($old_cats, (array)$deleted_category);
-			$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
 		}
 	} // end delete_category()
 
@@ -1672,23 +1579,10 @@ class s2class {
 
 		// handle issues from WordPress core where user_level is not set or set low
 		if ( empty($admin) ) {
-			global $wp_version;
-			if ( version_compare($wp_version, '3.1', '<') ) {
-				// WordPress version is less than 3.1, use WP_User_Search class
-				if ( !class_exists(WP_User_Search) ) {
-					require(ABSPATH . 'wp-admin/includes/user.php');
-					$wp_user_query = new WP_User_Search( '', '', 'administrator');
-					$admins_string = implode(', ', $wp_user_query->get_results());
-					$sql = "SELECT ID, display_name FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
-					$admin = $wpdb->get_results($sql);
-				}
-			} else {
-				// WordPress version is 3.1 or greater, use WP_User_Query class
-				$role = array('role' => 'administrator');
-				$wp_user_query = get_users( $role );
-				foreach ($wp_user_query as $user) {
-					$admin[] = $user;
-				}
+			$role = array('role' => 'administrator');
+			$wp_user_query = get_users( $role );
+			foreach ($wp_user_query as $user) {
+				$admin[] = $user;
 			}
 			$admin = $admin[0];
 		}
@@ -1903,7 +1797,7 @@ class s2class {
 
 		// show our form
 		echo "<div class=\"wrap\">";
-		screen_icon();
+		echo "<div id=\"icon-tools\" class=\"icon32\"></div>";
 		echo "<h2>" . __('Manage Subscribers', 'subscribe2') . "</h2>\r\n";
 		echo "<form method=\"post\" action=\"\">\r\n";
 		if ( function_exists('wp_nonce_field') ) {
@@ -1920,12 +1814,13 @@ class s2class {
 		echo "<h2>" . __('Current Subscribers', 'subscribe2') . "</h2>\r\n";
 		echo "<br />";
 		$this->display_subscriber_dropdown($what, __('Filter', 'subscribe2'));
+		echo "<br /><br />";
 		// show the selected subscribers
-		$alternate = '';
-		echo "<table cellpadding=\"2\" cellspacing=\"2\" width=\"100%\">";
+		$alternate = 'alternate';
+		echo "<table class=\"widefat\" cellpadding=\"2\" cellspacing=\"2\" width=\"100%\">";
 		$searchterm = ( $_POST['searchterm'] ) ? $_POST['searchterm'] : '';
-		echo "<tr class=\"alternate\"><td width=\"50%\"><input type=\"text\" name=\"searchterm\" value=\"" . $searchterm . "\" />&nbsp;\r\n";
-		echo "<input type=\"submit\" class=\"button-secondary\" name=\"search\" value=\"" . __('Search Subscribers', 'subscribe2') . "\" /></td>\r\n";
+		echo "<tr class=\"alternate\"><td colspan=\"3\"><input type=\"text\" name=\"searchterm\" value=\"" . $searchterm . "\" /></td>\r\n";
+		echo "<td><input type=\"submit\" class=\"button-secondary\" name=\"search\" value=\"" . __('Search Subscribers', 'subscribe2') . "\" /></td>\r\n";
 		if ( $reminderform ) {
 			echo "<td width=\"25%\" align=\"right\"><input type=\"hidden\" name=\"reminderemails\" value=\"" . $reminderemails . "\" />\r\n";
 			echo "<input type=\"submit\" class=\"button-secondary\" name=\"remind\" value=\"" . __('Send Reminder Email', 'subscribe2') . "\" /></td>\r\n";
@@ -1936,13 +1831,14 @@ class s2class {
 			$exportcsv = implode(",\r\n", $subscribers);
 			echo "<td width=\"25%\" align=\"right\"><input type=\"hidden\" name=\"exportcsv\" value=\"" . $what . "\" />\r\n";
 			echo "<input type=\"submit\" class=\"button-secondary\" name=\"csv\" value=\"" . __('Save Emails to CSV File', 'subscribe2') . "\" /></td>\r\n";
+		} else {
+			echo "<td width=\"25%\"></td>";
 		}
-		echo "</tr></table>";
+		echo "</tr>";
 
-		echo "<table class=\"widefat\" cellpadding=\"2\" cellspacing=\"2\">";
 		if ( !empty($subscribers) ) {
 			echo "<tr><td colspan=\"3\" align=\"center\"><input type=\"submit\" class=\"button-secondary\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" /></td>\r\n";
-			echo "<td align=\"right\">" . $strip . "</td></tr>\r\n";
+			echo "<td colspan=\"3\" align=\"right\">" . $strip . "</td></tr>\r\n";
 		}
 		if ( !empty($subscribers) ) {
 			if ( is_int($this->subscribe2_options['entries']) ) {
@@ -1958,11 +1854,11 @@ class s2class {
 			echo "<td width=\"4%\" align=\"center\">";
 			echo "<img src=\"" . $urlpath . "include/exclamation.png\" alt=\"&gt;\" title=\"" . __('Unconfirm this email address', 'subscribe2') . "\" /></td>\r\n";
 			echo "<td width=\"4%\" align=\"center\">";
-			echo "<img src=\"" . $urlpath . "include/cross.png\" alt=\"X\" title=\"" . __('Delete this email address', 'subscribe2') . "\" /></td><td></td></tr>\r\n";
-			echo "<tr><td align=\"center\"><input type=\"checkbox\" name=\"checkall\" value=\"confirm_checkall\" /></td>\r\n";
+			echo "<img src=\"" . $urlpath . "include/cross.png\" alt=\"X\" title=\"" . __('Delete this email address', 'subscribe2') . "\" /></td><td colspan=\"3\"></td></tr>\r\n";
+			echo "<tr class=\"\"><td align=\"center\"><input type=\"checkbox\" name=\"checkall\" value=\"confirm_checkall\" /></td>\r\n";
 			echo "<td align=\"center\"><input type=\"checkbox\" name=\"checkall\" value=\"unconfirm_checkall\" /></td>\r\n";
 			echo "<td align=\"center\"><input type=\"checkbox\" name=\"checkall\" value=\"delete_checkall\" /></td>\r\n";
-			echo "<td align=\"left\"><strong>" . __('Select / Unselect All', 'subscribe2') . "</strong></td></tr>\r\n";
+			echo "<td colspan =\"3\" align=\"left\"><strong>" . __('Select / Unselect All', 'subscribe2') . "</strong></td></tr>\r\n";
 
 			foreach ( $subscribers as $subscriber ) {
 				echo "<tr class=\"$alternate\" style=\"height:1.5em;\">";
@@ -1973,7 +1869,7 @@ class s2class {
 					echo "<td align=\"center\">\r\n";
 					echo "<input class=\"delete_checkall\" title=\"" . __('Delete this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
 					echo "</td>\r\n";
-					echo "<td><span style=\"color:#006600\">&#x221A;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
+					echo "<td colspan=\"3\"><span style=\"color:#006600\">&#x221A;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
 					echo "(<span style=\"color:#006600\"><abbr title=\"" . $this->signup_ip($subscriber) . "\">" . $this->signup_date($subscriber) . "</abbr></span>)\r\n";
 				} elseif ( in_array($subscriber, $unconfirmed) ) {
 					echo "<input class=\"confirm_checkall\" title=\"" . __('Confirm this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"confirm[]\" value=\"" . $subscriber . "\" /></td>\r\n";
@@ -1981,12 +1877,12 @@ class s2class {
 					echo "<td align=\"center\">\r\n";
 					echo "<input class=\"delete_checkall\" title=\"" . __('Delete this email address', 'subscribe2') . "\" type=\"checkbox\" name=\"delete[]\" value=\"" . $subscriber . "\" />\r\n";
 					echo "</td>\r\n";
-					echo "<td><span style=\"color:#FF0000\">&nbsp;!&nbsp;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
+					echo "<td colspan=\"3\"><span style=\"color:#FF0000\">&nbsp;!&nbsp;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
 					echo "(<span style=\"color:#FF0000\"><abbr title=\"" . $this->signup_ip($subscriber) . "\">" . $this->signup_date($subscriber) . "</abbr></span>)\r\n";
 				} elseif ( in_array($subscriber, $all_users) ) {
 					echo "</td><td align=\"center\"></td><td align=\"center\"></td>\r\n";
-					echo "<td><span style=\"color:#006600\">&reg;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
-					echo "(<a href=\"" . get_option('siteurl') . "/wp-admin/users.php?page=s2_users&amp;email=" . urlencode($subscriber) . "\">" . __('edit', 'subscribe2') . "</a>)\r\n";
+					echo "<td colspan=\"3\"><span style=\"color:#006600\">&reg;&nbsp;&nbsp;</span><a href=\"mailto:" . $subscriber . "\">" . $subscriber . "</a>\r\n";
+					echo "(<a href=\"" . get_option('siteurl') . "/wp-admin/admin.php?page=s2&amp;email=" . urlencode($subscriber) . "\">" . __('edit', 'subscribe2') . "</a>)\r\n";
 				}
 				echo "</td></tr>\r\n";
 				('alternate' == $alternate) ? $alternate = '' : $alternate = 'alternate';
@@ -1999,8 +1895,8 @@ class s2class {
 			}
 		}
 		if ( !empty($subscribers) ) {
-			echo "<tr><td colspan=\"3\" align=\"center\"><input type=\"submit\" class=\"button-secondary\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" /></td>\r\n";
-			echo "<td align=\"right\">" . $strip . "</td></tr>\r\n";
+			echo "<tr class=\"$alternate\"><td colspan=\"3\" align=\"center\"><input type=\"submit\" class=\"button-secondary\" name=\"process\" value=\"" . __('Process', 'subscribe2') . "\" /></td>\r\n";
+			echo "<td colspan=\"3\" align=\"right\">" . $strip . "</td></tr>\r\n";
 		}
 		echo "</table>\r\n";
 
@@ -2103,6 +1999,7 @@ class s2class {
 				$this->subscribe2_options['password'] = $_POST['password'];
 				$this->subscribe2_options['private'] = $_POST['private'];
 				$this->subscribe2_options['cron_order'] = $_POST['cron_order'];
+                $this->subscribe2_options['tracking'] = $_POST['tracking'];
 
 				// send per-post or digest emails
 				$email_freq = $_POST['email_freq'];
@@ -2231,7 +2128,7 @@ class s2class {
 		}
 		// show our form
 		echo "<div class=\"wrap\">";
-		screen_icon();
+		echo "<div id=\"icon-options-general\" class=\"icon32\"></div>";
 		echo "<h2>" . __('Subscribe2 Settings', 'subscribe2') . "</h2>\r\n";
 		echo "<a href=\"http://subscribe2.wordpress.com/\">" . __('Plugin Blog', 'subscribe2') . "</a> | ";
 		echo "<a href=\"https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904\">" . __('Make a donation via PayPal', 'subscribe2') . "</a>";
@@ -2340,6 +2237,9 @@ class s2class {
 			}
 			echo " /> " . __('Ascending', 'subscribe2') . "</label><br /><br />\r\n";
 		}
+		echo __('Add Tracking Parameters to the Permalink', 'subscribe2') . ": ";
+		echo "<input type=\"text\" name=\"tracking\" value=\"" . stripslashes($this->subscribe2_options['tracking']) . "\" size=\"50\" /> ";
+		echo "<br />" . __('eg. utm_source=subscribe2&utm_medium=email&utm_campaign=postnotify', 'subscribe2') . "<br /><br />\r\n";
 
 		// email templates
 		echo "<h2>" . __('Email Templates', 'subscribe2') . "</h2>\r\n";
@@ -2543,28 +2443,25 @@ class s2class {
 			echo " checked=\"checked\"";
 		}
 		echo " /> " . __('No', 'subscribe2');
-		if ( version_compare($wp_version, '2.9', '>') ) {
-			// comment meta was introduced in WP2.9, don't display this if we are on a lower version
-			echo"</label><br /><br />";
-			echo __('Display checkbox to allow subscriptions from the comment form', 'subscribe2') . ": <br />\r\n";
-			if ( version_compare($wp_version, '3.0', '>') ) {
-				echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"before\"";
-				if ( 'before' == $this->subscribe2_options['comment_subs'] ) {
-					echo " checked=\"checked\"";
-				}
-				echo " /> " . __('Before the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp;";
-			}
-			echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"after\"";
-			if ( 'after' == $this->subscribe2_options['comment_subs'] ) {
+		echo"</label><br /><br />";
+		echo __('Display checkbox to allow subscriptions from the comment form', 'subscribe2') . ": <br />\r\n";
+		if ( version_compare($wp_version, '3.0', '>') ) {
+			echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"before\"";
+			if ( 'before' == $this->subscribe2_options['comment_subs'] ) {
 				echo " checked=\"checked\"";
 			}
-			echo " /> " . __('After the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp;";
-			echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"no\"";
-			if ( 'no' == $this->subscribe2_options['comment_subs'] ) {
-				echo " checked=\"checked\"";
-			}
-			echo " /> " . __('No', 'subscribe2');
+			echo " /> " . __('Before the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp;";
 		}
+		echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"after\"";
+		if ( 'after' == $this->subscribe2_options['comment_subs'] ) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('After the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp;";
+		echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"no\"";
+		if ( 'no' == $this->subscribe2_options['comment_subs'] ) {
+			echo " checked=\"checked\"";
+		}
+		echo " /> " . __('No', 'subscribe2');
 		echo"</label></p>";
 
 		//barred domains
@@ -2608,67 +2505,76 @@ class s2class {
 			check_admin_referer('subscribe2-user_subscribers' . $s2nonce);
 
 			if ( isset($_POST['s2_format']) ) {
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), $_POST['s2_format']);
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), $_POST['s2_format']);
 			} else {
 				// value has not been set so use default
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), 'excerpt');
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), 'excerpt');
 			}
 			if ( isset($_POST['new_category']) ) {
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), $_POST['new_category']);
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), $_POST['new_category']);
 			} else {
 				// value has not been passed so use Settings defaults
 				if ( $this->subscribe2_options['show_autosub'] == 'yes' && $this->subscribe2_options['autosub_def'] == 'yes' ) {
-					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), 'yes');
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), 'yes');
 				} else {
-					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), 'no');
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), 'no');
 				}
 			}
 
 			$cats = $_POST['category'];
 
 			if ( empty($cats) || $cats == '-1' ) {
-				$oldcats = explode(',', $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
+				$oldcats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 				if ( $oldcats ) {
 					foreach ( $oldcats as $cat ) {
-						$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat);
+						delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat);
 					}
 				}
-				$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 			} elseif ( $cats == 'digest' ) {
 				$all_cats = $this->all_cats(false, 'ID');
 				foreach ( $all_cats as $cat ) {
 					('' == $catids) ? $catids = "$cat->term_id" : $catids .= ",$cat->term_id";
-					$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
 				}
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $catids);
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $catids);
 			} else {
 				if ( !is_array($cats) ) {
 					$cats = (array)$_POST['category'];
 				}
 				sort($cats);
-				$old_cats = explode(',', $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed')));
+				$old_cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 				$remove = array_diff($old_cats, $cats);
 				$new = array_diff($cats, $old_cats);
 				if ( !empty($remove) ) {
 					// remove subscription to these cat IDs
 					foreach ( $remove as $id ) {
-						$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
+						delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
 					}
 				}
 				if ( !empty($new) ) {
 					// add subscription to these cat IDs
 					foreach ( $new as $id ) {
-						$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id, $id);
+						update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id, $id);
 					}
 				}
-				$this->update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
 			}
+
+			$authors = $_POST['author'];
+			if ( is_array($authors) ) {
+				$authors = implode(',', $authors);
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), $authors);
+			} elseif ( empty($authors) ) {
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), '');
+			}
+
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Subscription preferences updated.', 'subscribe2') . "</strong></p></div>\n";
 		}
 
 		// show our form
 		echo "<div class=\"wrap\">";
-		screen_icon();
+		echo "<div id=\"icon-users\" class=\"icon32\"></div>";
 		echo "<h2>" . __('Notification Settings', 'subscribe2') . "</h2>\r\n";
 		if ( isset($_GET['email']) ) {
 			$user = get_userdata($user_ID);
@@ -2683,22 +2589,22 @@ class s2class {
 		if ( $this->subscribe2_options['email_freq'] == 'never' ) {
 			echo __('Receive email as', 'subscribe2') . ": &nbsp;&nbsp;";
 			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"html\"";
-			if ( 'html' == $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_format')) ) {
+			if ( 'html' == get_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), true) ) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('HTML - Full', 'subscribe2') ."</label>&nbsp;&nbsp;";
 			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"html_excerpt\" ";
-			if ( 'html_excerpt' == $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_format')) ) {
+			if ( 'html_excerpt' == get_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), true) ) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('HTML - Excerpt', 'subscribe2') . "</label>&nbsp;&nbsp;";
 			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"post\" ";
-			if ( 'post' == $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_format')) ) {
+			if ( 'post' == get_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), true) ) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('Plain Text - Full', 'subscribe2') . "</label>&nbsp;&nbsp;";
 			echo "<label><input type=\"radio\" name=\"s2_format\" value=\"excerpt\" ";
-			if ( 'excerpt' == $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_format')) ) {
+			if ( 'excerpt' == get_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), true) ) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('Plain Text - Excerpt', 'subscribe2') . "</label><br /><br />\r\n";
@@ -2706,12 +2612,12 @@ class s2class {
 			if ( $this->subscribe2_options['show_autosub'] == 'yes' ) {
 				echo __('Automatically subscribe me to newly created categories', 'subscribe2') . ': &nbsp;&nbsp;';
 				echo "<label><input type=\"radio\" name=\"new_category\" value=\"yes\" ";
-				if ( 'yes' == $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub')) ) {
+				if ( 'yes' == get_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), true) ) {
 					echo "checked=\"checked\" ";
 				}
 				echo "/> " . __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
 				echo "<label><input type=\"radio\" name=\"new_category\" value=\"no\" ";
-				if ( 'no' == $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub')) ) {
+				if ( 'no' == get_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), true) ) {
 					echo "checked=\"checked\" ";
 				}
 				echo "/> " . __('No', 'subscribe2') . "</label>";
@@ -2721,7 +2627,7 @@ class s2class {
 			// subscribed categories
 			if ( $this->s2_mu ) {
 				global $blog_id;
-				$subscribed = $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				$subscribed = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
 				// if we are subscribed to the current blog display an "unsubscribe" link
 				if ( !empty($subscribed) ) {
 					$unsubscribe_link = esc_url( add_query_arg('s2mu_unsubscribe', $blog_id) );
@@ -2735,22 +2641,27 @@ class s2class {
 			} else {
 				echo "<h2>" . __('Subscribed Categories', 'subscribe2') . "</h2>\r\n";
 			}
-			$this->display_category_form(explode(',', $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'))), $this->subscribe2_options['reg_override']);
+			$this->display_category_form(explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true)), $this->subscribe2_options['reg_override']);
 		} else {
 			// we're doing daily digests, so just show
 			// subscribe / unnsubscribe
 			echo __('Receive periodic summaries of new posts?', 'subscribe2') . ': &nbsp;&nbsp;';
 			echo "<label>";
 			echo "<input type=\"radio\" name=\"category\" value=\"digest\" ";
-			if ( $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed')) ) {
+			if ( get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true) ) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('Yes', 'subscribe2') . "</label> <label><input type=\"radio\" name=\"category\" value=\"-1\" ";
-			if ( !$this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed')) ) {
+			if ( !get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true) ) {
 				echo "checked=\"checked\" ";
 			}
 			echo "/> " . __('No', 'subscribe2');
 			echo "</label></p>";
+		}
+
+		if ( count($this->get_authors()) > 1 ) {
+			echo "<h2>" . __('Do not send notifications for post made by these authors', 'subscribe2') . "</h2>\r\n";
+			$this->display_author_form(explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), true)));
 		}
 
 		// submit
@@ -2781,7 +2692,7 @@ class s2class {
 				}
 
 				// check if we're subscribed to the blog
-				$subscribed = $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				$subscribed = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
 
 				$blogname = get_option('blogname');
 				if ( strlen($blogname) > 30 ) {
@@ -2900,7 +2811,7 @@ class s2class {
 
 		// show our form
 		echo "<div class=\"wrap\">";
-		screen_icon();
+		echo "<div id=\"icon-edit\" class=\"icon32\"></div>";
 		echo "<h2>" . __('Send an email to subscribers', 'subscribe2') . "</h2>\r\n";
 		echo "<form method=\"post\" action=\"\">\r\n";
 		if ( function_exists('wp_nonce_field') ) {
@@ -2940,7 +2851,7 @@ class s2class {
 		$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
 
 		foreach( $s2_taxonomies as $taxonomy ) {
-			if ( $this->s2_taxonomy_exists($taxonomy) ) {
+			if ( taxonomy_exists($taxonomy) ) {
 				$all_cats = array_merge($all_cats, get_categories(array('hide_empty' => false, 'orderby' => $orderby, 'taxonomy' => $taxonomy)));
 			}
 		}
@@ -2989,7 +2900,7 @@ class s2class {
 				$j++;
 			}
 			$catName = '';
-			$parents = array_reverse( $this->get_parents($cat->term_id, $cat->taxonomy) );
+			$parents = array_reverse( get_ancestors($cat->term_id, $cat->taxonomy) );
 			if ( $parents ) {
 				foreach ( $parents as $parent ) {
 					$parent = get_term($parent, $cat->taxonomy);
@@ -3016,6 +2927,45 @@ class s2class {
 		echo "</td></tr>\r\n";
 		echo "</table>\r\n";
 	} // end display_category_form()
+
+	/**
+	Display a table of authors with checkboxes
+	Optionally pre-select those authors specified
+	*/
+	function display_author_form($selected = array()) {
+		$all_authors = $this->get_authors();
+
+		$half = (count($all_authors) / 2);
+		$i = 0;
+		$j = 0;
+		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"5\" class=\"editform\">\r\n";
+		echo "<tr><td align=\"left\" colspan=\"2\">\r\n";
+		echo "<label><input type=\"checkbox\" name=\"checkall\" value=\"checkall_author\" /> " . __('Select / Unselect All', 'subscribe2') . "</label>\r\n";
+		echo "</td></tr>\r\n";
+		echo "<tr valign=\"top\"><td width=\"50%\" align=\"left\">\r\n";
+		foreach ( $all_authors as $author ) {
+			if ( $i >= $half && 0 == $j ) {
+				echo "</td><td width=\"50%\" align=\"left\">\r\n";
+				$j++;
+			}
+			if ( 0 == $j ) {
+				echo "<label><input class=\"checkall_author\" type=\"checkbox\" name=\"author[]\" value=\"" . $author->ID . "\"";
+				if ( in_array($author->ID, $selected) ) {
+						echo " checked=\"checked\"";
+				}
+				echo " /> " . $author->display_name . "</label><br />\r\n";
+			} else {
+				echo "<label><input class=\"checkall_author\" type=\"checkbox\" name=\"author[]\" value=\"" . $author->ID . "\"";
+				if ( in_array($author->ID, $selected) ) {
+					echo " checked=\"checked\"";
+				}
+				echo " /> " . $author->display_name . "</label><br />\r\n";
+				$i++;
+			}
+		}
+		echo "</td></tr>\r\n";
+		echo "</table>\r\n";
+	} // end display_author_form()
 
 	/**
 	Display a drop-down form to select subscribers
@@ -3107,23 +3057,10 @@ class s2class {
 
 		// handle issues from WordPress core where user_level is not set or set low
 		if ( empty($admins) ) {
-			global $wp_version;
-			if ( version_compare($wp_version, '3.1', '<') ) {
-				// WordPress version is less than 3.1, use WP_User_Search class
-				if ( !class_exists(WP_User_Search) ) {
-					require(ABSPATH . 'wp-admin/includes/user.php');
-					$wp_user_query = new WP_User_Search( '', '', 'administrator');
-					$admins_string = implode(', ', $wp_user_query->get_results());
-					$sql = "SELECT ID, display_name FROM $wpdb->users WHERE ID IN (" . $admins_string . ")";
-					$admins = $wpdb->get_results($sql);
-				}
-			} else {
-				// WordPress version is 3.1 or greater, use WP_User_Query class
-				$args = array('fields' => array('ID', 'display_name'), 'role' => 'administrator');
-				$wp_user_query = get_users( $args );
-				foreach ($wp_user_query as $user) {
-					$admins[] = $user;
-				}
+			$args = array('fields' => array('ID', 'display_name'), 'role' => 'administrator');
+			$wp_user_query = get_users( $args );
+			foreach ($wp_user_query as $user) {
+				$admins[] = $user;
 			}
 		}
 
@@ -3259,7 +3196,7 @@ class s2class {
 				$user_ID = $this->get_user_id( $subscriber );
 				$user_info = get_userdata($user_ID);
 
-				$cats = explode(',', $this->get_user_meta($user_info->ID, $this->get_usermeta_keyname('s2_subscribed')));
+				$cats = explode(',', get_user_meta($user_info->ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 				$subscribed_cats = '';
 				foreach ( $cat_ids as $cat ) {
 					(in_array($cat, $cats)) ? $subscribed_cats .= ",Yes" : $subscribed_cats .= ",No";
@@ -3293,6 +3230,7 @@ class s2class {
 				case 's2_cat':
 				case 's2_format':
 				case 's2_autosub':
+				case 's2_authors':
 					return $wpdb->prefix . $metaname;
 					break;
 			}
@@ -3326,7 +3264,7 @@ class s2class {
 	*/
 	function plugin_links($links, $file) {
 		if ( $file == S2DIR.'subscribe2.php' ) {
-			$links[] = "<a href='options-general.php?page=s2_settings'>" . __('Settings', 'subscribe2') . "</a>";
+			$links[] = "<a href='admin.php?page=s2_settings'>" . __('Settings', 'subscribe2') . "</a>";
 			$links[] = "<a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904'><b>" . __('Donate', 'subscribe2') . "</b></a>";
 		}
 		return $links;
@@ -3383,16 +3321,16 @@ class s2class {
 	*/
 	function wpmu_remove_user($user_ID) {
 		if ( 0 == $user_ID ) { return; }
-		$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'));
-		$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'));
-		$cats = $this->get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+		delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'));
+		delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'));
+		$cats = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
 		if ( !empty($cats) ) {
 			$cats = explode(',', $cats);
 			foreach ( $cats as $cat ) {
-				$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat);
+				delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat);
 			}
 		}
-		$this->delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+		delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
 	} // end wpmu_remove_user()
 
 	/**
@@ -3404,7 +3342,7 @@ class s2class {
 	} // end s2_meta_init()
 
 	/**
-	Meta box code for WordPress 2.5+
+	Meta box code
 	*/
 	function s2_meta_box() {
 		global $post_ID;
@@ -3443,7 +3381,7 @@ class s2class {
 	*/
 	function s2_comment_meta_form() {
 		if ( is_user_logged_in() ) {
-			echo $this->use_profile_admin;
+			echo $this->profile;
 		} else {
 			echo "<label><input type=\"checkbox\" name=\"s2_comment_request\" value=\"1\" />" . __('Check here to Subscribe to notifications for new posts', 'subscribe2') . "</label>";
 		}
@@ -3526,11 +3464,7 @@ class s2class {
 		global $user_ID;
 		get_currentuserinfo();
 		if ( $user_ID ) {
-			if ( current_user_can('manage_options') ) {
-				$this->s2form = $this->use_profile_admin;
-			} else {
-				$this->s2form = $this->use_profile_users;
-			}
+			$this->s2form = $this->profile;
 		}
 		if ( isset($_POST['subscribe']) || isset($_POST['unsubscribe']) ) {
 			global $wpdb, $user_email;
@@ -3708,7 +3642,7 @@ class s2class {
 	function button_init() {
 		if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) { return; }
 		if ( 'true' == get_user_option('rich_editing') ) {
-			// Use WordPress 2.5+ hooks
+			// Hook into the rich text editor
 			add_filter('mce_external_plugins', array(&$this, 'mce3_plugin'));
 			add_filter('mce_buttons', array(&$this, 'mce3_button'));
 		} else {
@@ -3718,7 +3652,7 @@ class s2class {
 	} // end button_init()
 
 	/**
-	Add buttons for WordPress 2.5+ using built in hooks
+	Add buttons for Rich Text Editor
 	*/
 	function mce3_plugin($arr) {
 		$path = S2URL . 'tinymce3/editor_plugin.js';
@@ -3869,10 +3803,10 @@ class s2class {
 			$message_post .= "\r\n";
 			$message_posttime .= "\r\n";
 
-			$tablelinks .= "\r\n" . get_permalink($post->ID) . "\r\n";
-			$message_post .= get_permalink($post->ID) . "\r\n";
+			$tablelinks .= "\r\n" . $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
+			$message_post .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
-			$message_posttime .= get_permalink($post->ID) . "\r\n";
+			$message_posttime .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
 			if ( strstr($mailtext, "{CATS}") ) {
 				$post_cat_names = implode(', ', wp_get_post_categories($post->ID, array('fields' => 'names')));
 				$message_post .= __('Posted in', 'subscribe2') . ": " . $post_cat_names . "\r\n";
@@ -3999,7 +3933,7 @@ class s2class {
 	function subscribe2() {
 		global $wpdb, $table_prefix, $wp_version, $wpmu_version;
 
-		load_plugin_textdomain('subscribe2', 'wp-content/plugins/' . S2DIR, '/' . S2DIR);
+		load_plugin_textdomain('subscribe2', false, S2DIR);
 
 		// Is this WordPressMU or not?
 		$this->s2_mu = false;
@@ -4111,6 +4045,7 @@ class s2class {
 	var $subscribe2_options = array();
 	var $all_public = '';
 	var $all_unconfirmed = '';
+	var $all_authors = '';
 	var $excluded_cats = '';
 	var $post_title = '';
 	var $permalink = '';
@@ -4128,8 +4063,7 @@ class s2class {
 
 	// some messages
 	var $please_log_in = '';
-	var $use_profile_admin = '';
-	var $use_profile_users = '';
+	var $profile = '';
 	var $confirmation_sent = '';
 	var $already_subscribed = '';
 	var $not_subscribed ='';
