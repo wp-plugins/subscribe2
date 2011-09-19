@@ -209,6 +209,15 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 == Changelog ==
 
+= Version 7.0 by Matthew Robinson =
+
+* NOTE Subscribe2 now requires WordPress 3.1 or higher
+* Implemented top level menu to make Subscribe2 menu access easier
+* Introduced the ability to add UTM Tracking parameters to email links - Thanks to Sander de Boer
+* Introduced Opt-out by Author for Registered Users (on sites where there is more than one author)
+* Improved table layout code on user management page
+* Make use of core checked() function to save code space
+
 = Version 6.5 by Matthew Robinson =
 
 * Fix for Multisite / MU detection for WordPress versions prior to 3.0
