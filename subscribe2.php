@@ -91,7 +91,7 @@ class s2class {
 
 		$this->error = "<p class=\"s2_error\">" . __('Sorry, there seems to be an error on the server. Please try again later.', 'subscribe2') . "</p>";
 
-		$this->no_page = "<p class=\"s2_error\">" . __('You must to create a WordPress page for this plugin to work correctly.', 'subscribe2') . "<p>";
+		$this->no_page = "<p class=\"s2_error\">" . __('You must to create a WordPress page for this plugin to work correctly.', 'subscribe2') . "</p>";
 
 		$this->mail_sent = "<p class=\"s2_message\">" . __('Message sent!', 'subscribe2') . "</p>";
 
@@ -1214,7 +1214,7 @@ class s2class {
 	} // end signup_ip()
 
 	/**
-	function to ensure email is compliant with internet messaging standards
+	Function to ensure email is compliant with internet messaging standards
 	*/
 	function sanitize_email($email) {
 		if ( !is_email($email) ) { return; }
