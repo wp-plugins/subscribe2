@@ -70,6 +70,24 @@ No joy there? Well, if you can't find an answer to your question you can get [pa
 
 A comprehensive guide that covers many, if not all, of the Subscribe2 features is available to purchase from the [My WP Works](http://mywpworks.com/store/subscribe2-ebook/)
 
+= Sending post notifications or email with Subscribe2 =
+
+Subscribe2 sends an email at the very moment the post is published. Since Subscribe2 sends live mail with no un-do, it's important to use the Preview function in WordPress to make sure the post has been edited to perfection *before* moving it from Draft to Published mode.
+
+Mail is sent when a post is published - it will not be re-sent if you Update the post later. If you need to send a mailing a second time (e.g. during testing), switch the post to Draft mode, then re-publish it.
+
+You can also manually send emails to groups of your subscribers using the Send Email page that the plugin creates in the WordPress administration area.
+
+= Where can I find the HTML and CSS templates? =
+
+While the template field in Settings | Subscribe2 does not display HTML by default, feel free to add HTML to it as needed. You can insert references to static images for use as banners, wrap sections of the template in divs or other elements, or do whatever you like.
+
+There is no need to include HTML header data or body tags - just focus on the HTML content, in conjunction with the template tags documented on the settings page.
+
+Subscribe2 does not maintain a separate stylesheet for the emails it generates. Instead, it uses the CSS of your currently active WordPress theme. If you need new/custom styles specific to your newsletter that aren't included in your theme stylesheet, try adding elements such as div id="newsletter_sidebar" to your HTML, with corresponding #newsletter_sidebar rules in your stylesheet.
+
+Note that if you ever change your site theme, you'll need to copy these additions over to the new theme's stylesheet. To avoid this problem, consider placing a custom CSS file on your server outside of your theme directory, and link to it from the template, thus overriding the active theme styles permanently.
+
 = Some or all email notifications fail to send, why?  =
 In the first instance ***check this with your hosting provider***, they have access to your server logs and will be able to tell you where and why emails are being blocked.
 
