@@ -558,6 +558,13 @@ class s2class {
 					return $post;
 			}
 
+			// Is the post assigned to a format for which we should not be sending posts
+			$post_format = get_post_format($post->ID);
+			$excluded_formats = explode(',', $this->subscribe2_options['exclude_formats']);
+			if ( in_array($post_format, $excluded_format) ) {
+				return $post;
+			}
+
 			$post_cats = wp_get_post_categories($post->ID);
 			$check = false;
 			// is the current post assigned to any categories
@@ -2081,6 +2088,14 @@ class s2class {
 				( isset($_POST['reg_override']) ) ? $override = '1' : $override = '0';
 				$this->subscribe2_options['reg_override'] = $override;
 
+				// excluded formats
+				if ( !empty($_POST['format']) ) {
+					$exclude_formats = implode(',', $_POST['format']);
+				} else {
+					$exclude_formats = '';
+				}
+				$this->subscribe2_options['exclude_formats'] = $exclude_formats;
+
 				// default WordPress page where Subscribe2 token is placed
 				if ( is_numeric($_POST['page']) && $_POST['page'] >= 0 ) {
 					$this->subscribe2_options['s2page'] = $_POST['page'];
@@ -2254,6 +2269,16 @@ class s2class {
 		$this->display_category_form(explode(',', $this->subscribe2_options['exclude']));
 		echo "<center><label><input type=\"checkbox\" name=\"reg_override\" value=\"1\"" . checked($this->subscribe2_options['reg_override'], '1', false) . " /> ";
 		echo __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</label></center><br />\r\n";
+
+		$formats = get_theme_support('post-formats');
+		if ( $formats !== false ) {
+			// excluded formats
+			echo "<h2>" . __('Excluded Formats', 'subscribe2') . "</h2>\r\n";
+			echo "<p>";
+			echo "<strong><em style=\"color: red\">" . __('Posts assigned to any Excluded Format do not generate notifications and are not included in digest notifications', 'subscribe2') . "</em></strong><br />\r\n";
+			echo "</p>";
+			$this->display_format_form($formats, explode(',', $this->subscribe2_options['exclude_formats']));
+		}
 
 		// Appearance options
 		echo "<h2>" . __('Appearance', 'subscribe2') . "</h2>\r\n";
@@ -2792,6 +2817,40 @@ class s2class {
 		echo "</td></tr>\r\n";
 		echo "</table>\r\n";
 	} // end display_category_form()
+
+	function display_format_form($formats, $selected = array()) {
+		$half = (count($formats[0]) / 2);
+		$i = 0;
+		$j = 0;
+		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"5\" class=\"editform\">\r\n";
+		echo "<tr><td align=\"left\" colspan=\"2\">\r\n";
+		echo "<label><input type=\"checkbox\" name=\"checkall\" value=\"checkall_format\" /> " . __('Select / Unselect All', 'subscribe2') . "</label>\r\n";
+		echo "</td></tr>\r\n";
+		echo "<tr valign=\"top\"><td width=\"50%\" align=\"left\">\r\n";
+		foreach ( $formats[0] as $format ) {
+			if ( $i >= $half && 0 == $j ){
+				echo "</td><td width=\"50%\" align=\"left\">\r\n";
+				$j++;
+			}
+
+			if ( 0 == $j ) {
+				echo "<label><input class=\"checkall_format\" type=\"checkbox\" name=\"format[]\" value=\"" . $format . "\"";
+				if ( in_array($format, $selected) ) {
+						echo " checked=\"checked\"";
+				}
+				echo " /> " . ucwords($format) . "</label><br />\r\n";
+			} else {
+				echo "<label><input class=\"checkall_format\" type=\"checkbox\" name=\"format[]\" value=\"" . $format . "\"";
+				if ( in_array($format, $selected) ) {
+							echo " checked=\"checked\"";
+				}
+				echo " /> " . ucwords($format) . "</label><br />\r\n";
+			}
+			$i++;
+		}
+		echo "</td></tr>\r\n";
+		echo "</table>\r\n";
+	} // end display_format_form()
 
 	/**
 	Display a table of authors with checkboxes
@@ -3640,6 +3699,13 @@ class s2class {
 			// is the current post private
 			// and should this not generate a notification email?
 			if ( $this->subscribe2_options['password'] == 'no' && $post->post_password != '' ) {
+				$check = true;
+			}
+			// is the post assigned a format that should
+			// not be included in the notification email?
+			$post_format = get_post_format($post->ID);
+			$excluded_formats = explode(',', $this->subscribe2_options['exclude_formats']);
+			if ( in_array($post_format, $excluded_format) ) {
 				$check = true;
 			}
 			// if this post is excluded

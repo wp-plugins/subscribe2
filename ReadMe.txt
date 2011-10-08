@@ -238,6 +238,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Show user name for Registered Users when mouse is hovered over email address in Subscribe2->Subscribers
 * Move IP address display on hover from date of signup to email address for Public Subscribers so consistent with above change
 * Introduced the 's2_capability' filter to allow API amendments to page access for different user capabilities
+* Added support to exclude 'post formats' from generating emails provided 'post formats' are supported by the current active theme
 
 = Version 6.5 by Matthew Robinson =
 
