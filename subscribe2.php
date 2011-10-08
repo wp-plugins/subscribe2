@@ -118,21 +118,21 @@ class s2class {
 	Hook the menu
 	*/
 	function admin_menu() {
-		add_menu_page (__('Subscribe2', 'subscribe2'), __('Subscribe2', 'subscribe2'), "read", 's2', NULL, S2URL . 'include/email_edit.png');
+		add_menu_page (__('Subscribe2', 'subscribe2'), __('Subscribe2', 'subscribe2'), apply_filters('s2_capability', "read", 'user'), 's2', NULL, S2URL . 'include/email_edit.png');
 
-		$s2user = add_submenu_page('s2', __('Your Subscriptions', 'subscribe2'), __('Your Subscriptions', 'subscribe2'), "read", 's2', array(&$this, 'user_menu'), S2URL . 'include/email_edit.png');
+		$s2user = add_submenu_page('s2', __('Your Subscriptions', 'subscribe2'), __('Your Subscriptions', 'subscribe2'), apply_filters('s2_capability', "read", 'user'), 's2', array(&$this, 'user_menu'), S2URL . 'include/email_edit.png');
 		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
 
-		$s2management = add_submenu_page('s2', __('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), "manage_options", 's2_tools', array(&$this, 'manage_menu'));
+		$s2management = add_submenu_page('s2', __('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'manage'), 's2_tools', array(&$this, 'manage_menu'));
 		add_action("admin_print_scripts-$s2management", array(&$this, 'checkbox_form_js'));
 
-		$s2options = add_submenu_page('s2', __('Settings', 'subscribe2'), __('Settings', 'subscribe2'), "manage_options", 's2_settings', array(&$this, 'options_menu'));
+		$s2options = add_submenu_page('s2', __('Settings', 'subscribe2'), __('Settings', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'settings'), 's2_settings', array(&$this, 'options_menu'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_scripts-$s2options", array(&$this, 'option_form_js'));
 		add_filter('plugin_row_meta', array(&$this, 'plugin_links'), 10, 2);
 
-		add_submenu_page('s2', __('Send Email', 'subscribe2'), __('Send Email', 'subscribe2'), "publish_posts", 's2_posts', array(&$this, 'write_menu'));
+		add_submenu_page('s2', __('Send Email', 'subscribe2'), __('Send Email', 'subscribe2'), apply_filters('s2_capability', "publish_posts", 'send'), 's2_posts', array(&$this, 'write_menu'));
 
 		$s2nonce = md5('subscribe2');
 	} // end admin_menu()
@@ -547,13 +547,13 @@ class s2class {
 				return $post;
 			}
 
-			// is this post set in the future?
+			// Is this post set in the future?
 			if ( $post->post_date > current_time('mysql') ) {
 				// bail out
 				return $post;
 			}
 
-			//Are we sending notifications for password protected posts?
+			// Are we sending notifications for password protected posts?
 			if ( $this->subscribe2_options['password'] == "no" && $post->post_password != '' ) {
 					return $post;
 			}
@@ -2248,9 +2248,9 @@ class s2class {
 
 		// excluded categories
 		echo "<h2>" . __('Excluded Categories', 'subscribe2') . "</h2>\r\n";
-		echo"<p>";
+		echo "<p>";
 		echo "<strong><em style=\"color: red\">" . __('Posts assigned to any Excluded Category do not generate notifications and are not included in digest notifications', 'subscribe2') . "</em></strong><br />\r\n";
-		echo"</p>";
+		echo "</p>";
 		$this->display_category_form(explode(',', $this->subscribe2_options['exclude']));
 		echo "<center><label><input type=\"checkbox\" name=\"reg_override\" value=\"1\"" . checked($this->subscribe2_options['reg_override'], '1', false) . " /> ";
 		echo __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</label></center><br />\r\n";

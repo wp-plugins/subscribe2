@@ -235,6 +235,9 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Introduced Opt-out by Author for Registered Users (on sites where there is more than one author)
 * Improved table layout code on user management page
 * Make use of core checked() function to save code space
+* Show user name for Registered Users when mouse is hovered over email address in Subscribe2->Subscribers
+* Move IP address display on hover from date of signup to email address for Public Subscribers so consistent with above change
+* Introduced the 's2_capability' filter to allow API amendments to page access for different user capabilities
 
 = Version 6.5 by Matthew Robinson =
 
