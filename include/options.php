@@ -107,8 +107,12 @@ if (!isset($this->subscribe2_options['entries'])) {
 } // option for the number of subscribers displayed on each page
 
 if (!isset($this->subscribe2_options['barred'])) {
-	$this->subscribe2_options['barred'] = '';
+	$this->subscribe2_options['barred'] = "";
 } // option containing domains barred from public registration
+
+if (!isset($this->subscribe2_options['exclude_formats'])) {
+	$this->subscribe2_options['exclude_formats'] = "";
+} // option for excluding post formats as supported by the current theme
 
 if (!isset($this->subscribe2_options['mailtext'])) {
 	$this->subscribe2_options['mailtext'] = __("{BLOGNAME} has posted a new item, '{TITLE}'\n\n{POST}\n\nYou may view the latest post at\n{PERMALINK}\n\nYou received this e-mail because you asked to be notified when new updates are posted.\nBest regards,\n{MYNAME}\n{EMAIL}", "subscribe2");
