@@ -178,22 +178,45 @@ If you opt for the latter way look in the options table for the subscribe2_optio
 
 In a plugin file for your site or perhaps functions.php in your theme add the following code where 'my_post_type' is change to the name of your custom post type.
 
-function my_post_types($types) {
+`function my_post_types($types) {
 	$types[] = 'my_post_type';
 	return $types;
 }
-add_filter('s2_post_types', 'my_post_types');
+add_filter('s2_post_types', 'my_post_types');`
 
 = How can I make use of the support for Custom Taxonomies =
 
 In a plugin file for your site or perhaps functions.php in your theme add the following code where 'my_
 taxonomy_type' is change to the name of your custom taxonomy type.
 
-function my_taxonomy_types($taxonomies) {
+`function my_taxonomy_types($taxonomies) {
 	$taxonomies[] = 'my_taxonomy_type';
 	return $taxonomies;
 }
-add_filter('s2_taxonomies', 'my_taxonomy_types');
+add_filter('s2_taxonomies', 'my_taxonomy_types');`
+
+= I want to change the kinds of users who can access the Subscribe2 mines. Is that possible? =
+
+Yes, it is possible with a little bit for code either in a custom plugin or your functions.php file in your theme. You use the 
+
+`function s2_admin_changes( $capability, $menu ) {
+	// $capability is the core WordPress capability to allow admin page access
+	// $menu is the title of the page:
+	//	'user' for access to personal subscription settings
+	//	'manage' to allow access to the user management screen
+	//	'settings' to allow access to the plugin settings
+	//	'send' for access to the Send Email page
+
+	// identify the menu you are changing capability for first
+	// then return a new capability
+	if ( $menu == 'send' ) {
+		return 'read';
+	}
+
+	return $capability;
+}
+
+add_filter('s2_capability', 's2_admin_changes', 10, 2);`
 
 = Can I suggest you add X as a feature =
 
