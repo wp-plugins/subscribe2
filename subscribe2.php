@@ -547,12 +547,6 @@ class s2class {
 				return $post;
 			}
 
-			// Is this post set in the future?
-			if ( $post->post_date > current_time('mysql') ) {
-				// bail out
-				return $post;
-			}
-
 			// Are we sending notifications for password protected posts?
 			if ( $this->subscribe2_options['password'] == "no" && $post->post_password != '' ) {
 					return $post;
@@ -561,7 +555,7 @@ class s2class {
 			// Is the post assigned to a format for which we should not be sending posts
 			$post_format = get_post_format($post->ID);
 			$excluded_formats = explode(',', $this->subscribe2_options['exclude_formats']);
-			if ( in_array($post_format, $excluded_formats) ) {
+			if ( $post_format !== false && in_array($post_format, $excluded_formats) ) {
 				return $post;
 			}
 
@@ -1327,9 +1321,9 @@ class s2class {
 		global $wpdb;
 
 		$useremails = explode(",", $emails);
-		$useremails = implode("', '", $useremails);
+		$useremails = "'" . implode("', '", $useremails) . "'";
 
-		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ('$useremails')";
+		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ($useremails)";
 		$user_IDs = $wpdb->get_col($sql);
 
 		foreach ( $user_IDs as $user_ID ) {
@@ -1359,11 +1353,8 @@ class s2class {
 		if ( empty($format) ) { return; }
 
 		global $wpdb;
-		$emails ='';
 		$subscribers = explode(',', $subscribers_string);
-		foreach ( $subscribers as $subscriber ) {
-			( '' == $emails) ? $emails = "'$subscriber'" : $emails .= ",'$subscriber'";
-		}
+		$emails = "'" . implode("', '", $subscribers) . "'";
 		$ids = $wpdb->get_col("SELECT ID FROM $wpdb->users WHERE user_email IN ($emails)");
 		$ids = implode(',', $ids);
 		$sql = "UPDATE $wpdb->usermeta SET meta_value='{$format}' WHERE meta_key='" . $this->get_usermeta_keyname('s2_format') . "' AND user_id IN ($ids)";
@@ -1378,9 +1369,9 @@ class s2class {
 
 		global $wpdb;
 		$useremails = explode(",", $emails);
-		$useremails = implode("', '", $useremails);
+		$useremails = "'" . implode("', '", $useremails) . "'";
 
-		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ('$useremails')";
+		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ($useremails)";
 		$user_IDs = $wpdb->get_col($sql);
 
 		if ( $digest == 'digest' ) {
@@ -3705,7 +3696,7 @@ class s2class {
 			// not be included in the notification email?
 			$post_format = get_post_format($post->ID);
 			$excluded_formats = explode(',', $this->subscribe2_options['exclude_formats']);
-			if ( in_array($post_format, $excluded_formats) ) {
+			if ( $post_format !== false && in_array($post_format, $excluded_formats) ) {
 				$check = true;
 			}
 			// if this post is excluded
@@ -3871,7 +3862,7 @@ class s2class {
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
-		if ( $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $this->public)) != $this->public ) { $this->install(); }
+		if ( $wpdb->get_var("SHOW TABLES LIKE '{$this->public}'") != $this->public ) { $this->install(); }
 		//do we need to upgrade anything?
 		if ( is_array($this->subscribe2_options) && $this->subscribe2_options['version'] !== S2VERSION ) {
 			add_action('shutdown', array(&$this, 'upgrade'));
