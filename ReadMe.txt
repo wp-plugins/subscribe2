@@ -123,12 +123,14 @@ This plugin sends emails to your subscribers using the BCC (Blind Carbon Copy) h
 
 = I can't find my subscribers / the options / something else =
 
-Subscribe2 creates four (4) new admin menus in the back end of WordPress.
+Subscribe2 creates four (4) new admin menus in the back end of WordPress. These are all under the top level menu header **Subscribe2**.
 
-* Posts -> Mail Subscribers : Allows users with Publish capabilities to send emails to your current subscribers
-* Tools -> Subscribers : Allows you to manually (un)subscribe users by email address, displays lists of currently subscribed users and allows you to bulk subscribe Registered Users
-* Users -> Subscriptions : Allows the currently logged in user to manage their own subscriptions
-* Settings -> Subscribe2 : Allows administrator level users to control many aspects of the plugins operation. It should be pretty self explanatory from the notes on the screen
+* Your Subscriptions : Allows the currently logged in user to manage their own subscriptions
+* Subscribers : Allows you to manually (un)subscribe users by email address, displays lists of currently subscribed users and allows you to bulk subscribe Registered Users
+* Settings : Allows administrator level users to control many aspects of the plugins operation. It should be pretty self explanatory from the notes on the screen
+* Send Mail : Allows users with Publish capabilities to send emails to your current subscribers
+
+**Note:** In versions of the plugin prior to version 7.0 the menus are under the WordPress system at Posts -> Mail Subscribers, Tools -> Subscribers, Users -> Subscriptions and Settings -> Subscribe2.
 
 = I'm confused, what are all the different types of subscriber? =
 
@@ -195,9 +197,9 @@ taxonomy_type' is change to the name of your custom taxonomy type.
 }
 add_filter('s2_taxonomies', 'my_taxonomy_types');`
 
-= I want to change the kinds of users who can access the Subscribe2 mines. Is that possible? =
+= I want to change the kinds of users who can access the Subscribe2 menus. Is that possible? =
 
-Yes, it is possible with a little bit for code either in a custom plugin or your functions.php file in your theme. You use the 
+Yes, it is possible with a little bit for code either in a custom plugin or your functions.php file in your theme. You use the add_filter() command that is part of WordPress to change the [capability](http://codex.wordpress.org/Roles_and_Capabilities#Capabilities) that allows access to each of the Subscribe2 menus. 
 
 `function s2_admin_changes( $capability, $menu ) {
 	// $capability is the core WordPress capability to allow admin page access
