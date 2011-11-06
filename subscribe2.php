@@ -50,11 +50,6 @@ if ( !in_array(ini_get('safe_mode'), $safe_mode) && ini_get('max_execution_time'
 	@ini_set('max_execution_time', 300);
 }
 
-/* Include buttonsnap library by Owen Winckler */
-if ( !class_exists('buttonsnap') ) {
-	require( S2PATH . 'include/buttonsnap.php' );
-}
-
 $mysubscribe2 = new s2class;
 $mysubscribe2->s2init();
 
@@ -3555,8 +3550,7 @@ class s2class {
 			add_filter('mce_external_plugins', array(&$this, 'mce3_plugin'));
 			add_filter('mce_buttons', array(&$this, 'mce3_button'));
 		} else {
-			buttonsnap_separator();
-			buttonsnap_jsbutton(S2URL . 'include/s2_button.png', __('Subscribe2', 'subscribe2'), 's2_insert_token();');
+			wp_enqueue_script('subscribe2_button', S2URL . 'include/s2_button.js', array('quicktags') );
 		}
 	} // end button_init()
 
@@ -3573,18 +3567,6 @@ class s2class {
 		$arr[] = 'subscribe2';
 		return $arr;
 	} // end mce3_button()
-
-	function s2_edit_form() {
-		echo "<!-- Start Subscribe2 Quicktags Javascript -->\r\n";
-		echo "<script type=\"text/javascript\">\r\n";
-		echo "//<![CDATA[\r\n";
-		echo "function s2_insert_token() {
-			buttonsnap_settext('[subscribe2]');
-		}\r\n";
-		echo "//]]>\r\n";
-		echo "</script>\r\n";
-		echo "<!-- End Subscribe2 Quicktags Javascript -->\r\n";
-	} // end s2_edit_form()
 
 /* ===== wp-cron functions ===== */
 	/**
