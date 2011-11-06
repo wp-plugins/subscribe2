@@ -34,9 +34,7 @@ AUTOMATIC INSTALLATION
 4. Configure the options to taste, including the email template and any categories which should be excluded from notification
 5. Click the "Tools" admin menu link, and select "Subscribers".
 6. Manually subscribe people as you see fit.
-7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the subscribe2 token.  Or, if you prefer, you may manually insert the subscribe2 shortcode or token:
-	[subscribe2] or the HTML invisible <!--subscribe2-->
-	***Ensure the token is on a line by itself and that it has a blank line above and below.***
+7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the subscribe2 token.  Or, if you prefer, you may manually insert the subscribe2 shortcode or token: [subscribe2] or the HTML invisible `<!--subscribe2-->` ***Ensure the token is on a line by itself and that it has a blank line above and below.***
 This token will automatically be replaced by dynamic subscription information and will display all forms and messages as necessary.
 8. In the WordPress "Settings" area for Subscribe2 select the page name in the "Appearance" section that of the WordPress page created in step 7.
 
@@ -47,9 +45,7 @@ MANUAL INSTALLATION
 4. Configure the options to taste, including the email template and any categories which should be excluded from notification
 5. Click the "Tools" admin menu link, and select "Subscribers".
 6. Manually subscribe people as you see fit.
-7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the subscribe2 token.  Or, if you prefer, you may manually insert the subscribe2 shortcode or token:
-	[subscribe2] or the HTML invisible <!--subscribe2-->
-	***Ensure the token is on a line by itself and that it has a blank line above and below.***
+7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the subscribe2 token.  Or, if you prefer, you may manually insert the subscribe2 shortcode or token: [subscribe2] or the HTML invisible `<!--subscribe2-->` ***Ensure the token is on a line by itself and that it has a blank line above and below.***
 This token will automatically be replaced by dynamic subscription information and will display all forms and messages as necessary.
 8. In the WordPress "Settings" area for Subscribe2 select the page name in the "Appearance" section that of the WordPress page created in step 7.
 
@@ -152,7 +148,7 @@ Get them to register with your blog rather than using the Subscribe2 form. Addit
 
 = How do I use the Subscribe2 shortcode? =
 
-In version 6.1 of Subscribe2 the new standard WordPress shortcode [subscribe2] was introduced. By default, it behaves same as old Subscribe2 token, <--subscribe2-->, which means that it will show the same Subscribe2 output in your chosen page in WordPress or in the Widget.
+In version 6.1 of Subscribe2 the new standard WordPress shortcode [subscribe2] was introduced. By default, it behaves same as old Subscribe2 token, `<--subscribe2-->`, which means that it will show the same Subscribe2 output in your chosen page in WordPress or in the Widget.
 
 But it also has advanced options, which are related to form. The default form contains two buttons for subscribing and unsubscribing. You may, for example, only want form that handles unsubscribing, so the shortcode accepts a **hide** parameter to hide one of the buttons.
 
@@ -199,7 +195,7 @@ add_filter('s2_taxonomies', 'my_taxonomy_types');`
 
 = I want to change the kinds of users who can access the Subscribe2 menus. Is that possible? =
 
-Yes, it is possible with a little bit for code either in a custom plugin or your functions.php file in your theme. You use the add_filter() command that is part of WordPress to change the [capability](http://codex.wordpress.org/Roles_and_Capabilities#Capabilities) that allows access to each of the Subscribe2 menus. 
+Yes, it is possible with a little bit for code either in a custom plugin or your functions.php file in your theme. You use the add_filter() command that is part of WordPress to change the [capability](http://codex.wordpress.org/Roles_and_Capabilities#Capabilities) that allows access to each of the Subscribe2 menus.
 
 `function s2_admin_changes( $capability, $menu ) {
 	// $capability is the core WordPress capability to allow admin page access
