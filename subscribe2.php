@@ -2804,6 +2804,9 @@ class s2class {
 		echo "</table>\r\n";
 	} // end display_category_form()
 
+	/**
+	Display a table of post formats supported by the currently active theme
+	*/
 	function display_format_form($formats, $selected = array()) {
 		$half = (count($formats[0]) / 2);
 		$i = 0;
