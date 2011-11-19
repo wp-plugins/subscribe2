@@ -2174,6 +2174,15 @@ class s2class {
 		echo __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
 		echo "<label><input type=\"radio\" name=\"pages\" value=\"no\"" . checked($this->subscribe2_options['pages'], 'no', false) . " /> ";
 		echo __('No', 'subscribe2') . "</label><br /><br />\r\n";
+		$s2_post_types = apply_filters('s2_post_types', NULL);
+		if ( !empty($s2_post_types) ) {
+			$types = '';
+			echo __('Subscribe2 will send email notifications for the following custom post types', 'subscribe2') . ': <strong>';
+			foreach ($s2_post_types as $type) {
+				('' == $types) ? $types = ucwords($type) : $types .= ", " . ucwords($type);
+			}
+			echo $types . "</strong><br /><br />\r\n";
+		}
 		echo __('Send Emails for Password Protected Posts', 'subscribe2') . ': ';
 		echo "<label><input type=\"radio\" name=\"password\" value=\"yes\"" . checked($this->subscribe2_options['password'], 'yes', false) . " /> ";
 		echo __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
