@@ -143,15 +143,18 @@ class s2class {
 	Insert Javascript and CSS into admin_header
 	*/
 	function checkbox_form_js() {
-		wp_enqueue_script('s2_checkbox', S2URL . 'include/s2_checkbox' . $this->script_debug . '.js', array('jquery'), '1.1');
+		wp_register_script('s2_checkbox', S2URL . 'include/s2_checkbox' . $this->script_debug . '.js', array('jquery'), '1.1');
+		wp_enqueue_script('s2_checkbox');
 	} //end checkbox_form_js()
 
 	function user_admin_css() {
-		wp_enqueue_style('s2_user_admin', S2URL . 'include/s2_user_admin.css', array(), '1.0');
+		wp_register_style('s2_user_admin', S2URL . 'include/s2_user_admin.css', array(), '1.0');
+		wp_enqueue_script('s2_user_admin');
 	} // end user_admin_css()
 
 	function option_form_js() {
-		wp_enqueue_script('s2_edit', S2URL . 'include/s2_edit' . $this->script_debug . '.js', array('jquery'), '1.0');
+		wp_register_script('s2_edit', S2URL . 'include/s2_edit' . $this->script_debug . '.js', array('jquery'), '1.0');
+		wp_enqueue_script('s2_edit');
 	} // end option_form_js()
 
 /* ===== Install, upgrade, reset ===== */
@@ -2987,7 +2990,7 @@ class s2class {
 		}
 
 		if ( $inc_author ) {
-			$author[] = (object)array('ID' => 'author', 'display_name' => 'Post Author');
+			$author[] = (object)array('ID' => 'author', 'display_name' => __('Post Author', 'subscribe2'));
 			$author[] = (object)array('ID' => 'blogname', 'display_name' => html_entity_decode(get_option('blogname'), ENT_QUOTES));
 			$admins = array_merge($author, $admins);
 		}
@@ -3507,9 +3510,12 @@ class s2class {
 	function widget_s2counter_css_and_js() {
 		// ensure we only add colorpicker js to widgets page
 		if ( stripos($_SERVER['REQUEST_URI'], 'widgets.php' ) !== false ) {
-			wp_enqueue_style('colorpicker', S2URL . 'include/colorpicker/css/colorpicker.css', '', '20090523'); // colorpicker css
-			wp_enqueue_script('colorpicker_js', S2URL . 'include/colorpicker/js/colorpicker' . $this->script_debug . '.js', array('jquery'), '20090523'); // colorpicker js
-			wp_enqueue_script('s2_colorpicker', S2URL . 'include/s2_colorpicker' . $this->script_debug . '.js', array('colorpicker_js'), '1.3'); //my js
+			wp_register_style('colorpicker', S2URL . 'include/colorpicker/css/colorpicker.css', '', '20090523'); // colorpicker css
+			wp_register_script('colorpicker_js', S2URL . 'include/colorpicker/js/colorpicker' . $this->script_debug . '.js', array('jquery'), '20090523'); // colorpicker js
+			wp_register_script('s2_colorpicker', S2URL . 'include/s2_colorpicker' . $this->script_debug . '.js', array('colorpicker_js'), '1.3'); //my js
+			wp_enqueue_style('colorpicker');
+			wp_enqueue_script('colorpicker_js');
+			wp_enqueue_script('s2_colorpicker');
 		}
 	} // end widget_s2_counter_css_and_js()
 
@@ -3959,6 +3965,8 @@ class s2class {
 	var $excluded_cats = '';
 	var $post_title = '';
 	var $permalink = '';
+	var $post_date = '';
+	var $post_time = '';
 	var $myname = '';
 	var $myemail = '';
 	var $signup_dates = array();
