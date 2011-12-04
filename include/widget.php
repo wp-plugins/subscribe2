@@ -6,9 +6,9 @@ class S2_Form_widget extends WP_Widget {
 	function S2_Form_widget() {
 		$widget_ops = array('classname' => 's2_form_widget', 'description' => __('Sidebar Widget for Subscribe2', 'subscribe2') );
 		$control_ops = array('width' => 250, 'height' => 300);
-		$this->WP_Widget('s2_form_widget', __('Subscribe2 Widget'), $widget_ops, $control_ops);
+		$this->WP_Widget('s2_form_widget', __('Subscribe2 Widget', 'subscribe2'), $widget_ops, $control_ops);
 	}
-	
+
 	/**
 	Displays the Widget
 	*/
@@ -41,7 +41,7 @@ class S2_Form_widget extends WP_Widget {
 		echo "</div>";
 		echo $after_widget;
 	}
-	
+
 	/**
 	Saves the widgets settings.
 	*/
@@ -53,10 +53,10 @@ class S2_Form_widget extends WP_Widget {
 		$instance['widgetpostcontent'] = stripslashes($new_instance['widgetpostcontent']);
 		$instance['hidebutton'] = strip_tags(stripslashes($new_instance['hidebutton']));
 		$instance['postto'] = stripslashes($new_instance['postto']);
-		
+
 		return $instance;
 	}
-	
+
 	/**
 	Creates the edit form for the widget.
 	*/
@@ -71,7 +71,7 @@ class S2_Form_widget extends WP_Widget {
 		}
 		// code to obtain old settings too
 		$instance = wp_parse_args( (array) $instance, $defaults);
-		
+
 		$title = htmlspecialchars($instance['title'], ENT_QUOTES);
 		$div= htmlspecialchars($instance['div'], ENT_QUOTES);
 		$widgetprecontent = htmlspecialchars($instance['widgetprecontent'], ENT_QUOTES);
