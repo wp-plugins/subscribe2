@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 7.0-beta
+Version: 7.0
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -389,8 +389,9 @@ class s2class {
 			$mailtext = apply_filters('s2_plain_email', $message);
 		}
 
-		// Replace any escaped html symbols in subject
+		// Replace any escaped html symbols in subject then apply filter
 		$subject = html_entity_decode($subject, ENT_QUOTES);
+		$subject = apply_filters('s2_email_subject', $subject);
 
 		// Construct BCC headers for sending or send individual emails
 		$bcc = '';
@@ -3553,7 +3554,7 @@ class s2class {
 	*/
 	function add_minimeta() {
 		if ( $this->subscribe2_options['s2page'] != 0 ) {
-			echo "<li><a href=\"" . get_option('siteurl') . "/?page_id=" . $this->subscribe2_options['s2page'] . "\">" . __('[Un]Subscribe to Posts', 'subscribe2') . "</a></li>\r\n";
+			echo "<li><a href=\"" . get_permalink($this->subscribe2_options['s2page']) . "\">" . __('[Un]Subscribe to Posts', 'subscribe2') . "</a></li>\r\n";
 		}
 	} // end add_minimeta()
 
