@@ -3912,12 +3912,6 @@ class s2class {
 			add_filter('ozh_adminmenu_icon_s2_settings', array(&$this, 'ozh_s2_icon'));
 		}
 
-		// add action to display editor buttons if option is enabled
-		if ( '1' == $this->subscribe2_options['show_button'] ) {
-			add_action('edit_page_form', array(&$this, 's2_edit_form'));
-			add_action('edit_form_advanced', array(&$this, 's2_edit_form'));
-		}
-
 		// add actions for automatic subscription based on option settings
 		add_action('register_form', array(&$this, 'register_form'));
 		add_action('user_register', array(&$this, 'register_post'));
