@@ -2,8 +2,8 @@
 Contributors: MattyRob, Skippy, RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
-Requires at least: 2.8
-Tested up to: 3.2.1
+Requires at least: 3.1
+Tested up to: 3.3-RC2
 Stable tag: 6.5
 
 Sends a list of subscribers an email notification when new posts are published to your blog
@@ -193,6 +193,29 @@ taxonomy_type' is change to the name of your custom taxonomy type.
 }
 add_filter('s2_taxonomies', 'my_taxonomy_types');`
 
+= How do I make use of the new option to AJAXify the form? =
+
+The first thing you will need to do is visit the options page and enable the AJAX setting where it says "Enable AJAX style subscription form?", this will load the necessary javascript onto your WordPress site.
+
+Next you need to decide if you want the link to be on a WordPress page or in your Sidebar with the Widget.
+
+For a WordPress page you use the normal Subscribe2 token but add a 'link' parameter with the text you'd like your users to click, so something like:
+
+`[subscribe2 link="Click Here to Subscribe"]`
+
+For Sidebar users, visit the Widgets page and look in the Subscribe2 Widget, there is a new option at the bottom called "Show as link". If you choose this a link will be placed in your sidebar that displays the form when clicked.
+
+In either case, if your end users have javascript disabled in their browser the link will sinply take them through to the subscription page you are recommended to create at step 7 of the install instructions.
+
+The final thing to mention is the styling of the form. The CSS taken from the jQuery-UI libraries and there are several to choose from. I quite link darkness-ui and that is the styling used by default. But what if you want to change this?
+
+Well, you need to write a little code and provide a link to the Google API or Microsoft CDN hosted CSS theme you prefer. The example below changes the theme from ui-darkness to ui-lightness. More choice are detailed on the [jQuery release blog](http://blog.jqueryui.com/2011/08/jquery-ui-1-8-16/) where the them names are listed and linked to the address you'll need.
+
+`function custom_ajax_css() {
+	return "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css";
+}
+add_filter('s2_jqueryui_css', 'custom_ajax_css');`
+
 = I want to change the kinds of users who can access the Subscribe2 menus. Is that possible? =
 
 Yes, it is possible with a little bit for code either in a custom plugin or your functions.php file in your theme. You use the add_filter() command that is part of WordPress to change the [capability](http://codex.wordpress.org/Roles_and_Capabilities#Capabilities) that allows access to each of the Subscribe2 menus.
@@ -216,6 +239,16 @@ Yes, it is possible with a little bit for code either in a custom plugin or your
 
 add_filter('s2_capability', 's2_admin_changes', 10, 2);`
 
+= I want to change the email subject, how do I do that? =
+
+You can change the email subject with the 's2_email_subject' filter. Something like this:
+
+`function s2_subject_changes($subject) {
+	return "This is my preferred email subject";
+}
+
+add_filter('s2_email_subject', 's2_subject_changes');`
+
 = Can I suggest you add X as a feature =
 
 I'm open to suggestions but since the software is written by me for use on my site and then shared for free because others may find it useful as it comes don't expect your suggestion to be implemented unless I'll find it useful.
@@ -226,7 +259,9 @@ By default Public Subscribers get plain text emails and only Registered Subscrib
 
 = Which version should I be using, I'm on WordPress x.x.x? =
 
-WordPress 2.8 and up requires Subscribe2 from the 6.x stable branch. The most recent version is hosted via [Wordpress.org](http://wordpress.org/extend/plugins/subscribe2/).
+WordPress 3.1 and up requres Subscribe2 from the 7.x stable branch. The most recent version is hosted via [Wordpress.org](http://wordpress.org/extend/plugins/subscribe2/).
+
+WordPress 2.8 and up requires Subscribe2 from the 6.x stable branch. The most recenet version is [6.5](http://downloads.wordpress.org/plugin/subscribe2.6.5.zip).
 
 WordPress 2.3.x through to 2.7.x require Subscribe2 from the 4.x or 5.x stable branch. The most recent version is [5.9](http://downloads.wordpress.org/plugin/subscribe2.5.9.zip).
 
@@ -261,6 +296,11 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Introduced the 's2_capability' filter to allow API amendments to page access for different user capabilities
 * Added support to exclude 'post formats' from generating emails provided 'post formats' are supported by the current active theme
 * Implemented use of core WordPress functions to place the authoring button shortcuts, removed reliance on buttonsnap.php so this library is now dropped
+* Implement use of wp_register_scripts() function
+* Display custom post types added using the API in the Settings page as confirmation things are working
+* Added two missed strings to the translation domain and corrected a typo - thanks to Stig Ulfsby
+* Added a filter for the outgoing email subject line
+* Added an option to AJAXify the form, read the FAQs for how to use this new feature
 
 = Version 6.5 by Matthew Robinson =
 

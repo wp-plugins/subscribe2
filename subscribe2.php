@@ -2104,6 +2104,10 @@ class s2class {
 				( $_POST['show_button'] == '1' ) ? $showbutton = '1' : $showbutton = '0';
 				$this->subscribe2_options['show_button'] = $showbutton;
 
+				// enable AJAX style form
+				( $_POST['ajax'] == '1' ) ? $ajax = '1' : $ajax = '0';
+				$this->subscribe2_options['ajax'] = $ajax;
+
 				// show widget in Presentation->Widgets
 				( $_POST['widget'] == '1' ) ? $showwidget = '1' : $showwidget = '0';
 				$this->subscribe2_options['widget'] = $showwidget;
@@ -2305,6 +2309,10 @@ class s2class {
 		// show QuickTag button
 		echo "<label><input type=\"checkbox\" name=\"show_button\" value=\"1\"" . checked($this->subscribe2_options['show_button'], '1', false) . " /> ";
 		echo __('Show the Subscribe2 button on the Write toolbar?', 'subscribe2') . "</label><br /><br />\r\n";
+
+		// enable AJAX style form
+		echo "<label><input type=\"checkbox\" name=\"ajax\" value=\"1\"" . checked($this->subscribe2_options['ajax'], '1', false) . " />";
+		echo __('Enable AJAX style subscription form?', 'subscribe2') . "</label><br /><br />\r\n";
 
 		// show Widget
 		echo "<label><input type=\"checkbox\" name=\"widget\" value=\"1\"" . checked($this->subscribe2_options['widget'], '1', false) . " /> ";
@@ -3361,8 +3369,16 @@ class s2class {
 		extract(shortcode_atts(array(
 			'hide'  => '',
 			'id'    => '',
-			'url' => ''
+			'url' => '',
+			'nojs' => 'false',
+			'link' => ''
 			), $atts));
+
+		// if link is true return a link to the page with the ajax class
+		if ( $link !== '' && !is_user_logged_in() ) {
+			$this->s2form = "<a href=\"" . get_permalink($this->subscribe2_options['s2page']) . "\" class=\"s2popup\">" . $link . "</a>\r\n";
+			return $this->s2form;
+		}
 
 		// if a button is hidden, show only other
 		if ( $hide == 'subscribe' ) {
@@ -3378,7 +3394,11 @@ class s2class {
 			$url = get_permalink( $id );
 		}
 		// build default form
-		$this->form = "<form method=\"post\" action=\"" . $url . "\"><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . __('Enter email address...', 'subscribe2') . "\" size=\"20\" onfocus=\"if (this.value == '" . __('Enter email address...', 'subscribe2') . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . __('Enter email address...', 'subscribe2') . "';}\" /></p><p>" . $this->input_form_action . "</p></form>\r\n";
+		if ( $nojs == 'true' ) {
+			$this->form = "<form method=\"post\" action=\"" . $url . "\"><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"\" size=\"20\" /></p><p>" . $this->input_form_action . "</p></form>";
+		} else {
+			$this->form = "<form method=\"post\" action=\"" . $url . "\"><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . __('Enter email address...', 'subscribe2') . "\" size=\"20\" onfocus=\"if (this.value == '" . __('Enter email address...', 'subscribe2') . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . __('Enter email address...', 'subscribe2') . "';}\" /></p><p>" . $this->input_form_action . "</p></form>\r\n";
+		}
 		$this->s2form = $this->form;
 
 		global $user_ID;
@@ -3557,6 +3577,39 @@ class s2class {
 			echo "<li><a href=\"" . get_permalink($this->subscribe2_options['s2page']) . "\">" . __('[Un]Subscribe to Posts', 'subscribe2') . "</a></li>\r\n";
 		}
 	} // end add_minimeta()
+
+	/**
+	Add jQuery code and CSS to front pages for ajax form
+	*/
+	function add_ajax() {
+		// enqueue the jQuery script we need and let WordPress handle the dependencies
+		wp_enqueue_script('jquery-ui-dialog');
+		wp_register_style('jquery-ui-style', apply_filters('s2_jqueryui_css', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-darkness/jquery-ui.css'));
+		wp_enqueue_style('jquery-ui-style');
+	} // end add_ajax()
+
+	/**
+	Write Subscribe2 form js code dynamically so we can pull WordPress functions
+	*/
+	function add_s2_ajax() {
+		echo "<script type=\"text/javascript\">\r\n";
+		echo "//<![CDATA[\r\n";
+		echo "jQuery(document).ready(function() {\r\n";
+		echo "	var dialog = jQuery('<div></div>')\r\n";
+		echo "	.html('" . do_shortcode('[subscribe2 nojs="true"]') . "')\r\n";
+		if ( $this->s2form != $this->form && !is_user_logged_in() ) {
+			echo "	.dialog({modal: true, zIndex: 10000, title: '" . __('Subscribe to this blog', 'subscribe2') . "'});\r\n";
+		} else {
+			echo "	.dialog({autoOpen: false, modal: true, zIndex: 10000, title: '" . __('Subscribe to this blog', 'subscribe2') . "'});\r\n";
+		}
+		echo "	jQuery('a.s2popup').click(function(){\r\n";
+		echo "		dialog.dialog('open');\r\n";
+		echo "		return false;\r\n";
+		echo "	});\r\n";
+		echo "});\r\n";
+		echo "//]]>\r\n";
+		echo "</script>\r\n";
+	} // end add_s2_ajax()
 
 /* ===== Write Toolbar Button Functions ===== */
 	/**
@@ -3902,6 +3955,12 @@ class s2class {
 		// add actions for other plugins
 		if ( '1' == $this->subscribe2_options['show_meta'] ) {
 			add_action('wp_meta', array(&$this, 'add_minimeta'), 0);
+		}
+
+		// add actions for ajax form if enabled
+		if ( '1' == $this->subscribe2_options['ajax'] ) {
+			add_action('wp_enqueue_scripts', array(&$this, 'add_ajax'));
+			add_action('wp_head', array(&$this, 'add_s2_ajax'));
 		}
 
 		// Add filters for Ozh Admin Menu
