@@ -3616,6 +3616,8 @@ class s2class {
 	Register our button in the QuickTags bar
 	*/
 	function button_init() {
+		global $pagenow;
+		if ( !in_array($pagenow, array('post-new.php', 'post.php', 'page-new.php', 'page.php')) ) { return; }
 		if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) { return; }
 		if ( 'true' == get_user_option('rich_editing') ) {
 			// Hook into the rich text editor
@@ -3880,7 +3882,7 @@ class s2class {
 
 		add_action('init', array(&$this, 'subscribe2'));
 		if ( '1' == $this->subscribe2_options['show_button'] ) {
-			add_action('init', array(&$this, 'button_init'));
+			add_action('admin_init', array(&$this, 'button_init'));
 		}
 
 		// add action to display widget if option is enabled
