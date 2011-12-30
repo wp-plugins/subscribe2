@@ -87,13 +87,29 @@ Note that if you ever change your site theme, you'll need to copy these addition
 = Some or all email notifications fail to send, why?  =
 In the first instance ***check this with your hosting provider***, they have access to your server logs and will be able to tell you where and why emails are being blocked.
 
-Some hosting providers place a restriction on the maximum number of recipients in any one email message.  Some hosts simply block all emails on certain low-cost hosting plans.
+This is by far the most common question I am asked and the most frequent issue that arises. Without fail it is always down to a server side limitation or restriction.
 
-Subscribe2 provides a facility to work around this restriction by sending batches of emails.  To enable this feature, go to Settings->Subscribe2 and located the setting to restrict the number of recipients per email. If this is set to 30 then each outgoing email notification will only contain addresses for 30 recipients.
+These restrictions broadly fall into one of three areas. These are the sender details, the header details and restrictions on the number of messages sent.
+
+***Sender Details***. You may need to ensure that the email notification is being sent from an email address on the same domain as your blog. So, if your blog is http://www.example.com the email should be something like admin@example.com. To do this go to Subscribe2->Settings and carefully select from the dropdown list where is says "Send Email From". Here you will see "Post Author", then the name of your blog and then the names of your administrator level users. It may be wise to set up a dummy user account specifically to send the emails from and make sure you give that account an on domain email address.
+
+***Header Details***. Some hosting providers place a restriction on the maximum number of recipients in any one email message.  Some hosts simply block all emails on certain low-cost hosting plans.
+
+Subscribe2 provides a facility to work around a restriction of the maximum number of recipients per email by sending batches of emails.  To enable this feature, go to Settings->Subscribe2 and located the setting to restrict the number of recipients per email. If this is set to 30 then each outgoing email notification will only contain addresses for 30 recipients.
 
 Reminder: because subscribe2 places all recipients in BCC fields, and places the blog admin in the TO field, the blog admin will receive one email per batched delivery.  So if you have 90 subscribers, the blog admin should receive three post notification emails, one for each set of 30 BCC recipients.
 
-Batches will occur for each group of message as described above.  A site on Dreamhost with many public and registered subscribers could conceivably generate a lot of email for your own inbox.
+Batches will occur for each group of message as described above.  A site like this with many public and registered subscribers could conceivably generate a lot of email for your own inbox.
+
+***Restrictions on the number of messages sent***. In order to combat spam many hosts are now implementing time based limitations. This means you are only allowed to send a certain number of messages per unit time, 500 per hour for example. Subscribe2 does not have a work around for this inbuilt but see the next question.
+
+= My host has a limit of X emails per hour / day, can I limit the way Subscribe2 sends emails? =
+
+This is the second most common question I get asked (the first being about emails not being sent which quote often ends up here anyway!). This is more commonly called 'throttling' or 'choking'. PHP is a scripting language and while it is technically possible to throttle emails using script it is not very efficient. It is much better in terms of speed and server overhead (CPU cycles and RAM) to throttle using a server side application.
+
+In the first instance you should try to solve the problem by speaking to your hosting provider about changing the restrictions, move to a less restricting hosting package or change hosting providers.
+
+If the above has not put you off then I spent some time writing a Mail Queue script for Subscribe2 that adds the mails to a database table and sends then in periodic batches. It is available, at a price, [here](http://wpplugins.com/plugin/76/wordpress-mail-queue-wpmq).
 
 = When I click on Send Preview in Settings->Susbcribe2 I get 4 emails, why =
 
@@ -104,14 +120,6 @@ Subscribe2 supports 4 potential email formats for Susbcribers so you will get a 
 Subscribe2 uses a filter system to display dynamic output to your readers. The token may result in the display of the subscription form, a subscription message, confirmation that an email has been sent, a prompt to log in. This information needs a static location for the output of the filter and a WordPress page is the ideal place for this to happen.
 
 If you decide to use Subscribe2 only using the widget you must still have at least one WordPress page on your site for Subscribe2 to work correctly.
-
-= My host has a limit of X emails per hour / day, can I limit the way Subscribe2 sends emails? =
-
-This is the second most common question I get asked (the first being about emails not being sent which quote often ends up here anyway!). This is more commonly called 'throttling' or 'choking'. PHP is a scripting language and while it is technically possible to throttle emails using script it is not very efficient. It is much better in terms of speed and server overhead (CPU cycles and RAM) to throttle using a server side application.
-
-In the first instance you should try to solve the problem by speaking to your hosting provider about changing the restrictions, move to a less restricting hosting package or change hosting providers.
-
-If the above has not put you off then I spent some time writing a Mail Queue script for Subscribe2 that adds the mails to a database table and sends then in periodic batches. It is available, at a price, [here](http://wpplugins.com/plugin/76/wordpress-mail-queue-wpmq).
 
 = Why is my admin address getting emails from Subscribe2? =
 
