@@ -85,15 +85,15 @@ Subscribe2 does not maintain a separate stylesheet for the emails it generates. 
 Note that if you ever change your site theme, you'll need to copy these additions over to the new theme's stylesheet. To avoid this problem, consider placing a custom CSS file on your server outside of your theme directory, and link to it from the template, thus overriding the active theme styles permanently.
 
 = Some or all email notifications fail to send, why?  =
-In the first instance ***check this with your hosting provider***, they have access to your server logs and will be able to tell you where and why emails are being blocked.
+In the first instance **check this with your hosting provider**, they have access to your server logs and will be able to tell you where and why emails are being blocked.
 
 This is by far the most common question I am asked and the most frequent issue that arises. Without fail it is always down to a server side limitation or restriction.
 
 These restrictions broadly fall into one of three areas. These are the sender details, the header details and restrictions on the number of messages sent.
 
-***Sender Details***. You may need to ensure that the email notification is being sent from an email address on the same domain as your blog. So, if your blog is http://www.example.com the email should be something like admin@example.com. To do this go to Subscribe2->Settings and carefully select from the dropdown list where is says "Send Email From". Here you will see "Post Author", then the name of your blog and then the names of your administrator level users. It may be wise to set up a dummy user account specifically to send the emails from and make sure you give that account an on domain email address.
+**Sender Details**. You may need to ensure that the email notification is being sent from an email address on the same domain as your blog. So, if your blog is http://www.example.com the email should be something like admin@example.com. To do this go to Subscribe2->Settings and carefully select from the dropdown list where is says "Send Email From". Here you will see "Post Author", then the name of your blog and then the names of your administrator level users. It may be wise to set up a dummy user account specifically to send the emails from and make sure you give that account an on domain email address.
 
-***Header Details***. Some hosting providers place a restriction on the maximum number of recipients in any one email message.  Some hosts simply block all emails on certain low-cost hosting plans.
+**Header Details**. Some hosting providers place a restriction on the maximum number of recipients in any one email message.  Some hosts simply block all emails on certain low-cost hosting plans.
 
 Subscribe2 provides a facility to work around a restriction of the maximum number of recipients per email by sending batches of emails.  To enable this feature, go to Settings->Subscribe2 and located the setting to restrict the number of recipients per email. If this is set to 30 then each outgoing email notification will only contain addresses for 30 recipients.
 
@@ -101,7 +101,7 @@ Reminder: because subscribe2 places all recipients in BCC fields, and places the
 
 Batches will occur for each group of message as described above.  A site like this with many public and registered subscribers could conceivably generate a lot of email for your own inbox.
 
-***Restrictions on the number of messages sent***. In order to combat spam many hosts are now implementing time based limitations. This means you are only allowed to send a certain number of messages per unit time, 500 per hour for example. Subscribe2 does not have a work around for this inbuilt but see the next question.
+**Restrictions on the number of messages sent**. In order to combat spam many hosts are now implementing time based limitations. This means you are only allowed to send a certain number of messages per unit time, 500 per hour for example. Subscribe2 does not have a work around for this inbuilt but see the next question.
 
 = My host has a limit of X emails per hour / day, can I limit the way Subscribe2 sends emails? =
 

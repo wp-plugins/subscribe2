@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 7.0.1
+Version: 7.1
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -30,8 +30,7 @@ You should have received a copy of the GNU General Public License
 along with Subscribe2. If not, see <http://www.gnu.org/licenses/>.
 */
 
-global $wp_version;
-if ( version_compare($wp_version, '3.1', '<') ) {
+if ( version_compare($GLOBALS['wp_version'], '3.1', '<') ) {
 	// Subscribe2 needs WordPress 3.1 or above, exit if not on a compatible version
 	$exit_msg = sprintf(__('This version of Subscribe2 requires WordPress 3.1 or greater. Please update %1$s or use an older version of %2$s.', 'subscribe2'), '<a href="http://codex.wordpress.org/Updating_WordPress">Wordpress</a>', '<a href="http://wordpress.org/extend/plugins/subscribe2/download/">Subscribe2</a>');
 	exit($exit_msg);
@@ -39,7 +38,7 @@ if ( version_compare($wp_version, '3.1', '<') ) {
 
 // our version number. Don't touch this or any line below
 // unless you know exactly what you are doing
-define( 'S2VERSION', '7.0.1' );
+define( 'S2VERSION', '7.1' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', trailingslashit(dirname(plugin_basename(__FILE__))) );
 define( 'S2URL', plugin_dir_url(dirname(__FILE__)) . S2DIR );
@@ -2369,10 +2368,8 @@ class s2class {
 		echo "<label><input type=\"radio\" name=\"autosub_def\" value=\"no\"" . checked($this->subscribe2_options['autosub_def'], 'no', false) . " /> ";
 		echo __('No', 'subscribe2') . "</label><br /><br />";
 		echo __('Display checkbox to allow subscriptions from the comment form', 'subscribe2') . ": <br />\r\n";
-		if ( version_compare($wp_version, '3.0', '>') ) {
-			echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"before\"" . checked($this->subscribe2_options['comment_subs'], 'before', false) . " /> ";
-			echo __('Before the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp;";
-		}
+		echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"before\"" . checked($this->subscribe2_options['comment_subs'], 'before', false) . " /> ";
+		echo __('Before the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp;";
 		echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"after\"" . checked($this->subscribe2_options['comment_subs'], 'after', false) . " /> ";
 		echo __('After the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp;";
 		echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"no\"" . checked($this->subscribe2_options['comment_subs'], 'no', false) . " /> ";
@@ -3632,7 +3629,7 @@ class s2class {
 	Add buttons for Rich Text Editor
 	*/
 	function mce3_plugin($arr) {
-		$path = S2URL . 'tinymce3/editor_plugin.js';
+		$path = S2URL . 'tinymce3/editor_plugin' . $this->script_debug . '.js';
 		$arr['subscribe2'] = $path;
 		return $arr;
 	} // end mce3_plugin()
