@@ -1799,14 +1799,17 @@ class s2class {
 		if ( function_exists('wp_nonce_field') ) {
 			wp_nonce_field('subscribe2-manage_subscribers' . $s2nonce);
 		}
+		echo "<div class=\"s2_admin\" id=\"s2_add_subscribers\">\r\n";
 		echo "<h2>" . __('Add/Remove Subscribers', 'subscribe2') . "</h2>\r\n";
 		echo "<p>" . __('Enter addresses, one per line or comma-separated', 'subscribe2') . "<br />\r\n";
 		echo "<textarea rows=\"2\" cols=\"80\" name=\"addresses\"></textarea></p>\r\n";
 		echo "<input type=\"hidden\" name=\"s2_admin\" />\r\n";
 		echo "<p class=\"submit\" style=\"border-top: none;\"><input type=\"submit\" class=\"button-primary\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" />";
 		echo "&nbsp;<input type=\"submit\" class=\"button-primary\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" /></p>\r\n";
+		echo "</div>\r\n";
 
 		// subscriber lists
+		echo "<div class=\"s2_admin\" id=\"s2_current_subscribers\">\r\n";
 		echo "<h2>" . __('Current Subscribers', 'subscribe2') . "</h2>\r\n";
 		echo "<br />";
 		$this->display_subscriber_dropdown($what, __('Filter', 'subscribe2'));
@@ -1896,10 +1899,12 @@ class s2class {
 			echo "<td colspan=\"3\" align=\"right\">" . $strip . "</td></tr>\r\n";
 		}
 		echo "</table>\r\n";
+		echo "</div>\r\n";
 
 		// show bulk managment form if filtered in some Registered Users
 		if ( in_array($what, array('registered', 'all_users')) || is_numeric($what) ) {
 			$subscribers_string = implode(',', $subscribers);
+			echo "<div class=\"s2_admin\" id=\"s2_bulk_manage\">\r\n";
 			echo "<h2>" . __('Bulk Management', 'subscribe2') . "</h2>\r\n";
 			if ( $this->subscribe2_options['email_freq'] == 'never' ) {
 				echo __('Preferences for Registered Users selected in the filter above can be changed using this section.', 'subscribe2') . "<br />\r\n";
@@ -1928,6 +1933,7 @@ class s2class {
 				echo "<input type=\"hidden\" name=\"emails\" value=\"$subscribers_string\" />\r\n";
 				echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_digest\" value=\"" . __('Bulk Update Digest Subscription', 'subscribe2') . "\" /></p>";
 			}
+			echo "</div>\r\n";
 		}
 		echo "</form></div>\r\n";
 
@@ -2151,6 +2157,7 @@ class s2class {
 		echo "<input type=\"hidden\" id=\"jsentries\" value=\"" . $this->subscribe2_options['entries'] . "\" />";
 
 		// settings for outgoing emails
+		echo "<div class=\"s2_admin\" id=\"s2_notification_settings\">\r\n";
 		echo "<h2>" . __('Notification Settings', 'subscribe2') . "</h2>\r\n";
 		echo __('Restrict the number of recipients per email to (0 for unlimited)', 'subscribe2') . ': ';
 		echo "<span id=\"s2bcc_1\"><span id=\"s2bcc\" style=\"background-color: #FFFBCC\">" . $this->subscribe2_options['bcclimit'] . "</span> ";
@@ -2216,10 +2223,12 @@ class s2class {
 		echo __('Add Tracking Parameters to the Permalink', 'subscribe2') . ": ";
 		echo "<input type=\"text\" name=\"tracking\" value=\"" . stripslashes($this->subscribe2_options['tracking']) . "\" size=\"50\" /> ";
 		echo "<br />" . __('eg. utm_source=subscribe2&utm_medium=email&utm_campaign=postnotify', 'subscribe2') . "<br /><br />\r\n";
+		echo "</div>\r\n";
 
 		// email templates
+		echo "<div class=\"s2_admin\" id=\"s2_templates\">\r\n";
 		echo "<h2>" . __('Email Templates', 'subscribe2') . "</h2>\r\n";
-		echo"<br />";
+		echo "<br />";
 		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" class=\"editform\">\r\n";
 		echo "<tr><td>";
 		echo __('New Post email (must not be empty)', 'subscribe2') . ":<br />\r\n";
@@ -2262,8 +2271,10 @@ class s2class {
 		echo "<input type=\"text\" name=\"remind_subject\" value=\"" . stripslashes($this->subscribe2_options['remind_subject']) . "\" size=\"30\" /><br />\r\n";
 		echo "<textarea rows=\"9\" cols=\"60\" name=\"remind_email\">" . stripslashes($this->subscribe2_options['remind_email']) . "</textarea><br /><br />\r\n";
 		echo "</td></tr></table><br />\r\n";
+		echo "/div>\r\n";
 
 		// excluded categories
+		echo "<div class=\"s2_admin\" id=\"s2_excluded_categories\">\r\n";
 		echo "<h2>" . __('Excluded Categories', 'subscribe2') . "</h2>\r\n";
 		echo "<p>";
 		echo "<strong><em style=\"color: red\">" . __('Posts assigned to any Excluded Category do not generate notifications and are not included in digest notifications', 'subscribe2') . "</em></strong><br />\r\n";
@@ -2281,10 +2292,12 @@ class s2class {
 			echo "</p>";
 			$this->display_format_form($formats, explode(',', $this->subscribe2_options['exclude_formats']));
 		}
+		echo "</div>\r\n";
 
 		// Appearance options
+		echo "<div class=\"s2_admin\" id=\"s2_appearance_settings\">\r\n";
 		echo "<h2>" . __('Appearance', 'subscribe2') . "</h2>\r\n";
-		echo"<p>";
+		echo "<p>";
 
 		// WordPress page ID where subscribe2 token is used
 		echo __('Set default Subscribe2 page as ID', 'subscribe2') . ': ';
@@ -2325,10 +2338,12 @@ class s2class {
 		echo "<label><input type =\"checkbox\" name=\"s2meta_default\" value=\"1\"" . checked($this->subscribe2_options['s2meta_default'], '1', false) . " /> ";
 		echo __('Disable email notifications is checked by default on authoring pages?', 'subscribe2') . "</label>\r\n";
 		echo "</p>";
+		echo "</div>\r\n";
 
 		//Auto Subscription for new registrations
+		echo "<div class=\"s2_admin\" id=\"s2_autosubscribe_settings\">\r\n";
 		echo "<h2>" . __('Auto Subscribe', 'subscribe2') . "</h2>\r\n";
-		echo"<p>";
+		echo "<p>";
 		echo __('Subscribe new users registering with your blog', 'subscribe2') . ":<br />\r\n";
 		echo "<label><input type=\"radio\" name=\"autosub\" value=\"yes\"" . checked($this->subscribe2_options['autosub'], 'yes', false) . " /> ";
 		echo __('Automatically', 'subscribe2') . "</label>&nbsp;&nbsp;";
@@ -2374,14 +2389,17 @@ class s2class {
 		echo __('After the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp;";
 		echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"no\"" . checked($this->subscribe2_options['comment_subs'], 'no', false) . " /> ";
 		echo __('No', 'subscribe2');
-		echo"</label></p>";
+		echo "</label></p>";
+		echo "</div>\r\n";
 
 		//barred domains
+		echo "<div class=\"s2_admin\" id=\"s2_barred_domains\">\r\n";
 		echo "<h2>" . __('Barred Domains', 'subscribe2') . "</h2>\r\n";
-		echo"<p>";
+		echo "<p>";
 		echo __('Enter domains to bar from public subscriptions: <br /> (Use a new line for each entry and omit the "@" symbol, for example email.com)', 'subscribe2');
 		echo "<br />\r\n<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"barred\">" . $this->subscribe2_options['barred'] . "</textarea>";
-		echo"</p>";
+		echo "</p>";
+		echo "</div>\r\n";
 
 		// submit
 		echo "<p class=\"submit\" align=\"center\"><input type=\"submit\" class=\"button-primary\" name=\"submit\" value=\"" . __('Submit', 'subscribe2') . "\" /></p>";
@@ -3621,7 +3639,7 @@ class s2class {
 			add_filter('mce_external_plugins', array(&$this, 'mce3_plugin'));
 			add_filter('mce_buttons', array(&$this, 'mce3_button'));
 		} else {
-			if ( version_compare($wp_version, '3.3', '<') ) {
+			if ( version_compare($this->wp_release, '3.3', '<') ) {
 				wp_enqueue_script('subscribe2_button', S2URL . 'include/s2_button' . $this->script_debug . '.js', array('quicktags'), '1.0' );
 			} else {
 				// use QTags.addButton for WordPress 3.3 and greater
@@ -3882,6 +3900,9 @@ class s2class {
 		// if SCRIPT_DEBUG is true, use dev scripts
 		$this->script_debug = ( defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ) ? '.dev' : '';
 
+		// get the WordPress release number for in code version comparisons
+		list($this->wp_release, $more) = explode('-', $GLOBALS['wp_version'], 2);
+
 		add_action('init', array(&$this, 'subscribe2'));
 		if ( '1' == $this->subscribe2_options['show_button'] ) {
 			add_action('admin_init', array(&$this, 'button_init'));
@@ -3989,12 +4010,14 @@ class s2class {
 		} else {
 			add_action('new_to_publish', array(&$this, 'publish'));
 			add_action('draft_to_publish', array(&$this, 'publish'));
+			add_action('auto-draft_to_publish', array(&$this, 'publish'));
 			add_action('pending_to_publish', array(&$this, 'publish'));
 			add_action('private_to_publish', array(&$this, 'publish'));
 			add_action('future_to_publish', array(&$this, 'publish'));
 			if ( $this->subscribe2_options['private'] == 'yes' ) {
 				add_action('new_to_private', array(&$this, 'publish'));
 				add_action('draft_to_private', array(&$this, 'publish'));
+				add_action('auto-draft_to_private', array(&$this, 'publish'));
 				add_action('pending_to_private', array(&$this, 'publish'));
 			}
 		}
