@@ -1160,7 +1160,7 @@ class s2class {
 		// specific authors
 		if ( '' != $r['author'] ) {
 			$JOIN .= "INNER JOIN $wpdb->usermeta AS d ON a.user_id = d.user_id ";
-			$AND .= " AND (d.meta_key='" . $this->get_usermeta_keyname('s2_authors') . " AND NOT FIND_IN_SET(" . $r['author'] . ", d.meta_value))";
+			$AND .= " AND (d.meta_key='" . $this->get_usermeta_keyname('s2_authors') . "' AND NOT FIND_IN_SET(" . $r['author'] . ", d.meta_value))";
 		}
 
 		if ( $this->s2_mu ) {
