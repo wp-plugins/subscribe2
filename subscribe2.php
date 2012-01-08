@@ -474,6 +474,18 @@ class s2class {
 				$admin = $this->get_userdata($this->subscribe2_options['sender']);
 				$this->myname = html_entity_decode($admin->display_name, ENT_QUOTES);
 				$this->myemail = $admin->user_email;
+				// fail safe to ensure sender details are not empty
+				if ( empty($this->myname) ) {
+					$this->myname = html_entity_decode(get_option('blogname'), ENT_QUOTES);
+				}
+				if ( empty($this->myemail) ) {
+					// Get the site domain and get rid of www.
+					$sitename = strtolower( $_SERVER['SERVER_NAME'] );
+					if ( substr( $sitename, 0, 4 ) == 'www.' ) {
+						$sitename = substr( $sitename, 4 );
+					}
+					$this->myemail = 'wordpress@' . $sitename;
+				}
 			}
 		}
 
@@ -481,7 +493,6 @@ class s2class {
 		$header['Reply-To'] = $this->myname . " <" . $this->myemail . ">";
 		$header['Return-path'] = "<" . $this->myemail . ">";
 		$header['Precedence'] = "list\nList-Id: " . get_option('blogname') . "";
-		$header['X-Mailer'] = "PHP" . phpversion() . "";
 		if ( $type == 'html' ) {
 			// To send HTML mail, the Content-Type header must be set
 			$header['Content-Type'] = get_option('html_type') . "; charset=\"". get_option('blog_charset') . "\"";
@@ -704,7 +715,7 @@ class s2class {
 			$this->mail(array($preview), $subject, $html_body, 'html');
 		} else {
 			// first we send plaintext summary emails
-			$registered = $this->get_registered("cats=$post_cats_string&format=excerpt");
+			$registered = $this->get_registered("cats=$post_cats_string&format=excerpt&author=$post->post_author");
 			if ( empty($registered) ) {
 				$recipients = (array)$public;
 			} elseif ( empty($public) ) {
@@ -715,13 +726,13 @@ class s2class {
 			$this->mail($recipients, $subject, $excerpt_body);
 
 			// next we send plaintext full content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=post"), $subject, $full_body);
+			$this->mail($this->get_registered("cats=$post_cats_string&format=post&author=$post->post_author"), $subject, $full_body);
 
 			// next we send html excerpt content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=html_excerpt"), $subject, $html_excerpt_body, 'html');
+			$this->mail($this->get_registered("cats=$post_cats_string&format=html_excerpt&author=$post->post_author"), $subject, $html_excerpt_body, 'html');
 
 			// finally we send html full content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=html"), $subject, $html_body, 'html');
+			$this->mail($this->get_registered("cats=$post_cats_string&format=html&author=$post->post_author"), $subject, $html_body, 'html');
 		}
 	} // end publish()
 
@@ -955,13 +966,10 @@ class s2class {
 					$subject .= __('New Subscription', 'subscribe2');
 					$subject = html_entity_decode($subject, ENT_QUOTES);
 					$message = $this->email . " " . __('subscribed to email notifications!', 'subscribe2');
-					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
-					if ( empty($recipients) ) {
-						$role = array('fields' => array('user_email'), 'role' => 'administrator');
-						$wp_user_query = get_users( $role );
-						foreach ($wp_user_query as $user) {
-							$recipients[] = $user->user_email;
-						}
+					$role = array('fields' => array('user_email'), 'role' => 'administrator');
+					$wp_user_query = get_users( $role );
+					foreach ($wp_user_query as $user) {
+						$recipients[] = $user->user_email;
 					}
 					$headers = $this->headers();
 					// send individual emails so we don't reveal admin emails to each other
@@ -981,13 +989,10 @@ class s2class {
 					$subject .= __('New Unsubscription', 'subscribe2');
 					$subject = html_entity_decode($subject, ENT_QUOTES);
 					$message = $this->email . " " . __('unsubscribed from email notifications!', 'subscribe2');
-					$recipients = $wpdb->get_col("SELECT DISTINCT(user_email) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value='10'");
-					if ( empty($recipients) ) {
-						$role = array('fields' => array('user_email'), 'role' => 'administrator');
-						$wp_user_query = get_users( $role );
-						foreach ($wp_user_query as $user) {
-							$recipients[] = $user->user_email;
-						}
+					$role = array('fields' => array('user_email'), 'role' => 'administrator');
+					$wp_user_query = get_users( $role );
+					foreach ($wp_user_query as $user) {
+						$recipients[] = $user->user_email;
 					}
 					$headers = $this->headers();
 					// send individual emails so we don't reveal admin emails to each other
@@ -1567,20 +1572,10 @@ class s2class {
 			$admin = &$userdata;
 		}
 
-		// if user record is empty grab the first admin from the database
-		if ( empty($admin) ) {
-			$sql = "SELECT DISTINCT(ID) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value IN (8, 9, 10) LIMIT 1";
-			$admin = get_userdata($wpdb->get_var($sql));
-		}
-
-		// handle issues from WordPress core where user_level is not set or set low
-		if ( empty($admin) ) {
+		if ( empty($admin) || $admin->ID == 0 ) {
 			$role = array('role' => 'administrator');
 			$wp_user_query = get_users( $role );
-			foreach ($wp_user_query as $user) {
-				$admin[] = $user;
-			}
-			$admin = $admin[0];
+			$admin = $wp_user_query[0];
 		}
 
 		return $admin;
@@ -3001,10 +2996,6 @@ class s2class {
 	function admin_dropdown($inc_author = false) {
 		global $wpdb;
 
-		$sql = "SELECT ID, display_name FROM $wpdb->users INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key='" . $wpdb->prefix . "user_level' AND $wpdb->usermeta.meta_value IN (8, 9, 10)";
-		$admins = $wpdb->get_results($sql);
-
-		// handle issues from WordPress core where user_level is not set or set low
 		if ( empty($admins) ) {
 			$args = array('fields' => array('ID', 'display_name'), 'role' => 'administrator');
 			$wp_user_query = get_users( $args );
