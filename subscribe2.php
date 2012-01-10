@@ -920,7 +920,7 @@ class s2class {
 	*/
 	function is_barred($email='') {
 		$barred_option = $this->subscribe2_options['barred'];
-		list($user, $domain) = split('@', $email);
+		list($user, $domain) = explode('@', $email, 2);
 		$bar_check = stristr($barred_option, $domain);
 
 		if ( !empty($bar_check) ) {
