@@ -304,6 +304,12 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fix for Opt-out by Author for Registered Users that resulted in posts being sent even though a user had opted out
 * Workaround implemented for core WordPress glitch that reults in blank sender details in digest emails when using "Post Author" as sender
 * Introduced DIV HTML tags to the administrion menu screens to allow jQuery custom hiding by plugins - proposed by madtownlems
+* Reduced code overhead when collecting admin level users
+* Fix for non-sending emails when published via XML RPC interface (like the iOS app and Windows Live Writer) - thanks to bellarush & Marc Williams
+* Removed the X-Mailer header ready for core PHPMailer update
+* Removed single use of split() function which is deprecated in PHP 5.3.0
+* Added additional parameters to the 's2_html_email' hook - props Milan Dinić
+* Added a check on wp-cron.php to warn digest email users - props Dave Bergschneider
 
 = Version 7.0.1 by Matthew Robinson =
 

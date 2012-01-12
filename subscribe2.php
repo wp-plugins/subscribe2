@@ -376,9 +376,9 @@ class s2class {
 		if ( 'html' == $type ) {
 			$headers = $this->headers('html');
 			if ( 'yes' == $this->subscribe2_options['stylesheet'] ) {
-				$mailtext = apply_filters('s2_html_email', "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . get_stylesheet_uri() . "\" type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>");
+				$mailtext = apply_filters('s2_html_email', "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . get_stylesheet_uri() . "\" type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>", $subject, $message);
 			} else {
-				$mailtext = apply_filters('s2_html_email', "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>");
+				$mailtext = apply_filters('s2_html_email', "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>", $subject, $message);
 			}
 		} else {
 			$headers = $this->headers();
@@ -3027,6 +3027,10 @@ class s2class {
 	*/
 	function display_digest_choices() {
 		global $wpdb;
+		$cron_file = ABSPATH . 'wp-cron.php';
+		if ( !is_readable($cron_file) ) {
+			echo "<strong><em style=\"color: red\">" . __('The WordPress cron functions may be disabled on this server. Digest notifications may not work.', 'subscribe2') . "</em></strong><br />\r\n";
+		}
 		$scheduled_time = wp_next_scheduled('s2_digest_cron');
 		$schedule = (array)wp_get_schedules();
 		$schedule = array_merge(array('never' => array('interval' => 0, 'display' => __('For each Post', 'subscribe2'))), $schedule);
