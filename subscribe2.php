@@ -822,14 +822,6 @@ class s2class {
 	function activate($email = '') {
 		global $wpdb;
 
-		if ( '' == $email ) {
-			if ( '' != $this->email ) {
-				$email = $this->email;
-			} else {
-				return false;
-			}
-		}
-
 		if ( false !== $this->is_public($email) ) {
 			$check = $wpdb->get_var("SELECT user_email FROM $wpdb->users WHERE user_email='$this->email'");
 			if ( $check ) { return; }
@@ -844,16 +836,8 @@ class s2class {
 	Add an public subscriber to the subscriber table as unconfirmed
 	*/
 	function add($email = '') {
-		if ( $this->filtered ==1 ) { return; }
+		if ( $this->filtered == 1 ) { return; }
 		global $wpdb;
-
-		if ( '' == $email ) {
-			if ( '' != $this->email ) {
-				$email = $this->email;
-			} else {
-				return false;
-			}
-		}
 
 		if ( !is_email($email) ) { return false; }
 
@@ -868,15 +852,8 @@ class s2class {
 	Remove a public subscriber user from the subscription table
 	*/
 	function delete($email = '') {
+		if ( $this->filtered == 1 ) { return; }
 		global $wpdb;
-
-		if ( '' == $email ) {
-			if ( '' != $this->email ) {
-				$email = $this->email;
-			} else {
-				return false;
-			}
-		}
 
 		if ( !is_email($email) ) { return false; }
 		$wpdb->get_results("DELETE FROM $this->public WHERE CAST(email as binary)='$email'");
@@ -941,8 +918,7 @@ class s2class {
 		$code = $_GET['s2'];
 		$action = intval(substr($code, 0, 1));
 		$hash = substr($code, 1, 32);
-		$code = str_replace($hash, '', $code);
-		$id = intval(substr($code, 1));
+		$id = intval(substr($code, 33));
 		if ( $id ) {
 			$this->email = $this->sanitize_email($this->get_email($id));
 			if ( !$this->email || $hash !== md5($this->email) ) {
@@ -983,7 +959,7 @@ class s2class {
 			// remove this subscriber
 			$this->message = $this->deleted;
 			if ( '0' != $current ) {
-				$this->delete();
+				$this->delete($this->email);
 				if ( $this->subscribe2_options['admin_email'] == 'unsubs' || $this->subscribe2_options['admin_email'] == 'both' ) {
 					( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(get_option('blogname')) . "] ";
 					$subject .= __('New Unsubscription', 'subscribe2');
@@ -2996,12 +2972,10 @@ class s2class {
 	function admin_dropdown($inc_author = false) {
 		global $wpdb;
 
-		if ( empty($admins) ) {
-			$args = array('fields' => array('ID', 'display_name'), 'role' => 'administrator');
-			$wp_user_query = get_users( $args );
-			foreach ($wp_user_query as $user) {
-				$admins[] = $user;
-			}
+		$args = array('fields' => array('ID', 'display_name'), 'role' => 'administrator');
+		$wp_user_query = get_users( $args );
+		foreach ($wp_user_query as $user) {
+			$admins[] = $user;
 		}
 
 		if ( $inc_author ) {
