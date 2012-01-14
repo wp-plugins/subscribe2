@@ -1,7 +1,7 @@
 (function() {
 	tinymce.create('tinymce.plugins.Subscribe2Plugin', {
 		init : function(ed, url) {
-			var pb = '<img src="' + url + '/../../include/trans.gif" class="mceSubscribe2 mceItemNoResize" />',
+			var pb = '<img src="' + url + '/../include/spacer.gif" class="mceSubscribe2 mceItemNoResize" />',
 			cls = 'mceSubscribe2',
 			sep = ed.getParam('subscribe2_separator', '[subscribe2]'),
 			pbRE;
