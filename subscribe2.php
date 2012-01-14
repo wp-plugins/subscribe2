@@ -2242,7 +2242,7 @@ class s2class {
 		echo "<input type=\"text\" name=\"remind_subject\" value=\"" . stripslashes($this->subscribe2_options['remind_subject']) . "\" size=\"30\" /><br />\r\n";
 		echo "<textarea rows=\"9\" cols=\"60\" name=\"remind_email\">" . stripslashes($this->subscribe2_options['remind_email']) . "</textarea><br /><br />\r\n";
 		echo "</td></tr></table><br />\r\n";
-		echo "/div>\r\n";
+		echo "</div>\r\n";
 
 		// excluded categories
 		echo "<div class=\"s2_admin\" id=\"s2_excluded_categories\">\r\n";
