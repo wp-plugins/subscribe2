@@ -58,9 +58,9 @@ You need to pay for the [Subscribe2 HTML version](http://wpplugins.com/plugin/46
 = Where can I get help? =
 So, you've downloaded the plugin an it isn't doing what you expect. First you should read the included documentation. There is a ReadMe.txt file and a PDF startup guide installed with the plugin.
 
-Next you could search in the [Subscribe2 Forum](http://getsatisfaction.com/subscribe2/), the [WordPress forums](http://wordpress.org/support/) or the [Subscribe2 blog FAQs](http://subscribe2.wordpress.com/category/faq/).
+Next you could search in the [WordPress forums](http://wordpress.org/support/), the old [Subscribe2 Forum](http://getsatisfaction.com/subscribe2/), or the [Subscribe2 blog FAQs](http://subscribe2.wordpress.com/category/faq/).
 
-No joy there? Well, if you can't find an answer to your question you can get [paid support](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2387904) by donating at least 20 UK pounds to the plugin author.
+If you can't find an answer then post a new topic at the [WordPress forums](http://wordpress.org/support/) or make a [donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2387904) to get my attention!
 
 = Where can I get more information about the plugin features? =
 

@@ -650,10 +650,15 @@ class s2class {
 		if ( function_exists('strip_shortcodes') ) {
 			$plaintext = strip_shortcodes($plaintext);
 		}
+		$plaintext = preg_replace('|<s*>(.*)<\/s>|','', $plaintext);
+		$plaintext = preg_replace('|<strike*>(.*)<\/strike>|','', $plaintext);
+		$plaintext = preg_replace('|<del*>(.*)<\/del>|','', $plaintext);
+
 		$gallid = '[gallery id="' . $post->ID . '"';
 		$content = str_replace('[gallery', $gallid, $post->post_content);
 		$content = apply_filters('the_content', $content);
 		$content = str_replace("]]>", "]]&gt", $content);
+
 		$excerpt = $post->post_excerpt;
 		if ( '' == $excerpt ) {
 			// no excerpt, is there a <!--more--> ?
@@ -694,6 +699,10 @@ class s2class {
 				}
 			}
 		}
+
+		// remove excess white space from with $excerpt and $plaintext
+		$excerpt = preg_replace('|\s+|', ' ', $excerpt);
+		$plaintext = preg_replace('|\s+|', ' ', $plaintext);
 
 		// prepare mail body texts
 		$excerpt_body = str_replace("{POST}", $excerpt, $mailtext);
@@ -1241,6 +1250,7 @@ class s2class {
 			}
 			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), 'excerpt');
 			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), $this->subscribe2_options['autosub_def']);
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), '');
 		} else {
 			// create post format entries for all users
 			if ( in_array($this->subscribe2_options['autoformat'], array('html', 'html_excerpt', 'post', 'excerpt')) ) {
@@ -1256,6 +1266,7 @@ class s2class {
 					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, $cat);
 				}
 			}
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), '');
 		}
 		return $user_ID;
 	} // end register()
@@ -3302,9 +3313,32 @@ class s2class {
 	/**
 	Process comment meta data
 	*/
-	function s2_comment_meta($comment_ID) {
+	function s2_comment_meta($comment_ID, $approved) {
 		if ( $_POST['s2_comment_request'] == '1' ) {
-			add_comment_meta($comment_ID, 's2_comment_request', $_POST['s2_comment_request']);
+			global $wpdb;
+			$sql = "SELECT comment_author_email, comment_approved FROM $wpdb->comments WHERE comment_ID='$comment_ID' LIMIT 1";
+			$comment = $wpdb->get_row($sql, OBJECT);
+			if ( empty($comment) ) { return $comment_ID; }
+			switch ($approved) {
+				case '0':
+					// Unapproved so hold in meta data pending moderation
+					add_comment_meta($comment_ID, 's2_comment_request', $_POST['s2_comment_request']);
+					break;
+				case '1':
+					// Approved so add
+					$is_public = $this->is_public($comment->comment_author_email);
+					if ( $is_public == 0 ) {
+						$this->toggle($comment->comment_author_email);
+					}
+					$is_registered = $this->is_registered($comment->comment_author_email);
+					if ( !$is_public && !$is_registered ) {
+						$this->activate($comment->comment_author_email);
+					}
+					break;
+				default:
+					// post is trash, spam or deleted
+					break;
+			}
 		}
 	} // end s2_comment_meta()
 
@@ -3324,9 +3358,11 @@ class s2class {
 		if ( empty($comment) ) { return $comment_ID; }
 
 		switch ($comment->comment_approved){
-			case '0': // Unapproved
+			case '0':
+				// Unapproved
 				break;
-			case '1': // Approved
+			case '1':
+				// Approved
 				$is_public = $this->is_public($comment->comment_author_email);
 				if ( $is_public == 0 ) {
 					$this->toggle($comment->comment_author_email);
@@ -3337,7 +3373,8 @@ class s2class {
 				}
 				delete_comment_meta($comment_ID, 's2_comment_request');
 				break;
-			default: // post is trash, spam or deleted
+			default:
+				// post is trash, spam or deleted
 				delete_comment_meta($comment_ID, 's2_comment_request');
 				break;
 		}
@@ -3814,6 +3851,9 @@ class s2class {
 		// we add a blank line after each post excerpt now trim white space that occurs for the last post
 		$message_post = trim($message_post);
 		$message_posttime = trim($message_posttime);
+		// remove excess white space from within $message_post and $message_posttime
+		$message_post = preg_replace('|\s+|', ' ', $message_post);
+		$message_posttime = preg_replace('|\s+|', ' ', $message_posttime);
 
 		// apply filter to allow external content to be inserted or content manipulated
 		$message_post = apply_filters('s2_digest_email', $message_post, $now, $prev, $last, $this->subscribe2_options['cron_order']);
@@ -3998,7 +4038,7 @@ class s2class {
 			} else {
 				add_action('comment_form', array(&$this, 's2_comment_meta_form'));
 			}
-			add_action('comment_post', array(&$this, 's2_comment_meta'), 1);
+			add_action('comment_post', array(&$this, 's2_comment_meta'), 1, 2);
 			add_action('wp_set_comment_status', array(&$this, 'comment_status'));
 		}
 
