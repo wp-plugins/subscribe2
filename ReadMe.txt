@@ -299,6 +299,15 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 == Changelog ==
 
+= Version 7.2 by Matthew Robinson =
+
+* Fix for non-sending Preview emails when sender details match recipient details exactly
+* Remove some HTML tags (DEL, S and STRIKE) from plain text content to avoid confusing reading - props cpo
+* Fix for non-sending emails to newly Registered Subscribers - thanks to Gengar003 and WebEndev
+* Fix for commenter subscriptions on systems without moderation in place - thanks to elarson
+* Improved the TinyMCE plugin code that handles placement of the Subscribe2 shortcode in the rich text editor
+* Tidied up some public subscribe functions removing unnecessary code
+
 = Version 7.1 by Matthew Robinson =
 
 * Fix for Opt-out by Author for Registered Users that resulted in posts being sent even though a user had opted out
