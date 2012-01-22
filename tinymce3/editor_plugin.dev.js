@@ -3,12 +3,9 @@
 		init : function(ed, url) {
 			var pb = '<img src="' + url + '/../include/spacer.gif" class="mceSubscribe2 mceItemNoResize" />',
 			cls = 'mceSubscribe2',
-			sep = ed.getParam('subscribe2_separator', '[subscribe2]'),
-			pbRE;
-
-			pbRE = new RegExp(sep.replace(/[\?\.\*\[\]\(\)\{\}\+\^\$\:]/g, function(a) {
-				return '\\' + a;
-			}), 'g');
+			shortcode = '[subscribe2]',
+			pbreplaced = [],
+			pbRE = new RegExp(/(\[|<!--)subscribe2.*(\]|-->)/g);
 
 			// Register commands
 			ed.addCommand('mceSubscribe2', function() {
@@ -45,15 +42,26 @@
 			});
 
 			ed.onBeforeSetContent.add(function(ed, o) {
+				pbreplaced = o.content.match(pbRE);
 				o.content = o.content.replace(pbRE, pb);
 			});
 
 			ed.onPostProcess.add(function(ed, o) {
-				if (o.get)
-					o.content = o.content.replace(/<img[^>]+>/g, function(im) {
-						if (im.indexOf('class="mceSubscribe2') !== -1)
-							im = sep;
-
+				if (o.get) {
+					if ( pbreplaced !== null ) {
+						for ( i = 0; i < pbreplaced.length; i++ ) {
+							o.content = o.content.replace(/<img[^>]+>/, function(im) {
+								if (im.indexOf('class="mceSubscribe2') !== -1) {
+									im = pbreplaced[i];
+								}
+								return im;
+							});
+						}
+					}
+					o.content = o.content.replace(/<img[^>]+>/, function(im) {
+						if (im.indexOf('class="mceSubscribe2') !== -1) {
+							im = shortcode;
+						}
 						return im;
 					});
 			});
