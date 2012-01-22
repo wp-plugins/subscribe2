@@ -395,8 +395,8 @@ class s2class {
 		// Construct BCC headers for sending or send individual emails
 		$bcc = '';
 		natcasesort($recipients);
-		if ( function_exists('wpmq_mail') || $this->subscribe2_options['bcclimit'] == 1 ) {
-			// BCCLimit is 1 so send individual emails
+		if ( function_exists('wpmq_mail') || $this->subscribe2_options['bcclimit'] == 1 || count($recipients) == 1 ) {
+			// BCCLimit is 1 so send individual emails or we only have 1 recipient
 			foreach ( $recipients as $recipient ) {
 				$recipient = trim($recipient);
 				// sanity check -- make sure we have a valid email
