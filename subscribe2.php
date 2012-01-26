@@ -492,7 +492,7 @@ class s2class {
 		$header['From'] = $this->myname . " <" . $this->myemail . ">";
 		$header['Reply-To'] = $this->myname . " <" . $this->myemail . ">";
 		$header['Return-path'] = "<" . $this->myemail . ">";
-		$header['Precedence'] = "list\nList-Id: " . get_option('blogname') . "";
+		$header['Precedence'] = "list\nList-Id: " . html_entity_decode(get_option('blogname'), ENT_QUOTES) . "";
 		if ( $type == 'html' ) {
 			// To send HTML mail, the Content-Type header must be set
 			$header['Content-Type'] = get_option('html_type') . "; charset=\"". get_option('blog_charset') . "\"";
@@ -947,7 +947,7 @@ class s2class {
 				$this->ip = $_SERVER['REMOTE_ADDR'];
 				$this->activate($this->email);
 				if ( $this->subscribe2_options['admin_email'] == 'subs' || $this->subscribe2_options['admin_email'] == 'both' ) {
-					( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(get_option('blogname')) . "] ";
+					( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(html_entity_decode(get_option('blogname'), ENT_QUOTES)) . "] ";
 					$subject .= __('New Subscription', 'subscribe2');
 					$subject = html_entity_decode($subject, ENT_QUOTES);
 					$message = $this->email . " " . __('subscribed to email notifications!', 'subscribe2');
@@ -970,7 +970,7 @@ class s2class {
 			if ( '0' != $current ) {
 				$this->delete($this->email);
 				if ( $this->subscribe2_options['admin_email'] == 'unsubs' || $this->subscribe2_options['admin_email'] == 'both' ) {
-					( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(get_option('blogname')) . "] ";
+					( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(html_entity_decode(get_option('blogname'), ENT_QUOTES)) . "] ";
 					$subject .= __('New Unsubscription', 'subscribe2');
 					$subject = html_entity_decode($subject, ENT_QUOTES);
 					$message = $this->email . " " . __('unsubscribed from email notifications!', 'subscribe2');
@@ -2714,7 +2714,7 @@ class s2class {
 		if ( isset($_POST['subject']) ) {
 			$subject = $_POST['subject'];
 		} else {
-			$subject = __('A message from', 'subscribe2') . " " . get_option('blogname');
+			$subject = __('A message from', 'subscribe2') . " " . html_entity_decode(get_option('blogname'), ENT_QUOTES);
 		}
 		if ( !isset($_POST['content']) ) {
 			$body = '';
@@ -3877,7 +3877,7 @@ class s2class {
 		$scheds = (array)wp_get_schedules();
 		$email_freq = $this->subscribe2_options['email_freq'];
 		$display = $scheds[$email_freq]['display'];
-		( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(get_option('blogname')) . "] ";
+		( '' == get_option('blogname') ) ? $subject = "" : $subject = "[" . stripslashes(html_entity_decode(get_option('blogname'), ENT_QUOTES)) . "] ";
 		$subject .= $display . " " . __('Digest Email', 'subscribe2');
 		$mailtext = str_replace("{TABLELINKS}", $tablelinks, $mailtext);
 		$mailtext = str_replace("{TABLE}", $table, $mailtext);
