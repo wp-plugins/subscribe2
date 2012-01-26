@@ -19,6 +19,7 @@
 				cmd : cls
 			});
 
+			// load the CSS and enable it on the right class
 			ed.onInit.add(function() {
 				ed.dom.loadCSS(url + "/css/content.css");
 
@@ -30,6 +31,7 @@
 				}
 			});
 
+			// allow selection of the image placeholder
 			ed.onClick.add(function(ed, e) {
 				e = e.target;
 
@@ -37,15 +39,20 @@
 					ed.selection.select(e);
 			});
 
+			// re-enable the CSS when the node changes
 			ed.onNodeChange.add(function(ed, cm, n) {
 				cm.setActive('subscribe2', n.nodeName === 'IMG' && ed.dom.hasClass(n, cls));
 			});
 
+			// create an array of replaced shortcodes so we have additional parameters
+			// then swap in the graphic
 			ed.onBeforeSetContent.add(function(ed, o) {
 				pbreplaced = o.content.match(pbRE);
 				o.content = o.content.replace(pbRE, pb);
 			});
 
+			// swap back the array of shortcodes to preserve parameters
+			// replace any other instances with the default shortcode
 			ed.onPostProcess.add(function(ed, o) {
 				if (o.get) {
 					if ( pbreplaced !== null ) {
@@ -64,6 +71,7 @@
 						}
 						return im;
 					});
+				}
 			});
 		},
 
