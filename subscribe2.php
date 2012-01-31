@@ -2554,8 +2554,10 @@ class s2class {
 		}
 
 		if ( count($this->get_authors()) > 1 ) {
+			echo "<div class=\"s2_admin\" id=\"s2_authors\">\r\n";
 			echo "<h2>" . __('Do not send notifications for post made by these authors', 'subscribe2') . "</h2>\r\n";
 			$this->display_author_form(explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), true)));
+			echo "</div>\r\n";
 		}
 
 		// submit
