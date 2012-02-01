@@ -91,7 +91,7 @@ if (!isset($this->subscribe2_options['show_button'])) {
 } // option to show Subscribe2 button on Write page
 
 if (!isset($this->subscribe2_options['ajax'])) {
-	$this->subscribe2_options['ajax'] ) = "0";
+	$this->subscribe2_options['ajax'] = "0";
 } // option to enable an AJAX style form
 
 if (!isset($this->subscribe2_options['widget'])) {

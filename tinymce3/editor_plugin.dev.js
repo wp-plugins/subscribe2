@@ -1,14 +1,11 @@
 (function() {
 	tinymce.create('tinymce.plugins.Subscribe2Plugin', {
 		init : function(ed, url) {
-			var pb = '<img src="' + url + '/../../include/trans.gif" class="mceSubscribe2 mceItemNoResize" />',
+			var pb = '<img src="' + url + '/../include/spacer.gif" class="mceSubscribe2 mceItemNoResize" />',
 			cls = 'mceSubscribe2',
-			sep = ed.getParam('subscribe2_separator', '[subscribe2]'),
-			pbRE;
-
-			pbRE = new RegExp(sep.replace(/[\?\.\*\[\]\(\)\{\}\+\^\$\:]/g, function(a) {
-				return '\\' + a;
-			}), 'g');
+			shortcode = '[subscribe2]',
+			pbreplaced = [],
+			pbRE = new RegExp(/(\[|<!--)subscribe2.*(\]|-->)/g);
 
 			// Register commands
 			ed.addCommand('mceSubscribe2', function() {
@@ -22,6 +19,7 @@
 				cmd : cls
 			});
 
+			// load the CSS and enable it on the right class
 			ed.onInit.add(function() {
 				ed.dom.loadCSS(url + "/css/content.css");
 
@@ -33,6 +31,7 @@
 				}
 			});
 
+			// allow selection of the image placeholder
 			ed.onClick.add(function(ed, e) {
 				e = e.target;
 
@@ -40,22 +39,39 @@
 					ed.selection.select(e);
 			});
 
+			// re-enable the CSS when the node changes
 			ed.onNodeChange.add(function(ed, cm, n) {
 				cm.setActive('subscribe2', n.nodeName === 'IMG' && ed.dom.hasClass(n, cls));
 			});
 
+			// create an array of replaced shortcodes so we have additional parameters
+			// then swap in the graphic
 			ed.onBeforeSetContent.add(function(ed, o) {
+				pbreplaced = o.content.match(pbRE);
 				o.content = o.content.replace(pbRE, pb);
 			});
 
+			// swap back the array of shortcodes to preserve parameters
+			// replace any other instances with the default shortcode
 			ed.onPostProcess.add(function(ed, o) {
-				if (o.get)
-					o.content = o.content.replace(/<img[^>]+>/g, function(im) {
-						if (im.indexOf('class="mceSubscribe2') !== -1)
-							im = sep;
-
+				if (o.get) {
+					if ( pbreplaced !== null ) {
+						for ( i = 0; i < pbreplaced.length; i++ ) {
+							o.content = o.content.replace(/<img[^>]+>/, function(im) {
+								if (im.indexOf('class="mceSubscribe2') !== -1) {
+									im = pbreplaced[i];
+								}
+								return im;
+							});
+						}
+					}
+					o.content = o.content.replace(/<img[^>]+>/, function(im) {
+						if (im.indexOf('class="mceSubscribe2') !== -1) {
+							im = shortcode;
+						}
 						return im;
 					});
+				}
 			});
 		},
 
