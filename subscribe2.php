@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 7.1
+Version: 7.2
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -38,7 +38,7 @@ if ( version_compare($GLOBALS['wp_version'], '3.1', '<') ) {
 
 // our version number. Don't touch this or any line below
 // unless you know exactly what you are doing
-define( 'S2VERSION', '7.1' );
+define( 'S2VERSION', '7.2' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', trailingslashit(dirname(plugin_basename(__FILE__))) );
 define( 'S2URL', plugin_dir_url(dirname(__FILE__)) . S2DIR );
@@ -1871,9 +1871,9 @@ class s2class {
 			}
 		} else {
 			if ( $_POST['searchterm'] ) {
-				echo "<tr><td align=\"center\"><b>" . __('No matching subscribers found', 'subscribe2') . "</b></td></tr>\r\n";
+				echo "<tr><td colspan=\"6\" align=\"center\"><b>" . __('No matching subscribers found', 'subscribe2') . "</b></td></tr>\r\n";
 			} else {
-				echo "<tr><td align=\"center\"><b>" . __('NONE', 'subscribe2') . "</b></td></tr>\r\n";
+				echo "<tr><td colspan=\"6\" align=\"center\"><b>" . __('NONE', 'subscribe2') . "</b></td></tr>\r\n";
 			}
 		}
 		if ( !empty($subscribers) ) {
@@ -3394,7 +3394,8 @@ class s2class {
 			'id'    => '',
 			'url' => '',
 			'nojs' => 'false',
-			'link' => ''
+			'link' => '',
+			'size' => 20
 			), $atts));
 
 		// if link is true return a link to the page with the ajax class
@@ -3418,9 +3419,9 @@ class s2class {
 		}
 		// build default form
 		if ( $nojs == 'true' ) {
-			$this->form = "<form method=\"post\" action=\"" . $url . "\"><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"\" size=\"20\" /></p><p>" . $this->input_form_action . "</p></form>";
+			$this->form = "<form method=\"post\" action=\"" . $url . "\"><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"\" size=\"" . $size . "\" /></p><p>" . $this->input_form_action . "</p></form>";
 		} else {
-			$this->form = "<form method=\"post\" action=\"" . $url . "\"><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . __('Enter email address...', 'subscribe2') . "\" size=\"20\" onfocus=\"if (this.value == '" . __('Enter email address...', 'subscribe2') . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . __('Enter email address...', 'subscribe2') . "';}\" /></p><p>" . $this->input_form_action . "</p></form>\r\n";
+			$this->form = "<form method=\"post\" action=\"" . $url . "\"><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . __('Enter email address...', 'subscribe2') . "\" size=\"" . $size . "\" onfocus=\"if (this.value == '" . __('Enter email address...', 'subscribe2') . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . __('Enter email address...', 'subscribe2') . "';}\" /></p><p>" . $this->input_form_action . "</p></form>\r\n";
 		}
 		$this->s2form = $this->form;
 

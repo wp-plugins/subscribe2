@@ -303,6 +303,8 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 * Fix for non-sending Preview emails when sender details match recipient details exactly
 * Remove some HTML tags (DEL, S and STRIKE) from plain text content to avoid confusing reading - props cpo
+* Improved removal of excess white space within the content of the plain text emails
+* Introduced 'size' parameter to the shortcode to allow sizing of the email text input box
 * Fix for non-sending emails to newly Registered Subscribers - thanks to Gengar003 and WebEndev
 * Fix for commenter subscriptions on systems without moderation in place - thanks to elarson
 * Improved the TinyMCE plugin code that handles placement of the Subscribe2 shortcode in the rich text editor
