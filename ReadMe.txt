@@ -311,6 +311,8 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fixed some PHP messages regarding use of deprecated clean_url() function and WordPress version checking - thanks to anmari
 * Improved white space trimming in the code so it respects tabs and line breaks - thanks to belg4mit
 * Updated screenshots to Subscribe2 8.0 and WordPress 3.3.1 screen layouts
+* Implemented one-click buttons to subscribe and unsubscribe - thanks to dimadin for code patch
+* Changed some default settings, sender to BLOGNAME and number of recipients per email to 1
 
 = Version 7.2 by Matthew Robinson =
 

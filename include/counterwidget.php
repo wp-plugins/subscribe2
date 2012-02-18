@@ -4,7 +4,7 @@ class S2_Counter_widget extends WP_Widget {
 	Declares the S2_Counter_widget class.
 	*/
 	function S2_Counter_widget() {
-		$widget_options = array('classname' => 's2_counter', 'description' => __('Subscriber Counter widget for the Subscribe2 plugin', 'subscribe2') );
+		$widget_options = array('classname' => 's2_counter', 'description' => __('Subscriber Counter widget for Subscribe2', 'subscribe2') );
 		$control_options = array('width' => 250, 'height' => 500);
 		$this->WP_Widget('s2_counter', __('Subscribe2 Counter', 'subscribe2'), $widget_options, $control_options);
 	}

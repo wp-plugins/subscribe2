@@ -707,5 +707,35 @@ class s2_admin extends s2class {
 			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
 		}
 	} // end delete_category()
+
+/* ===== functions to show & handle one-click subscription ===== */
+	/**
+	Show form for one-click subscription on user profile page
+	*/
+	function one_click_profile_form($user) {
+		echo "<h3>" . __('Email subscription', 'subscribe2') . "</h3>\r\n";
+		echo "<table class=\"form-table\">\r\n";
+		echo "<tr><th scope=\"row\">" . __('Subscribe / Unsubscribe', 'subscribe2') . "</th>\r\n";
+		echo "<td><label><input type=\"checkbox\" name=\"sub2-one-click-subscribe\" value=\"1\" " . checked( ! get_user_meta($user->ID, $this->get_usermeta_keyname('s2_subscribed'), true), false, false ) . " /> " . __('Receive notifications', 'subscribe2') . "</label><br />\r\n";
+		echo "<span class=\"description\">" . __('Check if you want to receive email notification when new posts are published', 'subscribe2') . "</span>\r\n";
+		echo "</td></tr></table>\r\n";
+	} // end one_click_profile_form()
+
+	/**
+	Handle submission from profile one-click subscription
+	*/
+	function one_click_profile_form_save($user_ID) {
+		if ( !current_user_can( 'edit_user', $user_ID ) ) {
+			return false;
+		}
+
+		if ( isset( $_POST['sub2-one-click-subscribe'] ) && 1 == $_POST['sub2-one-click-subscribe'] ) {
+			// Subscribe
+			$this->one_click_handler($user_ID, 'subscribe');
+		} else {
+			// Unsubscribe
+			$this->one_click_handler($user_ID, 'unsubscribe');
+		}
+	} // end one_click_profile_form_save()
 }
 ?>
