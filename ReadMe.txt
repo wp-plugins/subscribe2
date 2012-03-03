@@ -313,6 +313,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Updated screenshots to Subscribe2 8.0 and WordPress 3.3.1 screen layouts
 * Implemented one-click buttons to subscribe and unsubscribe - thanks to dimadin for code patch
 * Changed some default settings, sender to BLOGNAME and number of recipients per email to 1
+* Implemented a change so that categories are not displayed in the filter dropdowns when using Subscribe2 in digest mode
 
 = Version 7.2 by Matthew Robinson =
 
