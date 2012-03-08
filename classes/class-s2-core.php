@@ -393,7 +393,7 @@ class s2class {
 			// To send HTML mail, the Content-Type header must be set
 			$header['Content-Type'] = get_option('html_type') . "; charset=\"". get_option('blog_charset') . "\"";
 		} else {
-			$header['Content-Type'] = "text/plain; charset=\"". html_entity_decode(get_option('blogname'), ENT_QUOTES) . "\"";
+			$header['Content-Type'] = "text/plain; charset=\"". get_option('blog_charset') . "\"";
 		}
 
 		// apply header filter to allow on-the-fly amendments
