@@ -632,16 +632,23 @@ class s2class {
 			} else {
 				$recipients = array_merge((array)$public, (array)$registered);
 			}
+			$recipients = apply_filters('s2_send_plain_excerpt_suscribers', $recipients, $post->ID);
 			$this->mail($recipients, $subject, $excerpt_body);
 
 			// next we send plaintext full content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=post&author=$post->post_author"), $subject, $full_body);
+			$recipients = $this->get_registered("cats=$post_cats_string&format=post&author=$post->post_author");
+			$recipients = apply_filters('s2_send_plain_fullcontent_suscribers', $recipients, $post->ID);
+			$this->mail($recipients, $subject, $full_body);
 
 			// next we send html excerpt content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=html_excerpt&author=$post->post_author"), $subject, $html_excerpt_body, 'html');
+			$recipients = $this->get_registered("cats=$post_cats_string&format=html_excerpt&author=$post->post_author");
+			$recipients = apply_filters('s2_send_html_excerpt_suscribers', $recipients, $post->ID);
+			$this->mail($recipients, $subject, $html_excerpt_body, 'html');
 
 			// finally we send html full content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=html&author=$post->post_author"), $subject, $html_body, 'html');
+			$recipients = $this->get_registered("cats=$post_cats_string&format=html&author=$post->post_author");
+			$recipients = apply_filters('s2_send_html_fullcontent_suscribers', $recipients, $post->ID);
+			$this->mail($recipients, $subject, $html_body, 'html');
 		}
 	} // end publish()
 

@@ -314,6 +314,8 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Implemented one-click buttons to subscribe and unsubscribe - thanks to dimadin for code patch
 * Changed some default settings, sender to BLOGNAME and number of recipients per email to 1
 * Implemented a change so that categories are not displayed in the filter dropdowns when using Subscribe2 in digest mode
+* Ensure an action is specified for HTML5 validity - thanks to Franco Carinato
+* Introduced 4 new hooks to filter per-post subscribers for each of the 4 email types - thanks to Nicolas Noé
 
 = Version 7.2 by Matthew Robinson =
 
