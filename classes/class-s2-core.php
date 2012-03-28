@@ -393,7 +393,7 @@ class s2class {
 			// To send HTML mail, the Content-Type header must be set
 			$header['Content-Type'] = get_option('html_type') . "; charset=\"". get_option('blog_charset') . "\"";
 		} else {
-			$header['Content-Type'] = "text/plain; charset=\"". html_entity_decode(get_option('blogname'), ENT_QUOTES) . "\"";
+			$header['Content-Type'] = "text/plain; charset=\"". get_option('blog_charset') . "\"";
 		}
 
 		// apply header filter to allow on-the-fly amendments
@@ -632,16 +632,23 @@ class s2class {
 			} else {
 				$recipients = array_merge((array)$public, (array)$registered);
 			}
+			$recipients = apply_filters('s2_send_plain_excerpt_suscribers', $recipients, $post->ID);
 			$this->mail($recipients, $subject, $excerpt_body);
 
 			// next we send plaintext full content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=post&author=$post->post_author"), $subject, $full_body);
+			$recipients = $this->get_registered("cats=$post_cats_string&format=post&author=$post->post_author");
+			$recipients = apply_filters('s2_send_plain_fullcontent_suscribers', $recipients, $post->ID);
+			$this->mail($recipients, $subject, $full_body);
 
 			// next we send html excerpt content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=html_excerpt&author=$post->post_author"), $subject, $html_excerpt_body, 'html');
+			$recipients = $this->get_registered("cats=$post_cats_string&format=html_excerpt&author=$post->post_author");
+			$recipients = apply_filters('s2_send_html_excerpt_suscribers', $recipients, $post->ID);
+			$this->mail($recipients, $subject, $html_excerpt_body, 'html');
 
 			// finally we send html full content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=html&author=$post->post_author"), $subject, $html_body, 'html');
+			$recipients = $this->get_registered("cats=$post_cats_string&format=html&author=$post->post_author");
+			$recipients = apply_filters('s2_send_html_fullcontent_suscribers', $recipients, $post->ID);
+			$this->mail($recipients, $subject, $html_body, 'html');
 		}
 	} // end publish()
 
@@ -787,7 +794,7 @@ class s2class {
 	function toggle($email = '') {
 		global $wpdb;
 
-		if ( '' == $email || ! is_email($email) ) { return false; }
+		if ( '' == $email || !is_email($email) ) { return false; }
 
 		// let's see if this is a public user
 		$status = $this->is_public($email);
@@ -1095,6 +1102,38 @@ class s2class {
 
 		return $admin;
 	} //end get_userdata()
+
+	/**
+	Subscribe/unsubscribe user from one-click submission
+	*/
+	function one_click_handler($user_ID, $action) {
+		if ( !isset($user_ID) || !isset($action) ) { return; }
+
+		$all_cats = $this->all_cats(true);
+
+		if ( 'subscribe' == $action ) {
+			// Subscribe
+			$new_cats = array();
+			foreach ( $all_cats as $cat ) {
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
+				$new_cats[] = $cat->term_id;
+			}
+
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $new_cats));
+
+			if ( 'yes' == $this->subscribe2_options['show_autosub'] && 'no' != get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true) ) {
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), 'yes');
+			}
+		} elseif ( 'unsubscribe' == $action ) {
+			// Unsubscribe
+			foreach ( $all_cats as $cat ) {
+				delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id);
+			}
+
+			delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+			delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'));
+		}
+	} //end one_click_handler()
 
 /* ===== helper functions: forms and stuff ===== */
 	/**
@@ -1659,6 +1698,14 @@ class s2class {
 			// add counterwidget css and js
 			if ( '1' == $this->subscribe2_options['counterwidget'] ) {
 				add_action('admin_init', array(&$this, 'widget_s2counter_css_and_js'));
+			}
+
+			// add one-click handlers
+			if ( 'yes' == $this->subscribe2_options['one_click_profile'] ) {
+				add_action( 'show_user_profile', array(&$this, 'one_click_profile_form') );
+				add_action( 'edit_user_profile', array(&$this, 'one_click_profile_form') );
+				add_action( 'personal_options_update', array(&$this, 'one_click_profile_form_save') );
+				add_action( 'edit_user_profile_update', array(&$this, 'one_click_profile_form_save') );
 			}
 
 			// capture CSV export
