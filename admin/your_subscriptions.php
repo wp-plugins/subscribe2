@@ -177,7 +177,7 @@ echo "</form>\r\n";
 
 // list of subscribed blogs on wordpress mu
 if ( $this->s2_mu && !isset($_GET['email']) ) {
-	global $blog_id, $current_user;
+	global $blog_id, $current_user, $s2class_multisite;
 	$s2blog_id = $blog_id;
 	get_currentuserinfo();
 	$blogs = $s2class_multisite->get_mu_blog_list();
@@ -209,7 +209,7 @@ if ( $this->s2_mu && !isset($_GET['email']) ) {
 		}
 		$blog['description'] = get_option('blogdescription');
 		$blog['blogurl'] = get_option('home');
-		$blog['subscribe_page'] = get_option('home') . "/wp-admin/users.php?page=s2_users";
+		$blog['subscribe_page'] = get_option('home') . "/wp-admin/admin.php?page=s2";
 
 		$key = strtolower($blog['blogname'] . "-" . $blog['blog_id']);
 		if ( !empty($subscribed) ) {
