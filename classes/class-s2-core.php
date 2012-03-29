@@ -159,6 +159,7 @@ class s2class {
 
 		// upgrade old wpmu user meta data to new
 		if ( $this->s2_mu === true ) {
+			global $s2class_multisite;
 			$s2class_multisite->namechange_subscribe2_widget();
 			// loop through all users
 			foreach ( $users as $user_ID ) {
@@ -1620,6 +1621,28 @@ class s2class {
 
 		load_plugin_textdomain('subscribe2', false, S2DIR);
 
+		// load our strings
+		$this->load_strings();
+
+		// Is this WordPressMU or not?
+		$this->s2_mu = false;
+		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
+			$this->s2_mu = true;
+		}
+		if ( function_exists('is_multisite') && is_multisite() ) {
+			$this->s2_mu = true;
+		}
+
+		// add action to handle WPMU subscriptions and unsubscriptions
+		if ( $this->s2_mu === true ) {
+			require_once(S2PATH . "classes/class-s2_multisite.php");
+			global $s2class_multisite;
+			$s2class_multisite = new s2_multisite;
+			if ( isset($_GET['s2mu_subscribe']) || isset($_GET['s2mu_unsubscribe']) ) {
+				add_action('init', array(&$this, 'wpmu_subscribe'));
+			}
+		}
+
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
 		if ( $wpdb->get_var("SHOW TABLES LIKE '{$this->public}'") != $this->public ) { $this->install(); }
@@ -1743,25 +1766,6 @@ class s2class {
 				add_action('wp_enqueue_scripts', array(&$this, 'add_ajax'));
 				add_action('wp_head', array(&$this, 'add_s2_ajax'));
 			}
-		}
-
-		// load our strings
-		$this->load_strings();
-
-		// Is this WordPressMU or not?
-		$this->s2_mu = false;
-		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
-			$this->s2_mu = true;
-		}
-		if ( function_exists('is_multisite') && is_multisite() ) {
-			$this->s2_mu = true;
-		}
-
-		// add action to handle WPMU subscriptions and unsubscriptions
-		if ( $this->s2_mu === true || isset($_GET['s2mu_subscribe']) || isset($_GET['s2mu_unsubscribe']) ) {
-			require_once(S2PATH . "classes/class-s2_multisite.php");
-			$s2class_multisite = new s2_multisite;
-			add_action('init', array(&$s2class_multisite, 'wpmu_subscribe'));
 		}
 	} // end s2init()
 

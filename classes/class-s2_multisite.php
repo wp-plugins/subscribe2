@@ -78,15 +78,9 @@ class s2_multisite {
 		}
 
 		// redirect to profile page
-		if ( current_user_can('manage_options') ) {
-			$url = get_option('siteurl') . '/wp-admin/users.php?page=s2_users';
-			wp_redirect($url);
-			exit(0);
-		} else {
-			$url = get_option('siteurl') . '/wp-admin/profile.php?page=s2_users';
-			wp_redirect($url);
-			exit(0);
-		}
+		$url = get_option('siteurl') . '/wp-admin/admin.php?page=s2';
+		wp_redirect($url);
+		exit(0);
 	} // end wpmu_subscribe()
 
 	/**

@@ -41,7 +41,7 @@ class s2_admin extends s2class {
 
 	function user_admin_css() {
 		wp_register_style('s2_user_admin', S2URL . 'include/s2_user_admin.css', array(), '1.0');
-		wp_enqueue_script('s2_user_admin');
+		wp_enqueue_style('s2_user_admin');
 	} // end user_admin_css()
 
 	function option_form_js() {
