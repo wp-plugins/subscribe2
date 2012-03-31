@@ -5,6 +5,7 @@ class s2_multisite {
 	Handles subscriptions and unsubscriptions for different blogs on WPMU installs
 	*/
 	function wpmu_subscribe() {
+		global $mysubscribe2;
 		// subscribe to new blog
 		if ( !empty($_GET['s2mu_subscribe']) ) {
 			$sub_id = intval($_GET['s2mu_subscribe']);
@@ -22,21 +23,21 @@ class s2_multisite {
 				}
 
 				// get categories, remove excluded ones if override is off
-				if ( 0 == $this->subscribe2_options['reg_override'] ) {
-					$all_cats = $this->all_cats(true, 'ID');
+				if ( 0 == $mysubscribe2->subscribe2_options['reg_override'] ) {
+					$all_cats = $mysubscribe2->all_cats(true, 'ID');
 				} else {
-					$all_cats = $this->all_cats(false, 'ID');
+					$all_cats = $mysubscribe2->all_cats(false, 'ID');
 				}
 
 				$cats_string = '';
 				foreach ( $all_cats as $cat ) {
 					('' == $cats_string) ? $cats_string = "$cat->term_id" : $cats_string .= ",$cat->term_id";
-					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
+					update_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
 				}
 				if ( empty($cats_string) ) {
-					delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+					delete_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_subscribed'));
 				} else {
-					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats_string);
+					update_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_subscribed'), $cats_string);
 				}
 			}
 		} elseif ( !empty($_GET['s2mu_unsubscribe']) ) {
@@ -48,16 +49,16 @@ class s2_multisite {
 				$user_ID = get_current_user_id();
 
 				// delete subscription to all categories on that blog
-				$cats = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
+				$cats = get_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_subscribed'), true);
 				$cats = explode(',', $cats);
 				if ( !is_array($cats) ) {
 					$cats = array($cats);
 				}
 
 				foreach ( $cats as $id ) {
-					delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
+					delete_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_cat') . $id);
 				}
-				delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+				delete_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_subscribed'));
 
 				// add an action hook for external manipulation of blog and user data
 				do_action_ref_array('subscribe2_wpmu_unsubscribe', array($user_ID, $unsub_id));
@@ -107,11 +108,12 @@ class s2_multisite {
 	Register user details when new user is added to a multisite blog
 	*/
 	function wpmu_add_user($user_ID = 0) {
+		global $mysubscribe2;
 		if ( 0 == $user_ID ) { return; }
-		if ( 'yes' == $this->subscribe2_options['autosub'] ) {
-			$this->register($user_ID, true);
+		if ( 'yes' == $mysubscribe2->subscribe2_options['autosub'] ) {
+			$mysubscribe2->register($user_ID, true);
 		} else {
-			$this->register($user_ID, false);
+			$mysubscribe2->register($user_ID, false);
 		}
 	} // end wpmu_add_user()
 
@@ -119,17 +121,18 @@ class s2_multisite {
 	Delete user details when a user is removed from a multisite blog
 	*/
 	function wpmu_remove_user($user_ID) {
+		global $mysubscribe2;
 		if ( 0 == $user_ID ) { return; }
-		delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'));
-		delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'));
-		$cats = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true);
+		delete_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_format'));
+		delete_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_autosub'));
+		$cats = get_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_subscribed'), true);
 		if ( !empty($cats) ) {
 			$cats = explode(',', $cats);
 			foreach ( $cats as $cat ) {
-				delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat);
+				delete_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_cat') . $cat);
 			}
 		}
-		delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+		delete_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_subscribed'));
 	} // end wpmu_remove_user()
 
 	/**

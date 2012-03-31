@@ -303,6 +303,11 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 == Changelog ==
 
+= Version 8.1 by Matthew Robinson =
+
+* Fixed redirect errors and crash affecting multisite installs on upgrade to 8.0 - thanks in particular to Ed Cooper
+* Fixed several other multisite bugs affecting links and styling
+
 = Version 8.0 by Matthew Robinson =
 
 * Split the main plugin file into separate classes for more efficient (60% less RAM) server resource usage - huge thanks to Milan Petrovic
