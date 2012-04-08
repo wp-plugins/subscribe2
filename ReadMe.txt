@@ -307,6 +307,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 * Fixed redirect errors and crash affecting multisite installs on upgrade to 8.0 - thanks in particular to Ed Cooper
 * Fixed several other multisite bugs affecting links and styling
+* Fixed empty CSV exports - thanks to Gil Namur
 
 = Version 8.0 by Matthew Robinson =
 

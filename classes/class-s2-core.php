@@ -1175,7 +1175,7 @@ class s2class {
 		$subscribers = explode(",\r\n", $subscribers);
 		natcasesort($subscribers);
 
-		$exportcsv = "User Email,User Type";
+		$exportcsv = "User Email,User Type,User Name";
 		$all_cats = $this->all_cats(false, 'ID');
 
 		foreach ($all_cats as $cat) {
@@ -1184,9 +1184,14 @@ class s2class {
 		}
 		$exportcsv .= "\r\n";
 
+		if ( !function_exists('get_userdata') ) {
+			require_once(ABSPATH . WPINC . '/pluggable.php');
+		}
+
 		foreach ( $subscribers as $subscriber ) {
 			if ( $this->is_registered($subscriber) ) {
 				$user_ID = $this->get_user_id( $subscriber );
+				$user_info = get_userdata( $user_ID );
 
 				$cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 				$subscribed_cats = '';
@@ -1196,6 +1201,7 @@ class s2class {
 
 				$exportcsv .= $subscriber . ',';
 				$exportcsv .= __('Registered User', 'subscribe2');
+				$exportcsv .= ',' . $user_info->display_name;
 				$exportcsv .= $subscribed_cats . "\r\n";
 			} else {
 				if ( $this->is_public($subscriber) === '1' ) {
