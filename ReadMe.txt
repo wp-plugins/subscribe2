@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_butt
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.1
 Tested up to: 3.3.1
-Stable tag: 7.2
+Stable tag: 8.1
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -303,6 +303,12 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 == Changelog ==
 
+= Version 8.1 by Matthew Robinson =
+
+* Fixed redirect errors and crash affecting multisite installs on upgrade to 8.0 - thanks in particular to Ed Cooper
+* Fixed several other multisite bugs affecting links and styling - thanks to Mark Olbert
+* Fixed empty CSV exports - thanks to Gil Namur
+
 = Version 8.0 by Matthew Robinson =
 
 * Split the main plugin file into separate classes for more efficient (60% less RAM) server resource usage - huge thanks to Milan Petrovic
@@ -311,6 +317,11 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fixed some PHP messages regarding use of deprecated clean_url() function and WordPress version checking - thanks to anmari
 * Improved white space trimming in the code so it respects tabs and line breaks - thanks to belg4mit
 * Updated screenshots to Subscribe2 8.0 and WordPress 3.3.1 screen layouts
+* Implemented one-click buttons to subscribe and unsubscribe - thanks to dimadin for code patch
+* Changed some default settings, sender to BLOGNAME and number of recipients per email to 1
+* Implemented a change so that categories are not displayed in the filter dropdowns when using Subscribe2 in digest mode
+* Ensure an action is specified for HTML5 validity - thanks to Franco Carinato
+* Introduced 4 new hooks to filter per-post subscribers for each of the 4 email types - thanks to Nicolas Noé
 
 = Version 7.2 by Matthew Robinson =
 

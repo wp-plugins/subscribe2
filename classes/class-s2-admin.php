@@ -41,7 +41,7 @@ class s2_admin extends s2class {
 
 	function user_admin_css() {
 		wp_register_style('s2_user_admin', S2URL . 'include/s2_user_admin.css', array(), '1.0');
-		wp_enqueue_script('s2_user_admin');
+		wp_enqueue_style('s2_user_admin');
 	} // end user_admin_css()
 
 	function option_form_js() {
@@ -371,13 +371,16 @@ class s2_admin extends s2class {
 			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'");
 		}
 		$count['all'] = ($count['confirmed'] + $count['unconfirmed'] + $count['all_users']);
-		if ( $this->s2_mu ) {
-			foreach ( $all_cats as $cat ) {
-				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(a.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key='" . $this->get_usermeta_keyname('s2_cat') . $cat->term_id . "'");
-			}
-		} else {
-			foreach ( $all_cats as $cat ) {
-				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_cat') . $cat->term_id . "'");
+		// get subscribers to individual categories but only if we are using per-post notifications
+		if ( $this->subscribe2_options['email_freq'] == 'never' ) {
+			if ( $this->s2_mu ) {
+				foreach ( $all_cats as $cat ) {
+					$count[$cat->name] = $wpdb->get_var("SELECT COUNT(a.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key='" . $this->get_usermeta_keyname('s2_cat') . $cat->term_id . "'");
+				}
+			} else {
+				foreach ( $all_cats as $cat ) {
+					$count[$cat->name] = $wpdb->get_var("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_cat') . $cat->term_id . "'");
+				}
 			}
 		}
 
@@ -397,7 +400,7 @@ class s2_admin extends s2class {
 			echo ">$display (" . ($count[$whom]) . ")</option>\r\n";
 		}
 
-		if ( $count['registered'] > 0 ) {
+		if ( $count['registered'] > 0 && $this->subscribe2_options['email_freq'] == 'never' ) {
 			foreach ( $all_cats as $cat ) {
 				if ( in_array($cat->term_id, $exclude) ) { continue; }
 				echo "<option value=\"" . $cat->term_id . "\"";
@@ -707,5 +710,35 @@ class s2_admin extends s2class {
 			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
 		}
 	} // end delete_category()
+
+/* ===== functions to show & handle one-click subscription ===== */
+	/**
+	Show form for one-click subscription on user profile page
+	*/
+	function one_click_profile_form($user) {
+		echo "<h3>" . __('Email subscription', 'subscribe2') . "</h3>\r\n";
+		echo "<table class=\"form-table\">\r\n";
+		echo "<tr><th scope=\"row\">" . __('Subscribe / Unsubscribe', 'subscribe2') . "</th>\r\n";
+		echo "<td><label><input type=\"checkbox\" name=\"sub2-one-click-subscribe\" value=\"1\" " . checked( ! get_user_meta($user->ID, $this->get_usermeta_keyname('s2_subscribed'), true), false, false ) . " /> " . __('Receive notifications', 'subscribe2') . "</label><br />\r\n";
+		echo "<span class=\"description\">" . __('Check if you want to receive email notification when new posts are published', 'subscribe2') . "</span>\r\n";
+		echo "</td></tr></table>\r\n";
+	} // end one_click_profile_form()
+
+	/**
+	Handle submission from profile one-click subscription
+	*/
+	function one_click_profile_form_save($user_ID) {
+		if ( !current_user_can( 'edit_user', $user_ID ) ) {
+			return false;
+		}
+
+		if ( isset( $_POST['sub2-one-click-subscribe'] ) && 1 == $_POST['sub2-one-click-subscribe'] ) {
+			// Subscribe
+			$this->one_click_handler($user_ID, 'subscribe');
+		} else {
+			// Unsubscribe
+			$this->one_click_handler($user_ID, 'unsubscribe');
+		}
+	} // end one_click_profile_form_save()
 }
 ?>
