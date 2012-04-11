@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_butt
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.1
 Tested up to: 3.3.1
-Stable tag: 8.0
+Stable tag: 8.1
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -306,7 +306,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 = Version 8.1 by Matthew Robinson =
 
 * Fixed redirect errors and crash affecting multisite installs on upgrade to 8.0 - thanks in particular to Ed Cooper
-* Fixed several other multisite bugs affecting links and styling
+* Fixed several other multisite bugs affecting links and styling - thanks to Mark Olbert
 * Fixed empty CSV exports - thanks to Gil Namur
 
 = Version 8.0 by Matthew Robinson =
