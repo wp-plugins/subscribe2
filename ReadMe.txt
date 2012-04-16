@@ -303,6 +303,12 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 == Changelog ==
 
+= Version 8.2 by Matthew Robinson =
+
+* Implemented use of Farbtastic as colour chooser in the Counter Widget because ColorPicker has been deprecated in WordPress
+* Fixed one hook call in WordPress to pass $this variable by reference to save a little more RAM
+* Fixed Subscribe2 implementation of custom taxonomies
+
 = Version 8.1 by Matthew Robinson =
 
 * Fixed redirect errors and crash affecting multisite installs on upgrade to 8.0 - thanks in particular to Ed Cooper

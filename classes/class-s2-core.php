@@ -465,7 +465,9 @@ class s2class {
 				return $post;
 			}
 
-			$post_cats = wp_get_post_categories($post->ID);
+			$s2_taxonomies = array('category');
+			$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
+			$post_cats = wp_get_object_terms($post->ID, $s2_taxonomies, array('fields' => 'ids'));
 			$check = false;
 			// is the current post assigned to any categories
 			// which should not generate a notification email?
@@ -538,7 +540,7 @@ class s2class {
 			$this->myname = html_entity_decode($user->display_name, ENT_QUOTES);
 		}
 
-		$this->post_cat_names = implode(', ', wp_get_post_categories($post->ID, array('fields' => 'names')));
+		$this->post_cat_names = implode(', ', wp_get_object_terms($post->ID, $s2_taxonomies, array('fields' => 'names')));
 		$this->post_tag_names = implode(', ', wp_get_post_tags($post->ID, array('fields' => 'names')));
 
 		// Get email subject
@@ -1441,7 +1443,9 @@ class s2class {
 		$message_post= '';
 		$message_posttime = '';
 		foreach ( $posts as $post ) {
-			$post_cats = wp_get_post_categories($post->ID);
+			$s2_taxonomies = array('category');
+			$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
+			$post_cats = wp_get_object_terms($post->ID, $s2_taxonomies, array('fields' => 'ids'));
 			$post_cats_string = implode(',', $post_cats);
 			$all_post_cats = array_unique(array_merge($all_post_cats, $post_cats));
 			$check = false;
@@ -1499,7 +1503,7 @@ class s2class {
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
 			$message_posttime .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
 			if ( strstr($mailtext, "{CATS}") ) {
-				$post_cat_names = implode(', ', wp_get_post_categories($post->ID, array('fields' => 'names')));
+				$post_cat_names = implode(', ', wp_get_object_terms($post->ID, $s2_taxonomies, array('fields' => 'names')));
 				$message_post .= __('Posted in', 'subscribe2') . ": " . $post_cat_names . "\r\n";
 				$message_posttime .= __('Posted in', 'subscribe2') . ": " . $post_cat_names . "\r\n";
 			}
@@ -1687,7 +1691,7 @@ class s2class {
 		// Add actions specific to admin or frontend
 		if ( is_admin() ) {
 			//add menu, authoring and category admin actions
-			add_action('admin_menu', array($this, 'admin_menu'));
+			add_action('admin_menu', array(&$this, 'admin_menu'));
 			add_action('admin_menu', array(&$this, 's2_meta_init'));
 			add_action('save_post', array(&$this, 's2_meta_handler'));
 			add_action('create_category', array(&$this, 'new_category'));
