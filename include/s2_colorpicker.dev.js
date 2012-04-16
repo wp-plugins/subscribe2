@@ -18,6 +18,7 @@ jQuery(document).ready(function() {
 			}
 		});
 	} else {
+		alert("here");
 		// use .on as we are using jQuery 1.7 and up where .live is deprecated
 		jQuery(document).on('mousemove', function(event){
 			jQuery('.colorpickerField').each(function(){
@@ -37,9 +38,9 @@ jQuery(document).ready(function() {
 					});
 				}
 			});
+			jQuery('.colorpickerField').focusout(function() {
+				jQuery('.s2_colorpicker').slideUp();
+			});
 		});
 	}
-	jQuery('.colorpickerField').focusout(function() {
-		jQuery('.s2_colorpicker').slideUp();
-	});
 });
