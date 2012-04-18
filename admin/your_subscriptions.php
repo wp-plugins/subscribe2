@@ -16,69 +16,75 @@ if ( isset($_GET['email']) ) {
 if ( isset($_POST['s2_admin']) && 'user' == $_POST['s2_admin'] ) {
 	check_admin_referer('subscribe2-user_subscribers' . $s2nonce);
 
-	if ( isset($_POST['s2_format']) ) {
-		update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), $_POST['s2_format']);
-	} else {
-		// value has not been set so use default
-		update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), 'excerpt');
-	}
-	if ( isset($_POST['new_category']) ) {
-		update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), $_POST['new_category']);
-	} else {
-		// value has not been passed so use Settings defaults
-		if ( $this->subscribe2_options['show_autosub'] == 'yes' && $this->subscribe2_options['autosub_def'] == 'yes' ) {
-			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), 'yes');
+	if ( $_POST['submit'] ) {
+		if ( isset($_POST['s2_format']) ) {
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), $_POST['s2_format']);
 		} else {
-			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), 'no');
+			// value has not been set so use default
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), 'excerpt');
 		}
-	}
-
-	$cats = $_POST['category'];
-
-	if ( empty($cats) || $cats == '-1' ) {
-		$oldcats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
-		if ( $oldcats ) {
-			foreach ( $oldcats as $cat ) {
-				delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat);
+		if ( isset($_POST['new_category']) ) {
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), $_POST['new_category']);
+		} else {
+			// value has not been passed so use Settings defaults
+			if ( $this->subscribe2_options['show_autosub'] == 'yes' && $this->subscribe2_options['autosub_def'] == 'yes' ) {
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), 'yes');
+			} else {
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), 'no');
 			}
 		}
-		delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
-	} elseif ( $cats == 'digest' ) {
-		$all_cats = $this->all_cats(false, 'ID');
-		foreach ( $all_cats as $cat ) {
-			('' == $catids) ? $catids = "$cat->term_id" : $catids .= ",$cat->term_id";
-			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
-		}
-		update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $catids);
-	} else {
-		if ( !is_array($cats) ) {
-			$cats = (array)$_POST['category'];
-		}
-		sort($cats);
-		$old_cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
-		$remove = array_diff($old_cats, $cats);
-		$new = array_diff($cats, $old_cats);
-		if ( !empty($remove) ) {
-			// remove subscription to these cat IDs
-			foreach ( $remove as $id ) {
-				delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
-			}
-		}
-		if ( !empty($new) ) {
-			// add subscription to these cat IDs
-			foreach ( $new as $id ) {
-				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id, $id);
-			}
-		}
-		update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
-	}
 
-	$authors = $_POST['author'];
-	if ( is_array($authors) ) {
-		$authors = implode(',', $authors);
-		update_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), $authors);
-	} elseif ( empty($authors) ) {
-		update_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), '');
+		$cats = $_POST['category'];
+
+		if ( empty($cats) || $cats == '-1' ) {
+			$oldcats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
+			if ( $oldcats ) {
+				foreach ( $oldcats as $cat ) {
+					delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat);
+				}
+			}
+			delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+		} elseif ( $cats == 'digest' ) {
+			$all_cats = $this->all_cats(false, 'ID');
+			foreach ( $all_cats as $cat ) {
+				('' == $catids) ? $catids = "$cat->term_id" : $catids .= ",$cat->term_id";
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
+			}
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $catids);
+		} else {
+			if ( !is_array($cats) ) {
+				$cats = (array)$_POST['category'];
+			}
+			sort($cats);
+			$old_cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
+			$remove = array_diff($old_cats, $cats);
+			$new = array_diff($cats, $old_cats);
+			if ( !empty($remove) ) {
+				// remove subscription to these cat IDs
+				foreach ( $remove as $id ) {
+					delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
+				}
+			}
+			if ( !empty($new) ) {
+				// add subscription to these cat IDs
+				foreach ( $new as $id ) {
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id, $id);
+				}
+			}
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
+		}
+
+		$authors = $_POST['author'];
+		if ( is_array($authors) ) {
+			$authors = implode(',', $authors);
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), $authors);
+		} elseif ( empty($authors) ) {
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), '');
+		}
+	} elseif ( $_POST['subscribe'] ) {
+		$this->one_click_handler($user_ID, 'subscribe');
+	} elseif ( $_POST['unsubscribe'] ) {
+		$this->one_click_handler($user_ID, 'unsubscribe');
 	}
 
 	echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Subscription preferences updated.', 'subscribe2') . "</strong></p></div>\n";
@@ -118,6 +124,11 @@ if ( $this->subscribe2_options['email_freq'] == 'never' ) {
 		echo "</p>";
 	}
 
+	// One-click subscribe and unsubscribe buttons
+	echo "<h2>" . __('One Click Subscription / Unsubscription', 'subscribe2') . "</h2>\r\n";
+	echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"subscribe\" value=\"" . __("Subscribe to All", 'subscribe2') . "\" />&nbsp;&nbsp;";
+	echo "<input type=\"submit\" class=\"button-primary\" name=\"unsubscribe\" value=\"" . __("Unsubscribe from All", 'subscribe2') . "\" /></p>";
+
 	// subscribed categories
 	if ( $this->s2_mu ) {
 		global $blog_id;
@@ -153,7 +164,7 @@ if ( $this->subscribe2_options['email_freq'] == 'never' ) {
 	echo "</label></p>";
 }
 
-if ( count($this->get_authors()) > 1 ) {
+if ( count($this->get_authors()) > 1 && $this->subscribe2_options['email_freq'] == 'never' ) {
 	echo "<div class=\"s2_admin\" id=\"s2_authors\">\r\n";
 	echo "<h2>" . __('Do not send notifications for post made by these authors', 'subscribe2') . "</h2>\r\n";
 	$this->display_author_form(explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), true)));
@@ -166,7 +177,7 @@ echo "</form>\r\n";
 
 // list of subscribed blogs on wordpress mu
 if ( $this->s2_mu && !isset($_GET['email']) ) {
-	global $blog_id, $current_user;
+	global $blog_id, $current_user, $s2class_multisite;
 	$s2blog_id = $blog_id;
 	get_currentuserinfo();
 	$blogs = $s2class_multisite->get_mu_blog_list();
@@ -198,7 +209,7 @@ if ( $this->s2_mu && !isset($_GET['email']) ) {
 		}
 		$blog['description'] = get_option('blogdescription');
 		$blog['blogurl'] = get_option('home');
-		$blog['subscribe_page'] = get_option('home') . "/wp-admin/users.php?page=s2_users";
+		$blog['subscribe_page'] = get_option('home') . "/wp-admin/admin.php?page=s2";
 
 		$key = strtolower($blog['blogname'] . "-" . $blog['blog_id']);
 		if ( !empty($subscribed) ) {

@@ -229,7 +229,7 @@ echo "<br /><br />";
 // show the selected subscribers
 $alternate = 'alternate';
 echo "<table class=\"widefat\" cellpadding=\"2\" cellspacing=\"2\" width=\"100%\">";
-$searchterm = ( $_POST['searchterm'] ) ? $_POST['searchterm'] : '';
+$searchterm = ( $_POST['searchterm'] ) ? stripslashes(esc_html($_POST['searchterm'])) : '';
 echo "<tr class=\"alternate\"><td colspan=\"3\"><input type=\"text\" name=\"searchterm\" value=\"" . $searchterm . "\" /></td>\r\n";
 echo "<td><input type=\"submit\" class=\"button-secondary\" name=\"search\" value=\"" . __('Search Subscribers', 'subscribe2') . "\" /></td>\r\n";
 if ( $reminderform ) {

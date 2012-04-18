@@ -190,6 +190,7 @@ if ( isset( $_POST['s2_admin']) ) {
 		$this->subscribe2_options['show_autosub'] = $_POST['show_autosub'];
 		$this->subscribe2_options['autosub_def'] = $_POST['autosub_def'];
 		$this->subscribe2_options['comment_subs'] = $_POST['comment_subs'];
+		$this->subscribe2_options['one_click_profile'] = $_POST['one_click_profile'];
 
 		//barred domains
 		$this->subscribe2_options['barred'] = $_POST['barred'];
@@ -446,16 +447,20 @@ echo __('Before the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp
 echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"after\"" . checked($this->subscribe2_options['comment_subs'], 'after', false) . " /> ";
 echo __('After the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp;";
 echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"no\"" . checked($this->subscribe2_options['comment_subs'], 'no', false) . " /> ";
-echo __('No', 'subscribe2');
-echo "</label></p>";
-echo "</div>\r\n";
+echo __('No', 'subscribe2') . "</label><br /><br />";
+echo __('Show one-click subscription on profile page', 'subscribe2') . ":<br />\r\n";
+echo "<label><input type=\"radio\" name=\"one_click_profile\" value=\"yes\"" . checked($this->subscribe2_options['one_click_profile'], 'yes', false) . " /> ";
+echo __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
+echo "<label><input type=\"radio\" name=\"one_click_profile\" value=\"no\"" . checked($this->subscribe2_options['one_click_profile'], 'no', false) . " /> ";
+echo __('No', 'subscribe2') . "</label>\r\n";
+echo "</p></div>\r\n";
 
 //barred domains
 echo "<div class=\"s2_admin\" id=\"s2_barred_domains\">\r\n";
 echo "<h2>" . __('Barred Domains', 'subscribe2') . "</h2>\r\n";
 echo "<p>";
 echo __('Enter domains to bar from public subscriptions: <br /> (Use a new line for each entry and omit the "@" symbol, for example email.com)', 'subscribe2');
-echo "<br />\r\n<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"barred\">" . $this->subscribe2_options['barred'] . "</textarea>";
+echo "<br />\r\n<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"barred\">" . esc_textarea($this->subscribe2_options['barred']) . "</textarea>";
 echo "</p>";
 echo "</div>\r\n";
 

@@ -32,6 +32,10 @@ class s2_frontend extends s2class {
 		// if ID is provided, get permalink
 		if ( $id ) {
 			$url = get_permalink( $id );
+		} elseif ( $this->subscribe2_options['s2page'] > 0 ) {
+			$url = get_permalink( $this->subscribe2_options['s2page'] );
+		} else {
+			$url = get_site_url();
 		}
 		// build default form
 		if ( $nojs == 'true' ) {
