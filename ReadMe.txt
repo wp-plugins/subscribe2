@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_butt
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.1
 Tested up to: 3.3.1
-Stable tag: 8.1
+Stable tag: 8.2
 
 Sends a list of subscribers an email notification when new posts are published to your blog
 
@@ -308,6 +308,8 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Implemented use of Farbtastic as colour chooser in the Counter Widget because ColorPicker has been deprecated in WordPress
 * Fixed one hook call in WordPress to pass $this variable by reference to save a little more RAM
 * Fixed Subscribe2 implementation of custom taxonomies
+* Fixed Bulk Management Format Change code to apply for all users
+* Fix for low impact security vulnerability
 
 = Version 8.1 by Matthew Robinson =
 
