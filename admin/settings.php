@@ -460,7 +460,7 @@ echo "<div class=\"s2_admin\" id=\"s2_barred_domains\">\r\n";
 echo "<h2>" . __('Barred Domains', 'subscribe2') . "</h2>\r\n";
 echo "<p>";
 echo __('Enter domains to bar from public subscriptions: <br /> (Use a new line for each entry and omit the "@" symbol, for example email.com)', 'subscribe2');
-echo "<br />\r\n<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"barred\">" . $this->subscribe2_options['barred'] . "</textarea>";
+echo "<br />\r\n<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"barred\">" . esc_textarea($this->subscribe2_options['barred']) . "</textarea>";
 echo "</p>";
 echo "</div>\r\n";
 
