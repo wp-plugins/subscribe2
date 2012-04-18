@@ -592,7 +592,7 @@ class s2_admin extends s2class {
 		if ( empty($format) ) { return; }
 
 		global $wpdb;
-		$subscribers = explode(',\r\n', $subscribers_string);
+		$subscribers = explode(",\r\n", $subscribers_string);
 		$emails = "'" . implode("', '", $subscribers) . "'";
 		$ids = $wpdb->get_col("SELECT ID FROM $wpdb->users WHERE user_email IN ($emails)");
 		$ids = implode(',', $ids);
