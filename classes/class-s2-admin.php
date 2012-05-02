@@ -527,7 +527,7 @@ class s2_admin extends s2class {
 		if ( '' == $emails || '' == $cats ) { return false; }
 		global $wpdb;
 
-		$useremails = explode(",", $emails);
+		$useremails = explode(",\r\n", $emails);
 		$useremails = implode("', '", $useremails);
 
 		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ('$useremails')";
@@ -559,7 +559,7 @@ class s2_admin extends s2class {
 		if ( '' == $emails || '' == $cats ) { return false; }
 		global $wpdb;
 
-		$useremails = explode(",", $emails);
+		$useremails = explode(",\r\n", $emails);
 		$useremails = "'" . implode("', '", $useremails) . "'";
 
 		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ($useremails)";
@@ -597,7 +597,7 @@ class s2_admin extends s2class {
 		$ids = $wpdb->get_col("SELECT ID FROM $wpdb->users WHERE user_email IN ($emails)");
 		$ids = implode(',', $ids);
 		$sql = "UPDATE $wpdb->usermeta SET meta_value='{$format}' WHERE meta_key='" . $this->get_usermeta_keyname('s2_format') . "' AND user_id IN ($ids)";
-		$wpdb->get_results("UPDATE $wpdb->usermeta SET meta_value='{$format}' WHERE meta_key='" . $this->get_usermeta_keyname('s2_format') . "' AND user_id IN ($ids)");
+		$wpdb->get_results($sql);
 	} // end format_change()
 
 	/**
