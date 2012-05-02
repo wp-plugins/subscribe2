@@ -15,10 +15,10 @@ if ( empty($id) ) {
 // was anything POSTed?
 if ( isset( $_POST['s2_admin']) ) {
 	check_admin_referer('subscribe2-options_subscribers' . $s2nonce);
-	if ( $_POST['reset'] ) {
+	if ( isset($_POST['reset']) ) {
 		$this->reset();
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_reset</strong></p></div>";
-	} elseif ( $_POST['preview'] ) {
+	} elseif ( isset($_POST['preview']) ) {
 		global $user_email;
 		$this->preview_email = true;
 		if ( 'never' == $this->subscribe2_options['email_freq'] ) {
@@ -28,14 +28,14 @@ if ( isset( $_POST['s2_admin']) ) {
 			$this->subscribe2_cron($user_email);
 		}
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Preview message(s) sent to logged in user', 'subscribe2') . "</strong></p></div>";
-	} elseif ( $_POST['resend'] ) {
+	} elseif ( isset($_POST['resend']) ) {
 		$status = $this->subscribe2_cron('', 'resend');
 		if ( $status === false ) {
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('The Digest Notification email contained no post information. No email was sent', 'subscribe2') . "</strong></p></div>";
 		} else {
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Attempt made to resend the Digest Notification email', 'subscribe2') . "</strong></p></div>";
 		}
-	} elseif ( $_POST['submit'] ) {
+	} elseif ( isset($_POST['submit']) ) {
 		// BCClimit
 		if ( is_numeric($_POST['bcc']) && $_POST['bcc'] >= 0 ) {
 			$this->subscribe2_options['bcclimit'] = $_POST['bcc'];
@@ -159,27 +159,27 @@ if ( isset( $_POST['s2_admin']) ) {
 		}
 
 		// show meta link?
-		( $_POST['show_meta'] == '1' ) ? $showmeta = '1' : $showmeta = '0';
+		( isset($_POST['show_meta']) && $_POST['show_meta'] == '1' ) ? $showmeta = '1' : $showmeta = '0';
 		$this->subscribe2_options['show_meta'] = $showmeta;
 
 		// show button?
-		( $_POST['show_button'] == '1' ) ? $showbutton = '1' : $showbutton = '0';
+		( isset($_POST['show_button']) && $_POST['show_button'] == '1' ) ? $showbutton = '1' : $showbutton = '0';
 		$this->subscribe2_options['show_button'] = $showbutton;
 
 		// enable AJAX style form
-		( $_POST['ajax'] == '1' ) ? $ajax = '1' : $ajax = '0';
+		( isset($_POST['ajax']) && $_POST['ajax'] == '1' ) ? $ajax = '1' : $ajax = '0';
 		$this->subscribe2_options['ajax'] = $ajax;
 
 		// show widget in Presentation->Widgets
-		( $_POST['widget'] == '1' ) ? $showwidget = '1' : $showwidget = '0';
+		( isset($_POST['widget']) && $_POST['widget'] == '1' ) ? $showwidget = '1' : $showwidget = '0';
 		$this->subscribe2_options['widget'] = $showwidget;
 
 		// show counterwidget in Presentation->Widgets
-		( $_POST['counterwidget'] == '1' ) ? $showcounterwidget = '1' : $showcounterwidget = '0';
+		( isset($_POST['counterwidget']) && $_POST['counterwidget'] == '1' ) ? $showcounterwidget = '1' : $showcounterwidget = '0';
 		$this->subscribe2_options['counterwidget'] = $showcounterwidget;
 
 		// Subscribe2 over ride postmeta checked by default
-		( $_POST['s2meta_default'] == '1' ) ? $s2meta_default = '1' : $s2meta_default = '0';
+		( isset($_POST['s2meta_default']) && $_POST['s2meta_default'] == '1' ) ? $s2meta_default = '1' : $s2meta_default = '0';
 		$this->subscribe2_options['s2meta_default'] = $s2meta_default;
 
 		//automatic subscription

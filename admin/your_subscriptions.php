@@ -16,7 +16,7 @@ if ( isset($_GET['email']) ) {
 if ( isset($_POST['s2_admin']) && 'user' == $_POST['s2_admin'] ) {
 	check_admin_referer('subscribe2-user_subscribers' . $s2nonce);
 
-	if ( $_POST['submit'] ) {
+	if ( isset($_POST['submit']) ) {
 		if ( isset($_POST['s2_format']) ) {
 			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_format'), $_POST['s2_format']);
 		} else {
@@ -34,7 +34,7 @@ if ( isset($_POST['s2_admin']) && 'user' == $_POST['s2_admin'] ) {
 			}
 		}
 
-		$cats = $_POST['category'];
+		$cats = ( isset($_POST['category']) ) ? $_POST['category'] : '';
 
 		if ( empty($cats) || $cats == '-1' ) {
 			$oldcats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
@@ -74,16 +74,16 @@ if ( isset($_POST['s2_admin']) && 'user' == $_POST['s2_admin'] ) {
 			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $cats));
 		}
 
-		$authors = $_POST['author'];
+		$authors = ( isset($_POST['author']) ) ? $_POST['author'] : '';
 		if ( is_array($authors) ) {
 			$authors = implode(',', $authors);
 			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), $authors);
 		} elseif ( empty($authors) ) {
 			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), '');
 		}
-	} elseif ( $_POST['subscribe'] ) {
+	} elseif ( isset($_POST['subscribe']) ) {
 		$this->one_click_handler($user_ID, 'subscribe');
-	} elseif ( $_POST['unsubscribe'] ) {
+	} elseif ( isset($_POST['unsubscribe']) ) {
 		$this->one_click_handler($user_ID, 'unsubscribe');
 	}
 

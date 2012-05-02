@@ -38,6 +38,8 @@ if ( isset($_POST['s2_admin']) && 'mail' == $_POST['s2_admin'] ) {
 	$status = $this->mail($recipients, $subject, $body, 'text');
 	if ( $status ) {
 		$message = $this->mail_sent;
+	} elseif ( empty($body) ) {
+		$message = __('Your email was empty', 'subscribe2');
 	} else {
 		global $phpmailer;
 		$message = $this->mail_failed . $phpmailer->ErrorInfo;

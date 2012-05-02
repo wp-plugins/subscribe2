@@ -413,6 +413,7 @@ class s2class {
 	Function to add UTM tracking details to links
 	*/
 	function get_tracking_link($link) {
+		if ( empty($link) ) { return; }
 		if ( !empty($this->subscribe2_options['tracking']) ) {
 				$delimiter = '?';
 				if ( strpos($link, $delimiter) > 0 ) { $delimiter = '&'; }
@@ -1134,7 +1135,7 @@ class s2class {
 			}
 
 			delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
-			delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'));
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), 'no');
 		}
 	} //end one_click_handler()
 
@@ -1617,7 +1618,6 @@ class s2class {
 		$this->load_strings();
 
 		// Is this WordPressMU or not?
-		$this->s2_mu = false;
 		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
 			$this->s2_mu = true;
 		}
@@ -1724,7 +1724,7 @@ class s2class {
 			}
 
 			// capture CSV export
-			if ( isset($_POST['s2_admin']) && $_POST['csv'] ) {
+			if ( isset($_POST['s2_admin']) && isset($_POST['csv']) ) {
 				$date = date('Y-m-d');
 				header("Content-Description: File Transfer");
 				header("Content-type: application/octet-stream");
@@ -1774,11 +1774,16 @@ class s2class {
 	var $post_time = '';
 	var $myname = '';
 	var $myemail = '';
+	var $authorname = '';
+	var $post_cat_names = '';
+	var $post_tag_names = '';
+	var $post_count = '';
 	var $signup_dates = array();
 	var $filtered = 0;
 	var $preview_email = false;
 
 	// state variables used to affect processing
+	var $s2_mu = false;
 	var $action = '';
 	var $email = '';
 	var $message = '';

@@ -43,7 +43,7 @@ if ( version_compare($GLOBALS['wp_version'], '3.1', '<') || !function_exists( 'a
 
 // our version number. Don't touch this or any line below
 // unless you know exactly what you are doing
-define( 'S2VERSION', '8.1' );
+define( 'S2VERSION', '8.3' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', trailingslashit(dirname(plugin_basename(__FILE__))) );
 define( 'S2URL', plugin_dir_url(dirname(__FILE__)) . S2DIR );
