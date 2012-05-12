@@ -513,6 +513,10 @@ class s2class {
 				// if not, no sense doing anything else
 				return $post;
 			}
+		} else {
+			// make sure we prime the taxonomy variable for preview posts
+			$s2_taxonomies = array('category');
+			$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
 		}
 
 		// we set these class variables so that we can avoid

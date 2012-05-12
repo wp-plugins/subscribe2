@@ -303,6 +303,16 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 == Changelog ==
 
+= Version 8.3 by Matthew Robinson =
+
+* Fixed a bunch of PHP messages - should not show anyway unless WP_DEBUG is true or PHP error reporting is on a high setting
+* Fixed bulk category management so it applies to all users and not just the first record
+* Update 'autosub' to no on one-click unsubscribe instead of erasing the value
+* Return empty string is get_tracking_link() is passed and empty variable
+* Fixed some typographical errors
+* Fixed profile page to obey 'one click' display setting
+* Fixed implode error seen when sending preview emails on some configurations
+
 = Version 8.2 by Matthew Robinson =
 
 * Implemented use of Farbtastic as colour chooser in the Counter Widget because ColorPicker has been deprecated in WordPress

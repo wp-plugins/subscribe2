@@ -124,10 +124,12 @@ if ( $this->subscribe2_options['email_freq'] == 'never' ) {
 		echo "</p>";
 	}
 
-	// One-click subscribe and unsubscribe buttons
-	echo "<h2>" . __('One Click Subscription / Unsubscription', 'subscribe2') . "</h2>\r\n";
-	echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"subscribe\" value=\"" . __("Subscribe to All", 'subscribe2') . "\" />&nbsp;&nbsp;";
-	echo "<input type=\"submit\" class=\"button-primary\" name=\"unsubscribe\" value=\"" . __("Unsubscribe from All", 'subscribe2') . "\" /></p>";
+	if ( $this->subscribe2_options['one_click_profile'] == 'yes' ) {
+		// One-click subscribe and unsubscribe buttons
+		echo "<h2>" . __('One Click Subscription / Unsubscription', 'subscribe2') . "</h2>\r\n";
+		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"subscribe\" value=\"" . __("Subscribe to All", 'subscribe2') . "\" />&nbsp;&nbsp;";
+		echo "<input type=\"submit\" class=\"button-primary\" name=\"unsubscribe\" value=\"" . __("Unsubscribe from All", 'subscribe2') . "\" /></p>";
+	}
 
 	// subscribed categories
 	if ( $this->s2_mu ) {
