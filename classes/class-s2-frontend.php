@@ -20,14 +20,18 @@ class s2_frontend extends s2class {
 			return $this->s2form;
 		}
 
+		// Apply filters to button text
+		$unsubscribe_button_value = apply_filters('s2_unsubscribe_button', __('Unsubscribe', 'subscribe2'));
+		$subscribe_button_value = apply_filters('s2_subscribe_button', __('Subscribe', 'subscribe2'));
+
 		// if a button is hidden, show only other
 		if ( $hide == 'subscribe' ) {
-			$this->input_form_action = "<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" />";
+			$this->input_form_action = "<input type=\"submit\" name=\"unsubscribe\" value=\"" . esc_attr($unsubscribe_button_value) . "\" />";
 		} elseif ( $hide == 'unsubscribe' ) {
-			$this->input_form_action = "<input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" />";
+			$this->input_form_action = "<input type=\"submit\" name=\"subscribe\" value=\"" . esc_attr($subscribe_button_value) . "\" />";
 		} else {
 			// both form input actions
-			$this->input_form_action = "<input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" />&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" />";
+			$this->input_form_action = "<input type=\"submit\" name=\"subscribe\" value=\"" . esc_attr($subscribe_button_value) . "\" />&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . esc_attr($unsubscribe_button_value) . "\" />";
 		}
 		// if ID is provided, get permalink
 		if ( $id ) {
@@ -166,7 +170,7 @@ class s2_frontend extends s2class {
 		$id = intval(substr($code, 33));
 		if ( $id ) {
 			$this->email = $this->sanitize_email($this->get_email($id));
-			if ( !$this->email || $hash !== md5($this->email) ) {
+			if ( !$this->email || $hash !== wp_hash($this->email) ) {
 				return $this->no_such_email;
 			}
 		} else {

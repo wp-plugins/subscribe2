@@ -673,7 +673,7 @@ class s2class {
 
 		// generate the URL "?s2=ACTION+HASH+ID"
 		// ACTION = 1 to subscribe, 0 to unsubscribe
-		// HASH = md5 hash of email address
+		// HASH = wp_hash of email address
 		// ID = user's ID in the subscribe2 table
 		// use home instead of siteurl incase index.php is not in core wordpress directory
 		$link = get_option('home') . "/?s2=";
@@ -683,7 +683,7 @@ class s2class {
 		} elseif ( 'del' == $what ) {
 			$link .= '0';
 		}
-		$link .= md5($this->email);
+		$link .= wp_hash($this->email);
 		$link .= $id;
 
 		// sort the headers now so we have all substitute information
@@ -774,14 +774,14 @@ class s2class {
 			if ( $confirm ) {
 				$wpdb->get_results("UPDATE $this->public SET active='1', ip='$this->ip' WHERE CAST(email as binary)='$email'");
 			} else {
-				$wpdb->get_results("UPDATE $this->public SET date=NOW() WHERE CAST(email as binary)='$email'");
+				$wpdb->get_results("UPDATE $this->public SET date=CURDATE() WHERE CAST(email as binary)='$email'");
 			}
 		} else {
 			if ( $confirm ) {
 				global $current_user;
-				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, NOW(), %s)", $email, 1, $current_user->user_login));
+				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, CURDATE(), %s)", $email, 1, $current_user->user_login));
 			} else {
-				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, NOW(), %s)", $email, 0, $this->ip));
+				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, CURDATE(), %s)", $email, 0, $this->ip));
 			}
 		}
 	} // end add()

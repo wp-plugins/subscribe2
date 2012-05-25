@@ -421,8 +421,12 @@ class s2_admin extends s2class {
 
 		$args = array('fields' => array('ID', 'display_name'), 'role' => 'administrator');
 		$wp_user_query = get_users( $args );
-		foreach ($wp_user_query as $user) {
-			$admins[] = $user;
+		if ( !empty($wp_user_query) ) {
+			foreach ($wp_user_query as $user) {
+				$admins[] = $user;
+			}
+		} else {
+			$admins = array();
 		}
 
 		if ( $inc_author ) {
