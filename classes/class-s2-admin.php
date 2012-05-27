@@ -21,7 +21,7 @@ class s2_admin extends s2class {
 
 		add_submenu_page('s2', __('Send Email', 'subscribe2'), __('Send Email', 'subscribe2'), apply_filters('s2_capability', "publish_posts", 'send'), 's2_posts', array(&$this, 'write_menu'));
 
-		$s2nonce = md5('subscribe2');
+		$s2nonce = wp_hash('subscribe2');
 	} // end admin_menu()
 
 	/**
@@ -154,7 +154,7 @@ class s2_admin extends s2class {
 	function s2_meta_box() {
 		global $post_ID;
 		$s2mail = get_post_meta($post_ID, 's2mail', true);
-		echo "<input type=\"hidden\" name=\"s2meta_nonce\" id=\"s2meta_nonce\" value=\"" . wp_create_nonce(md5(plugin_basename(__FILE__))) . "\" />";
+		echo "<input type=\"hidden\" name=\"s2meta_nonce\" id=\"s2meta_nonce\" value=\"" . wp_create_nonce(wp_hash(plugin_basename(__FILE__))) . "\" />";
 		echo __("Check here to disable sending of an email notification for this post/page", 'subscribe2');
 		echo "&nbsp;&nbsp;<input type=\"checkbox\" name=\"s2_meta_field\" value=\"no\"";
 		if ( $s2mail == 'no' || ($this->subscribe2_options['s2meta_default'] == "1" && $s2mail == "") ) {
@@ -167,7 +167,7 @@ class s2_admin extends s2class {
 	Meta box form handler
 	*/
 	function s2_meta_handler($post_id) {
-		if ( !isset($_POST['s2meta_nonce']) || !wp_verify_nonce($_POST['s2meta_nonce'], md5(plugin_basename(__FILE__))) ) { return $post_id; }
+		if ( !isset($_POST['s2meta_nonce']) || !wp_verify_nonce($_POST['s2meta_nonce'], wp_hash(plugin_basename(__FILE__))) ) { return $post_id; }
 
 		if ( 'page' == $_POST['post_type'] ) {
 			if ( !current_user_can('edit_page', $post_id) ) { return $post_id; }
