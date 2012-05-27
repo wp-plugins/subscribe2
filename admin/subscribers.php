@@ -12,7 +12,7 @@ $all_users = $this->get_all_registered();
 // was anything POSTed ?
 if ( isset($_POST['s2_admin']) ) {
 	check_admin_referer('subscribe2-manage_subscribers' . $s2nonce);
-	if ( $_POST['addresses'] ) {
+	if ( !empty($_POST['addresses']) ) {
 		$sub_error = '';
 		$unsub_error = '';
 		foreach ( preg_split ("|[\s,]+|", $_POST['addresses']) as $email ) {
@@ -41,27 +41,27 @@ if ( isset($_POST['s2_admin']) ) {
 		}
 		echo $message;
 		$_POST['what'] = 'confirmed';
-	} elseif ( $_POST['process'] ) {
-		if ( $_POST['delete'] ) {
+	} elseif ( isset($_POST['process']) ) {
+		if ( isset($_POST['delete']) ) {
 			foreach ( $_POST['delete'] as $address ) {
 				$this->delete($address);
 			}
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) deleted!', 'subscribe2') . "</strong></p></div>";
 		}
-		if ( $_POST['confirm'] ) {
+		if ( isset($_POST['confirm']) ) {
 			foreach ( $_POST['confirm'] as $address ) {
 				$this->toggle($this->sanitize_email($address));
 			}
 			$message = "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Status changed!', 'subscribe2') . "</strong></p></div>";
 		}
-		if ( $_POST['unconfirm'] ) {
+		if ( isset($_POST['unconfirm']) ) {
 			foreach ( $_POST['unconfirm'] as $address ) {
 				$this->toggle($this->sanitize_email($address));
 			}
 			$message = "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Status changed!', 'subscribe2') . "</strong></p></div>";
 		}
 		echo $message;
-	} elseif ( $_POST['searchterm'] ) {
+	} elseif ( !empty($_POST['searchterm']) ) {
 		$confirmed = $this->get_public();
 		$unconfirmed = $this->get_public(0);
 		$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$all_users);
@@ -70,19 +70,19 @@ if ( isset($_POST['s2_admin']) ) {
 				$result[] = $subscriber;
 			}
 		}
-	} elseif ( $_POST['remind'] ) {
+	} elseif ( isset($_POST['remind']) ) {
 		$this->remind($_POST['reminderemails']);
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Reminder Email(s) Sent!', 'subscribe2') . "</strong></p></div>";
-	} elseif ( $_POST['sub_categories'] && 'subscribe' == $_POST['manage'] ) {
+	} elseif ( isset($_POST['sub_categories']) && 'subscribe' == $_POST['manage'] ) {
 		$this->subscribe_registered_users($_POST['exportcsv'], $_POST['category']);
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Subscribed!', 'subscribe2') . "</strong></p></div>";
-	} elseif ( $_POST['sub_categories'] && 'unsubscribe' == $_POST['manage'] ) {
+	} elseif ( isset($_POST['sub_categories']) && 'unsubscribe' == $_POST['manage'] ) {
 		$this->unsubscribe_registered_users($_POST['exportcsv'], $_POST['category']);
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Unsubscribed!', 'subscribe2') . "</strong></p></div>";
-	} elseif ( $_POST['sub_format'] ) {
+	} elseif ( isset($_POST['sub_format']) ) {
 		$this->format_change( $_POST['format'], $_POST['exportcsv'] );
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Format updated for Selected Registered Users!', 'subscribe2') . "</strong></p></div>";
-	} elseif ( $_POST['sub_digest'] ) {
+	} elseif ( isset($_POST['sub_digest']) ) {
 		$this->digest_change( $_POST['sub_category'], $_POST['exportcsv'] );
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Digest Subscription updated for Selected Registered Users!', 'subscribe2') . "</strong></p></div>";
 	}
@@ -165,7 +165,7 @@ if ( isset($_POST['what']) ) {
 	$what = 'all';
 	$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$all_users);
 }
-if ( $_POST['searchterm'] ) {
+if ( !empty($_POST['searchterm']) ) {
 	$subscribers = &$result;
 	$what = 'public';
 }
@@ -229,7 +229,7 @@ echo "<br /><br />";
 // show the selected subscribers
 $alternate = 'alternate';
 echo "<table class=\"widefat\" cellpadding=\"2\" cellspacing=\"2\" width=\"100%\">";
-$searchterm = ( $_POST['searchterm'] ) ? $_POST['searchterm'] : '';
+$searchterm = ( isset($_POST['searchterm']) ) ? stripslashes(esc_html($_POST['searchterm'])) : '';
 echo "<tr class=\"alternate\"><td colspan=\"3\"><input type=\"text\" name=\"searchterm\" value=\"" . $searchterm . "\" /></td>\r\n";
 echo "<td><input type=\"submit\" class=\"button-secondary\" name=\"search\" value=\"" . __('Search Subscribers', 'subscribe2') . "\" /></td>\r\n";
 if ( $reminderform ) {

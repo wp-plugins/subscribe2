@@ -159,6 +159,7 @@ class s2class {
 
 		// upgrade old wpmu user meta data to new
 		if ( $this->s2_mu === true ) {
+			global $s2class_multisite;
 			$s2class_multisite->namechange_subscribe2_widget();
 			// loop through all users
 			foreach ( $users as $user_ID ) {
@@ -393,7 +394,7 @@ class s2class {
 			// To send HTML mail, the Content-Type header must be set
 			$header['Content-Type'] = get_option('html_type') . "; charset=\"". get_option('blog_charset') . "\"";
 		} else {
-			$header['Content-Type'] = "text/plain; charset=\"". html_entity_decode(get_option('blogname'), ENT_QUOTES) . "\"";
+			$header['Content-Type'] = "text/plain; charset=\"". get_option('blog_charset') . "\"";
 		}
 
 		// apply header filter to allow on-the-fly amendments
@@ -412,6 +413,7 @@ class s2class {
 	Function to add UTM tracking details to links
 	*/
 	function get_tracking_link($link) {
+		if ( empty($link) ) { return; }
 		if ( !empty($this->subscribe2_options['tracking']) ) {
 				$delimiter = '?';
 				if ( strpos($link, $delimiter) > 0 ) { $delimiter = '&'; }
@@ -464,7 +466,9 @@ class s2class {
 				return $post;
 			}
 
-			$post_cats = wp_get_post_categories($post->ID);
+			$s2_taxonomies = array('category');
+			$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
+			$post_cats = wp_get_object_terms($post->ID, $s2_taxonomies, array('fields' => 'ids'));
 			$check = false;
 			// is the current post assigned to any categories
 			// which should not generate a notification email?
@@ -509,6 +513,10 @@ class s2class {
 				// if not, no sense doing anything else
 				return $post;
 			}
+		} else {
+			// make sure we prime the taxonomy variable for preview posts
+			$s2_taxonomies = array('category');
+			$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
 		}
 
 		// we set these class variables so that we can avoid
@@ -537,7 +545,7 @@ class s2class {
 			$this->myname = html_entity_decode($user->display_name, ENT_QUOTES);
 		}
 
-		$this->post_cat_names = implode(', ', wp_get_post_categories($post->ID, array('fields' => 'names')));
+		$this->post_cat_names = implode(', ', wp_get_object_terms($post->ID, $s2_taxonomies, array('fields' => 'names')));
 		$this->post_tag_names = implode(', ', wp_get_post_tags($post->ID, array('fields' => 'names')));
 
 		// Get email subject
@@ -632,16 +640,23 @@ class s2class {
 			} else {
 				$recipients = array_merge((array)$public, (array)$registered);
 			}
+			$recipients = apply_filters('s2_send_plain_excerpt_suscribers', $recipients, $post->ID);
 			$this->mail($recipients, $subject, $excerpt_body);
 
 			// next we send plaintext full content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=post&author=$post->post_author"), $subject, $full_body);
+			$recipients = $this->get_registered("cats=$post_cats_string&format=post&author=$post->post_author");
+			$recipients = apply_filters('s2_send_plain_fullcontent_suscribers', $recipients, $post->ID);
+			$this->mail($recipients, $subject, $full_body);
 
 			// next we send html excerpt content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=html_excerpt&author=$post->post_author"), $subject, $html_excerpt_body, 'html');
+			$recipients = $this->get_registered("cats=$post_cats_string&format=html_excerpt&author=$post->post_author");
+			$recipients = apply_filters('s2_send_html_excerpt_suscribers', $recipients, $post->ID);
+			$this->mail($recipients, $subject, $html_excerpt_body, 'html');
 
 			// finally we send html full content emails
-			$this->mail($this->get_registered("cats=$post_cats_string&format=html&author=$post->post_author"), $subject, $html_body, 'html');
+			$recipients = $this->get_registered("cats=$post_cats_string&format=html&author=$post->post_author");
+			$recipients = apply_filters('s2_send_html_fullcontent_suscribers', $recipients, $post->ID);
+			$this->mail($recipients, $subject, $html_body, 'html');
 		}
 	} // end publish()
 
@@ -658,7 +673,7 @@ class s2class {
 
 		// generate the URL "?s2=ACTION+HASH+ID"
 		// ACTION = 1 to subscribe, 0 to unsubscribe
-		// HASH = md5 hash of email address
+		// HASH = wp_hash of email address
 		// ID = user's ID in the subscribe2 table
 		// use home instead of siteurl incase index.php is not in core wordpress directory
 		$link = get_option('home') . "/?s2=";
@@ -668,7 +683,7 @@ class s2class {
 		} elseif ( 'del' == $what ) {
 			$link .= '0';
 		}
-		$link .= md5($this->email);
+		$link .= wp_hash($this->email);
 		$link .= $id;
 
 		// sort the headers now so we have all substitute information
@@ -759,14 +774,14 @@ class s2class {
 			if ( $confirm ) {
 				$wpdb->get_results("UPDATE $this->public SET active='1', ip='$this->ip' WHERE CAST(email as binary)='$email'");
 			} else {
-				$wpdb->get_results("UPDATE $this->public SET date=NOW() WHERE CAST(email as binary)='$email'");
+				$wpdb->get_results("UPDATE $this->public SET date=CURDATE() WHERE CAST(email as binary)='$email'");
 			}
 		} else {
 			if ( $confirm ) {
 				global $current_user;
-				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, NOW(), %s)", $email, 1, $current_user->user_login));
+				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, CURDATE(), %s)", $email, 1, $current_user->user_login));
 			} else {
-				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, NOW(), %s)", $email, 0, $this->ip));
+				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, CURDATE(), %s)", $email, 0, $this->ip));
 			}
 		}
 	} // end add()
@@ -787,7 +802,7 @@ class s2class {
 	function toggle($email = '') {
 		global $wpdb;
 
-		if ( '' == $email || ! is_email($email) ) { return false; }
+		if ( '' == $email || !is_email($email) ) { return false; }
 
 		// let's see if this is a public user
 		$status = $this->is_public($email);
@@ -1096,6 +1111,38 @@ class s2class {
 		return $admin;
 	} //end get_userdata()
 
+	/**
+	Subscribe/unsubscribe user from one-click submission
+	*/
+	function one_click_handler($user_ID, $action) {
+		if ( !isset($user_ID) || !isset($action) ) { return; }
+
+		$all_cats = $this->all_cats(true);
+
+		if ( 'subscribe' == $action ) {
+			// Subscribe
+			$new_cats = array();
+			foreach ( $all_cats as $cat ) {
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id, $cat->term_id);
+				$new_cats[] = $cat->term_id;
+			}
+
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $new_cats));
+
+			if ( 'yes' == $this->subscribe2_options['show_autosub'] && 'no' != get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true) ) {
+				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), 'yes');
+			}
+		} elseif ( 'unsubscribe' == $action ) {
+			// Unsubscribe
+			foreach ( $all_cats as $cat ) {
+				delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat->term_id);
+			}
+
+			delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'));
+			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), 'no');
+		}
+	} //end one_click_handler()
+
 /* ===== helper functions: forms and stuff ===== */
 	/**
 	Get an object of all categories, include default and custom type
@@ -1131,28 +1178,11 @@ class s2class {
 	/**
 	Export subscriber emails and other details to CSV
 	*/
-	function prepare_export( $what ) {
-		$confirmed = $this->get_public();
-		$unconfirmed = $this->get_public(0);
-		if ( 'all' == $what ) {
-			$subscribers = array_merge((array)$confirmed, (array)$unconfirmed, (array)$this->get_all_registered());
-		} elseif ( 'public' == $what ) {
-			$subscribers = array_merge((array)$confirmed, (array)$unconfirmed);
-		} elseif ( 'confirmed' == $what ) {
-			$subscribers = $confirmed;
-		} elseif ( 'unconfirmed' == $what ) {
-			$subscribers = $unconfirmed;
-		} elseif ( is_numeric($what) ) {
-			$subscribers = $this->get_registered("cats=$what");
-		} elseif ( 'registered' == $what ) {
-			$subscribers = $this->get_registered();
-		} elseif ( 'all_users' == $what ) {
-			$subscribers = $this->get_all_registered();
-		}
-
+	function prepare_export( $subscribers ) {
+		$subscribers = explode(",\r\n", $subscribers);
 		natcasesort($subscribers);
 
-		$exportcsv = "User Email,User Name";
+		$exportcsv = "User Email,User Type,User Name";
 		$all_cats = $this->all_cats(false, 'ID');
 
 		foreach ($all_cats as $cat) {
@@ -1161,24 +1191,29 @@ class s2class {
 		}
 		$exportcsv .= "\r\n";
 
+		if ( !function_exists('get_userdata') ) {
+			require_once(ABSPATH . WPINC . '/pluggable.php');
+		}
+
 		foreach ( $subscribers as $subscriber ) {
 			if ( $this->is_registered($subscriber) ) {
 				$user_ID = $this->get_user_id( $subscriber );
-				$user_info = get_userdata($user_ID);
+				$user_info = get_userdata( $user_ID );
 
-				$cats = explode(',', get_user_meta($user_info->ID, $this->get_usermeta_keyname('s2_subscribed'), true));
+				$cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 				$subscribed_cats = '';
 				foreach ( $cat_ids as $cat ) {
 					(in_array($cat, $cats)) ? $subscribed_cats .= ",Yes" : $subscribed_cats .= ",No";
 				}
 
-				$exportcsv .= $user_info->user_email . ',';
-				$exportcsv .= $user_info->display_name;
+				$exportcsv .= $subscriber . ',';
+				$exportcsv .= __('Registered User', 'subscribe2');
+				$exportcsv .= ',' . $user_info->display_name;
 				$exportcsv .= $subscribed_cats . "\r\n";
 			} else {
-				if ( in_array($subscriber, $confirmed) ) {
+				if ( $this->is_public($subscriber) === '1' ) {
 					$exportcsv .= $subscriber . ',' . __('Confirmed Public Subscriber', 'subscribe2') . "\r\n";
-				} elseif ( in_array($subscriber, $unconfirmed) ) {
+				} elseif ( $this->is_public($subscriber) === '0' ) {
 					$exportcsv .= $subscriber . ',' . __('Unconfirmed Public Subscriber', 'subscribe2') . "\r\n";
 				}
 			}
@@ -1413,7 +1448,9 @@ class s2class {
 		$message_post= '';
 		$message_posttime = '';
 		foreach ( $posts as $post ) {
-			$post_cats = wp_get_post_categories($post->ID);
+			$s2_taxonomies = array('category');
+			$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
+			$post_cats = wp_get_object_terms($post->ID, $s2_taxonomies, array('fields' => 'ids'));
 			$post_cats_string = implode(',', $post_cats);
 			$all_post_cats = array_unique(array_merge($all_post_cats, $post_cats));
 			$check = false;
@@ -1471,7 +1508,7 @@ class s2class {
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
 			$message_posttime .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
 			if ( strstr($mailtext, "{CATS}") ) {
-				$post_cat_names = implode(', ', wp_get_post_categories($post->ID, array('fields' => 'names')));
+				$post_cat_names = implode(', ', wp_get_object_terms($post->ID, $s2_taxonomies, array('fields' => 'names')));
 				$message_post .= __('Posted in', 'subscribe2') . ": " . $post_cat_names . "\r\n";
 				$message_posttime .= __('Posted in', 'subscribe2') . ": " . $post_cat_names . "\r\n";
 			}
@@ -1581,6 +1618,27 @@ class s2class {
 
 		load_plugin_textdomain('subscribe2', false, S2DIR);
 
+		// load our strings
+		$this->load_strings();
+
+		// Is this WordPressMU or not?
+		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
+			$this->s2_mu = true;
+		}
+		if ( function_exists('is_multisite') && is_multisite() ) {
+			$this->s2_mu = true;
+		}
+
+		// add action to handle WPMU subscriptions and unsubscriptions
+		if ( $this->s2_mu === true ) {
+			require_once(S2PATH . "classes/class-s2_multisite.php");
+			global $s2class_multisite;
+			$s2class_multisite = new s2_multisite;
+			if ( isset($_GET['s2mu_subscribe']) || isset($_GET['s2mu_unsubscribe']) ) {
+				add_action('init', array(&$this, 'wpmu_subscribe'));
+			}
+		}
+
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
 		if ( $wpdb->get_var("SHOW TABLES LIKE '{$this->public}'") != $this->public ) { $this->install(); }
@@ -1637,7 +1695,7 @@ class s2class {
 		// Add actions specific to admin or frontend
 		if ( is_admin() ) {
 			//add menu, authoring and category admin actions
-			add_action('admin_menu', array($this, 'admin_menu'));
+			add_action('admin_menu', array(&$this, 'admin_menu'));
 			add_action('admin_menu', array(&$this, 's2_meta_init'));
 			add_action('save_post', array(&$this, 's2_meta_handler'));
 			add_action('create_category', array(&$this, 'new_category'));
@@ -1661,8 +1719,16 @@ class s2class {
 				add_action('admin_init', array(&$this, 'widget_s2counter_css_and_js'));
 			}
 
+			// add one-click handlers
+			if ( 'yes' == $this->subscribe2_options['one_click_profile'] ) {
+				add_action( 'show_user_profile', array(&$this, 'one_click_profile_form') );
+				add_action( 'edit_user_profile', array(&$this, 'one_click_profile_form') );
+				add_action( 'personal_options_update', array(&$this, 'one_click_profile_form_save') );
+				add_action( 'edit_user_profile_update', array(&$this, 'one_click_profile_form_save') );
+			}
+
 			// capture CSV export
-			if ( isset($_POST['s2_admin']) && $_POST['csv'] ) {
+			if ( isset($_POST['s2_admin']) && isset($_POST['csv']) ) {
 				$date = date('Y-m-d');
 				header("Content-Description: File Transfer");
 				header("Content-type: application/octet-stream");
@@ -1697,25 +1763,6 @@ class s2class {
 				add_action('wp_head', array(&$this, 'add_s2_ajax'));
 			}
 		}
-
-		// load our strings
-		$this->load_strings();
-
-		// Is this WordPressMU or not?
-		$this->s2_mu = false;
-		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
-			$this->s2_mu = true;
-		}
-		if ( function_exists('is_multisite') && is_multisite() ) {
-			$this->s2_mu = true;
-		}
-
-		// add action to handle WPMU subscriptions and unsubscriptions
-		if ( $this->s2_mu === true || isset($_GET['s2mu_subscribe']) || isset($_GET['s2mu_unsubscribe']) ) {
-			require_once(S2PATH . "classes/class-s2_multisite.php");
-			$s2class_multisite = new s2_multisite;
-			add_action('init', array(&$s2class_multisite, 'wpmu_subscribe'));
-		}
 	} // end s2init()
 
 /* ===== our variables ===== */
@@ -1731,11 +1778,16 @@ class s2class {
 	var $post_time = '';
 	var $myname = '';
 	var $myemail = '';
+	var $authorname = '';
+	var $post_cat_names = '';
+	var $post_tag_names = '';
+	var $post_count = '';
 	var $signup_dates = array();
 	var $filtered = 0;
 	var $preview_email = false;
 
 	// state variables used to affect processing
+	var $s2_mu = false;
 	var $action = '';
 	var $email = '';
 	var $message = '';
