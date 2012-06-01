@@ -1389,7 +1389,6 @@ class s2class {
 			// update last_s2cron execution time before completing or bailing
 			$now = current_time('mysql');
 			$prev = $this->subscribe2_options['last_s2cron'];
-			$prev = "2011-05-28 20:44:19";
 			$last = $this->subscribe2_options['previous_s2cron'];
 			$this->subscribe2_options['last_s2cron'] = $now;
 			$this->subscribe2_options['previous_s2cron'] = $prev;

@@ -37,7 +37,11 @@ if ( isset($_POST['s2_admin']) && 'mail' == $_POST['s2_admin'] ) {
 	}
 	$status = $this->mail($recipients, $subject, $body, 'text');
 	if ( $status ) {
-		$message = $this->mail_sent;
+		if ( isset($_POST['preview']) ) {
+			$message = "<p class=\"s2_message\">" . __('Preview message sent!', 'subscribe2') . "</p>";
+		} else {
+			$message = $this->mail_sent;
+		}
 	} elseif ( empty($body) ) {
 		$message = __('Your email was empty', 'subscribe2');
 	} else {
