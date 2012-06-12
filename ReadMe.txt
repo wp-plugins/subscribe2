@@ -310,6 +310,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 * Fixed an error in the 'Send Mail' page that blocked emails from being sent
 * Provide clearer user feedback for Send and Preview buttons in "Send Email" window
+* Add new option to the Widget to return users to the home page on submission
 
 = Version 8.3 by Matthew Robinson =
 
