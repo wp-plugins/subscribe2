@@ -64,7 +64,7 @@ class s2_frontend extends s2class {
 				$this->email = $this->sanitize_email($_POST['email']);
 				$this->ip = $_POST['ip'];
 				// does the supplied email belong to a registered user?
-				$check = $wpdb->get_var("SELECT user_email FROM $wpdb->users WHERE user_email = '$this->email'");
+				$check = $wpdb->get_var($wpdb->prepare("SELECT user_email FROM $wpdb->users WHERE user_email = %s", $this->email));
 				if ( '' != $check ) {
 					// this is a registered email
 					$this->s2form = $this->please_log_in;
