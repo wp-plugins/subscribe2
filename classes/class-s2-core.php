@@ -564,6 +564,16 @@ class s2class {
 
 		$gallid = '[gallery id="' . $post->ID . '"';
 		$content = str_replace('[gallery', $gallid, $post->post_content);
+
+		// remove the autoembed filter to remove iframes from notification emails
+		if ( get_option('embed_autourls') ) {
+			global $wp_embed;
+			$priority = has_filter('the_content', array(&$wp_embed, 'autoembed'));
+			if ( $priority !== false ) {
+				remove_filter('the_content', array(&$wp_embed, 'autoembed'), $priority);
+			}
+		}
+
 		$content = apply_filters('the_content', $content);
 		$content = str_replace("]]>", "]]&gt", $content);
 

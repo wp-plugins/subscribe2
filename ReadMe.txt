@@ -313,6 +313,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Add new option to the Widget to return users to the home page on submission
 * Added warning to Settings page if selected sender email address is "off-domain"
 * Fixed numerous minor SQL injections vectors - thanks to Tom Adams (holizz)
+* Removed auto-embed iframes from HTML emails - thanks to Doug Lerner
 
 = Version 8.3 by Matthew Robinson =
 
