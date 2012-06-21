@@ -1427,15 +1427,15 @@ class s2class {
 			// collect posts
 			if ( $resend == 'resend' ) {
 				if ( $this->subscribe2_options['cron_order'] == 'desc' ) {
-					$posts = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= %s AND post_date < %s AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC"), $last, $prev);
+					$posts = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= %s AND post_date < %s AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC", $last, $prev));
 				} else {
-					$posts = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= %s AND post_date < %s AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC"), $last, $prev);
+					$posts = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= %s AND post_date < %s AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC", $last, $prev));
 				}
 			} else {
 				if ( $this->subscribe2_options['cron_order'] == 'desc' ) {
-					$posts = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= %s AND post_date < %s AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC"), $prev, $now);
+					$posts = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= %s AND post_date < %s AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC", $prev, $now));
 				} else {
-					$posts = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= %s AND post_date < %s AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC"), $prev, $now);
+					$posts = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= %s AND post_date < %s AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC", $prev, $now));
 				}
 			}
 		} else {

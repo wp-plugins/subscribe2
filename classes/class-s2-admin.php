@@ -662,7 +662,7 @@ class s2_admin extends s2class {
 			if ( $this->s2_mu ) {
 				$sql = $wpdb->prepare("SELECT DISTINCT a.user_id FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b WHERE a.user_id = b.user_id AND a.meta_key=%s AND a.meta_value='yes' AND b.meta_key=%s", $this->get_usermeta_keyname('s2_autosub'), $this->get_usermeta_keyname('s2_subscribed'));
 			} else {
-				$sql = $wpdb->prepare("SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE $wpdb->usermeta.meta_key=%s AND $wpdb->usermeta.meta_value='yes'", $this->get_usermeta_keyname('s2_autosub'));;
+				$sql = $wpdb->prepare("SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE $wpdb->usermeta.meta_key=%s AND $wpdb->usermeta.meta_value='yes'", $this->get_usermeta_keyname('s2_autosub'));
 			}
 			$user_IDs = $wpdb->get_col($sql);
 			if ( '' == $user_IDs ) { return; }

@@ -3,7 +3,7 @@ Contributors: MattyRob, Skippy, RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.1
-Tested up to: 3.3.1
+Tested up to: 3.4
 Stable tag: 8.3
 License: GPL3
 
@@ -311,6 +311,8 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fixed an error in the 'Send Mail' page that blocked emails from being sent
 * Provide clearer user feedback for Send and Preview buttons in "Send Email" window
 * Add new option to the Widget to return users to the home page on submission
+* Added warning to Settings page if selected sender email address is "off-domain"
+* Fixed numerous minor SQL injections vectors - thanks to Tom Adams (holizz)
 
 = Version 8.3 by Matthew Robinson =
 
