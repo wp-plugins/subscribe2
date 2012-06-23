@@ -1762,7 +1762,7 @@ class s2class {
 				if ( defined('DOING_S2_CONFIRM') && DOING_S2_CONFIRM ) { return; }
 				define( 'DOING_S2_CONFIRM', true );
 				add_filter('query_string', array(&$this, 'query_filter'));
-				add_filter('single_post_title', array(&$this, 'title_filter'));
+				add_filter('the_title', array(&$this, 'title_filter'));
 				add_filter('the_content', array(&$this, 'confirm'));
 			}
 

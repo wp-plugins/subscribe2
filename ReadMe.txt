@@ -309,12 +309,13 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 = Version 8.4 by Matthew Robinson =
 
 * Fixed an error in the 'Send Mail' page that blocked emails from being sent
+* Added tracking features to Digest title links in HTML version - thanks to Jeremy Schultz
 * Provide clearer user feedback for Send and Preview buttons in "Send Email" window
 * Add new option to the Widget to return users to the home page on submission
 * Added warning to Settings page if selected sender email address is "off-domain"
 * Fixed numerous minor SQL injections vectors - thanks to Tom Adams (holizz)
 * Removed auto-embed iframes from HTML emails - thanks to Doug Lerner
-* Changed 'the_title' filter to avoid multiple page title replacements - thanks to Robbie
+* Add more intuitive user messages for Public Subscribers when Unsubscribing - thanks to Doug Lerner
 
 = Version 8.3 by Matthew Robinson =
 

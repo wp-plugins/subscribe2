@@ -150,7 +150,13 @@ class s2_frontend extends s2class {
 	function title_filter($title) {
 		// don't interfere if we've already done our thing
 		if ( in_the_loop() ) {
-			return __('Subscription Confirmation', 'subscribe2');
+			$code = $_GET['s2'];
+			$action = intval(substr($code, 0, 1));
+			if ( $action == '1' ) {
+				return __('Subscription Confirmation', 'subscribe2');
+			} else {
+				return __('Unsubscription Confirmation', 'subscribe2');
+			}
 		} else {
 			return $title;
 		}
