@@ -12,13 +12,19 @@ if ( empty($id) ) {
 	echo "<div id=\"message\" class=\"error\"><p><strong>$this->no_page</strong></p></div>";
 }
 
+$sender = $this->get_userdata($this->subscribe2_options['sender']);
+list($user, $domain) = explode('@', $sender->user_email, 2);
+if ( !strstr($_SERVER['SERVER_NAME'], $domain) ) {
+	echo "<div id=\"message\" class=\"error\"><p><strong>" . __('You appear to be sending notifications from an email address from a different domain name to your blog, this may result in failed emails', 'subscribe2') . "</strong></p></div>";
+}
+
 // was anything POSTed?
 if ( isset( $_POST['s2_admin']) ) {
 	check_admin_referer('subscribe2-options_subscribers' . $s2nonce);
-	if ( $_POST['reset'] ) {
+	if ( isset($_POST['reset']) ) {
 		$this->reset();
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_reset</strong></p></div>";
-	} elseif ( $_POST['preview'] ) {
+	} elseif ( isset($_POST['preview']) ) {
 		global $user_email;
 		$this->preview_email = true;
 		if ( 'never' == $this->subscribe2_options['email_freq'] ) {
@@ -28,14 +34,14 @@ if ( isset( $_POST['s2_admin']) ) {
 			$this->subscribe2_cron($user_email);
 		}
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Preview message(s) sent to logged in user', 'subscribe2') . "</strong></p></div>";
-	} elseif ( $_POST['resend'] ) {
+	} elseif ( isset($_POST['resend']) ) {
 		$status = $this->subscribe2_cron('', 'resend');
 		if ( $status === false ) {
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('The Digest Notification email contained no post information. No email was sent', 'subscribe2') . "</strong></p></div>";
 		} else {
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Attempt made to resend the Digest Notification email', 'subscribe2') . "</strong></p></div>";
 		}
-	} elseif ( $_POST['submit'] ) {
+	} elseif ( isset($_POST['submit']) ) {
 		// BCClimit
 		if ( is_numeric($_POST['bcc']) && $_POST['bcc'] >= 0 ) {
 			$this->subscribe2_options['bcclimit'] = $_POST['bcc'];
@@ -159,27 +165,27 @@ if ( isset( $_POST['s2_admin']) ) {
 		}
 
 		// show meta link?
-		( $_POST['show_meta'] == '1' ) ? $showmeta = '1' : $showmeta = '0';
+		( isset($_POST['show_meta']) && $_POST['show_meta'] == '1' ) ? $showmeta = '1' : $showmeta = '0';
 		$this->subscribe2_options['show_meta'] = $showmeta;
 
 		// show button?
-		( $_POST['show_button'] == '1' ) ? $showbutton = '1' : $showbutton = '0';
+		( isset($_POST['show_button']) && $_POST['show_button'] == '1' ) ? $showbutton = '1' : $showbutton = '0';
 		$this->subscribe2_options['show_button'] = $showbutton;
 
 		// enable AJAX style form
-		( $_POST['ajax'] == '1' ) ? $ajax = '1' : $ajax = '0';
+		( isset($_POST['ajax']) && $_POST['ajax'] == '1' ) ? $ajax = '1' : $ajax = '0';
 		$this->subscribe2_options['ajax'] = $ajax;
 
 		// show widget in Presentation->Widgets
-		( $_POST['widget'] == '1' ) ? $showwidget = '1' : $showwidget = '0';
+		( isset($_POST['widget']) && $_POST['widget'] == '1' ) ? $showwidget = '1' : $showwidget = '0';
 		$this->subscribe2_options['widget'] = $showwidget;
 
 		// show counterwidget in Presentation->Widgets
-		( $_POST['counterwidget'] == '1' ) ? $showcounterwidget = '1' : $showcounterwidget = '0';
+		( isset($_POST['counterwidget']) && $_POST['counterwidget'] == '1' ) ? $showcounterwidget = '1' : $showcounterwidget = '0';
 		$this->subscribe2_options['counterwidget'] = $showcounterwidget;
 
 		// Subscribe2 over ride postmeta checked by default
-		( $_POST['s2meta_default'] == '1' ) ? $s2meta_default = '1' : $s2meta_default = '0';
+		( isset($_POST['s2meta_default']) && $_POST['s2meta_default'] == '1' ) ? $s2meta_default = '1' : $s2meta_default = '0';
 		$this->subscribe2_options['s2meta_default'] = $s2meta_default;
 
 		//automatic subscription
@@ -190,6 +196,7 @@ if ( isset( $_POST['s2_admin']) ) {
 		$this->subscribe2_options['show_autosub'] = $_POST['show_autosub'];
 		$this->subscribe2_options['autosub_def'] = $_POST['autosub_def'];
 		$this->subscribe2_options['comment_subs'] = $_POST['comment_subs'];
+		$this->subscribe2_options['one_click_profile'] = $_POST['one_click_profile'];
 
 		//barred domains
 		$this->subscribe2_options['barred'] = $_POST['barred'];
@@ -446,16 +453,20 @@ echo __('Before the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp
 echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"after\"" . checked($this->subscribe2_options['comment_subs'], 'after', false) . " /> ";
 echo __('After the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp;";
 echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"no\"" . checked($this->subscribe2_options['comment_subs'], 'no', false) . " /> ";
-echo __('No', 'subscribe2');
-echo "</label></p>";
-echo "</div>\r\n";
+echo __('No', 'subscribe2') . "</label><br /><br />";
+echo __('Show one-click subscription on profile page', 'subscribe2') . ":<br />\r\n";
+echo "<label><input type=\"radio\" name=\"one_click_profile\" value=\"yes\"" . checked($this->subscribe2_options['one_click_profile'], 'yes', false) . " /> ";
+echo __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
+echo "<label><input type=\"radio\" name=\"one_click_profile\" value=\"no\"" . checked($this->subscribe2_options['one_click_profile'], 'no', false) . " /> ";
+echo __('No', 'subscribe2') . "</label>\r\n";
+echo "</p></div>\r\n";
 
 //barred domains
 echo "<div class=\"s2_admin\" id=\"s2_barred_domains\">\r\n";
 echo "<h2>" . __('Barred Domains', 'subscribe2') . "</h2>\r\n";
 echo "<p>";
 echo __('Enter domains to bar from public subscriptions: <br /> (Use a new line for each entry and omit the "@" symbol, for example email.com)', 'subscribe2');
-echo "<br />\r\n<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"barred\">" . $this->subscribe2_options['barred'] . "</textarea>";
+echo "<br />\r\n<textarea style=\"width: 98%;\" rows=\"4\" cols=\"60\" name=\"barred\">" . esc_textarea($this->subscribe2_options['barred']) . "</textarea>";
 echo "</p>";
 echo "</div>\r\n";
 

@@ -20,18 +20,26 @@ class s2_frontend extends s2class {
 			return $this->s2form;
 		}
 
+		// Apply filters to button text
+		$unsubscribe_button_value = apply_filters('s2_unsubscribe_button', __('Unsubscribe', 'subscribe2'));
+		$subscribe_button_value = apply_filters('s2_subscribe_button', __('Subscribe', 'subscribe2'));
+
 		// if a button is hidden, show only other
 		if ( $hide == 'subscribe' ) {
-			$this->input_form_action = "<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" />";
+			$this->input_form_action = "<input type=\"submit\" name=\"unsubscribe\" value=\"" . esc_attr($unsubscribe_button_value) . "\" />";
 		} elseif ( $hide == 'unsubscribe' ) {
-			$this->input_form_action = "<input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" />";
+			$this->input_form_action = "<input type=\"submit\" name=\"subscribe\" value=\"" . esc_attr($subscribe_button_value) . "\" />";
 		} else {
 			// both form input actions
-			$this->input_form_action = "<input type=\"submit\" name=\"subscribe\" value=\"" . __('Subscribe', 'subscribe2') . "\" />&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . __('Unsubscribe', 'subscribe2') . "\" />";
+			$this->input_form_action = "<input type=\"submit\" name=\"subscribe\" value=\"" . esc_attr($subscribe_button_value) . "\" />&nbsp;<input type=\"submit\" name=\"unsubscribe\" value=\"" . esc_attr($unsubscribe_button_value) . "\" />";
 		}
 		// if ID is provided, get permalink
 		if ( $id ) {
 			$url = get_permalink( $id );
+		} elseif ( $this->subscribe2_options['s2page'] > 0 ) {
+			$url = get_permalink( $this->subscribe2_options['s2page'] );
+		} else {
+			$url = get_site_url();
 		}
 		// build default form
 		if ( $nojs == 'true' ) {
@@ -56,7 +64,7 @@ class s2_frontend extends s2class {
 				$this->email = $this->sanitize_email($_POST['email']);
 				$this->ip = $_POST['ip'];
 				// does the supplied email belong to a registered user?
-				$check = $wpdb->get_var("SELECT user_email FROM $wpdb->users WHERE user_email = '$this->email'");
+				$check = $wpdb->get_var($wpdb->prepare("SELECT user_email FROM $wpdb->users WHERE user_email = %s", $this->email));
 				if ( '' != $check ) {
 					// this is a registered email
 					$this->s2form = $this->please_log_in;
@@ -142,7 +150,13 @@ class s2_frontend extends s2class {
 	function title_filter($title) {
 		// don't interfere if we've already done our thing
 		if ( in_the_loop() ) {
-			return __('Subscription Confirmation', 'subscribe2');
+			$code = $_GET['s2'];
+			$action = intval(substr($code, 0, 1));
+			if ( $action == '1' ) {
+				return __('Subscription Confirmation', 'subscribe2');
+			} else {
+				return __('Unsubscription Confirmation', 'subscribe2');
+			}
 		} else {
 			return $title;
 		}
@@ -162,7 +176,7 @@ class s2_frontend extends s2class {
 		$id = intval(substr($code, 33));
 		if ( $id ) {
 			$this->email = $this->sanitize_email($this->get_email($id));
-			if ( !$this->email || $hash !== md5($this->email) ) {
+			if ( !$this->email || $hash !== wp_hash($this->email) ) {
 				return $this->no_such_email;
 			}
 		} else {

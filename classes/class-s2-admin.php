@@ -21,7 +21,7 @@ class s2_admin extends s2class {
 
 		add_submenu_page('s2', __('Send Email', 'subscribe2'), __('Send Email', 'subscribe2'), apply_filters('s2_capability', "publish_posts", 'send'), 's2_posts', array(&$this, 'write_menu'));
 
-		$s2nonce = md5('subscribe2');
+		$s2nonce = wp_hash('subscribe2');
 	} // end admin_menu()
 
 	/**
@@ -41,7 +41,7 @@ class s2_admin extends s2class {
 
 	function user_admin_css() {
 		wp_register_style('s2_user_admin', S2URL . 'include/s2_user_admin.css', array(), '1.0');
-		wp_enqueue_script('s2_user_admin');
+		wp_enqueue_style('s2_user_admin');
 	} // end user_admin_css()
 
 	function option_form_js() {
@@ -132,11 +132,9 @@ class s2_admin extends s2class {
 	function widget_s2counter_css_and_js() {
 		// ensure we only add colorpicker js to widgets page
 		if ( stripos($_SERVER['REQUEST_URI'], 'widgets.php' ) !== false ) {
-			wp_register_style('colorpicker', S2URL . 'include/colorpicker/css/colorpicker.css', '', '20090523'); // colorpicker css
-			wp_register_script('colorpicker_js', S2URL . 'include/colorpicker/js/colorpicker' . $this->script_debug . '.js', array('jquery'), '20090523'); // colorpicker js
-			wp_register_script('s2_colorpicker', S2URL . 'include/s2_colorpicker' . $this->script_debug . '.js', array('colorpicker_js'), '1.3'); //my js
-			wp_enqueue_style('colorpicker');
-			wp_enqueue_script('colorpicker_js');
+			wp_enqueue_style('farbtastic');
+			wp_enqueue_script('farbtastic');
+			wp_register_script('s2_colorpicker', S2URL . 'include/s2_colorpicker' . $this->script_debug . '.js', array('farbtastic'), '1.0'); //my js
 			wp_enqueue_script('s2_colorpicker');
 		}
 	} // end widget_s2_counter_css_and_js()
@@ -156,7 +154,7 @@ class s2_admin extends s2class {
 	function s2_meta_box() {
 		global $post_ID;
 		$s2mail = get_post_meta($post_ID, 's2mail', true);
-		echo "<input type=\"hidden\" name=\"s2meta_nonce\" id=\"s2meta_nonce\" value=\"" . wp_create_nonce(md5(plugin_basename(__FILE__))) . "\" />";
+		echo "<input type=\"hidden\" name=\"s2meta_nonce\" id=\"s2meta_nonce\" value=\"" . wp_create_nonce(wp_hash(plugin_basename(__FILE__))) . "\" />";
 		echo __("Check here to disable sending of an email notification for this post/page", 'subscribe2');
 		echo "&nbsp;&nbsp;<input type=\"checkbox\" name=\"s2_meta_field\" value=\"no\"";
 		if ( $s2mail == 'no' || ($this->subscribe2_options['s2meta_default'] == "1" && $s2mail == "") ) {
@@ -169,7 +167,7 @@ class s2_admin extends s2class {
 	Meta box form handler
 	*/
 	function s2_meta_handler($post_id) {
-		if ( !isset($_POST['s2meta_nonce']) || !wp_verify_nonce($_POST['s2meta_nonce'], md5(plugin_basename(__FILE__))) ) { return $post_id; }
+		if ( !isset($_POST['s2meta_nonce']) || !wp_verify_nonce($_POST['s2meta_nonce'], wp_hash(plugin_basename(__FILE__))) ) { return $post_id; }
 
 		if ( 'page' == $_POST['post_type'] ) {
 			if ( !current_user_can('edit_page', $post_id) ) { return $post_id; }
@@ -366,18 +364,21 @@ class s2_admin extends s2class {
 			$count['all_users'] = $wpdb->get_var("SELECT COUNT(ID) FROM $wpdb->users");
 		}
 		if ( $this->s2_mu ) {
-			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities' AND meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'");
+			$count['registered'] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities' AND meta_key=%s", $this->get_usermeta_keyname('s2_subscribed')));
 		} else {
-			$count['registered'] = $wpdb->get_var("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'");
+			$count['registered'] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key=%s", $this->get_usermeta_keyname('s2_subscribed')));
 		}
 		$count['all'] = ($count['confirmed'] + $count['unconfirmed'] + $count['all_users']);
-		if ( $this->s2_mu ) {
-			foreach ( $all_cats as $cat ) {
-				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(a.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key='" . $this->get_usermeta_keyname('s2_cat') . $cat->term_id . "'");
-			}
-		} else {
-			foreach ( $all_cats as $cat ) {
-				$count[$cat->name] = $wpdb->get_var("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_cat') . $cat->term_id . "'");
+		// get subscribers to individual categories but only if we are using per-post notifications
+		if ( $this->subscribe2_options['email_freq'] == 'never' ) {
+			if ( $this->s2_mu ) {
+				foreach ( $all_cats as $cat ) {
+					$count[$cat->name] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(a.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key=%s", $this->get_usermeta_keyname('s2_cat') . $cat->term_id));
+				}
+			} else {
+				foreach ( $all_cats as $cat ) {
+					$count[$cat->name] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key=%s", $this->get_usermeta_keyname('s2_cat') . $cat->term_id));
+				}
 			}
 		}
 
@@ -397,7 +398,7 @@ class s2_admin extends s2class {
 			echo ">$display (" . ($count[$whom]) . ")</option>\r\n";
 		}
 
-		if ( $count['registered'] > 0 ) {
+		if ( $count['registered'] > 0 && $this->subscribe2_options['email_freq'] == 'never' ) {
 			foreach ( $all_cats as $cat ) {
 				if ( in_array($cat->term_id, $exclude) ) { continue; }
 				echo "<option value=\"" . $cat->term_id . "\"";
@@ -420,8 +421,12 @@ class s2_admin extends s2class {
 
 		$args = array('fields' => array('ID', 'display_name'), 'role' => 'administrator');
 		$wp_user_query = get_users( $args );
-		foreach ($wp_user_query as $user) {
-			$admins[] = $user;
+		if ( !empty($wp_user_query) ) {
+			foreach ($wp_user_query as $user) {
+				$admins[] = $user;
+			}
+		} else {
+			$admins = array();
 		}
 
 		if ( $inc_author ) {
@@ -526,10 +531,10 @@ class s2_admin extends s2class {
 		if ( '' == $emails || '' == $cats ) { return false; }
 		global $wpdb;
 
-		$useremails = explode(",", $emails);
-		$useremails = implode("', '", $useremails);
+		$useremails = explode(",\r\n", $emails);
+		$useremails = implode(", ", array_map(array($this, 'prepare_in_data'), $useremails));
 
-		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ('$useremails')";
+		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ($useremails)";
 		$user_IDs = $wpdb->get_col($sql);
 
 		foreach ( $user_IDs as $user_ID ) {
@@ -558,8 +563,8 @@ class s2_admin extends s2class {
 		if ( '' == $emails || '' == $cats ) { return false; }
 		global $wpdb;
 
-		$useremails = explode(",", $emails);
-		$useremails = "'" . implode("', '", $useremails) . "'";
+		$useremails = explode(",\r\n", $emails);
+		$useremails = implode(", ", array_map(array($this, 'prepare_in_data'), $useremails));
 
 		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ($useremails)";
 		$user_IDs = $wpdb->get_col($sql);
@@ -591,12 +596,12 @@ class s2_admin extends s2class {
 		if ( empty($format) ) { return; }
 
 		global $wpdb;
-		$subscribers = explode(',\r\n', $subscribers_string);
-		$emails = "'" . implode("', '", $subscribers) . "'";
+		$subscribers = explode(",\r\n", $subscribers_string);
+		$emails = implode(", ", array_map(array($this,'prepare_in_data'), $subscribers));
 		$ids = $wpdb->get_col("SELECT ID FROM $wpdb->users WHERE user_email IN ($emails)");
-		$ids = implode(',', $ids);
+		$ids = implode(',', array_map(array($this, 'prepare_in_data'), $ids));
 		$sql = "UPDATE $wpdb->usermeta SET meta_value='{$format}' WHERE meta_key='" . $this->get_usermeta_keyname('s2_format') . "' AND user_id IN ($ids)";
-		$wpdb->get_results("UPDATE $wpdb->usermeta SET meta_value='{$format}' WHERE meta_key='" . $this->get_usermeta_keyname('s2_format') . "' AND user_id IN ($ids)");
+		$wpdb->get_results($sql);
 	} // end format_change()
 
 	/**
@@ -607,7 +612,7 @@ class s2_admin extends s2class {
 
 		global $wpdb;
 		$useremails = explode(",\r\n", $emails);
-		$useremails = "'" . implode("', '", $useremails) . "'";
+		$useremails = implode(", ", array_map(array($this, 'prepare_in_data'), $useremails));
 
 		$sql = "SELECT ID FROM $wpdb->users WHERE user_email IN ($useremails)";
 		$user_IDs = $wpdb->get_col($sql);
@@ -655,9 +660,9 @@ class s2_admin extends s2class {
 
 		if ( 'yes' == $this->subscribe2_options['show_autosub'] ) {
 			if ( $this->s2_mu ) {
-				$sql = "SELECT DISTINCT a.user_id FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b WHERE a.user_id = b.user_id AND a.meta_key='" . $this->get_usermeta_keyname('s2_autosub') . "' AND a.meta_value='yes' AND b.meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'";
+				$sql = $wpdb->prepare("SELECT DISTINCT a.user_id FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b WHERE a.user_id = b.user_id AND a.meta_key=%s AND a.meta_value='yes' AND b.meta_key=%s", $this->get_usermeta_keyname('s2_autosub'), $this->get_usermeta_keyname('s2_subscribed'));
 			} else {
-				$sql = "SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE $wpdb->usermeta.meta_key='" . $this->get_usermeta_keyname('s2_autosub') . "' AND $wpdb->usermeta.meta_value='yes'";
+				$sql = $wpdb->prepare("SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE $wpdb->usermeta.meta_key=%s AND $wpdb->usermeta.meta_value='yes'", $this->get_usermeta_keyname('s2_autosub'));
 			}
 			$user_IDs = $wpdb->get_col($sql);
 			if ( '' == $user_IDs ) { return; }
@@ -689,9 +694,9 @@ class s2_admin extends s2class {
 		global $wpdb;
 
 		if ( $this->s2_mu ) {
-			$sql = "SELECT DISTINCT a.user_id FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b WHERE a.user_id = b.user_id AND a.meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$deleted_category' AND b.meta_key='" . $this->get_usermeta_keyname('s2_subscribed') . "'";
+			$sql = $wpdb->prepare("SELECT DISTINCT a.user_id FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b WHERE a.user_id = b.user_id AND a.meta_key=%s AND b.meta_key=%s", $this->get_usermeta_keyname('s2_cat') . $deleted_category, $this->get_usermeta_keyname('s2_subscribed'));
 		} else {
-			$sql = "SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE meta_key='" . $this->get_usermeta_keyname('s2_cat') . "$deleted_category'";
+			$sql = $wpdb->prepare("SELECT DISTINCT user_id FROM $wpdb->usermeta WHERE meta_key=%s", $this->get_usermeta_keyname('s2_cat') . $deleted_category);
 		}
 		$user_IDs = $wpdb->get_col($sql);
 		if ( '' == $user_IDs ) { return; }
@@ -707,5 +712,35 @@ class s2_admin extends s2class {
 			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), implode(',', $remain));
 		}
 	} // end delete_category()
+
+/* ===== functions to show & handle one-click subscription ===== */
+	/**
+	Show form for one-click subscription on user profile page
+	*/
+	function one_click_profile_form($user) {
+		echo "<h3>" . __('Email subscription', 'subscribe2') . "</h3>\r\n";
+		echo "<table class=\"form-table\">\r\n";
+		echo "<tr><th scope=\"row\">" . __('Subscribe / Unsubscribe', 'subscribe2') . "</th>\r\n";
+		echo "<td><label><input type=\"checkbox\" name=\"sub2-one-click-subscribe\" value=\"1\" " . checked( ! get_user_meta($user->ID, $this->get_usermeta_keyname('s2_subscribed'), true), false, false ) . " /> " . __('Receive notifications', 'subscribe2') . "</label><br />\r\n";
+		echo "<span class=\"description\">" . __('Check if you want to receive email notification when new posts are published', 'subscribe2') . "</span>\r\n";
+		echo "</td></tr></table>\r\n";
+	} // end one_click_profile_form()
+
+	/**
+	Handle submission from profile one-click subscription
+	*/
+	function one_click_profile_form_save($user_ID) {
+		if ( !current_user_can( 'edit_user', $user_ID ) ) {
+			return false;
+		}
+
+		if ( isset( $_POST['sub2-one-click-subscribe'] ) && 1 == $_POST['sub2-one-click-subscribe'] ) {
+			// Subscribe
+			$this->one_click_handler($user_ID, 'subscribe');
+		} else {
+			// Unsubscribe
+			$this->one_click_handler($user_ID, 'unsubscribe');
+		}
+	} // end one_click_profile_form_save()
 }
 ?>

@@ -8,7 +8,7 @@ global $wpdb, $s2nonce, $current_user;
 // was anything POSTed?
 if ( isset($_POST['s2_admin']) && 'mail' == $_POST['s2_admin'] ) {
 	check_admin_referer('subscribe2-write_subscribers' . $s2nonce);
-	$subject = $this->substitute(stripslashes(strip_tags($_POST['subject'])));
+	$subject = html_entity_decode($this->substitute(stripslashes(strip_tags($_POST['subject']))), ENT_QUOTES);
 	$body = $this->substitute(stripslashes($_POST['content']));
 	if ( '' != $current_user->display_name || '' != $current_user->user_email ) {
 		$this->myname = html_entity_decode($current_user->display_name, ENT_QUOTES);
@@ -37,7 +37,13 @@ if ( isset($_POST['s2_admin']) && 'mail' == $_POST['s2_admin'] ) {
 	}
 	$status = $this->mail($recipients, $subject, $body, 'text');
 	if ( $status ) {
-		$message = $this->mail_sent;
+		if ( isset($_POST['preview']) ) {
+			$message = "<p class=\"s2_message\">" . __('Preview message sent!', 'subscribe2') . "</p>";
+		} else {
+			$message = $this->mail_sent;
+		}
+	} elseif ( empty($body) ) {
+		$message = __('Your email was empty', 'subscribe2');
 	} else {
 		global $phpmailer;
 		$message = $this->mail_failed . $phpmailer->ErrorInfo;
@@ -54,7 +60,7 @@ if ( function_exists('wp_nonce_field') ) {
 	wp_nonce_field('subscribe2-write_subscribers' . $s2nonce);
 }
 if ( isset($_POST['subject']) ) {
-	$subject = $_POST['subject'];
+	$subject = stripslashes(esc_html($_POST['subject']));
 } else {
 	$subject = __('A message from', 'subscribe2') . " " . html_entity_decode(get_option('blogname'), ENT_QUOTES);
 }
