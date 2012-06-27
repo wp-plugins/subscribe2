@@ -104,7 +104,7 @@ class s2_frontend extends s2class {
 								$this->s2form = $this->error;
 							}
 						}
-						$this->action='unsubscribe';
+						$this->action = 'unsubscribe';
 					}
 				}
 			}

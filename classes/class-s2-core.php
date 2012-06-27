@@ -267,7 +267,7 @@ class s2class {
 	/**
 	Delivers email to recipients in HTML or plaintext
 	*/
-	function mail($recipients = array(), $subject = '', $message = '', $type='text') {
+	function mail($recipients = array(), $subject = '', $message = '', $type = 'text') {
 		if ( empty($recipients) || '' == $message ) { return; }
 
 		if ( 'html' == $type ) {
@@ -362,7 +362,7 @@ class s2class {
 	/**
 	Construct standard set of email headers
 	*/
-	function headers($type='text') {
+	function headers($type = 'text') {
 		if ( empty($this->myname) || empty($this->myemail) ) {
 			if ( $this->subscribe2_options['sender'] == 'blogname' ) {
 				$this->myname = html_entity_decode(get_option('blogname'), ENT_QUOTES);
@@ -842,7 +842,7 @@ class s2class {
 	/**
 	Check email is not from a barred domain
 	*/
-	function is_barred($email='') {
+	function is_barred($email = '') {
 		$barred_option = $this->subscribe2_options['barred'];
 		list($user, $domain) = explode('@', $email, 2);
 		$bar_check = stristr($barred_option, $domain);
