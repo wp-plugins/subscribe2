@@ -306,6 +306,11 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 == Changelog ==
 
+= Version 8.5 by Matthew Robinson =
+
+* Fixed width of a page select drop down in the Widget settings - thanks to Balky79
+* Added option to check the comment subscription box by default - thanks to Doug Lerner
+
 = Version 8.4 by Matthew Robinson =
 
 * Fixed an error in the 'Send Mail' page that blocked emails from being sent

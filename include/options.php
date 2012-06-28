@@ -30,6 +30,10 @@ if (!isset($this->subscribe2_options['comment_subs'])) {
 	$this->subscribe2_options['comment_subs'] = "no";
 } // option for commenters to subscribe as public subscribers
 
+if (!isset($this->subscribe2_options['comment_def'])) {
+	$this->subscribe2_options['comment_def'] = "no";
+} // option for comments box to be checked by default
+
 if (!isset($this->subscribe2_options['one_click_profile'])) {
 	$this->subscribe2_options['one_click_profile'] = "no";
 } // option for displaying 'one-click' option on profile page
