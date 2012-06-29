@@ -14,7 +14,7 @@ if ( empty($id) ) {
 
 $sender = $this->get_userdata($this->subscribe2_options['sender']);
 list($user, $domain) = explode('@', $sender->user_email, 2);
-if ( !strstr($_SERVER['SERVER_NAME'], $domain) ) {
+if ( !strstr($_SERVER['SERVER_NAME'], $domain) && !in_array($this->subscribe2_options['sender'],array('home', 'blogname')) ) {
 	echo "<div id=\"message\" class=\"error\"><p><strong>" . __('You appear to be sending notifications from an email address from a different domain name to your blog, this may result in failed emails', 'subscribe2') . "</strong></p></div>";
 }
 
