@@ -311,6 +311,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fixed width of a page select drop down in the Widget settings - thanks to Balky79
 * Added option to check the comment subscription box by default - thanks to Doug Lerner
 * Improved off-domain error message in Settings page so it does not display if Post Author for Blogname are selected
+* Fixed an issue on Multisite installs displaying the wrong link to profiles pages for other blog sites - thanks to MadtownLems
 
 = Version 8.4 by Matthew Robinson =
 
