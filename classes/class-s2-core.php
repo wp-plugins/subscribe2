@@ -1636,9 +1636,6 @@ class s2class {
 
 		load_plugin_textdomain('subscribe2', false, S2DIR);
 
-		// load our strings
-		$this->load_strings();
-
 		// Is this WordPressMU or not?
 		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
 			$this->s2_mu = true;
@@ -1656,6 +1653,9 @@ class s2class {
 				add_action('init', array(&$this, 'wpmu_subscribe'));
 			}
 		}
+
+		// load our strings
+		$this->load_strings();
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
