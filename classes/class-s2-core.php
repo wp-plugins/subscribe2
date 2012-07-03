@@ -1650,12 +1650,12 @@ class s2class {
 			global $s2class_multisite;
 			$s2class_multisite = new s2_multisite;
 			if ( isset($_GET['s2mu_subscribe']) || isset($_GET['s2mu_unsubscribe']) ) {
-				add_action('init', array(&$this, 'wpmu_subscribe'));
+				add_action('init', array(&$s2class_multisite, 'wpmu_subscribe'));
 			}
 		}
 
 		// load our strings
-		$this->load_strings();
+		add_action('init', array(&$this, 'load_strings'));
 
 		// do we need to install anything?
 		$this->public = $table_prefix . "subscribe2";
