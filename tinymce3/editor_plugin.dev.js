@@ -65,7 +65,7 @@
 							});
 						}
 					}
-					o.content = o.content.replace(/<img[^>]+>/, function(im) {
+					o.content = o.content.replace(/<img[^>]+>/g, function(im) {
 						if (im.indexOf('class="mceSubscribe2') !== -1) {
 							im = shortcode;
 						}
