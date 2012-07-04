@@ -295,13 +295,13 @@ echo "<div class=\"s2_admin\" id=\"s2_templates\">\r\n";
 echo "<h2>" . __('Email Templates', 'subscribe2') . "</h2>\r\n";
 echo "<br />";
 echo "<table style=\"width: 100%; border-collapse: separate; border-spacing: 2px; *border-collapse: expression('separate', cellSpacing = '2px');\" class=\"editform\">\r\n";
-echo "<tr><td>";
+echo "<tr><td style=\"vertical-align: top; height: 350px; min-height: 350px;\">";
 echo __('New Post email (must not be empty)', 'subscribe2') . ":<br />\r\n";
 echo __('Subject Line', 'subscribe2') . ": ";
 echo "<input type=\"text\" name=\"notification_subject\" value=\"" . stripslashes($this->subscribe2_options['notification_subject']) . "\" size=\"30\" />";
 echo "<br />\r\n";
-echo "<textarea rows=\"9\" cols=\"60\" name=\"mailtext\">" . stripslashes($this->subscribe2_options['mailtext']) . "</textarea><br /><br />\r\n";
-echo "</td><td valign=\"top\" rowspan=\"3\">";
+echo "<textarea rows=\"9\" cols=\"60\" name=\"mailtext\">" . stripslashes($this->subscribe2_options['mailtext']) . "</textarea>\r\n";
+echo "</td><td style=\"vertical-align: top;\" rowspan=\"3\">";
 echo "<p class=\"submit\"><input type=\"submit\" class=\"button-secondary\" name=\"preview\" value=\"" . __('Send Email Preview', 'subscribe2') . "\" /></p>\r\n";
 echo "<h3>" . __('Message substitutions', 'subscribe2') . "</h3>\r\n";
 echo "<dl>";
@@ -325,12 +325,12 @@ echo "<dt><b>{ACTION}</b></dt><dd>" . __("Action performed by LINK in confirmati
 echo "<dt><b>{CATS}</b></dt><dd>" . __("the post's assigned categories", 'subscribe2') . "</dd>\r\n";
 echo "<dt><b>{TAGS}</b></dt><dd>" . __("the post's assigned Tags", 'subscribe2') . "</dd>\r\n";
 echo "<dt><b>{COUNT}</b></dt><dd>" . __("the number of posts included in the digest email<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
-echo "</dl></td></tr><tr><td>";
+echo "</dl></td></tr><tr><td  style=\"vertical-align: top; height: 350px; min-height: 350px;\">";
 echo __('Subscribe / Unsubscribe confirmation email', 'subscribe2') . ":<br />\r\n";
 echo __('Subject Line', 'subscribe2') . ": ";
 echo "<input type=\"text\" name=\"confirm_subject\" value=\"" . stripslashes($this->subscribe2_options['confirm_subject']) . "\" size=\"30\" /><br />\r\n";
-echo "<textarea rows=\"9\" cols=\"60\" name=\"confirm_email\">" . stripslashes($this->subscribe2_options['confirm_email']) . "</textarea><br /><br />\r\n";
-echo "</td></tr><tr valign=\"top\"><td>";
+echo "<textarea rows=\"9\" cols=\"60\" name=\"confirm_email\">" . stripslashes($this->subscribe2_options['confirm_email']) . "</textarea>\r\n";
+echo "</td></tr><tr><td style=\"vertical-align: top; height: 350px; min-height: 350px;\">";
 echo __('Reminder email to Unconfirmed Subscribers', 'subscribe2') . ":<br />\r\n";
 echo __('Subject Line', 'subscribe2') . ": ";
 echo "<input type=\"text\" name=\"remind_subject\" value=\"" . stripslashes($this->subscribe2_options['remind_subject']) . "\" size=\"30\" /><br />\r\n";
@@ -345,8 +345,8 @@ echo "<p>";
 echo "<strong><em style=\"color: red\">" . __('Posts assigned to any Excluded Category do not generate notifications and are not included in digest notifications', 'subscribe2') . "</em></strong><br />\r\n";
 echo "</p>";
 $this->display_category_form(explode(',', $this->subscribe2_options['exclude']));
-echo "<center><label><input type=\"checkbox\" name=\"reg_override\" value=\"1\"" . checked($this->subscribe2_options['reg_override'], '1', false) . " /> ";
-echo __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</label></center><br />\r\n";
+echo "<p style=\"text-align: center;\"><label><input type=\"checkbox\" name=\"reg_override\" value=\"1\"" . checked($this->subscribe2_options['reg_override'], '1', false) . " /> ";
+echo __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</label></p><br />\r\n";
 
 // excluded post formats
 $formats = get_theme_support('post-formats');
@@ -477,12 +477,12 @@ echo "</p>";
 echo "</div>\r\n";
 
 // submit
-echo "<p class=\"submit\" align=\"center\"><input type=\"submit\" class=\"button-primary\" name=\"submit\" value=\"" . __('Submit', 'subscribe2') . "\" /></p>";
+echo "<p class=\"submit\" style=\"text-align: center\"><input type=\"submit\" class=\"button-primary\" name=\"submit\" value=\"" . __('Submit', 'subscribe2') . "\" /></p>";
 
 // reset
 echo "<h2>" . __('Reset Default', 'subscribe2') . "</h2>\r\n";
 echo "<p>" . __('Use this to reset all options to their defaults. This <strong><em>will not</em></strong> modify your list of subscribers.', 'subscribe2') . "</p>\r\n";
-echo "<p class=\"submit\" align=\"center\">";
+echo "<p class=\"submit\" style=\"text-align: center\">";
 echo "<input type=\"submit\" id=\"deletepost\" name=\"reset\" value=\"" . __('RESET', 'subscribe2') .
 "\" />";
 echo "</p></form></div>\r\n";
