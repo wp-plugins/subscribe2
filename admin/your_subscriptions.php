@@ -98,7 +98,7 @@ if ( isset($_GET['email']) ) {
 	$user = get_userdata($user_ID);
 	echo "<span style=\"color: red;line-height: 300%;\">" . __('Editing Subscribe2 preferences for user', 'subscribe2') . ": " . $user->display_name . "</span>";
 }
-echo "<form method=\"post\" action=\"\">";
+echo "<form method=\"post\">";
 echo "<p>";
 if ( function_exists('wp_nonce_field') ) {
 	wp_nonce_field('subscribe2-user_subscribers' . $s2nonce);

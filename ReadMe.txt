@@ -312,6 +312,9 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Added option to check the comment subscription box by default - thanks to Doug Lerner
 * Improved off-domain error message in Settings page so it does not display if Post Author for Blogname are selected
 * Fixed an issue on Multisite installs displaying the wrong link to profiles pages for other blog sites - thanks to MadtownLems
+* Fixed an issue with Image and Shortcode replacement in the visual editor (TinyMCE) - thanks to Dave Firman
+* Fixed unique IDs for 2 possible error messages in the Settings page - thanks to MadtownLems
+* Fixed several HTML5 validation error in the admin pages
 
 = Version 8.4 by Matthew Robinson =
 

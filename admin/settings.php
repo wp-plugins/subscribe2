@@ -9,13 +9,13 @@ global $s2nonce, $wpdb, $wp_version;
 $sql = "SELECT ID FROM $wpdb->posts WHERE post_type='page' AND post_status='publish' LIMIT 1";
 $id = $wpdb->get_var($sql);
 if ( empty($id) ) {
-	echo "<div id=\"message\" class=\"error\"><p><strong>$this->no_page</strong></p></div>";
+	echo "<div id=\"page_message\" class=\"error\"><p class=\"s2_error\"><strong>$this->no_page</strong></p></div>";
 }
 
 $sender = $this->get_userdata($this->subscribe2_options['sender']);
 list($user, $domain) = explode('@', $sender->user_email, 2);
 if ( !strstr($_SERVER['SERVER_NAME'], $domain) && !in_array($this->subscribe2_options['sender'],array('home', 'blogname')) ) {
-	echo "<div id=\"message\" class=\"error\"><p><strong>" . __('You appear to be sending notifications from an email address from a different domain name to your blog, this may result in failed emails', 'subscribe2') . "</strong></p></div>";
+	echo "<div id=\"sender_message\" class=\"error\"><p class=\"s2_error\"><strong>" . __('You appear to be sending notifications from an email address from a different domain name to your blog, this may result in failed emails', 'subscribe2') . "</strong></p></div>";
 }
 
 // was anything POSTed?
@@ -212,7 +212,7 @@ echo "<div id=\"icon-options-general\" class=\"icon32\"></div>";
 echo "<h2>" . __('Subscribe2 Settings', 'subscribe2') . "</h2>\r\n";
 echo "<a href=\"http://subscribe2.wordpress.com/\">" . __('Plugin Blog', 'subscribe2') . "</a> | ";
 echo "<a href=\"https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904\">" . __('Make a donation via PayPal', 'subscribe2') . "</a>";
-echo "<form method=\"post\" action=\"\">\r\n";
+echo "<form method=\"post\">\r\n";
 if ( function_exists('wp_nonce_field') ) {
 	wp_nonce_field('subscribe2-options_subscribers' . $s2nonce);
 }
@@ -287,14 +287,14 @@ if ( function_exists('wp_schedule_event') ) {
 }
 echo __('Add Tracking Parameters to the Permalink', 'subscribe2') . ": ";
 echo "<input type=\"text\" name=\"tracking\" value=\"" . stripslashes($this->subscribe2_options['tracking']) . "\" size=\"50\" /> ";
-echo "<br />" . __('eg. utm_source=subscribe2&utm_medium=email&utm_campaign=postnotify', 'subscribe2') . "<br /><br />\r\n";
+echo "<br />" . __('eg. utm_source=subscribe2&amp;utm_medium=email&amp;utm_campaign=postnotify', 'subscribe2') . "<br /><br />\r\n";
 echo "</div>\r\n";
 
 // email templates
 echo "<div class=\"s2_admin\" id=\"s2_templates\">\r\n";
 echo "<h2>" . __('Email Templates', 'subscribe2') . "</h2>\r\n";
 echo "<br />";
-echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" class=\"editform\">\r\n";
+echo "<table style=\"width: 100%; border-collapse: separate; border-spacing: 2px; *border-collapse: expression('separate', cellSpacing = '2px');\" class=\"editform\">\r\n";
 echo "<tr><td>";
 echo __('New Post email (must not be empty)', 'subscribe2') . ":<br />\r\n";
 echo __('Subject Line', 'subscribe2') . ": ";

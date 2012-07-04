@@ -199,14 +199,14 @@ class s2_admin extends s2class {
 		$half = (count($all_cats) / 2);
 		$i = 0;
 		$j = 0;
-		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"5\" class=\"editform\">\r\n";
-		echo "<tr><td align=\"left\" colspan=\"2\">\r\n";
+		echo "<table style=\"width: 100%; border-collapse: separate; border-spacing: 2px; *border-collapse: expression('separate', cellSpacing = '2px');\" class=\"editform\">\r\n";
+		echo "<tr><td style=\"text-align: left;\" colspan=\"2\">\r\n";
 		echo "<label><input type=\"checkbox\" name=\"checkall\" value=\"checkall_cat\" /> " . __('Select / Unselect All', 'subscribe2') . "</label>\r\n";
 		echo "</td></tr>\r\n";
-		echo "<tr valign=\"top\"><td width=\"50%\" align=\"left\">\r\n";
+		echo "<tr style=\"vertical-align: top;\"><td style=\"width: 50%; text-align: left;\">\r\n";
 		foreach ( $all_cats as $cat ) {
 			if ( $i >= $half && 0 == $j ){
-				echo "</td><td width=\"50%\" align=\"left\">\r\n";
+				echo "</td><td style=\"width: 50%; text-align: left;\">\r\n";
 				$j++;
 			}
 			$catName = '';
@@ -245,14 +245,14 @@ class s2_admin extends s2class {
 		$half = (count($formats[0]) / 2);
 		$i = 0;
 		$j = 0;
-		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"5\" class=\"editform\">\r\n";
-		echo "<tr><td align=\"left\" colspan=\"2\">\r\n";
+		echo "<table style=\"width: 100%; border-collapse: separate; border-spacing: 2px; *border-collapse: expression('separate', cellSpacing = '2px');\" class=\"editform\">\r\n";
+		echo "<tr><td style=\"text-align: left;\" colspan=\"2\">\r\n";
 		echo "<label><input type=\"checkbox\" name=\"checkall\" value=\"checkall_format\" /> " . __('Select / Unselect All', 'subscribe2') . "</label>\r\n";
 		echo "</td></tr>\r\n";
-		echo "<tr valign=\"top\"><td width=\"50%\" align=\"left\">\r\n";
+		echo "<tr style=\"vertical-align: top;\"><td style=\"width: 50%; text-align: left\">\r\n";
 		foreach ( $formats[0] as $format ) {
 			if ( $i >= $half && 0 == $j ){
-				echo "</td><td width=\"50%\" align=\"left\">\r\n";
+				echo "</td><td style=\"width: 50%; text-align: left\">\r\n";
 				$j++;
 			}
 
@@ -285,14 +285,14 @@ class s2_admin extends s2class {
 		$half = (count($all_authors) / 2);
 		$i = 0;
 		$j = 0;
-		echo "<table width=\"100%\" cellspacing=\"2\" cellpadding=\"5\" class=\"editform\">\r\n";
-		echo "<tr><td align=\"left\" colspan=\"2\">\r\n";
+		echo "<table style=\"width: 100%; border-collapse: separate; border-spacing: 2px; *border-collapse: expression('separate', cellSpacing = '2px');\" class=\"editform\">\r\n";
+		echo "<tr><td style=\"text-align: left;\" colspan=\"2\">\r\n";
 		echo "<label><input type=\"checkbox\" name=\"checkall\" value=\"checkall_author\" /> " . __('Select / Unselect All', 'subscribe2') . "</label>\r\n";
 		echo "</td></tr>\r\n";
-		echo "<tr valign=\"top\"><td width=\"50%\" align=\"left\">\r\n";
+		echo "<tr style=\"vertical-align: top;\"><td style=\"width: 50%; test-align: left;\">\r\n";
 		foreach ( $all_authors as $author ) {
 			if ( $i >= $half && 0 == $j ) {
-				echo "</td><td width=\"50%\" align=\"left\">\r\n";
+				echo "</td><td style=\"width: 50%; text-align: left;\">\r\n";
 				$j++;
 			}
 			if ( 0 == $j ) {
