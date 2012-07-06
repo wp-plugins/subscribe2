@@ -294,7 +294,7 @@ echo "</div>\r\n";
 echo "<div class=\"s2_admin\" id=\"s2_templates\">\r\n";
 echo "<h2>" . __('Email Templates', 'subscribe2') . "</h2>\r\n";
 echo "<br />";
-echo "<table style=\"width: 100%; border-collapse: separate; border-spacing: 2px; *border-collapse: expression('separate', cellSpacing = '2px');\" class=\"editform\">\r\n";
+echo "<table style=\"width: 100%; border-collapse: separate; border-spacing: 5px; *border-collapse: expression('separate', cellSpacing = '5px');\" class=\"editform\">\r\n";
 echo "<tr><td style=\"vertical-align: top; height: 350px; min-height: 350px;\">";
 echo __('New Post email (must not be empty)', 'subscribe2') . ":<br />\r\n";
 echo __('Subject Line', 'subscribe2') . ": ";
@@ -389,7 +389,7 @@ echo "<label><input type=\"checkbox\" name=\"show_button\" value=\"1\"" . checke
 echo __('Show the Subscribe2 button on the Write toolbar?', 'subscribe2') . "</label><br /><br />\r\n";
 
 // enable AJAX style form
-echo "<label><input type=\"checkbox\" name=\"ajax\" value=\"1\"" . checked($this->subscribe2_options['ajax'], '1', false) . " />";
+echo "<label><input type=\"checkbox\" name=\"ajax\" value=\"1\"" . checked($this->subscribe2_options['ajax'], '1', false) . " /> ";
 echo __('Enable AJAX style subscription form?', 'subscribe2') . "</label><br /><br />\r\n";
 
 // show Widget
