@@ -228,7 +228,7 @@ $this->display_subscriber_dropdown($what, __('Filter', 'subscribe2'));
 echo "<br /><br />";
 // show the selected subscribers
 $alternate = 'alternate';
-echo "<table style=\"width: 100%; border-collapse: separate; border-spacing: 2px; *border-collapse: expression('separate', cellSpacing = '2px');\" class=\"widefat\" >";
+echo "<table style=\"width: 100%; border-collapse: separate; border-spacing: 0px; *border-collapse: expression('separate', cellSpacing = '0px');\" class=\"widefat\" >";
 $searchterm = ( isset($_POST['searchterm']) ) ? stripslashes(esc_html($_POST['searchterm'])) : '';
 echo "<tr class=\"alternate\"><td colspan=\"3\"><input type=\"text\" name=\"searchterm\" value=\"" . $searchterm . "\" /></td>\r\n";
 echo "<td><input type=\"submit\" class=\"button-secondary\" name=\"search\" value=\"" . __('Search Subscribers', 'subscribe2') . "\" /></td>\r\n";
