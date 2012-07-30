@@ -527,7 +527,7 @@ class s2class {
 		$this->post_time = get_the_time();
 
 		$author = get_userdata($post->post_author);
-		$this->authorname = $author->display_name;
+		$this->authorname = html_entity_decode(apply_filters('the_author', $author->display_name), ENT_QUOTES);
 
 		// do we send as admin, or post author?
 		if ( 'author' == $this->subscribe2_options['sender'] ) {
@@ -549,7 +549,7 @@ class s2class {
 		$this->post_tag_names = implode(', ', wp_get_post_tags($post->ID, array('fields' => 'names')));
 
 		// Get email subject
-		$subject = stripslashes(strip_tags($this->substitute($this->subscribe2_options['notification_subject'])));
+		$subject = html_entity_decode(stripslashes(wp_kses($this->substitute($this->subscribe2_options['notification_subject']), '')));
 		// Get the message template
 		$mailtext = apply_filters('s2_email_template', $this->subscribe2_options['mailtext']);
 		$mailtext = stripslashes($this->substitute($mailtext));
@@ -558,9 +558,9 @@ class s2class {
 		if ( function_exists('strip_shortcodes') ) {
 			$plaintext = strip_shortcodes($plaintext);
 		}
-		$plaintext = preg_replace('|<s*>(.*)<\/s>|','', $plaintext);
-		$plaintext = preg_replace('|<strike*>(.*)<\/strike>|','', $plaintext);
-		$plaintext = preg_replace('|<del*>(.*)<\/del>|','', $plaintext);
+		$plaintext = preg_replace('|<s[^>]*>(.*)<\/s>|Ui','', $plaintext);
+		$plaintext = preg_replace('|<strike[^>]*>(.*)<\/strike>|Ui','', $plaintext);
+		$plaintext = preg_replace('|<del[^>]*>(.*)<\/del>|Ui','', $plaintext);
 
 		$gallid = '[gallery id="' . $post->ID . '"';
 		$content = str_replace('[gallery', $gallid, $post->post_content);
@@ -1401,7 +1401,7 @@ class s2class {
 	function subscribe2_cron($preview = '', $resend = '') {
 		if ( defined('DOING_S2_CRON') && DOING_S2_CRON ) { return; }
 		define( 'DOING_S2_CRON', true );
-		global $wpdb;
+		global $wpdb, $post;
 
 		if ( '' == $preview ) {
 			// update last_s2cron execution time before completing or bailing
@@ -1514,8 +1514,8 @@ class s2class {
 			if ( strstr($mailtext, "{AUTHORNAME}") ) {
 				$author = get_userdata($post->post_author);
 				if ( $author->display_name != '' ) {
-					$message_post .= " (" . __('Author', 'subscribe2') . ": " . $author->display_name . ")";
-					$message_posttime .= " (" . __('Author', 'subscribe2') . ": " . $author->display_name . ")";
+					$message_post .= " (" . __('Author', 'subscribe2') . ": " . html_entity_decode(apply_filters('the_author', $author->display_name), ENT_QUOTES) . ")";
+					$message_posttime .= " (" . __('Author', 'subscribe2') . ": " . html_entity_decode(apply_filters('the_author', $author->display_name), ENT_QUOTES) . ")";
 				}
 			}
 			$message_post .= "\r\n";

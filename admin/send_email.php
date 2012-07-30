@@ -8,7 +8,7 @@ global $wpdb, $s2nonce, $current_user;
 // was anything POSTed?
 if ( isset($_POST['s2_admin']) && 'mail' == $_POST['s2_admin'] ) {
 	check_admin_referer('subscribe2-write_subscribers' . $s2nonce);
-	$subject = html_entity_decode($this->substitute(stripslashes(strip_tags($_POST['subject']))), ENT_QUOTES);
+	$subject = html_entity_decode(stripslashes(wp_kses($this->substitute($_POST['subject']), '')), ENT_QUOTES);
 	$body = $this->substitute(stripslashes($_POST['content']));
 	if ( '' != $current_user->display_name || '' != $current_user->user_email ) {
 		$this->myname = html_entity_decode($current_user->display_name, ENT_QUOTES);

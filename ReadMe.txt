@@ -315,6 +315,9 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fixed an issue with Image and Shortcode replacement in the visual editor (TinyMCE) - thanks to Dave Firman
 * Fixed unique IDs for 2 possible error messages in the Settings page - thanks to MadtownLems
 * Fixed several HTML5 validation error in the admin pages
+* Improved regex replacedment of s strike and del HTML tags in plaintext emails - thanks to jimshell
+* Use wp_kses() rather than strip_tags() on email subject lines so that single angle brackets are allowed - thanks to eightize and esmi
+* Allow remote definition of email address in form - thanks to orion42
 
 = Version 8.4 by Matthew Robinson =
 

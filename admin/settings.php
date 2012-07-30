@@ -25,11 +25,12 @@ if ( isset( $_POST['s2_admin']) ) {
 		$this->reset();
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_reset</strong></p></div>";
 	} elseif ( isset($_POST['preview']) ) {
-		global $user_email;
+		global $user_email, $post;
 		$this->preview_email = true;
 		if ( 'never' == $this->subscribe2_options['email_freq'] ) {
-			$post = get_posts('numberposts=1');
-			$this->publish($post[0], $user_email);
+			$posts = get_posts('numberposts=1');
+			$post = $posts[0];
+			$this->publish($post, $user_email);
 		} else {
 			$this->subscribe2_cron($user_email);
 		}
