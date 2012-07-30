@@ -303,7 +303,7 @@ if ( !empty($subscribers) ) {
 	if ( $_POST['searchterm'] ) {
 		echo "<tr><td colspan=\"6\" style=\"text-align: center;\"><b>" . __('No matching subscribers found', 'subscribe2') . "</b></td></tr>\r\n";
 	} else {
-		echo "<tr><td colspan=\"6\" align=\"center\"><b>" . __('NONE', 'subscribe2') . "</b></td></tr>\r\n";
+		echo "<tr><td colspan=\"6\" style=\"text-align: center;\"><b>" . __('NONE', 'subscribe2') . "</b></td></tr>\r\n";
 	}
 }
 if ( !empty($subscribers) ) {
