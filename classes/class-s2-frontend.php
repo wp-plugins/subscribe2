@@ -46,11 +46,11 @@ class s2_frontend extends s2class {
 		if ( isset($_REQUEST['email']) ) {
 			if ( is_email($_REQUEST['email']) ) {
 				$value = $this->sanitize_email($_REQUEST['email']);
-			} elseif ( $nojs == 'true' ) {
-				$value = '';
-			} else {
-				$value = __('Enter email address...', 'subscribe2');
 			}
+		} elseif ( $nojs == 'true' ) {
+			$value = '';
+		} else {
+			$value = __('Enter email address...', 'subscribe2');
 		}
 
 		// build default form
