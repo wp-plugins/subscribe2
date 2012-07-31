@@ -80,10 +80,10 @@ if ( isset($_POST['s2_admin']) ) {
 		$this->unsubscribe_registered_users($_POST['exportcsv'], $_POST['category']);
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Registered Users Unsubscribed!', 'subscribe2') . "</strong></p></div>";
 	} elseif ( isset($_POST['sub_format']) ) {
-		$this->format_change( $_POST['format'], $_POST['exportcsv'] );
+		$this->format_change( $_POST['exportcsv'], $_POST['format'] );
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Format updated for Selected Registered Users!', 'subscribe2') . "</strong></p></div>";
 	} elseif ( isset($_POST['sub_digest']) ) {
-		$this->digest_change( $_POST['sub_category'], $_POST['exportcsv'] );
+		$this->digest_change( $_POST['exportcsv'], $_POST['sub_category'] );
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Digest Subscription updated for Selected Registered Users!', 'subscribe2') . "</strong></p></div>";
 	}
 }

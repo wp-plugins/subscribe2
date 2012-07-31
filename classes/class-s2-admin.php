@@ -545,7 +545,7 @@ class s2_admin extends s2class {
 			} else {
 				$newcats = $cats;
 			}
-			if ( !empty($newcats) ) {
+			if ( !empty($newcats) && $newcats !== $old_cats) {
 				// add subscription to these cat IDs
 				foreach ( $newcats as $id ) {
 					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id, $id);
@@ -572,7 +572,7 @@ class s2_admin extends s2class {
 		foreach ( $user_IDs as $user_ID ) {
 			$old_cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
 			$remain = array_diff($old_cats, $cats);
-			if ( !empty($remain) ) {
+			if ( !empty($remain) && $remain !== $old_cats) {
 				// remove subscription to these cat IDs and update s2_subscribed
 				foreach ( $cats as $id ) {
 					delete_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $id);
@@ -592,13 +592,13 @@ class s2_admin extends s2class {
 	/**
 	Handles bulk changes to email format for Registered Subscribers
 	*/
-	function format_change($format, $subscribers_string) {
+	function format_change($emails, $format) {
 		if ( empty($format) ) { return; }
 
 		global $wpdb;
-		$subscribers = explode(",\r\n", $subscribers_string);
-		$emails = implode(", ", array_map(array($this,'prepare_in_data'), $subscribers));
-		$ids = $wpdb->get_col("SELECT ID FROM $wpdb->users WHERE user_email IN ($emails)");
+		$useremails = explode(",\r\n", $emails);
+		$useremails = implode(", ", array_map(array($this,'prepare_in_data'), $useremails));
+		$ids = $wpdb->get_col("SELECT ID FROM $wpdb->users WHERE user_email IN ($useremails)");
 		$ids = implode(',', array_map(array($this, 'prepare_in_data'), $ids));
 		$sql = "UPDATE $wpdb->usermeta SET meta_value='{$format}' WHERE meta_key='" . $this->get_usermeta_keyname('s2_format') . "' AND user_id IN ($ids)";
 		$wpdb->get_results($sql);
@@ -607,7 +607,7 @@ class s2_admin extends s2class {
 	/**
 	Handles bulk update to digest preferences
 	*/
-	function digest_change($digest, $emails) {
+	function digest_change($emails, $digest) {
 		if ( empty($digest) ) { return; }
 
 		global $wpdb;
