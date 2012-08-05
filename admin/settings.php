@@ -135,6 +135,15 @@ if ( isset( $_POST['s2_admin']) ) {
 			$this->subscribe2_options['remind_email'] = $_POST['remind_email'];
 		}
 
+		// compulsory categories
+		if ( !empty($_POST['compulsory']) ) {
+			sort($_POST['compulsory']);
+			$compulsory_cats = implode(',', $_POST['compulsory']);
+		} else {
+			$compulsory_cats = '';
+		}
+		$this->subscribe2_options['compulsory'] = $compulsory_cats;
+
 		// excluded categories
 		if ( !empty($_POST['category']) ) {
 			sort($_POST['category']);
@@ -338,6 +347,14 @@ echo "<input type=\"text\" name=\"remind_subject\" value=\"" . stripslashes($thi
 echo "<textarea rows=\"9\" cols=\"60\" name=\"remind_email\">" . stripslashes($this->subscribe2_options['remind_email']) . "</textarea><br /><br />\r\n";
 echo "</td></tr></table><br />\r\n";
 echo "</div>\r\n";
+
+// compulsory categories
+echo "<div class=\"s2_admin\" id=\"s2_compulsory_categories\">\r\n";
+echo "<h2>" . __('Complusory Categories', 'subscribe2') . "</h2>\r\n";
+echo "<p>";
+echo "<strong><em style=\"color: red\">" . __('Compulsory categories will be checked by default for Registered Subscribers', 'subscribe2') . "</em></strong><br />\r\n";
+echo "</p>";
+$this->display_category_form(array(), 1, explode(',', $this->subscribe2_options['compulsory']), 'compulsory');
 
 // excluded categories
 echo "<div class=\"s2_admin\" id=\"s2_excluded_categories\">\r\n";

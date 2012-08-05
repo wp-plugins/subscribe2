@@ -78,6 +78,10 @@ if (!isset($this->subscribe2_options['cron_order'])) {
 	$this->subscribe2_options['cron_order'] = "desc";
 } // option for ordering of posts in digest email
 
+if (!isset($this->subscribe2_options['compulsory'])) {
+	$this->subscribe2_options['compulsory'] = "";
+} // option for compulsory categories
+
 if (!isset($this->subscribe2_options['exclude'])) {
 	$this->subscribe2_options['exclude'] = "";
 } // option for excluded categories

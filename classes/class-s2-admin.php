@@ -187,7 +187,7 @@ class s2_admin extends s2class {
 	Display a table of categories with checkboxes
 	Optionally pre-select those categories specified
 	*/
-	function display_category_form($selected = array(), $override = 1) {
+	function display_category_form($selected = array(), $override = 1, $compulsory = array(), $name = 'category') {
 		global $wpdb;
 
 		if ( $override == 0 ) {
@@ -201,7 +201,7 @@ class s2_admin extends s2class {
 		$j = 0;
 		echo "<table style=\"width: 100%; border-collapse: separate; border-spacing: 2px; *border-collapse: expression('separate', cellSpacing = '2px');\" class=\"editform\">\r\n";
 		echo "<tr><td style=\"text-align: left;\" colspan=\"2\">\r\n";
-		echo "<label><input type=\"checkbox\" name=\"checkall\" value=\"checkall_cat\" /> " . __('Select / Unselect All', 'subscribe2') . "</label>\r\n";
+		echo "<label><input type=\"checkbox\" name=\"checkall\" value=\"checkall_" . $name . "\" /> " . __('Select / Unselect All', 'subscribe2') . "</label>\r\n";
 		echo "</td></tr>\r\n";
 		echo "<tr style=\"vertical-align: top;\"><td style=\"width: 50%; text-align: left;\">\r\n";
 		foreach ( $all_cats as $cat ) {
@@ -220,15 +220,21 @@ class s2_admin extends s2class {
 			$catName .= $cat->name;
 
 			if ( 0 == $j ) {
-				echo "<label><input class=\"checkall_cat\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
-				if ( in_array($cat->term_id, $selected) ) {
-						echo " checked=\"checked\"";
+				echo "<label><input class=\"checkall_" . $name . "\" type=\"checkbox\" name=\"" . $name . "[]\" value=\"" . $cat->term_id . "\"";
+				if ( in_array($cat->term_id, $selected) || in_array($cat->term_id, $compulsory) ) {
+					echo " checked=\"checked\"";
+				}
+				if ( in_array($cat->term_id, $compulsory) && $name === 'category' ) {
+					echo " DISABLED";
 				}
 				echo " /> <abbr title=\"" . $cat->slug . "\">" . $catName . "</abbr></label><br />\r\n";
 			} else {
-				echo "<label><input class=\"checkall_cat\" type=\"checkbox\" name=\"category[]\" value=\"" . $cat->term_id . "\"";
-				if ( in_array($cat->term_id, $selected) ) {
-							echo " checked=\"checked\"";
+				echo "<label><input class=\"checkall_" . $name . "\" type=\"checkbox\" name=\"" . $name . "[]\" value=\"" . $cat->term_id . "\"";
+				if ( in_array($cat->term_id, $selected) && !in_array($cat->term_id, $compulsory) ) {
+					echo " checked=\"checked\"";
+				}
+				if ( in_array($cat->term_id, $compulsory) ) {
+					echo " checked=\"checked\" DISABLED";
 				}
 				echo " /> <abbr title=\"" . $cat->slug . "\">" . $catName . "</abbr></label><br />\r\n";
 			}

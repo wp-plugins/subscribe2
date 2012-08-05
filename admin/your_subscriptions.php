@@ -148,7 +148,7 @@ if ( $this->subscribe2_options['email_freq'] == 'never' ) {
 	} else {
 		echo "<h2>" . __('Subscribed Categories', 'subscribe2') . "</h2>\r\n";
 	}
-	$this->display_category_form(explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true)), $this->subscribe2_options['reg_override']);
+	$this->display_category_form(explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true)), $this->subscribe2_options['reg_override'], explode(',', $this->subscribe2_options['compulsory']));
 } else {
 	// we're doing daily digests, so just show
 	// subscribe / unnsubscribe

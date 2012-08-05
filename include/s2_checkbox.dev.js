@@ -1,11 +1,20 @@
 // version 1.0 - original version
 // version 1.1 - Updated with function fixes and for WordPress 3.2 / jQuery 1.6
+// version 1.2 - Update to work when DISABLED is specified for changes in version 8.5
 jQuery(document).ready(function () {
 	// function to check or uncheck all when 'checkall' box it toggled
 	jQuery('input[name="checkall"]').click(function () {
 		var checked_status = this.checked;
 		jQuery('input[class="' + this.value + '"]').each(function () {
-			this.checked = checked_status;
+			if (jQuery().jquery >= '1.6') {
+				if (jQuery(this).prop('disabled') === false) {
+					this.checked = checked_status;
+				}
+			} else {
+				if (jQuery(this).attr('disabled') === false) {
+					this.checked = checked_status;
+				}
+			}
 		});
 	});
 	// function to check or uncheck 'checkall' box when individual boxes are toggled
