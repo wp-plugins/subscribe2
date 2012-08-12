@@ -35,7 +35,7 @@ class s2_admin extends s2class {
 	Insert Javascript and CSS into admin_header
 	*/
 	function checkbox_form_js() {
-		wp_register_script('s2_checkbox', S2URL . 'include/s2_checkbox' . $this->script_debug . '.js', array('jquery'), '1.1');
+		wp_register_script('s2_checkbox', S2URL . 'include/s2_checkbox' . $this->script_debug . '.js', array('jquery'), '1.2');
 		wp_enqueue_script('s2_checkbox');
 	} //end checkbox_form_js()
 
