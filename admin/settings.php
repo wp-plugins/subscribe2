@@ -297,7 +297,7 @@ if ( function_exists('wp_schedule_event') ) {
 }
 echo __('Add Tracking Parameters to the Permalink', 'subscribe2') . ": ";
 echo "<input type=\"text\" name=\"tracking\" value=\"" . stripslashes($this->subscribe2_options['tracking']) . "\" size=\"50\" /> ";
-echo "<br />" . __('eg. utm_source=subscribe2&amp;utm_medium=email&amp;utm_campaign=postnotify', 'subscribe2') . "<br /><br />\r\n";
+echo "<br />" . __('eg. utm_source=subscribe2&amp;utm_medium=email&amp;utm_campaign=postnotify&amp;utm_id={ID}', 'subscribe2') . "<br /><br />\r\n";
 echo "</div>\r\n";
 
 // email templates

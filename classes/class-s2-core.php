@@ -415,11 +415,15 @@ class s2class {
 	function get_tracking_link($link) {
 		if ( empty($link) ) { return; }
 		if ( !empty($this->subscribe2_options['tracking']) ) {
-				$delimiter = '?';
-				if ( strpos($link, $delimiter) > 0 ) { $delimiter = '&'; }
-				return $link . $delimiter . $this->subscribe2_options['tracking'];
+			(strpos($link, '?') > 0) ? $delimiter .= '&' : $delimiter = '?';
+			if ( strpos($this->subscribe2_options['tracking'], "{ID}") ) {
+				global $post;
+				$tracking = str_replace("{ID}", $post->ID, $this->subscribe2_options['tracking']);
+				return $link . $delimiter . $tracking;
+			}
+			return $link . $delimiter . $this->subscribe2_options['tracking'];
 		} else {
-				return $link;
+			return $link;
 		}
 	} // end get_tracking_link()
 
@@ -434,6 +438,7 @@ class s2class {
 			if ( $switched ) { return; }
 		}
 
+		global $post;
 		if ( $preview == '' ) {
 			// we aren't sending a Preview to the current user so carry out checks
 			$s2mail = get_post_meta($post->ID, 's2mail', true);

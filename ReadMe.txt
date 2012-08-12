@@ -319,6 +319,8 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Use wp_kses() rather than strip_tags() on email subject lines so that single angle brackets are allowed - thanks to eightize and esmi
 * Allow remote definition of email address in form - thanks to orion42
 * Added ability to have compulsory categories - thanks to iClimb
+* Apply WordPress the_author filter to the author names to improve plugin compatibility - thanks to SpaciousMind
+* Added the ability to track the post ID in the tracking Parameter field - thanks to Laga
 * Fixed some Markdown errors in the ReadMe
 
 = Version 8.4 by Matthew Robinson =
