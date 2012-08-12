@@ -1,3 +1,4 @@
+// Version 1.0 - original version
 jQuery(document).ready(function () {
 	// hide our span before page loads
 	jQuery('#s2bcc_2').hide();
