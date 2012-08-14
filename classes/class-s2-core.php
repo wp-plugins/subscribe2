@@ -438,7 +438,6 @@ class s2class {
 			if ( $switched ) { return; }
 		}
 
-		global $post;
 		if ( $preview == '' ) {
 			// we aren't sending a Preview to the current user so carry out checks
 			$s2mail = get_post_meta($post->ID, 's2mail', true);
@@ -471,8 +470,7 @@ class s2class {
 				return $post;
 			}
 
-			$s2_taxonomies = array('category');
-			$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
+			$s2_taxonomies = apply_filters('s2_taxonomies', array('category'));
 			$post_cats = wp_get_object_terms($post->ID, $s2_taxonomies, array('fields' => 'ids'));
 			$check = false;
 			// is the current post assigned to any categories
@@ -520,8 +518,7 @@ class s2class {
 			}
 		} else {
 			// make sure we prime the taxonomy variable for preview posts
-			$s2_taxonomies = array('category');
-			$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
+			$s2_taxonomies = apply_filters('s2_taxonomies', array('category'));
 		}
 
 		// we set these class variables so that we can avoid
@@ -1164,8 +1161,7 @@ class s2class {
 	*/
 	function all_cats($exclude = false, $orderby = 'slug') {
 		$all_cats = array();
-		$s2_taxonomies = array('category');
-		$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
+		$s2_taxonomies = apply_filters('s2_taxonomies', array('category'));
 
 		foreach( $s2_taxonomies as $taxonomy ) {
 			if ( taxonomy_exists($taxonomy) ) {
@@ -1471,8 +1467,7 @@ class s2class {
 		$message_post= '';
 		$message_posttime = '';
 		foreach ( $posts as $post ) {
-			$s2_taxonomies = array('category');
-			$s2_taxonomies = apply_filters('s2_taxonomies', $s2_taxonomies);
+			$s2_taxonomies = apply_filters('s2_taxonomies', array('category'));
 			$post_cats = wp_get_object_terms($post->ID, $s2_taxonomies, array('fields' => 'ids'));
 			$post_cats_string = implode(',', $post_cats);
 			$all_post_cats = array_unique(array_merge($all_post_cats, $post_cats));
