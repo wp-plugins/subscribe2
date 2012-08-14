@@ -122,6 +122,16 @@ The pseudo-cron is WordPress is named after the cron jobs on servers. These are 
 
 some reasons why your pseudo-cron may not be working are explained [here](http://wordpress.org/support/topic/296236#post-1175405). You can also try overcoming these by calling the wp-cron.php file directly and there are even [instructions](http://www.satollo.net/how-to-make-the-wordpress-cron-work) about how to set up a server cron job to do this periodically to restore WordPress pseudo-cron to a working state.
 
+= I'd like to send the Digest email but on a different interval to the ones listed. Is this possible? =
+
+Yes, this is possible, it just requires a little bit of code. Subscribe2 uses the intervals that are currently defined in WordPress (and by any plugins that create additional intervals), so all you need to do is add to the available intervals. Use code like this and simply change the interval time (in seconds) and description.
+
+`function add_my_new_sched($sched) {
+	$sched['my_new'] = array('interval' => 2419200, 'display' => 'Four Weekly'));
+	return $sched;
+}
+add_filter('cron_schedules', 'add_my_new_sched');`
+
 = When I click on Send Preview in Settings->Susbcribe2 I get 4 emails, why =
 
 Subscribe2 supports 4 potential email formats for Susbcribers so you will get a preview for each of the different possibilities.
