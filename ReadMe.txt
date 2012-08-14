@@ -127,7 +127,7 @@ some reasons why your pseudo-cron may not be working are explained [here](http:/
 Yes, this is possible, it just requires a little bit of code. Subscribe2 uses the intervals that are currently defined in WordPress (and by any plugins that create additional intervals), so all you need to do is add to the available intervals. Use code like this and simply change the interval time (in seconds) and description.
 
 `function add_my_new_sched($sched) {
-	$sched['my_new'] = array('interval' => 2419200, 'display' => 'Four Weekly'));
+	$sched['my_new'] = array('interval' => 2419200, 'display' => 'Four Weekly');
 	return $sched;
 }
 add_filter('cron_schedules', 'add_my_new_sched');`
