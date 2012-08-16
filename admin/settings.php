@@ -355,6 +355,7 @@ echo "<p>";
 echo "<strong><em style=\"color: red\">" . __('Compulsory categories will be checked by default for Registered Subscribers', 'subscribe2') . "</em></strong><br />\r\n";
 echo "</p>";
 $this->display_category_form(array(), 1, explode(',', $this->subscribe2_options['compulsory']), 'compulsory');
+echo "</div>\r\n";
 
 // excluded categories
 echo "<div class=\"s2_admin\" id=\"s2_excluded_categories\">\r\n";
@@ -365,18 +366,20 @@ echo "</p>";
 $this->display_category_form(explode(',', $this->subscribe2_options['exclude']));
 echo "<p style=\"text-align: center;\"><label><input type=\"checkbox\" name=\"reg_override\" value=\"1\"" . checked($this->subscribe2_options['reg_override'], '1', false) . " /> ";
 echo __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</label></p><br />\r\n";
+echo "</div>\r\n";
 
 // excluded post formats
 $formats = get_theme_support('post-formats');
 if ( $formats !== false ) {
 	// excluded formats
+	echo "<div class=\"s2_admin\" id=\"s2_excluded_formats\">\r\n";
 	echo "<h2>" . __('Excluded Formats', 'subscribe2') . "</h2>\r\n";
 	echo "<p>";
 	echo "<strong><em style=\"color: red\">" . __('Posts assigned to any Excluded Format do not generate notifications and are not included in digest notifications', 'subscribe2') . "</em></strong><br />\r\n";
 	echo "</p>";
 	$this->display_format_form($formats, explode(',', $this->subscribe2_options['exclude_formats']));
+	echo "</div>\r\n";
 }
-echo "</div>\r\n";
 
 // Appearance options
 echo "<div class=\"s2_admin\" id=\"s2_appearance_settings\">\r\n";
