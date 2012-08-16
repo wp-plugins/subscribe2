@@ -438,6 +438,14 @@ class s2class {
 			if ( $switched ) { return; }
 		}
 
+		if ( did_action('future_to_publish') > 0 ) {
+			// Fix for future posts not have certain globals defined
+			global $post_id ;
+			$post_id = $post->ID;
+			global $post;
+			$post = get_post($post_id);
+		}
+
 		if ( $preview == '' ) {
 			// we aren't sending a Preview to the current user so carry out checks
 			$s2mail = get_post_meta($post->ID, 's2mail', true);
