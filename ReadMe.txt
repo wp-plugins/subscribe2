@@ -319,7 +319,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 = Version 8.5 by Matthew Robinson =
 
 * Fixed width of a page select drop down in the Widget settings - thanks to Balky79
-* Added option to check the comment subscription box by default - thanks to Doug Lerner
+* Added option to check the comment subscription box by default - proposed by Doug Lerner
 * Improved off-domain error message in Settings page so it does not display if Post Author for Blogname are selected
 * Fixed an issue on Multisite installs displaying the wrong link to profiles pages for other blog sites - thanks to MadtownLems
 * Fixed an issue with Image and Shortcode replacement in the visual editor (TinyMCE) - thanks to Dave Firman
@@ -328,9 +328,10 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Improved regex replacedment of s strike and del HTML tags in plaintext emails - thanks to jimshell
 * Use wp_kses() rather than strip_tags() on email subject lines so that single angle brackets are allowed - thanks to eightize and esmi
 * Allow remote definition of email address in form - thanks to orion42
-* Added ability to have compulsory categories - thanks to iClimb
-* Apply WordPress the_author filter to the author names to improve plugin compatibility - thanks to SpaciousMind
-* Added the ability to track the post ID in the tracking Parameter field - thanks to Laga
+* Added ability to have compulsory categories - proposed by iClimb
+* Apply WordPress the_author filter to the author names to improve plugin compatibility - proposed by SpaciousMind
+* Added the ability to track the post ID in the tracking Parameter field - proposed by Laga
+* Protect the 's2email' post meta key - proposed by Nally123
 * Fixed some Markdown errors in the ReadMe
 
 = Version 8.4 by Matthew Robinson =

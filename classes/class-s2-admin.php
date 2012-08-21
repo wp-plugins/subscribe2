@@ -153,7 +153,7 @@ class s2_admin extends s2class {
 	*/
 	function s2_meta_box() {
 		global $post_ID;
-		$s2mail = get_post_meta($post_ID, 's2mail', true);
+		$s2mail = get_post_meta($post_ID, '_s2mail', true);
 		echo "<input type=\"hidden\" name=\"s2meta_nonce\" id=\"s2meta_nonce\" value=\"" . wp_create_nonce(wp_hash(plugin_basename(__FILE__))) . "\" />";
 		echo __("Check here to disable sending of an email notification for this post/page", 'subscribe2');
 		echo "&nbsp;&nbsp;<input type=\"checkbox\" name=\"s2_meta_field\" value=\"no\"";
@@ -176,9 +176,9 @@ class s2_admin extends s2class {
 		}
 
 		if ( isset($_POST['s2_meta_field']) && $_POST['s2_meta_field'] == 'no' ) {
-			update_post_meta($post_id, 's2mail', $_POST['s2_meta_field']);
+			update_post_meta($post_id, '_s2mail', $_POST['s2_meta_field']);
 		} else {
-			update_post_meta($post_id, 's2mail', 'yes');
+			update_post_meta($post_id, '_s2mail', 'yes');
 		}
 	} // end s2_meta_box_handler()
 

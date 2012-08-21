@@ -216,6 +216,11 @@ class s2class {
 				$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET email=%s WHERE CAST(email as binary)=%s", $new_email, $email));
 			}
 		}
+
+		// update postmeta field to a protected name, from version 8.5
+		$sql = $wpdb->prepare( "UPDATE $wpdb->postmeta SET meta_key = '_s2mail' WHERE meta_key = 's2mail'");
+		$wpdb->query($sql);
+
 		return;
 	} // end upgrade()
 
@@ -417,8 +422,8 @@ class s2class {
 		if ( !empty($this->subscribe2_options['tracking']) ) {
 			(strpos($link, '?') > 0) ? $delimiter .= '&' : $delimiter = '?';
 			if ( strpos($this->subscribe2_options['tracking'], "{ID}") ) {
-				global $post;
-				$tracking = str_replace("{ID}", $post->ID, $this->subscribe2_options['tracking']);
+				$id = url_to_postid($link);
+				$tracking = str_replace("{ID}", $id, $this->subscribe2_options['tracking']);
 				return $link . $delimiter . $tracking;
 			}
 			return $link . $delimiter . $this->subscribe2_options['tracking'];
@@ -430,7 +435,7 @@ class s2class {
 	/**
 	Sends an email notification of a new post
 	*/
-	function publish($post = 0, $preview = '') {
+	function publish($post, $preview = '') {
 		if ( !$post ) { return $post; }
 
 		if ( $this->s2_mu ) {
@@ -438,17 +443,17 @@ class s2class {
 			if ( $switched ) { return; }
 		}
 
-		if ( did_action('future_to_publish') > 0 ) {
-			// Fix for future posts not have certain globals defined
+		/*if ( did_action('future_to_publish') > 0 ) {
+			// Fix for future posts not having certain globals defined
 			global $post_id ;
 			$post_id = $post->ID;
 			global $post;
 			$post = get_post($post_id);
-		}
+		}*/
 
 		if ( $preview == '' ) {
 			// we aren't sending a Preview to the current user so carry out checks
-			$s2mail = get_post_meta($post->ID, 's2mail', true);
+			$s2mail = get_post_meta($post->ID, '_s2mail', true);
 			if ( (isset($_POST['s2_meta_field']) && $_POST['s2_meta_field'] == 'no') || strtolower(trim($s2mail)) == 'no' ) { return $post; }
 
 			// are we doing daily digests? If so, don't send anything now
@@ -1493,7 +1498,7 @@ class s2class {
 			}
 			// is the current post set by the user to
 			// not generate a notification email?
-			$s2mail = get_post_meta($post->ID, 's2mail', true);
+			$s2mail = get_post_meta($post->ID, '_s2mail', true);
 			if ( strtolower(trim($s2mail)) == 'no' ) {
 				$check = true;
 			}
