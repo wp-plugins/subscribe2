@@ -72,10 +72,6 @@ if ( isset( $_POST['s2_admin']) ) {
 		$email_freq = $_POST['email_freq'];
 		$scheduled_time = wp_next_scheduled('s2_digest_cron');
 		if ( $email_freq != $this->subscribe2_options['email_freq'] || $_POST['hour'] != date('H', $scheduled_time) ) {
-			// make sure the timezone strings are right
-			if ( function_exists('date_default_timezone_get') && date_default_timezone_get() != get_option('timezone_string') ) {
-				date_default_timezone_set(get_option('timezone_string'));
-			}
 			$this->subscribe2_options['email_freq'] = $email_freq;
 			wp_clear_scheduled_hook('s2_digest_cron');
 			$scheds = (array)wp_get_schedules();
@@ -87,25 +83,11 @@ if ( isset( $_POST['s2_admin']) ) {
 			} else {
 				// if we are using digest schedule the event and prime last_cron as now
 				$time = time() + $interval;
-				if ( $interval < 86400 ) {
-					// Schedule CRON events occurring less than daily starting now and periodically thereafter
-					$maybe_time = mktime($_POST['hour'], 0, 0, date('m', time()), date('d', time()), date('Y', time()));
-					// is maybe_time in the future
-					$offset = $maybe_time - time();
-					// is maybe_time + $interval in the future
-					$offset2 = ($maybe_time + $interval) - time();
-					if ( $offset < 0 ) {
-						if ( $offset2 < 0 ) {
-							$timestamp = &$time;
-						} else {
-							$timestamp = $maybe_time + $interval;
-						}
-					} else {
-						$timestamp = &$maybe_time;
-					}
-				} else {
-					// Schedule other CRON events starting at user defined hour and periodically thereafter
-					$timestamp = mktime($_POST['hour'], 0, 0, date('m', $time), date('d', $time), date('Y', $time));
+				$timestamp = mktime($_POST['hour'], 0, 0, date('m', $time), date('d', $time), date('Y', $time));
+				while ($timestamp < time()) {
+					// if we are trying to set the time in the past increment it forward
+					// by the interval period until it is in the future
+					$timestamp += $interval;
 				}
 				wp_schedule_event($timestamp, $email_freq, 's2_digest_cron');
 				if ( !isset($this->subscribe2_options['last_s2cron']) ) {

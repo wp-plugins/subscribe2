@@ -463,6 +463,7 @@ class s2_admin extends s2class {
 			echo "<strong><em style=\"color: red\">" . __('The WordPress cron functions may be disabled on this server. Digest notifications may not work.', 'subscribe2') . "</em></strong><br />\r\n";
 		}
 		$scheduled_time = wp_next_scheduled('s2_digest_cron');
+		$offset = get_option( 'gmt_offset' ) * 60 * 60;
 		$schedule = (array)wp_get_schedules();
 		$schedule = array_merge(array('never' => array('interval' => 0, 'display' => __('For each Post', 'subscribe2'))), $schedule);
 		$sort = array();
@@ -478,19 +479,18 @@ class s2_admin extends s2class {
 			echo "<label><input type=\"radio\" name=\"email_freq\" value=\"" . $key . "\"" . checked($this->subscribe2_options['email_freq'], $key, false) . " />";
 			echo " " . $value['display'] . "</label><br />\r\n";
 		}
-		echo "<br />" . __('Send Digest Notification at', 'subscribe2') . ": \r\n";
+		echo "<br />" . __('Send Digest Notification at UTC', 'subscribe2') . ": \r\n";
 		$hours = array('12am', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm');
 		echo "<select name=\"hour\">\r\n";
-		while ( $hour = current($hours) ) {
-			echo "<option value=\"" . key($hours) . "\"";
-			if ( key($hours) == date('H', $scheduled_time) && !empty($scheduled_time) ){
+		foreach ( $hours as $key => $value ) {
+			echo "<option value=\"" . $key . "\"";
+			if ( !empty($scheduled_time) && $key == date('H', $scheduled_time) ) {
 				echo " selected=\"selected\"";
 			}
-			echo ">" . $hour . "</option>\r\n";
-			next($hours);
+			echo ">" . $value . "</option>\r\n";
 		}
 		echo "</select>\r\n";
-		echo "<strong><em style=\"color: red\">" . __('This option will be ignored if the time selected is not in the future in relation to the current time', 'subscribe2') . "</em></strong>\r\n";
+		echo "<strong><em style=\"color: red\">" . __('Chosen time will be scheduled to a future date in relation to the current UTC time', 'subscribe2') . "</em></strong>\r\n";
 		if ( $scheduled_time ) {
 			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 			echo "<p>" . __('Current UTC time is', 'subscribe2') . ": \r\n";
@@ -498,7 +498,7 @@ class s2_admin extends s2class {
 			echo "<p>" . __('Current blog time is', 'subscribe2') . ": \r\n";
 			echo "<strong>" . date_i18n($datetime) . "</strong></p>\r\n";
 			echo "<p>" . __('Next email notification will be sent when your blog time is after', 'subscribe2') . ": \r\n";
-			echo "<strong>" . date_i18n($datetime, $scheduled_time) . "</strong></p>\r\n";
+			echo "<strong>" . date_i18n($datetime, $scheduled_time + $offset) . "</strong></p>\r\n";
 			if ( !empty($this->subscribe2_options['previous_s2cron']) ) {
 				echo "<p>" . __('Attempt to resend the last Digest Notification email', 'subscribe2') . ": ";
 				echo "<input type=\"submit\" class=\"button-secondary\" name=\"resend\" value=\"" . __('Resend Digest', 'subscribe2') . "\" /></p>\r\n";
