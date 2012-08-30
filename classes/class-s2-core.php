@@ -1341,7 +1341,7 @@ class s2class {
 	/**
 	Action subscribe requests made on comment forms when comments are approved
 	*/
-	function comment_status($comment_ID = 0){
+	function comment_status($comment_ID = 0) {
 		global $wpdb;
 
 		// get meta data

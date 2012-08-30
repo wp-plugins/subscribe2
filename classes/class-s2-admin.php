@@ -205,7 +205,7 @@ class s2_admin extends s2class {
 		echo "</td></tr>\r\n";
 		echo "<tr style=\"vertical-align: top;\"><td style=\"width: 50%; text-align: left;\">\r\n";
 		foreach ( $all_cats as $cat ) {
-			if ( $i >= $half && 0 == $j ){
+			if ( $i >= $half && 0 == $j ) {
 				echo "</td><td style=\"width: 50%; text-align: left;\">\r\n";
 				$j++;
 			}
@@ -257,7 +257,7 @@ class s2_admin extends s2class {
 		echo "</td></tr>\r\n";
 		echo "<tr style=\"vertical-align: top;\"><td style=\"width: 50%; text-align: left\">\r\n";
 		foreach ( $formats[0] as $format ) {
-			if ( $i >= $half && 0 == $j ){
+			if ( $i >= $half && 0 == $j ) {
 				echo "</td><td style=\"width: 50%; text-align: left\">\r\n";
 				$j++;
 			}
