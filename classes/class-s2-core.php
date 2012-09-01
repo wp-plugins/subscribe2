@@ -91,6 +91,7 @@ class s2class {
 		$date = date('Y-m-d');
 		maybe_add_column($this->public, 'date', "ALTER TABLE $this->public ADD date DATE DEFAULT '$date' NOT NULL AFTER active");
 		maybe_add_column($this->public, 'ip', "ALTER TABLE $this->public ADD ip char(64) DEFAULT 'admin' NOT NULL AFTER date");
+		maybe_add_column($this->public, 'time', "ALTER TABLE $this->public ADD time TIME DEFAULT '00:00:00' NOT NULL AFTER date");
 
 		// let's take the time to check process registered users
 		// existing public subscribers are subscribed to all categories
@@ -791,14 +792,14 @@ class s2class {
 			if ( $confirm ) {
 				$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET active='1', ip=%s WHERE CAST(email as binary)=%s", $this->ip, $email));
 			} else {
-				$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET date=CURDATE() WHERE CAST(email as binary)=%s", $email));
+				$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET date=CURDATE(), time=CURTIME() WHERE CAST(email as binary)=%s", $email));
 			}
 		} else {
 			if ( $confirm ) {
 				global $current_user;
-				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, CURDATE(), %s)", $email, 1, $current_user->user_login));
+				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, time, ip) VALUES (%s, %d, CURDATE(), CURTIME(), %s)", $email, 1, $current_user->user_login));
 			} else {
-				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, ip) VALUES (%s, %d, CURDATE(), %s)", $email, 0, $this->ip));
+				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, time, ip) VALUES (%s, %d, CURDATE(), CURTIME(), %s)", $email, 0, $this->ip));
 			}
 		}
 	} // end add()
@@ -1579,6 +1580,8 @@ class s2class {
 		// remove excess white space from within $message_post and $message_posttime
 		$message_post = preg_replace('|[ ]+|', ' ', $message_post);
 		$message_posttime = preg_replace('|[ ]+|', ' ', $message_posttime);
+		$message_post = preg_replace("|[\r\n]{3,}|", "\r\n\r\n", $message_post);
+		$message_posttime = preg_replace("|[\r\n]{3,}|", "\r\n\r\n", $message_posttime);
 
 		// apply filter to allow external content to be inserted or content manipulated
 		$message_post = apply_filters('s2_digest_email', $message_post, $now, $prev, $last, $this->subscribe2_options['cron_order']);

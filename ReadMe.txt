@@ -332,6 +332,8 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Apply WordPress the_author filter to the author names to improve plugin compatibility - proposed by SpaciousMind
 * Added the ability to track the post ID in the tracking Parameter field - proposed by Laga
 * Protect the 's2email' post meta key - proposed by Nally123
+* Strip excess white space within the Digest email when images are removed
+* Add a time column to the public subscriber table for hosting provider spam policy compliance - proposed by Erik N
 * Change plugin folder name to suppress update prompts for the HTML version
 * Include alternative class-s2-core.php file for enabling HTML Excerpts in the HTML version
 * Fixed some Markdown errors in the ReadMe

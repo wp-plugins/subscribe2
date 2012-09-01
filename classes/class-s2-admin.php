@@ -463,7 +463,7 @@ class s2_admin extends s2class {
 			echo "<strong><em style=\"color: red\">" . __('The WordPress cron functions may be disabled on this server. Digest notifications may not work.', 'subscribe2') . "</em></strong><br />\r\n";
 		}
 		$scheduled_time = wp_next_scheduled('s2_digest_cron');
-		$offset = get_option( 'gmt_offset' ) * 60 * 60;
+		$offset = get_option('gmt_offset') * 60 * 60;
 		$schedule = (array)wp_get_schedules();
 		$schedule = array_merge(array('never' => array('interval' => 0, 'display' => __('For each Post', 'subscribe2'))), $schedule);
 		$sort = array();
