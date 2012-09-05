@@ -335,7 +335,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Strip excess white space within the Digest email when images are removed
 * Add a time column to the public subscriber table for hosting provider spam policy compliance - proposed by Erik N
 * Change plugin folder name to suppress update prompts for the HTML version
-* Include alternative class-s2-core.php file for enabling HTML Excerpts in the HTML version
+* Rename js files consistently with core ticket 21633
 * Fixed some Markdown errors in the ReadMe
 
 = Version 8.4 by Matthew Robinson =

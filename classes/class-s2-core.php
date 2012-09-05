@@ -1636,7 +1636,7 @@ class s2class {
 		// load the options
 		$this->subscribe2_options = get_option('subscribe2_options');
 		// if SCRIPT_DEBUG is true, use dev scripts
-		$this->script_debug = ( defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ) ? '.dev' : '';
+		$this->script_debug = ( defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ) ? '' : '.min';
 
 		// get the WordPress release number for in code version comparisons
 		$tmp = explode('-', $wp_version, 2);
