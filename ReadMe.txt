@@ -336,6 +336,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Add a time column to the public subscriber table for hosting provider spam policy compliance - proposed by Erik N
 * Change plugin folder name to suppress update prompts for the HTML version
 * Rename js files consistently with core ticket 21633
+* Add width parameter to comment form text to fix issues with some themes - proposed by mharpen
 * Fixed some Markdown errors in the ReadMe
 
 = Version 8.4 by Matthew Robinson =
