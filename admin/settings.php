@@ -65,6 +65,7 @@ if ( isset( $_POST['s2_admin']) ) {
 		$this->subscribe2_options['pages'] = $_POST['pages'];
 		$this->subscribe2_options['password'] = $_POST['password'];
 		$this->subscribe2_options['private'] = $_POST['private'];
+		$this->subscribe2_options['stickies'] = $_POST['stickies'];
 		$this->subscribe2_options['cron_order'] = $_POST['cron_order'];
 		$this->subscribe2_options['tracking'] = $_POST['tracking'];
 
@@ -263,6 +264,11 @@ echo __('Send Emails for Private Posts', 'subscribe2') . ': ';
 echo "<label><input type=\"radio\" name=\"private\" value=\"yes\"" . checked($this->subscribe2_options['private'], 'yes', false) . " /> ";
 echo __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
 echo "<label><input type=\"radio\" name=\"private\" value=\"no\"" . checked($this->subscribe2_options['private'], 'no', false) . " /> ";
+echo __('No', 'subscribe2') . "</label><br /><br />\r\n";
+echo __('Include Sticky Posts at the top of all Digest Notifications', 'subscribe2') . ': ';
+echo "<label><input type=\"radio\" name=\"stickies\" value=\"yes\"" . checked($this->subscribe2_options['stickies'], 'yes', false) . " /> ";
+echo __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
+echo "<label><input type=\"radio\" name=\"stickies\" value=\"no\"" . checked($this->subscribe2_options['stickies'], 'no', false) . " /> ";
 echo __('No', 'subscribe2') . "</label><br /><br />\r\n";
 echo __('Send Email From', 'subscribe2') . ': ';
 echo "<label>\r\n";

@@ -66,6 +66,10 @@ if (!isset($this->subscribe2_options['password'])) {
 	$this->subscribe2_options['password'] = "no";
 } // option for sending notifications for posts that are password protected
 
+if (!isset($this->subscribe2_options['stickies'])) {
+	$this->subscribe2_options['stickies'] = "no";
+} // option for including sticky posts in digest notifications
+
 if (!isset($this->subscribe2_options['private'])) {
 	$this->subscribe2_options['private'] = "no";
 } // option for sending notifications for posts that are private

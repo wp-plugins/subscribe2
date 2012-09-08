@@ -1460,6 +1460,14 @@ class s2class {
 			$posts = get_posts('numberposts=1');
 		}
 
+		// Collect sticky posts if desired
+		if ( $this->subscribe2_options['stickies'] == 'yes' ) {
+			$stickies = get_posts(array('post__in' => get_option('sticky_posts')));
+			if ( !empty($stickies) ) {
+				$posts = array_merge((array)$stickies, (array)$posts);
+			}
+		}
+
 		// do we have any posts?
 		if ( empty($posts) && !has_filter('s2_digest_email') ) { return false; }
 		$this->post_count = count($posts);
@@ -1467,12 +1475,16 @@ class s2class {
 		// if we have posts, let's prepare the digest
 		$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 		$all_post_cats = array();
+		$ids = array();
 		$mailtext = apply_filters('s2_email_template', $this->subscribe2_options['mailtext']);
 		$table = '';
 		$tablelinks = '';
 		$message_post= '';
 		$message_posttime = '';
 		foreach ( $posts as $post ) {
+			// keep an array of post ids and skip if we've already done it once
+			if ( in_array($post->ID, $ids) ) { continue; }
+			$ids[] = $post->ID;
 			$s2_taxonomies = apply_filters('s2_taxonomies', array('category'));
 			$post_cats = wp_get_object_terms($post->ID, $s2_taxonomies, array('fields' => 'ids'));
 			$post_cats_string = implode(',', $post_cats);
