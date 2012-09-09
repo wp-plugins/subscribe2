@@ -5,19 +5,6 @@ if ( !function_exists('add_action') ) {
 
 global $s2nonce, $wpdb, $wp_version;
 
-// send error message if no WordPress page exists
-$sql = "SELECT ID FROM $wpdb->posts WHERE post_type='page' AND post_status='publish' LIMIT 1";
-$id = $wpdb->get_var($sql);
-if ( empty($id) ) {
-	echo "<div id=\"page_message\" class=\"error\"><p class=\"s2_error\"><strong>$this->no_page</strong></p></div>";
-}
-
-$sender = $this->get_userdata($this->subscribe2_options['sender']);
-list($user, $domain) = explode('@', $sender->user_email, 2);
-if ( !strstr($_SERVER['SERVER_NAME'], $domain) && !in_array($this->subscribe2_options['sender'],array('home', 'blogname')) ) {
-	echo "<div id=\"sender_message\" class=\"error\"><p class=\"s2_error\"><strong>" . __('You appear to be sending notifications from an email address from a different domain name to your blog, this may result in failed emails', 'subscribe2') . "</strong></p></div>";
-}
-
 // was anything POSTed?
 if ( isset( $_POST['s2_admin']) ) {
 	check_admin_referer('subscribe2-options_subscribers' . $s2nonce);
@@ -199,6 +186,26 @@ if ( isset( $_POST['s2_admin']) ) {
 		update_option('subscribe2_options', $this->subscribe2_options);
 	}
 }
+
+// send error message if no WordPress page exists
+$sql = "SELECT ID FROM $wpdb->posts WHERE post_type='page' AND post_status='publish' LIMIT 1";
+$id = $wpdb->get_var($sql);
+if ( empty($id) ) {
+	echo "<div id=\"page_message\" class=\"error\"><p class=\"s2_error\"><strong>$this->no_page</strong></p></div>";
+}
+
+// send error message if sender email address is off-domain
+if ( $this->subscribe2_options['sender'] == 'blogname' ) {
+	$sender = get_bloginfo('admin_email');
+} else {
+	$userdata = $this->get_userdata($this->subscribe2_options['sender']);
+	$sender = $userdata->user_email;
+}
+list($user, $domain) = explode('@', $sender, 2);
+if ( !strstr($_SERVER['SERVER_NAME'], $domain) && $this->subscribe2_options['sender'] != 'author' ) {
+	echo "<div id=\"sender_message\" class=\"error\"><p class=\"s2_error\"><strong>" . __('You appear to be sending notifications from an email address from a different domain name to your blog, this may result in failed emails', 'subscribe2') . "</strong></p></div>";
+}
+
 // show our form
 echo "<div class=\"wrap\">";
 echo "<div id=\"icon-options-general\" class=\"icon32\"></div>";
