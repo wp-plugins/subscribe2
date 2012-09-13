@@ -316,6 +316,10 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 == Changelog ==
 
+= Version 8.6 by Matthew Robinson =
+
+* Minor layout update to Widget Settings
+
 = Version 8.5 by Matthew Robinson =
 
 * Fixed width of a page select drop down in the Widget settings - thanks to Balky79
