@@ -511,7 +511,7 @@ class s2class {
 				$public = $this->get_public();
 			}
 			if ( $post->post_type == 'page' ) {
-				$post_cats_string = get_all_category_ids();
+				$post_cats_string = implode(',', get_all_category_ids());
 			} else {
 				$post_cats_string = implode(',', $post_cats);
 			}

@@ -319,6 +319,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 = Version 8.6 by Matthew Robinson =
 
 * Minor layout update to Widget Settings
+* Fix for non-sending notifications for pages - proposed by ctcdesign
 
 = Version 8.5 by Matthew Robinson =
 
