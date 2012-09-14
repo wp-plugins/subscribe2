@@ -471,7 +471,7 @@ echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"after\"" . chec
 echo __('After the Comment Submit button', 'subscribe2') . "</label>&nbsp;&nbsp;";
 echo "<label><input type=\"radio\" name=\"comment_subs\" value=\"no\"" . checked($this->subscribe2_options['comment_subs'], 'no', false) . " /> ";
 echo __('No', 'subscribe2') . "</label><br /><br />";
-echo __('Comment form checkbox is checked by default', 'subscrib2') . ": <br />\r\n";
+echo __('Comment form checkbox is checked by default', 'subscribe2') . ": <br />\r\n";
 echo "<label><input type=\"radio\" name=\"comment_def\" value=\"yes\"" . checked($this->subscribe2_options['comment_def'], 'yes', false) . " /> ";
 echo __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;";
 echo "<label><input type=\"radio\" name=\"comment_def\" value=\"no\"" . checked($this->subscribe2_options['comment_def'], 'no', false) . " /> ";

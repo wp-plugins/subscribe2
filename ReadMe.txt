@@ -320,6 +320,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 
 * Minor layout update to Widget Settings
 * Fix for non-sending notifications for pages - proposed by ctcdesign
+* Fix for a translation domain error in admin/settings.php - proposed by monpelaud
 
 = Version 8.5 by Matthew Robinson =
 
