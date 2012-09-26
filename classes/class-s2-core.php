@@ -11,8 +11,9 @@ class s2class {
 
 		$this->profile = "<p class=\"s2_message\">" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/admin.php?page=s2\">" . __('profile', 'subscribe2') . "</a>.</p>";
 		if ( $this->s2_mu === true ) {
-			global $blog_id, $user_ID;
-			if ( !is_blog_user($blog_id) ) {
+			global $blog_id;
+			$user_ID = get_current_user_id();
+			if ( !is_user_member_of_blog($user_ID, $blog_id) ) {
 				// if we are on multisite and the user is not a member of this blog change the link
 				$this->profile = "<p class=\"s2_message\"><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a> " . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
 			}
@@ -92,6 +93,9 @@ class s2class {
 		maybe_add_column($this->public, 'date', "ALTER TABLE $this->public ADD date DATE DEFAULT '$date' NOT NULL AFTER active");
 		maybe_add_column($this->public, 'ip', "ALTER TABLE $this->public ADD ip char(64) DEFAULT 'admin' NOT NULL AFTER date");
 		maybe_add_column($this->public, 'time', "ALTER TABLE $this->public ADD time TIME DEFAULT '00:00:00' NOT NULL AFTER date");
+		maybe_add_column($this->public, 'conf_date', "ALTER TABLE $this->public ADD conf_date DATE AFTER ip");
+		maybe_add_column($this->public, 'conf_time', "ALTER TABLE $this->public ADD conf_time TIME AFTER conf_date");
+		maybe_add_column($this->public, 'conf_ip', "ALTER TABLE $this->public ADD conf_ip char(64) AFTER conf_time");
 
 		// let's take the time to check process registered users
 		// existing public subscribers are subscribed to all categories
@@ -827,9 +831,9 @@ class s2class {
 		if ( false === $status ) { return false; }
 
 		if ( '0' == $status ) {
-			$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET active='1' WHERE CAST(email as binary)=%s", $email));
+			$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET active='1', conf_date=CURDATE(), conf_time=CURTIME(), conf_ip=%s WHERE CAST(email as binary)=%s", $this->ip, $email));
 		} else {
-			$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET active='0' WHERE CAST(email as binary)=%s", $email));
+			$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET active='0' conf_date=CURDATE(), conf_time=CURTIME(), conf_ip=%s WHERE CAST(email as binary)=%s", $this->ip, $email));
 		}
 	} // end toggle()
 

@@ -49,12 +49,16 @@ if ( isset($_POST['s2_admin']) ) {
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) deleted!', 'subscribe2') . "</strong></p></div>";
 		}
 		if ( isset($_POST['confirm']) ) {
+			global $current_user;
+			$this->ip = $current_user->user_login;
 			foreach ( $_POST['confirm'] as $address ) {
 				$this->toggle($this->sanitize_email($address));
 			}
 			$message = "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Status changed!', 'subscribe2') . "</strong></p></div>";
 		}
 		if ( isset($_POST['unconfirm']) ) {
+			global $current_user;
+			$this->ip = $current_user->user_login;
 			foreach ( $_POST['unconfirm'] as $address ) {
 				$this->toggle($this->sanitize_email($address));
 			}
