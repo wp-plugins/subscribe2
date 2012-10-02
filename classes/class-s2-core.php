@@ -833,7 +833,7 @@ class s2class {
 		if ( '0' == $status ) {
 			$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET active='1', conf_date=CURDATE(), conf_time=CURTIME(), conf_ip=%s WHERE CAST(email as binary)=%s", $this->ip, $email));
 		} else {
-			$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET active='0' conf_date=CURDATE(), conf_time=CURTIME(), conf_ip=%s WHERE CAST(email as binary)=%s", $this->ip, $email));
+			$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET active='0', conf_date=CURDATE(), conf_time=CURTIME(), conf_ip=%s WHERE CAST(email as binary)=%s", $this->ip, $email));
 		}
 	} // end toggle()
 
