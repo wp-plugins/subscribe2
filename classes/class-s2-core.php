@@ -1670,7 +1670,7 @@ class s2class {
 
 		// add action to handle WPMU subscriptions and unsubscriptions
 		if ( $this->s2_mu === true ) {
-			require_once(S2PATH . "classes/class-s2_multisite.php");
+			require_once(S2PATH . "classes/class-s2-multisite.php");
 			global $s2class_multisite;
 			$s2class_multisite = new s2_multisite;
 			if ( isset($_GET['s2mu_subscribe']) || isset($_GET['s2mu_unsubscribe']) ) {
