@@ -325,6 +325,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Extend Subscribe2 database table to collect additional data to meet DreamHost privacy policy - thanks to matt, joshukraine and Dreamhost
 * Refresh Subscribers page in admin, tables now sortable on present columns
 * Order CSS files better by applying CSSComb
+* Reuse $value variable in the 'frontend' class to reduce translation strings
 
 = Version 8.5 by Matthew Robinson =
 
