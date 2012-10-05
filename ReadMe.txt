@@ -323,6 +323,8 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Fix for a translation domain error in admin/settings.php - proposed by monpelaud
 * Fix for deprecated is_blog_user() function on Multisite installs - proposed by hallcp
 * Extend Subscribe2 database table to collect additional data to meet DreamHost privacy policy - thanks to matt, joshukraine and Dreamhost
+* Refresh Subscribers page in admin, tables now sortable on present columns
+* Order CSS files better by applying CSSComb
 
 = Version 8.5 by Matthew Robinson =
 
