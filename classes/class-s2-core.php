@@ -1802,7 +1802,7 @@ class s2class {
 			// add actions for ajax form if enabled
 			if ( '1' == $this->subscribe2_options['ajax'] ) {
 				add_action('wp_enqueue_scripts', array(&$this, 'add_ajax'));
-				add_action('wp_head', array(&$this, 'add_s2_ajax'));
+				add_action('wp_footer', array(&$this, 'add_s2_ajax'));
 			}
 		}
 	} // end s2init()

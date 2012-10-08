@@ -326,6 +326,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Refresh Subscribers page in admin, tables now sortable on present columns
 * Order CSS files better by applying CSSComb
 * Reuse $value variable in the 'frontend' class to reduce translation strings
+* Improve AJAX form to obey the shortcode hide parameter - proposed by bwsl
 
 = Version 8.5 by Matthew Robinson =
 
