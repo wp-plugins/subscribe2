@@ -37,12 +37,12 @@ if ( isset($_POST['s2_admin']) ) {
 		}
 		echo $message;
 		$_POST['what'] = 'confirmed';
-	} elseif ( $_POST['action'] === 'delete' ) {
+	} elseif ( $_POST['action'] === 'delete' || $_POST['action2'] === 'delete' ) {
 		foreach ( $_POST['subscriber'] as $address ) {
 			$this->delete($address);
 		}
 		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) deleted!', 'subscribe2') . "</strong></p></div>";
-	} elseif ( $_POST['action'] === 'toggle' ) {
+	} elseif ( $_POST['action'] === 'toggle' || $_POST['action2'] === 'toggle' ) {
 		global $current_user;
 		$this->ip = $current_user->user_login;
 		foreach ( $_POST['subscriber'] as $address ) {
