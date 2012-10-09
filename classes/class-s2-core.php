@@ -2,6 +2,13 @@
 class s2class {
 // variables and constructor are declared at the end
 	/**
+	Load translations
+	*/
+	function load_translations() {
+		load_plugin_textdomain('subscribe2', false, S2DIR);
+	} // end load_translations()
+
+	/**
 	Load all our strings
 	*/
 	function load_strings() {
@@ -1658,8 +1665,6 @@ class s2class {
 		$tmp = explode('-', $wp_version, 2);
 		$this->wp_release = $tmp[0];
 
-		load_plugin_textdomain('subscribe2', false, S2DIR);
-
 		// Is this WordPressMU or not?
 		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
 			$this->s2_mu = true;
@@ -1678,7 +1683,8 @@ class s2class {
 			}
 		}
 
-		// load our strings
+		// load our translations and strings
+		add_action('init', array(&$this, 'load_translations'), 5);
 		add_action('init', array(&$this, 'load_strings'));
 
 		// do we need to install anything?
