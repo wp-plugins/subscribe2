@@ -345,7 +345,7 @@ echo "</div>\r\n";
 
 // compulsory categories
 echo "<div class=\"s2_admin\" id=\"s2_compulsory_categories\">\r\n";
-echo "<h2>" . __('Complusory Categories', 'subscribe2') . "</h2>\r\n";
+echo "<h2>" . __('Compulsory Categories', 'subscribe2') . "</h2>\r\n";
 echo "<p>";
 echo "<strong><em style=\"color: red\">" . __('Compulsory categories will be checked by default for Registered Subscribers', 'subscribe2') . "</em></strong><br />\r\n";
 echo "</p>";

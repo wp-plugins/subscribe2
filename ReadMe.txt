@@ -327,6 +327,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Order CSS files better by applying CSSComb
 * Reuse $value variable in the 'frontend' class to reduce translation strings
 * Improve AJAX form to obey the shortcode hide parameter - proposed by bwsl
+* Correct spelling error in the Settings page - proposed by dimadin
 
 = Version 8.5 by Matthew Robinson =
 
