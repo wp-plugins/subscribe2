@@ -45,7 +45,7 @@ class s2_admin extends s2class {
 	} // end user_admin_css()
 
 	function option_form_js() {
-		wp_register_script('s2_edit', S2URL . 'include/s2_edit' . $this->script_debug . '.js', array('jquery'), '1.0');
+		wp_register_script('s2_edit', S2URL . 'include/s2_edit' . $this->script_debug . '.js', array('jquery'), '1.1');
 		wp_enqueue_script('s2_edit');
 	} // end option_form_js()
 

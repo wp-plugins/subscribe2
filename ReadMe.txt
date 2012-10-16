@@ -329,6 +329,8 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Improve AJAX form to obey the shortcode hide parameter - proposed by bwsl
 * Correct spelling error in the Settings page - proposed by dimadin
 * Call translation code via a hook to allow greater dynamic control - proposed by dimadin
+* Look in more locations for translation files, can place in core languages folder now for upgrade protection
+* Refresh Settings page in admin to a tabbed interface
 
 = Version 8.5 by Matthew Robinson =
 
