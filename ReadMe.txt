@@ -331,6 +331,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Call translation code via a hook to allow greater dynamic control - proposed by dimadin
 * Look in more locations for translation files, can place in core languages folder now for upgrade protection
 * Refresh Settings page in admin to a tabbed interface
+* Strip HTML from email subject to improve compatibility with other plugins
 
 = Version 8.5 by Matthew Robinson =
 
