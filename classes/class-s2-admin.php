@@ -230,7 +230,7 @@ class s2_admin extends s2class {
 				echo " /> <abbr title=\"" . $cat->slug . "\">" . $catName . "</abbr></label><br />\r\n";
 			} else {
 				echo "<label><input class=\"checkall_" . $name . "\" type=\"checkbox\" name=\"" . $name . "[]\" value=\"" . $cat->term_id . "\"";
-				if ( in_array($cat->term_id, $selected) && !in_array($cat->term_id, $compulsory) ) {
+				if ( in_array($cat->term_id, $selected) || in_array($cat->term_id, $compulsory) ) {
 					echo " checked=\"checked\"";
 				}
 				if ( in_array($cat->term_id, $compulsory) && $name === 'category' ) {

@@ -332,6 +332,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Look in more locations for translation files, can place in core languages folder now for upgrade protection
 * Refresh Settings page in admin to a tabbed interface
 * Strip HTML from email subject to improve compatibility with other plugins
+* Fixed bug in the display of compulsory categories in the Settings page
 
 = Version 8.5 by Matthew Robinson =
 
