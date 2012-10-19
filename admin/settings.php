@@ -302,7 +302,6 @@ switch ($current_tab) {
 			$this->display_format_form($formats, explode(',', $this->subscribe2_options['exclude_formats']));
 			echo "</div>\r\n";
 		}
-		echo "</p>\r\n";
 
 		//Auto Subscription for new registrations
 		echo "<div class=\"s2_admin\" id=\"s2_autosubscribe_settings\">\r\n";
@@ -439,9 +438,9 @@ if ($current_tab === 'misc') {
 	echo "<p>" . __('Use this to reset all options to their defaults. This <strong><em>will not</em></strong> modify your list of subscribers.', 'subscribe2') . "</p>\r\n";
 	echo "<p class=\"submit\" style=\"text-align: center\">";
 	echo "<input type=\"submit\" id=\"deletepost\" name=\"reset\" value=\"" . __('RESET', 'subscribe2') .
-	"\" />";
+	"\" /></p>";
 }
-echo "</p></form></div>\r\n";
+echo "</form></div>\r\n";
 
 include(ABSPATH . 'wp-admin/admin-footer.php');
 // just to be sure
