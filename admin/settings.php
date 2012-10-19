@@ -36,26 +36,32 @@ if ( isset( $_POST['s2_admin']) ) {
 				if ( is_numeric($_POST[$key]) && $_POST[$key] >= 0 ) {
 					$this->subscribe2_options[$key] = (int)$_POST[$key];
 				}
-			} elseif ( in_array($key, array('show_meta', 'show_button', 'ajax', 'widget', 'counterwidget', 's2meta_default', 'reg_override')) ){
+			} elseif ( in_array($key, array('show_meta', 'show_button', 'ajax', 'widget', 'counterwidget', 's2meta_default', 'reg_override')) ) {
 				// check box entries
 				( isset($_POST[$key]) && $_POST[$key] == '1' ) ? $newvalue = '1' : $newvalue = '0';
 				$this->subscribe2_options[$key] = $newvalue;
 			} elseif ( in_array($key, array('notification_subject', 'mailtext', 'confirm_subject', 'confirm_email', 'remind_subject', 'remind_email')) && !empty($_POST[$key]) ) {
 							// email subject and body templates
 				$this->subscribe2_options[$key] = $_POST[$key];
-			} elseif ( in_array($key, array('compulsory', 'category', 'format')) ) {
-				if ( !empty($_POST[$key]) ) {
-					sort($_POST[$key]);
-					$newvalue = implode(',', $_POST[$key]);
-				} else {
-					$newvalue = '';
-				}
-				if ( $key === 'category' ) {
-					$this->subscribe2_options['exclude'] = $newvalue;
-				} elseif ($key === 'format') {
+			} elseif ( in_array($key, array('compulsory', 'exclude', 'format')) ) {
+				sort($_POST[$key]);
+				$newvalue = implode(',', $_POST[$key]);
+
+				if ($key === 'format') {
 					$this->subscribe2_options['exclude_formats'] = $newvalue;
 				} else {
 					$this->subscribe2_options[$key] = $newvalue;
+				}
+			} elseif ( $key === 'registered_users_tab' ) {
+				$options = array('compulsory', 'exclude', 'format', 'reg_override');
+				foreach ( $options as $option ) {
+					if ( !isset($_POST[$option]) ) {
+						if ($option === 'format') {
+							$this->subscribe2_options['exclude_formats'] = '';
+						} else {
+							$this->subscribe2_options[$option] = '';
+						}
+					}
 				}
 			} elseif ( $key === 'email_freq' ) {
 				// send per-post or digest emails
@@ -271,6 +277,7 @@ switch ($current_tab) {
 
 	case 'registered':
 		// compulsory categories
+		echo "<input type=\"hidden\" name=\"registered_users_tab\" value=\"options\" />\r\n";
 		echo "<div class=\"s2_admin\" id=\"s2_compulsory_categories\">\r\n";
 		echo "<h3>" . __('Compulsory Categories', 'subscribe2') . "</h3>\r\n";
 		echo "<p>\r\n";
@@ -285,7 +292,7 @@ switch ($current_tab) {
 		echo "<p>";
 		echo "<strong><em style=\"color: red\">" . __('Posts assigned to any Excluded Category do not generate notifications and are not included in digest notifications', 'subscribe2') . "</em></strong><br />\r\n";
 		echo "</p>";
-		$this->display_category_form(explode(',', $this->subscribe2_options['exclude']));
+		$this->display_category_form(explode(',', $this->subscribe2_options['exclude']), 1, array(), 'exclude');
 		echo "<p style=\"text-align: center;\"><label><input type=\"checkbox\" name=\"reg_override\" value=\"1\"" . checked($this->subscribe2_options['reg_override'], '1', false) . " /> ";
 		echo __('Allow registered users to subscribe to excluded categories?', 'subscribe2') . "</label></p>\r\n";
 		echo "</div>\r\n";
