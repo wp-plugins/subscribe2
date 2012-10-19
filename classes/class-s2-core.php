@@ -259,7 +259,7 @@ class s2class {
 		}
 		$string = str_replace("{BLOGNAME}", html_entity_decode(get_option('blogname'), ENT_QUOTES), $string);
 		$string = str_replace("{BLOGLINK}", get_option('home'), $string);
-		$string = str_replace("{TITLE}", stripslashes(strip_tags($this->post_title)), $string);
+		$string = str_replace("{TITLE}", stripslashes($this->post_title), $string);
 		$link = "<a href=\"" . $this->get_tracking_link($this->permalink) . "\">" . $this->get_tracking_link($this->permalink) . "</a>";
 		$string = str_replace("{PERMALINK}", $link, $string);
 		if ( strstr($string, "{TINYLINK}") ) {
@@ -305,7 +305,7 @@ class s2class {
 		}
 
 		// Replace any escaped html symbols in subject then apply filter
-		$subject = html_entity_decode($subject, ENT_QUOTES);
+		$subject = strip_tags(html_entity_decode($subject, ENT_QUOTES));
 		$subject = apply_filters('s2_email_subject', $subject);
 
 		// Construct BCC headers for sending or send individual emails
