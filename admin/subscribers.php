@@ -129,7 +129,7 @@ if ( !empty($_POST['s']) ) {
 	$subscribers = $result;
 }
 
-if( !class_exists('WP_List_Table') ){
+if ( !class_exists('WP_List_Table') ){
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 // Instantiate and prepare our table data - this also runs the bulk actions

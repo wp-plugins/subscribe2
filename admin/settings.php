@@ -71,7 +71,7 @@ if ( isset( $_POST['s2_admin']) ) {
 					$this->subscribe2_options['email_freq'] = $email_freq;
 					wp_clear_scheduled_hook('s2_digest_cron');
 					$scheds = (array)wp_get_schedules();
-					$interval = ( isset($scheds[$email_freq]['interval']) ) ? (int) $scheds[$email_freq]['interval'] : 0;
+					$interval = ( isset($scheds[$email_freq]['interval']) ) ? (int)$scheds[$email_freq]['interval'] : 0;
 					if ( $interval == 0 ) {
 						// if we are on per-post emails remove last_cron entry
 						unset($this->subscribe2_options['last_s2cron']);
