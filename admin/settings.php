@@ -40,6 +40,13 @@ if ( isset( $_POST['s2_admin']) ) {
 				// check box entries
 				( isset($_POST[$key]) && $_POST[$key] == '1' ) ? $newvalue = '1' : $newvalue = '0';
 				$this->subscribe2_options[$key] = $newvalue;
+			} elseif ( $key === 'appearance_users_tab' ) {
+				$options = array('show_meta', 'show_button', 'ajax', 'widget', 'counterwidget', 's2meta_default');
+				foreach ( $options as $option ) {
+					if ( !isset($_POST[$option]) ) {
+						$this->subscribe2_options[$option] = '';
+					}
+				}
 			} elseif ( in_array($key, array('notification_subject', 'mailtext', 'confirm_subject', 'confirm_email', 'remind_subject', 'remind_email')) && !empty($_POST[$key]) ) {
 							// email subject and body templates
 				$this->subscribe2_options[$key] = $_POST[$key];
@@ -277,8 +284,8 @@ switch ($current_tab) {
 
 	case 'registered':
 		// compulsory categories
-		echo "<input type=\"hidden\" name=\"registered_users_tab\" value=\"options\" />\r\n";
 		echo "<div class=\"s2_admin\" id=\"s2_compulsory_categories\">\r\n";
+		echo "<input type=\"hidden\" name=\"registered_users_tab\" value=\"options\" />\r\n";
 		echo "<h3>" . __('Compulsory Categories', 'subscribe2') . "</h3>\r\n";
 		echo "<p>\r\n";
 		echo "<strong><em style=\"color: red\">" . __('Compulsory categories will be checked by default for Registered Subscribers', 'subscribe2') . "</em></strong><br />\r\n";
@@ -375,6 +382,7 @@ switch ($current_tab) {
 	case 'appearance':
 		// Appearance options
 		echo "<div class=\"s2_admin\" id=\"s2_appearance_settings\">\r\n";
+		echo "<input type=\"hidden\" name=\"appearance_users_tab\" value=\"options\" />\r\n";
 		echo "<p>\r\n";
 
 		// WordPress page ID where subscribe2 token is used
