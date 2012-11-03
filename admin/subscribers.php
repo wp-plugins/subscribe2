@@ -182,7 +182,7 @@ switch ($current_tab) {
 		echo "<div class=\"s2_admin\" id=\"s2_current_subscribers\">\r\n";
 		echo "<h2>" . __('Current Subscribers', 'subscribe2') . "</h2>\r\n";
 		echo "<br />";
-		$exclude = array('public', 'confirmed', 'unconfirmed');
+		$exclude = array('all', 'public', 'confirmed', 'unconfirmed');
 		break;
 }
 
