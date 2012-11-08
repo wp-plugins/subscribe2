@@ -544,8 +544,8 @@ class s2class {
 		// passing them in function calls a little later
 		$this->post_title = "<a href=\"" . get_permalink($post->ID) . "\">" . html_entity_decode($post->post_title, ENT_QUOTES) . "</a>";
 		$this->permalink = get_permalink($post->ID);
-		$this->post_date = get_the_time(get_option('date_format'));
-		$this->post_time = get_the_time();
+		$this->post_date = get_the_time(get_option('date_format'), $post);
+		$this->post_time = get_the_time('', $post);
 
 		$author = get_userdata($post->post_author);
 		$this->authorname = html_entity_decode(apply_filters('the_author', $author->display_name), ENT_QUOTES);

@@ -336,6 +336,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Add option to manually send emails to All Registered Users and Public Subscribers - proposed by TigWeb
 * Enable TinyURL link shortening for Digest Notification Emails if {TINYLINK} is present in the Email Template
 * Fixed bug in TinyURL error handling and fallback when link generation fails
+* Fixed bug where {DATE} was left blank in the subject field for future scheduled post notifications - thanks to Steve Savoy
 
 = Version 8.5 by Matthew Robinson =
 
