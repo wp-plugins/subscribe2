@@ -17,7 +17,7 @@ Email Notifications can be sent on a per-post basis or periodically in a Digest 
 
 The plugin also handles subscription requests allowing users to publicly subscribe (**Public Subscribers**) by submitting their email address in an easy to use form or to register with your blog (**Registered Users**) which enables greater flexibility over the email content for per-post notifications for the subscriber. Admins are given control over the presentation of the email notifications, can bulk manage subscriptions for users and manually send email notices to subscribers.
 
-The format of the email can also be customised for per-post notifications, subscribe2 can generate emails for each of the following formats:
+The format of the email can also be customised for per-post notifications, Subscribe2 can generate emails for each of the following formats:
 
 * plaintext excerpt
 * plaintext full post (Registered Users only)
@@ -36,7 +36,7 @@ AUTOMATIC INSTALLATION
 4. Configure the options to taste, including the email template and any categories which should be excluded from notification
 5. Click the "Tools" admin menu link, and select "Subscribers".
 6. Manually subscribe people as you see fit.
-7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the subscribe2 token.  Or, if you prefer, you may manually insert the subscribe2 shortcode or token: [subscribe2] or the HTML invisible `<!--subscribe2-->` ***Ensure the token is on a line by itself and that it has a blank line above and below.***
+7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the Subscribe2 token.  Or, if you prefer, you may manually insert the Subscribe2 shortcode or token: [subscribe2] or the HTML invisible `<!--subscribe2-->` ***Ensure the token is on a line by itself and that it has a blank line above and below.***
 This token will automatically be replaced by dynamic subscription information and will display all forms and messages as necessary.
 8. In the WordPress "Settings" area for Subscribe2 select the page name in the "Appearance" section that of the WordPress page created in step 7.
 
@@ -48,7 +48,7 @@ MANUAL INSTALLATION
 4. Configure the options to taste, including the email template and any categories which should be excluded from notification
 5. Click the "Tools" admin menu link, and select "Subscribers".
 6. Manually subscribe people as you see fit.
-7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the subscribe2 token.  Or, if you prefer, you may manually insert the subscribe2 shortcode or token: [subscribe2] or the HTML invisible `<!--subscribe2-->` ***Ensure the token is on a line by itself and that it has a blank line above and below.***
+7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the Subscribe2 token.  Or, if you prefer, you may manually insert the Subscribe2 shortcode or token: [subscribe2] or the HTML invisible `<!--subscribe2-->` ***Ensure the token is on a line by itself and that it has a blank line above and below.***
 This token will automatically be replaced by dynamic subscription information and will display all forms and messages as necessary.
 8. In the WordPress "Settings" area for Subscribe2 select the page name in the "Appearance" section that of the WordPress page created in step 7.
 
@@ -98,9 +98,9 @@ These restrictions broadly fall into one of three areas. These are the sender de
 
 **Header Details**. Some hosting providers place a restriction on the maximum number of recipients in any one email message.  Some hosts simply block all emails on certain low-cost hosting plans.
 
-Subscribe2 provides a facility to work around a restriction of the maximum number of recipients per email by sending batches of emails.  To enable this feature, go to Settings->Subscribe2 and located the setting to restrict the number of recipients per email. If this is set to 30 then each outgoing email notification will only contain addresses for 30 recipients.
+Subscribe2 provides a facility to work around a restriction of the maximum number of recipients per email by sending batches of emails.  To enable this feature, go to Subscribe2->Settings and locate the setting to restrict the number of recipients per email. If this is set to 30 then each outgoing email notification will only contain addresses for 30 recipients.
 
-Reminder: because subscribe2 places all recipients in BCC fields, and places the blog admin in the TO field, the blog admin will receive one email per batched delivery.  So if you have 90 subscribers, the blog admin should receive three post notification emails, one for each set of 30 BCC recipients.
+Reminder: Because Subscribe2 places all recipients in BCC fields, and places the blog admin in the TO field, the blog admin will receive one email per batched delivery. So if you have 90 subscribers, the blog admin should receive three post notification emails, one for each set of 30 BCC recipients.
 
 Batches will occur for each group of message as described above.  A site like this with many public and registered subscribers could conceivably generate a lot of email for your own inbox.
 
@@ -132,7 +132,7 @@ Yes, this is possible, it just requires a little bit of code. Subscribe2 uses th
 }
 add_filter('cron_schedules', 'add_my_new_sched');`
 
-= When I click on Send Preview in Settings->Susbcribe2 I get 4 emails, why =
+= When I click on Send Preview in Susbcribe2->Settings I get 4 emails, why =
 
 Subscribe2 supports 4 potential email formats for Susbcribers so you will get a preview for each of the different possibilities.
 
@@ -784,7 +784,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Added BCCLIMIT and S2PAGE to options page with AJAX editing
 * Improved setting of CRON task base time
 * Improved handling of option values in the options form
-* Full XHTML compliance on all subscribe2 admin pages
+* Full XHTML compliance on all Subscribe2 admin pages
 * Decode HTML entity codes in notification email subjects
 * Added Subscribe2 support for blogging via email
 * Work-around fix implemented for WordPress the_title bug
