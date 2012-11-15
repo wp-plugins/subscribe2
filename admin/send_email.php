@@ -74,7 +74,7 @@ echo __('Recipients:', 'subscribe2') . " ";
 $this->display_subscriber_dropdown('registered', false);
 echo "<input type=\"hidden\" name=\"s2_admin\" value=\"mail\" />";
 echo "</p>";
-echo "<p class=\"submit\"><input type=\"submit\" class=\"button-secondary\" name=\"preview\" value=\""  . __('Preview', 'subscribe2') . "\" /><input type=\"submit\" class=\"button-primary\" name=\"send\" value=\"" . __('Send', 'subscribe2') . "\" /></p>";
+echo "<p class=\"submit\"><input type=\"submit\" class=\"button-secondary\" name=\"preview\" value=\""  . __('Preview', 'subscribe2') . "\" />&nbsp;<input type=\"submit\" class=\"button-primary\" name=\"send\" value=\"" . __('Send', 'subscribe2') . "\" /></p>";
 echo "</form></div>\r\n";
 echo "<div style=\"clear: both;\"><p>&nbsp;</p></div>";
 

@@ -59,7 +59,7 @@ This token will automatically be replaced by dynamic subscription information an
 You need to pay for the [Subscribe2 HTML version](http://wpplugins.com/plugin/46/subscribe2-html).
 
 = Where can I get help? =
-So, you've downloaded the plugin an it isn't doing what you expect. First you should read the included documentation. There is a ReadMe.txt file and a PDF startup guide installed with the plugin.
+So, you've downloaded the plugin an it isn't doing what you expect. First you should read the included documentation. There is a [ReadMe.txt](http://plugins.svn.wordpress.org/subscribe2/trunk/ReadMe.txt) file and a [legacy PDF startup guide](http://plugins.svn.wordpress.org/subscribe2/tags/6.0/The%20WordPress%20Subscriber%20User%20Guide.pdf) installed with the plugin.
 
 Next you could search in the [WordPress forums](http://wordpress.org/support/), the old [Subscribe2 Forum](http://getsatisfaction.com/subscribe2/), or the [Subscribe2 blog FAQs](http://subscribe2.wordpress.com/category/faq/).
 
@@ -131,6 +131,22 @@ Yes, this is possible, it just requires a little bit of code. Subscribe2 uses th
 	return $sched;
 }
 add_filter('cron_schedules', 'add_my_new_sched');`
+
+= I'd like to change the size of the image inserted by the {IMAGE} keyword in the paid version of the code. Is this possible? =
+
+Yes, this is possible, it just requires a little bit of code. Subscribe2 introduced a filter in version 8.6 that allows on-the-fly customisation of the image size. Use the code below in a plugin of your own.
+
+`function my_s2_image_size() {
+	// return a pre-defined size like 'thumbnail' or 'full'
+	// or return a physical size as an array like array(300, 300) or array(150, 150)
+
+	// examples:
+	return 'thumbnail';
+	return 'full'
+	return array(300,300);
+}
+
+add_filter('s2_image_size', 'my_s2_image_size');`
 
 = When I click on Send Preview in Susbcribe2->Settings I get 4 emails, why =
 
@@ -337,6 +353,7 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Enable TinyURL link shortening for Digest Notification Emails if {TINYLINK} is present in the Email Template
 * Fixed bug in TinyURL error handling and fallback when link generation fails
 * Fixed bug where {DATE} was left blank in the subject field for future scheduled post notifications - thanks to Steve Savoy
+* Added a filter to allow on-the-fly alteration of the size of the {IMAGE} in the paid version
 
 = Version 8.5 by Matthew Robinson =
 
