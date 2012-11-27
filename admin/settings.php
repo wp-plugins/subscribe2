@@ -290,7 +290,7 @@ switch ($current_tab) {
 		echo "<p>\r\n";
 		echo "<strong><em style=\"color: red\">" . __('Compulsory categories will be checked by default for Registered Subscribers', 'subscribe2') . "</em></strong><br />\r\n";
 		echo "</p>";
-		$this->display_category_form(array(), 1, explode(',', $this->subscribe2_options['compulsory']), 'compulsory');
+		$this->display_category_form(explode(',', $this->subscribe2_options['compulsory']), 1, array(), 'compulsory');
 		echo "</div>\r\n";
 
 		// excluded categories

@@ -240,6 +240,11 @@ class s2_admin extends s2class {
 			}
 			$i++;
 		}
+		if ( !empty($compulsory) ) {
+			foreach ($compulsory as $cat) {
+				echo "<input type=\"hidden\" name=\"" . $name . "[]\" value=\"" . $cat . "\">\r\n";
+			}
+		}
 		echo "</td></tr>\r\n";
 		echo "</table>\r\n";
 	} // end display_category_form()
