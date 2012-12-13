@@ -240,6 +240,11 @@ class s2_admin extends s2class {
 			}
 			$i++;
 		}
+		if ( !empty($compulsory) ) {
+			foreach ($compulsory as $cat) {
+				echo "<input type=\"hidden\" name=\"" . $name . "[]\" value=\"" . $cat . "\">\r\n";
+			}
+		}
 		echo "</td></tr>\r\n";
 		echo "</table>\r\n";
 	} // end display_category_form()
@@ -345,7 +350,8 @@ class s2_admin extends s2class {
 	function display_subscriber_dropdown($selected = 'registered', $submit = '', $exclude = array()) {
 		global $wpdb;
 
-		$who = array('public' => __('Public Subscribers', 'subscribe2'),
+		$who = array('all' => __('All Users and Subscribers', 'subscribe2'),
+			'public' => __('Public Subscribers', 'subscribe2'),
 			'confirmed' => ' &nbsp;&nbsp;' . __('Confirmed', 'subscribe2'),
 			'unconfirmed' => ' &nbsp;&nbsp;' . __('Unconfirmed', 'subscribe2'),
 			'all_users' => __('All Registered Users', 'subscribe2'),

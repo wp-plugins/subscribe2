@@ -232,8 +232,7 @@ class s2class {
 		}
 
 		// update postmeta field to a protected name, from version 8.5
-		$sql = $wpdb->prepare( "UPDATE $wpdb->postmeta SET meta_key = '_s2mail' WHERE meta_key = 's2mail'");
-		$wpdb->query($sql);
+		$wpdb->query( "UPDATE $wpdb->postmeta SET meta_key = '_s2mail' WHERE meta_key = 's2mail'" );
 
 		return;
 	} // end upgrade()
@@ -264,7 +263,7 @@ class s2class {
 		$string = str_replace("{PERMALINK}", $link, $string);
 		if ( strstr($string, "{TINYLINK}") ) {
 			$tinylink = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode($this->get_tracking_link($this->permalink)));
-			if ( $tinylink !== 'Error' || $tinylink != false ) {
+			if ( $tinylink !== 'Error' && $tinylink != false ) {
 				$tlink = "<a href=\"" . $tinylink . "\">" . $tinylink . "</a>";
 				$string = str_replace("{TINYLINK}", $tlink, $string);
 			} else {
@@ -544,8 +543,8 @@ class s2class {
 		// passing them in function calls a little later
 		$this->post_title = "<a href=\"" . get_permalink($post->ID) . "\">" . html_entity_decode($post->post_title, ENT_QUOTES) . "</a>";
 		$this->permalink = get_permalink($post->ID);
-		$this->post_date = get_the_time(get_option('date_format'));
-		$this->post_time = get_the_time();
+		$this->post_date = get_the_time(get_option('date_format'), $post);
+		$this->post_time = get_the_time('', $post);
 
 		$author = get_userdata($post->post_author);
 		$this->authorname = html_entity_decode(apply_filters('the_author', $author->display_name), ENT_QUOTES);
@@ -985,11 +984,6 @@ class s2class {
 	*/
 	function get_registered($args = '') {
 		global $wpdb;
-
-		$format = '';
-		$cats = '';
-		$authors = '';
-		$subscribers = array();
 
 		parse_str($args, $r);
 		if ( !isset($r['format']) )
@@ -1552,10 +1546,20 @@ class s2class {
 			$message_post .= "\r\n";
 			$message_posttime .= "\r\n";
 
-			$tablelinks .= "\r\n" . $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
-			$message_post .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
-			$message_posttime .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
+			if ( strstr($mailtext, "{TINYLINK}") ) {
+				$tinylink = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode($this->get_tracking_link(get_permalink($post->ID))));
+				if ( $tinylink !== 'Error' && $tinylink !== false ) {
+					$tablelinks .= "\r\n" . $tinylink . "\r\n";
+					$message_post .= $tinylink . "\r\n";
+					$message_posttime .= $tinylink . "\r\n";
+				} else {
+					$tablelinks .= "\r\n" . $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
+					$message_post .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
+					$message_posttime .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
+				}
+			}
+
 			if ( strstr($mailtext, "{CATS}") ) {
 				$post_cat_names = implode(', ', wp_get_object_terms($post->ID, $s2_taxonomies, array('fields' => 'names')));
 				$message_post .= __('Posted in', 'subscribe2') . ": " . $post_cat_names . "\r\n";

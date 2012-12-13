@@ -40,6 +40,13 @@ if ( isset( $_POST['s2_admin']) ) {
 				// check box entries
 				( isset($_POST[$key]) && $_POST[$key] == '1' ) ? $newvalue = '1' : $newvalue = '0';
 				$this->subscribe2_options[$key] = $newvalue;
+			} elseif ( $key === 'appearance_users_tab' ) {
+				$options = array('show_meta', 'show_button', 'ajax', 'widget', 'counterwidget', 's2meta_default');
+				foreach ( $options as $option ) {
+					if ( !isset($_POST[$option]) ) {
+						$this->subscribe2_options[$option] = '';
+					}
+				}
 			} elseif ( in_array($key, array('notification_subject', 'mailtext', 'confirm_subject', 'confirm_email', 'remind_subject', 'remind_email')) && !empty($_POST[$key]) ) {
 							// email subject and body templates
 				$this->subscribe2_options[$key] = $_POST[$key];
@@ -250,7 +257,7 @@ switch ($current_tab) {
 		echo "<dt><b>{TABLE}</b></dt><dd>" . __("a list of post titles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>{TABLELINKS}</b></dt><dd>" . __("a list of post titles followed by links to the atricles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>{PERMALINK}</b></dt><dd>" . __("the post's permalink<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>{TINYLINK}</b></dt><dd>" . __("the post's permalink after conversion by TinyURL<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{TINYLINK}</b></dt><dd>" . __("the post's permalink after conversion by TinyURL", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>{DATE}</b></dt><dd>" . __("the date the post was made<br />(<i>for per-post emails only</i>)", "subscribe2") . "</dd>\r\n";
 		echo "<dt><b>{TIME}</b></dt><dd>" . __("the time the post was made<br />(<i>for per-post emails only</i>)", "subscribe2") . "</dd>\r\n";
 		echo "<dt><b>{MYNAME}</b></dt><dd>" . __("the admin or post author's name", 'subscribe2') . "</dd>\r\n";
@@ -277,13 +284,13 @@ switch ($current_tab) {
 
 	case 'registered':
 		// compulsory categories
-		echo "<input type=\"hidden\" name=\"registered_users_tab\" value=\"options\" />\r\n";
 		echo "<div class=\"s2_admin\" id=\"s2_compulsory_categories\">\r\n";
+		echo "<input type=\"hidden\" name=\"registered_users_tab\" value=\"options\" />\r\n";
 		echo "<h3>" . __('Compulsory Categories', 'subscribe2') . "</h3>\r\n";
 		echo "<p>\r\n";
 		echo "<strong><em style=\"color: red\">" . __('Compulsory categories will be checked by default for Registered Subscribers', 'subscribe2') . "</em></strong><br />\r\n";
 		echo "</p>";
-		$this->display_category_form(array(), 1, explode(',', $this->subscribe2_options['compulsory']), 'compulsory');
+		$this->display_category_form(explode(',', $this->subscribe2_options['compulsory']), 1, array(), 'compulsory');
 		echo "</div>\r\n";
 
 		// excluded categories
@@ -375,6 +382,7 @@ switch ($current_tab) {
 	case 'appearance':
 		// Appearance options
 		echo "<div class=\"s2_admin\" id=\"s2_appearance_settings\">\r\n";
+		echo "<input type=\"hidden\" name=\"appearance_users_tab\" value=\"options\" />\r\n";
 		echo "<p>\r\n";
 
 		// WordPress page ID where subscribe2 token is used
