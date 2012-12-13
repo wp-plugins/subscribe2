@@ -232,8 +232,7 @@ class s2class {
 		}
 
 		// update postmeta field to a protected name, from version 8.5
-		$sql = $wpdb->prepare( "UPDATE $wpdb->postmeta SET meta_key = '_s2mail' WHERE meta_key = 's2mail'");
-		$wpdb->query($sql);
+		$wpdb->query( "UPDATE $wpdb->postmeta SET meta_key = '_s2mail' WHERE meta_key = 's2mail'" );
 
 		return;
 	} // end upgrade()
@@ -985,11 +984,6 @@ class s2class {
 	*/
 	function get_registered($args = '') {
 		global $wpdb;
-
-		$format = '';
-		$cats = '';
-		$authors = '';
-		$subscribers = array();
 
 		parse_str($args, $r);
 		if ( !isset($r['format']) )
