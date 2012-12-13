@@ -3,8 +3,8 @@ Contributors: MattyRob, Skippy, RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.1
-Tested up to: 3.4.2
-Stable tag: 8.5
+Tested up to: 3.5
+Stable tag: 8.6
 License: GPL3
 
 Sends a list of subscribers an email notification when new posts are published to your blog
@@ -24,7 +24,7 @@ The format of the email can also be customised for per-post notifications, Subsc
 * HTML excerpt (Registered Users only)
 * HTML full post (Registered Users only)
 
-If you want to send full content HTML emails to Public Subscribers too then upgrade to [Subscribe2 HTML](http://wpplugins.com/plugin/46/subscribe2-html).
+If you want to send full content HTML emails to Public Subscribers too then upgrade to [Subscribe2 HTML](http://semperplugins.com/plugins/subscribe2-html/).
 
 == Installation ==
 
@@ -56,7 +56,7 @@ This token will automatically be replaced by dynamic subscription information an
 
 = I want HTML email to be the default email type =
 
-You need to pay for the [Subscribe2 HTML version](http://wpplugins.com/plugin/46/subscribe2-html).
+You need to pay for the [Subscribe2 HTML version](http://semperplugins.com/plugins/subscribe2-html/).
 
 = Where can I get help? =
 So, you've downloaded the plugin an it isn't doing what you expect. First you should read the included documentation. There is a [ReadMe.txt](http://plugins.svn.wordpress.org/subscribe2/trunk/ReadMe.txt) file and a [legacy PDF startup guide](http://plugins.svn.wordpress.org/subscribe2/tags/6.0/The%20WordPress%20Subscriber%20User%20Guide.pdf) installed with the plugin.
@@ -181,7 +181,7 @@ Public Subscribers have provided their email address for email notification of y
 
 Registered Users have registered with your WordPress blog (provided you have enabled this in the core WordPress settings). Registered users of the blog can elect to receive email notifications for specific categories (unless Digest email are select, then it is an opt in or out decision).  The Subscribe2->Your Subscriptions menu item will also allow them greater control to select the delivery format (plaintext or HTML), amount of message (excerpt or full post), and the categories to which they want to subscribe.  You, the blog owner, have the option (Subscribe2->Settings) to allow registered users to subscribe to your excluded categories or not.
 
-**Note** You can send HTML emails to Public Subscribers with the paid [Subscribe2 HTML version](http://wpplugins.com/plugin/46/subscribe2-html) of the plugin.
+**Note** You can send HTML emails to Public Subscribers with the paid [Subscribe2 HTML version](http://semperplugins.com/plugins/subscribe2-html/) of the plugin.
 
 = Can I put the form elsewhere? (header, footer, sidebar without the widget) =
 
@@ -304,7 +304,7 @@ I'm open to suggestions but since the software is written by me for use on my si
 
 = I'd like to be able to send my subscribers notifications in HTML =
 
-By default Public Subscribers get plain text emails and only Registered Subscribers can opt to receive email in HTML format. If you really want HTML for all you need to pay for the [Subscribe2 HTML version](http://wpplugins.com/plugin/46/subscribe2-html).
+By default Public Subscribers get plain text emails and only Registered Subscribers can opt to receive email in HTML format. If you really want HTML for all you need to pay for the [Subscribe2 HTML version](http://semperplugins.com/plugins/subscribe2-html/).
 
 = Which version should I be using, I'm on WordPress x.x.x? =
 
@@ -347,13 +347,14 @@ Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correc
 * Call translation code via a hook to allow greater dynamic control - proposed by dimadin
 * Look in more locations for translation files, can place in core languages folder now for upgrade protection
 * Refresh Settings page in admin to a tabbed interface
-* Strip HTML from email subject to improve compatibility with other plugins
+* Strip HTML from email subject to improve compatibility with other plugins and WordPress 3.5
 * Fixed bug in the display of compulsory categories in the Settings page
 * Add option to manually send emails to All Registered Users and Public Subscribers - proposed by TigWeb
 * Enable TinyURL link shortening for Digest Notification Emails if {TINYLINK} is present in the Email Template
 * Fixed bug in TinyURL error handling and fallback when link generation fails
 * Fixed bug where {DATE} was left blank in the subject field for future scheduled post notifications - thanks to Steve Savoy
 * Added a filter to allow on-the-fly alteration of the size of the {IMAGE} in the paid version
+* Fixed a warning message for a core function ready for WordPress 3.6
 
 = Version 8.5 by Matthew Robinson =
 
