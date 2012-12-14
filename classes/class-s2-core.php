@@ -434,12 +434,17 @@ class s2class {
 		if ( empty($link) ) { return; }
 		if ( !empty($this->subscribe2_options['tracking']) ) {
 			(strpos($link, '?') > 0) ? $delimiter .= '&' : $delimiter = '?';
-			if ( strpos($this->subscribe2_options['tracking'], "{ID}") ) {
+			$tracking = $this->subscribe2_options['tracking'];
+			if ( strpos($tracking, "{ID}") ) {
 				$id = url_to_postid($link);
-				$tracking = str_replace("{ID}", $id, $this->subscribe2_options['tracking']);
-				return $link . $delimiter . $tracking;
+				$tracking = str_replace("{ID}", $id, $tracking);
 			}
-			return $link . $delimiter . $this->subscribe2_options['tracking'];
+			if ( strpos($tracking, "{TITLE}") ) {
+				$id = url_to_postid($link);
+				$title = urlencode(htmlentities(get_the_title($id),1));
+				$tracking = str_replace("{TITLE}", $title, $tracking);
+			}
+			return $link . $delimiter . $tracking;
 		} else {
 			return $link;
 		}

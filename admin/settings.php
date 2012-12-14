@@ -228,7 +228,7 @@ switch ($current_tab) {
 		}
 		echo __('Add Tracking Parameters to the Permalink', 'subscribe2') . ": ";
 		echo "<input type=\"text\" name=\"tracking\" value=\"" . stripslashes($this->subscribe2_options['tracking']) . "\" size=\"50\" /> ";
-		echo "<br />" . __('eg. utm_source=subscribe2&amp;utm_medium=email&amp;utm_campaign=postnotify&amp;utm_id={ID}', 'subscribe2') . "\r\n";
+		echo "<br />" . __('eg. utm_source=subscribe2&amp;utm_medium=email&amp;utm_campaign=postnotify&amp;utm_id={ID}&amp;utm_title={TITLE}', 'subscribe2') . "\r\n";
 		echo "</p>\r\n";
 		echo "</div>\r\n";
 	break;

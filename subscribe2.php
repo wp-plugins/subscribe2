@@ -54,14 +54,14 @@ if ( !in_array(ini_get('safe_mode'), $safe_mode) && ini_get('max_execution_time'
 	@ini_set('max_execution_time', 300);
 }
 
-require_once(S2PATH . 'classes/class-s2-core.php');
+require_once( S2PATH . 'classes/class-s2-core.php' );
 if ( is_admin() ) {
-	require_once(S2PATH . 'classes/class-s2-admin.php');
+	require_once( S2PATH . 'classes/class-s2-admin.php' );
 	global $mysubscribe2;
 	$mysubscribe2 = new s2_admin;
 	$mysubscribe2->s2init();
 } else {
-	require_once(S2PATH . 'classes/class-s2-frontend.php');
+	require_once( S2PATH . 'classes/class-s2-frontend.php' );
 	global $mysubscribe2;
 	$mysubscribe2 = new s2_frontend;
 	$mysubscribe2->s2init();
