@@ -1563,6 +1563,10 @@ class s2class {
 					$message_post .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
 					$message_posttime .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
 				}
+			} else {
+				$tablelinks .= "\r\n" . $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
+				$message_post .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
+				$message_posttime .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
 			}
 
 			if ( strstr($mailtext, "{CATS}") ) {
