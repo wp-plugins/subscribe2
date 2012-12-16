@@ -1554,15 +1554,13 @@ class s2class {
 			$message_posttime .= __('Posted on', 'subscribe2') . ": " . mysql2date($datetime, $post->post_date) . "\r\n";
 			if ( strstr($mailtext, "{TINYLINK}") ) {
 				$tinylink = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode($this->get_tracking_link(get_permalink($post->ID))));
-				if ( $tinylink !== 'Error' && $tinylink !== false ) {
-					$tablelinks .= "\r\n" . $tinylink . "\r\n";
-					$message_post .= $tinylink . "\r\n";
-					$message_posttime .= $tinylink . "\r\n";
-				} else {
-					$tablelinks .= "\r\n" . $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
-					$message_post .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
-					$message_posttime .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
-				}
+			} else {
+				$tinylink = false;
+			}
+			if ( strstr($mailtext, "{TINYLINK}") && $tinylink !== 'Error' && $tinylink !== false ) {
+				$tablelinks .= "\r\n" . $tinylink . "\r\n";
+				$message_post .= $tinylink . "\r\n";
+				$message_posttime .= $tinylink . "\r\n";
 			} else {
 				$tablelinks .= "\r\n" . $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
 				$message_post .= $this->get_tracking_link(get_permalink($post->ID)) . "\r\n";
