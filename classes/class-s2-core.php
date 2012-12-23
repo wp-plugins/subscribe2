@@ -131,12 +131,22 @@ class s2class {
 					$cats = implode(',', $old_cats);
 					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
 				}
+				if ( strpos($subscribed, ',') === 0 ) {
+					// make sure we remove leading ',' from this setting
+					$old_cats = explode(',', $subscribed);
+					unset($old_cats[0]);
+					$cats = implode(',', $old_cats);
+					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
+				}
 				$check_authors = get_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), true);
 				if ( empty($check_authors) ) {
 					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_authors'), '');
 				}
 			}
 		}
+		// remove unnecessary table data
+		$wpdb->query( "DELETE FROM $wpdb->usermeta WHERE meta_key = 's2_cat'" );
+
 		// update the options table to serialized format
 		$old_options = $wpdb->get_col("SELECT option_name from $wpdb->options where option_name LIKE 's2%' AND option_name != 's2_future_posts'");
 
@@ -1582,7 +1592,7 @@ class s2class {
 			$message_post .= "\r\n";
 			$message_posttime .= "\r\n";
 
-			$excerpt = $post->post_excerpt;
+			( !empty($post->post_excerpt) ) ? $excerpt = $post->post_excerpt : $excerpt = '';
 			if ( '' == $excerpt ) {
 				// no excerpt, is there a <!--more--> ?
 				if ( false !== strpos($post->post_content, '<!--more-->') ) {

@@ -1,8 +1,10 @@
 = Version 8.7 by Matthew Robinson =
 
 * Enabled {TITLE} as a keyword in URL Tracking in free version
-* Moved Subscribers page class code to a new external class file
+* Moved Subscribers page class code to a new external class file to avoid fatal PHP errors on some sites
 * Fixed a glitch in the {TABLELINK} tag caused by adding support for {TINYLINK} to the digest email
+* Fixed and repaired addition of extra comma to s2_subscribed table values and also addition of null s2cat values
+* Minor code improvements
 
 = Version 8.6 by Matthew Robinson =
 
