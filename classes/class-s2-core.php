@@ -78,6 +78,10 @@ class s2class {
 			active tinyint(1) default 0,
 			date DATE default '$date' NOT NULL,
 			ip char(64) NOT NULL default 'admin',
+			time TIME DEFAULT '00:00:00' NOT NULL,
+			conf_date DATE,
+			conf_time TIME,
+			conf_ip char(64),
 			PRIMARY KEY (id) )";
 
 		// create the table, as needed
