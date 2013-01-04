@@ -5,6 +5,7 @@
 * Fixed a glitch in the {TABLELINK} tag caused by adding support for {TINYLINK} to the digest email
 * Fixed and repaired addition of extra comma to s2_subscribed table values and also addition of null s2cat values
 * Fixed incomplete table creation on new installs - thanks to niclaslockner
+* Fix for PHP Warning about an undefined $value variable on form submission - thanks to annewinterbottom
 * Minor code improvements
 
 = Version 8.6 by Matthew Robinson =
