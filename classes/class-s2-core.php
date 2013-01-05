@@ -313,7 +313,7 @@ class s2class {
 			$headers = $this->headers();
 			$message = preg_replace('|&[^a][^m][^p].{0,3};|', '', $message);
 			$message = preg_replace('|&amp;|', '&', $message);
-			$message = wordwrap(strip_tags($message), 80, "\n");
+			$message = wordwrap(strip_tags($message), $this->word_wrap, "\n");
 			$mailtext = apply_filters('s2_plain_email', $message);
 		}
 
@@ -770,10 +770,10 @@ class s2class {
 	function get_public($confirmed = 1) {
 		global $wpdb;
 		if ( 1 == $confirmed ) {
-			if ( '' == $this->all_public ) {
-				$this->all_public = $wpdb->get_col("SELECT email FROM $this->public WHERE active='1'");
+			if ( '' == $this->all_confirmed ) {
+				$this->all_confirmed = $wpdb->get_col("SELECT email FROM $this->public WHERE active='1'");
 			}
-			return $this->all_public;
+			return $this->all_confirmed;
 		} else {
 			if ( '' == $this->all_unconfirmed ) {
 				$this->all_unconfirmed = $wpdb->get_col("SELECT email FROM $this->public WHERE active='0'");
@@ -984,15 +984,27 @@ class s2class {
 
 		if ( $this->s2_mu ) {
 			if ( $return === 'ID' ) {
-				return $wpdb->get_col("SELECT user_id FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
+				if ( $this->all_registered_id === '' ) {
+					$this->all_registered_id = $wpdb->get_col("SELECT user_id FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities'");
+				}
+				return $this->all_registered_id;
 			} else {
-				return $wpdb->get_col("SELECT a.user_email FROM $wpdb->users AS a INNER JOIN $wpdb->usermeta AS b ON a.ID = b.user_id WHERE b.meta_key='" . $wpdb->prefix . "capabilities'");
+				if ( $this->all_registered_email === '' ) {
+					$this->all_registered_email = $wpdb->get_col("SELECT a.user_email FROM $wpdb->users AS a INNER JOIN $wpdb->usermeta AS b ON a.ID = b.user_id WHERE b.meta_key='" . $wpdb->prefix . "capabilities'");
+				}
+				return $this->all_registered_email;
 			}
 		} else {
 			if ( $return === 'ID' ) {
-				return $wpdb->get_col("SELECT ID FROM $wpdb->users");
+				if ( $this->all_registered_id === '' ) {
+					$this->all_registered_id = $wpdb->get_col("SELECT ID FROM $wpdb->users");
+				}
+				return $this->all_registered_id;
 			} else {
-				return $wpdb->get_col("SELECT user_email FROM $wpdb->users");
+				if ( $this->all_registered_email === '' ) {
+					$this->all_registered_email = $wpdb->get_col("SELECT user_email FROM $wpdb->users");
+				}
+				return $this->all_registered_email;
 			}
 		}
 	} // end get_all_registered()
@@ -1843,8 +1855,10 @@ class s2class {
 /* ===== our variables ===== */
 	// cache variables
 	var $subscribe2_options = array();
-	var $all_public = '';
+	var $all_confirmed = '';
 	var $all_unconfirmed = '';
+	var $all_registered_id = '';
+	var $all_registered_email = '';
 	var $all_authors = '';
 	var $excluded_cats = '';
 	var $post_title = '';
@@ -1866,6 +1880,7 @@ class s2class {
 	var $action = '';
 	var $email = '';
 	var $message = '';
+	var $word_wrap = 80;
 	var $excerpt_length = 55;
 
 	// some messages
