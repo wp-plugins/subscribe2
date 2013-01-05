@@ -115,6 +115,10 @@ class s2class {
 
 		// ensure that the options are in the database
 		require(S2PATH . "include/options.php");
+		// catch old version that didn't use serialised options
+		if ( !isset($this->subscribe2_options['version']) ) {
+			$this->subscribe2_options['version'] = 2.0;
+		}
 
 		// let's take the time to ensure that database entries exist for all registered users
 		$s2_upgrade->upgrade_core();
