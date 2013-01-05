@@ -8,6 +8,8 @@
 * Fix for PHP Warning about an undefined $value variable on form submission - thanks to annewinterbottom
 * Rename public subscriber variables internally for consistency
 * Implement variable caching for Registered users in the same way as for Public subscribers
+* Widen Subject boxes on the Subscribe2->Settings:Templates page - props Orion42
+* Allow easier customisation of the word wrap length in plain text emails - props Orion42
 * Minor code improvements
 
 = Version 8.6 by Matthew Robinson =
