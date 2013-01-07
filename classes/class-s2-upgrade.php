@@ -1,6 +1,7 @@
 <?php
 class s2class_upgrade {
 	function upgrade_core() {
+		// let's take the time to double check data for registered users
 		global $mysubscribe2;
 		if ( version_compare($mysubscribe2->wp_release, '3.5', '<') ) {
 			global $wpdb;
@@ -10,19 +11,6 @@ class s2class_upgrade {
 					$mysubscribe2->register($user_ID);
 				}
 			}
-			// let's take the time to check process registered users
-			// existing public subscribers are subscribed to all categories
-			/*$users = $mysubscribe2->get_all_registered('ID');
-			if ( !empty($users) ) {
-				foreach ( $users as $user_ID ) {
-					$check_format = get_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_format'), true);
-					// if user is already registered update format remove 's2_excerpt' field and update 's2_format'
-					if ( empty($check_format) ) {
-						// no prior settings so create them
-						$mysubscribe2->register($user_ID);
-					}
-				}
-			}*/
 		} else {
 			$args = array(
 				'meta_query' => array(

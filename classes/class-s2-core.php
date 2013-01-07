@@ -115,35 +115,35 @@ class s2class {
 
 		// ensure that the options are in the database
 		require(S2PATH . "include/options.php");
-		// catch old version that didn't use serialised options
+		// catch older versions that didn't use serialised options
 		if ( !isset($this->subscribe2_options['version']) ) {
-			$this->subscribe2_options['version'] = 2.0;
+			$this->subscribe2_options['version'] = '2.0';
 		}
 
 		// let's take the time to ensure that database entries exist for all registered users
 		$s2_upgrade->upgrade_core();
-		if ( (float)$this->subscribe2_options['version'] < 2.3 ) {
+		if ( version_compare($this->subscribe2_options['version'], '2.3', '<') ) {
 			$s2_upgrade->upgrade23();
 		}
-		if ( (float)$this->subscribe2_options['version'] < 5.1 ) {
+		if ( version_compare($this->subscribe2_options['version'], '5.1', '<') ) {
 			$s2_upgrade->upgrade51();
 		}
-		if ( (float)$this->subscribe2_options['version'] < 5.6 ) {
+		if ( version_compare($this->subscribe2_options['version'], '5.6', '<') ) {
 			$s2_upgrade->upgrade56();
 		}
-		if ( (float)$this->subscribe2_options['version'] < 5.9 ) {
+		if ( version_compare($this->subscribe2_options['version'], '5.9', '<') ) {
 			$s2_upgrade->upgrade59();
 		}
-		if ( (float)$this->subscribe2_options['version'] < 6.4 ) {
+		if ( version_compare($this->subscribe2_options['version'], '6.4', '<') ) {
 			$s2_upgrade->upgrade64();
 		}
-		if ( (float)$this->subscribe2_options['version'] < 7.0 ) {
+		if ( version_compare($this->subscribe2_options['version'], '7.0', '<') ) {
 			$s2_upgrade->upgrade70();
 		}
-		if ( (float)$this->subscribe2_options['version'] < 8.5 ) {
+		if ( version_compare($this->subscribe2_options['version'], '8.5', '<') ) {
 			$s2_upgrade->upgrade85();
 		}
-		if ( (float)$this->subscribe2_options['version'] < 8.6 ) {
+		if ( version_compare($this->subscribe2_options['version'], '8.6', '<') ) {
 			$s2_upgrade->upgrade86();
 		}
 
