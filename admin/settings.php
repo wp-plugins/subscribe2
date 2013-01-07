@@ -48,7 +48,7 @@ if ( isset( $_POST['s2_admin']) ) {
 					}
 				}
 			} elseif ( in_array($key, array('notification_subject', 'mailtext', 'confirm_subject', 'confirm_email', 'remind_subject', 'remind_email')) && !empty($_POST[$key]) ) {
-							// email subject and body templates
+				// email subject and body templates
 				$this->subscribe2_options[$key] = $_POST[$key];
 			} elseif ( in_array($key, array('compulsory', 'exclude', 'format')) ) {
 				sort($_POST[$key]);
