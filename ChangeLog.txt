@@ -12,6 +12,7 @@
 * Allow easier customisation of the word wrap length in plain text emails - props Orion42
 * Abstracted the upgrade() code and made it incremental so that only necessary code is executed
 * Fixed a bug in the Send Email page that failed to send emails to Public Subscribers when All Users was selected - thanks to Gui
+* Added an option to disable JavaScript within the Widget
 * Minor code improvements
 
 = Version 8.6 by Matthew Robinson =
