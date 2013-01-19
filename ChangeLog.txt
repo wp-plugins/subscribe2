@@ -1,3 +1,9 @@
+= Version 8.8 by Matthew Robinson =
+
+* Added ability to filter both excerpt_length and word_wrap
+* Added code to stop site wide activation on Multisite installs
+* Added code to fix compatibility issues with Autoblog plugin - thanks to Kevin Waite and Andy Stratton
+
 = Version 8.7 by Matthew Robinson =
 
 * Enabled {TITLE} as a keyword in URL Tracking in free version

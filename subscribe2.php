@@ -33,11 +33,22 @@ along with Subscribe2. If not, see <http://www.gnu.org/licenses/>.
 
 if ( version_compare($GLOBALS['wp_version'], '3.1', '<') || !function_exists( 'add_action' ) ) {
 	if ( !function_exists( 'add_action' ) ) {
-		$exit_msg = "I'm just a plugin, please don't call me directly";
+		$exit_msg = __("I'm just a plugin, please don't call me directly", 'subscribe2');
 	} else {
 		// Subscribe2 needs WordPress 3.1 or above, exit if not on a compatible version
 		$exit_msg = sprintf(__('This version of Subscribe2 requires WordPress 3.1 or greater. Please update %1$s or use an older version of %2$s.', 'subscribe2'), '<a href="http://codex.wordpress.org/Updating_WordPress">Wordpress</a>', '<a href="http://wordpress.org/extend/plugins/subscribe2/download/">Subscribe2</a>');
 	}
+	exit($exit_msg);
+}
+
+// stop Subscribe2 being activated site wide on Multisite installs
+if ( !function_exists( 'is_plugin_active_for_network' ) ) {
+	require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
+}
+
+if ( is_plugin_active_for_network(plugin_basename(__FILE__)) ) {
+	deactivate_plugins( plugin_basename(__FILE__) );
+	$exit_msg = __('Subscribe2 cannot be activate as a network plugin. Please activate it at on a site level', 'subscribe2');
 	exit($exit_msg);
 }
 
