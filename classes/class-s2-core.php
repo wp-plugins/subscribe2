@@ -372,7 +372,7 @@ class s2class {
 	function publish($post, $preview = '') {
 		if ( !$post ) { return $post; }
 
-		if ( $this->s2_mu ) {
+		if ( $this->s2_mu && !function_exists('set_autoblog_url') ) {
 			global $switched;
 			if ( $switched ) { return; }
 		}
@@ -1754,6 +1754,11 @@ class s2class {
 		}
 	} // end s2init()
 
+	function __construct() {
+		$this->word_wrap = apply_filters('s2_word_wrap', 80);
+		$this->excerpt_length = apply_filters('s2_excerpt_length', 55);
+	} // end __construct()
+
 /* ===== our variables ===== */
 	// cache variables
 	var $subscribe2_options = array();
@@ -1782,8 +1787,8 @@ class s2class {
 	var $action = '';
 	var $email = '';
 	var $message = '';
-	var $word_wrap = 80;
-	var $excerpt_length = 55;
+	var $word_wrap;
+	var $excerpt_length;
 
 	// some messages
 	var $please_log_in = '';
