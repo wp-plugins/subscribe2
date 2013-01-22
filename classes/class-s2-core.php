@@ -372,7 +372,7 @@ class s2class {
 	function publish($post, $preview = '') {
 		if ( !$post ) { return $post; }
 
-		if ( $this->s2_mu && !function_exists('set_autoblog_url') ) {
+		if ( $this->s2_mu && !apply_filters('s2_allow_site_switching', $this->site_switching) ) {
 			global $switched;
 			if ( $switched ) { return; }
 		}
@@ -1754,9 +1754,22 @@ class s2class {
 		}
 	} // end s2init()
 
+	/**
+	PHP4 Constructor
+	Can be erased when support for WordPress 3.1 is dropped
+	*/
+	function s2class() {
+		$this->__construct();
+	} // end s2class()
+
+	/**
+	PHP5 Constructor
+	Allows dynamic variable setting
+	*/
 	function __construct() {
 		$this->word_wrap = apply_filters('s2_word_wrap', 80);
 		$this->excerpt_length = apply_filters('s2_excerpt_length', 55);
+		$this->site_switching = apply_filters('s2_allow_site_switching', false);
 	} // end __construct()
 
 /* ===== our variables ===== */
@@ -1789,6 +1802,7 @@ class s2class {
 	var $message = '';
 	var $word_wrap;
 	var $excerpt_length;
+	var $site_switching;
 
 	// some messages
 	var $please_log_in = '';
