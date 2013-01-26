@@ -178,7 +178,7 @@ switch ($current_tab) {
 	case 'registered':
 		echo "<div class=\"s2_admin\" id=\"s2_add_subscribers\">\r\n";
 		echo "<h2>" . __('Add/Remove Subscribers', 'subscribe2') . "</h2>\r\n";
-		echo "<p class=\"submit\" style=\"border-top: none;\"><input type=\"submit\" class=\"button-primary\" name=\"add_user\" value=\"" . __('Add Registered User', 'subscribe2') . "\" formaction=\"" . admin_url() . "user-new.php\" /></p>\r\n";
+		echo "<p class=\"submit\" style=\"border-top: none;\"><input type=\"button\" class=\"button-primary\" name=\"add_user\" value=\"" . __('Add Registered User', 'subscribe2') . "\" formaction=\"" . admin_url() . "user-new.php\" /></p>\r\n";
 
 		echo "</div>\r\n";
 
