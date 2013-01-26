@@ -146,6 +146,9 @@ class s2class {
 		if ( version_compare($this->subscribe2_options['version'], '8.6', '<') ) {
 			$s2_upgrade->upgrade86();
 		}
+		if ( version_compare($this->subscribe2_options['version'], '8.8', '<') ) {
+			$s2_upgrade->upgrade88();
+		}
 
 		$this->subscribe2_options['version'] = S2VERSION;
 		update_option('subscribe2_options', $this->subscribe2_options);

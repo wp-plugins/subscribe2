@@ -222,5 +222,21 @@ class s2class_upgrade {
 		}
 		return;
 	} // end upgrade86()
+
+	function upgrade88() {
+		// to ensure compulsory category collects all users we need there to be s2_subscribed meta-keys for all users
+		global $mysubscribe2;
+
+		$all_registered = $mysubscribe2->get_all_registered('ID');
+		if ( !empty($all_registered) ) {
+			foreach ( $all_registered as $user_ID ) {
+				$check_subscribed = get_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_subscribed'), true);
+				if ( empty($check_subscribed) ) {
+					update_user_meta($user_ID, $mysubscribe2->get_usermeta_keyname('s2_subscribed'), '');
+				}
+			}
+		}
+
+	} // end upgrade88()
 }
 ?>
