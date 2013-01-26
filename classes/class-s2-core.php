@@ -926,6 +926,14 @@ class s2class {
 		if ( !isset($r['author']) )
 			$r['author'] = '';
 
+		// collect all subscribers for compulsory categories
+		$compulsory = explode(',', $this->subscribe2_options['compulsory']);
+		foreach ( explode(',', $r['cats']) as $cat ) {
+			if ( in_array($cat, $compulsory) ) {
+				$r['cats'] = '';
+			}
+		}
+
 		$JOIN = ''; $AND = '';
 		// text or HTML subscribers
 		if ( 'all' != $r['format'] ) {
