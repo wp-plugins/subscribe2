@@ -89,9 +89,95 @@ class Subscribe2_List_Table extends WP_List_Table {
 		}
 	}
 
-	function prepare_items() {
+	function pagination( $which ) {
+		if ( empty( $this->_pagination_args ) )
+			return;
 
-		global $mysubscribe2;
+		extract( $this->_pagination_args, EXTR_SKIP );
+
+		$output = '<span class="displaying-num">' . sprintf( _n( '1 item', '%s items', $total_items ), number_format_i18n( $total_items ) ) . '</span>';
+
+		if ( isset($_POST['what']) ) {
+			$current = 1;
+		} else {
+			$current = $this->get_pagenum();
+		}
+
+		$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+
+		$current_url = remove_query_arg( array( 'hotkeys_highlight_last', 'hotkeys_highlight_first' ), $current_url );
+
+		if ( isset($what) ) {
+			$current_url = add_query_arg(array('what' => $what), $current_url);
+		} elseif ( isset($_REQUEST['what']) ) {
+			$current_url = add_query_arg(array('what' => $_REQUEST['what']), $current_url);
+		}
+
+		$page_links = array();
+
+		$disable_first = $disable_last = '';
+		if ( $current == 1 )
+			$disable_first = ' disabled';
+		if ( $current == $total_pages )
+			$disable_last = ' disabled';
+
+		$page_links[] = sprintf( "<a class='%s' title='%s' href='%s'>%s</a>",
+			'first-page' . $disable_first,
+			esc_attr__( 'Go to the first page' ),
+			esc_url( remove_query_arg( 'paged', $current_url ) ),
+			'&laquo;'
+		);
+
+		$page_links[] = sprintf( "<a class='%s' title='%s' href='%s'>%s</a>",
+			'prev-page' . $disable_first,
+			esc_attr__( 'Go to the previous page' ),
+			esc_url( add_query_arg( 'paged', max( 1, $current-1 ), $current_url ) ),
+			'&lsaquo;'
+		);
+
+		if ( 'bottom' == $which )
+			$html_current_page = $current;
+		else
+			$html_current_page = sprintf( "<input class='current-page' title='%s' type='text' name='paged' value='%s' size='%d' />",
+				esc_attr__( 'Current page' ),
+				$current,
+				strlen( $total_pages )
+			);
+
+		$html_total_pages = sprintf( "<span class='total-pages'>%s</span>", number_format_i18n( $total_pages ) );
+		$page_links[] = '<span class="paging-input">' . sprintf( _x( '%1$s of %2$s', 'paging' ), $html_current_page, $html_total_pages ) . '</span>';
+
+		$page_links[] = sprintf( "<a class='%s' title='%s' href='%s'>%s</a>",
+			'next-page' . $disable_last,
+			esc_attr__( 'Go to the next page' ),
+			esc_url( add_query_arg( 'paged', min( $total_pages, $current+1 ), $current_url ) ),
+			'&rsaquo;'
+		);
+
+		$page_links[] = sprintf( "<a class='%s' title='%s' href='%s'>%s</a>",
+			'last-page' . $disable_last,
+			esc_attr__( 'Go to the last page' ),
+			esc_url( add_query_arg( 'paged', $total_pages, $current_url ) ),
+			'&raquo;'
+		);
+
+		$pagination_links_class = 'pagination-links';
+		if ( ! empty( $infinite_scroll ) )
+			$pagination_links_class = ' hide-if-js';
+		$output .= "\n<span class='$pagination_links_class'>" . join( "\n", $page_links ) . '</span>';
+
+		if ( $total_pages )
+			$page_class = $total_pages < 2 ? ' one-page' : '';
+		else
+			$page_class = ' no-pages';
+
+		$this->_pagination = "<div class='tablenav-pages{$page_class}'>$output</div>";
+
+		echo $this->_pagination;
+	}
+
+	function prepare_items() {
+		global $mysubscribe2, $subscribers, $current_tab;
 		if ( is_int($mysubscribe2->subscribe2_options['entries']) ) {
 			$per_page = $mysubscribe2->subscribe2_options['entries'];
 		} else {
@@ -103,7 +189,6 @@ class Subscribe2_List_Table extends WP_List_Table {
 		$sortable = $this->get_sortable_columns();
 		$this->_column_headers = array($columns, $hidden, $sortable);
 
-		global $mysubscribe2, $subscribers, $current_tab;
 		$data = array();
 		if ( $current_tab == 'public' ) {
 			foreach($subscribers as $email) {
@@ -123,10 +208,14 @@ class Subscribe2_List_Table extends WP_List_Table {
 		}
 		usort($data, 'usort_reorder');
 
-        $current_page = $this->get_pagenum();
-        $total_items = count($data);
-        $data = array_slice($data,(($current_page-1)*$per_page),$per_page);
-        $this->items = $data;
+		if ( isset($_POST['what']) ) {
+			$current_page = 1;
+		} else {
+			$current_page = $this->get_pagenum();
+		}
+		$total_items = count($data);
+		$data = array_slice($data,(($current_page-1)*$per_page),$per_page);
+		$this->items = $data;
 
 		$this->set_pagination_args( array(
 			'total_items' => $total_items,

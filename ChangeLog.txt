@@ -6,6 +6,7 @@
 * Fixed digit entry in pagination section on Registeres tab in Subscribe2->Subscribers
 * Removed ID from a string in the Settings page as it was confusing
 * Enhanced Compulsory Category code to ensure that Registered Users all get notifications for such categories despite their current personal settings
+* Improved Pagination when the Filter is changed on the Subscribe2->Subscribers page
 
 = Version 8.7 by Matthew Robinson =
 
