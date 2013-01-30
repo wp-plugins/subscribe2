@@ -1607,7 +1607,7 @@ class s2class {
 	Subscribe2 constructor
 	*/
 	function s2init() {
-		global $wpdb, $table_prefix, $wp_version, $wpmu_version;
+		global $wpdb, $wp_version, $wpmu_version;
 		// load the options
 		$this->subscribe2_options = get_option('subscribe2_options');
 		// if SCRIPT_DEBUG is true, use dev scripts
@@ -1640,7 +1640,7 @@ class s2class {
 		add_action('init', array(&$this, 'load_strings'));
 
 		// do we need to install anything?
-		$this->public = $table_prefix . "subscribe2";
+		$this->public = $wpdb->prefix . "subscribe2";
 		if ( $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $this->public)) != $this->public ) { $this->install(); }
 		//do we need to upgrade anything?
 		if ( $this->subscribe2_options === false || is_array($this->subscribe2_options) && $this->subscribe2_options['version'] !== S2VERSION ) {

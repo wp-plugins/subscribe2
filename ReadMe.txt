@@ -199,7 +199,7 @@ But it also has advanced options, which are related to form. The default form co
 
 If you use the shortcode [subscribe2 hide="subscribe"] then the button for subscribing will be hidden and similarly if you use [subscribe2 hide="unsubscribe"], only button for subscribing will be shown.
 
-The new shortcode also accepts two further attributes, these are **id** and **url**. To understand these parameters you need to understand that Subscribe2 returns a user to the default WordPress Page on your site where you use the shortcode or token however in some circumstances you may ant to override this behaviour. If you specify a WordPress page id using the id parameter or a full URL using the url parameter then the user would be returned to the alternative page.
+The new shortcode also accepts two further attributes, these are **id** and **url**. To understand these parameters you need to understand that Subscribe2 returns a user to the default WordPress Page on your site where you use the shortcode or token however in some circumstances you may want to override this behaviour. If you specify a WordPress page id using the id parameter or a full URL using the url parameter then the user would be returned to the alternative page.
 
 There are many scenarios in which to use new options, but here is an example:
 
