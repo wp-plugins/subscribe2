@@ -187,7 +187,7 @@ class s2class_upgrade {
 	} // end upgrade70()
 
 	function upgrade85() {
-		global $wpdb;
+		global $mysubscribe2, $wpdb;
 
 		// include upgrade-functions for maybe_add_column;
 		if ( !function_exists('maybe_add_column') ) {

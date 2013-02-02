@@ -77,8 +77,8 @@ class s2class {
 			email varchar(64) NOT NULL default '',
 			active tinyint(1) default 0,
 			date DATE default '$date' NOT NULL,
-			ip char(64) NOT NULL default 'admin',
 			time TIME DEFAULT '00:00:00' NOT NULL,
+			ip char(64) NOT NULL default 'admin',
 			conf_date DATE,
 			conf_time TIME,
 			conf_ip char(64),
@@ -440,6 +440,7 @@ class s2class {
 			}
 
 			// lets collect our subscribers
+			$public = array();
 			if ( !$check ) {
 				// if this post is assigned to an excluded
 				// category, or is a private post then

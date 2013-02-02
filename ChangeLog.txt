@@ -9,6 +9,7 @@
 * Improved Pagination when the Filter is changed on the Subscribe2->Subscribers page
 * Use $wpdb->prefix in preference to $table_prefix
 * Improve functionality of the uninstall script on Multisite installs
+* Fixed glitch in upgrade85 code that failed to add a new database column when called
 
 = Version 8.7 by Matthew Robinson =
 
