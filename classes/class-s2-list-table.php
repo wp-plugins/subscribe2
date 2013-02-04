@@ -1,6 +1,6 @@
 <?php
 class Subscribe2_List_Table extends WP_List_Table {
-	function __construct(){
+	function __construct() {
 		global $status, $page;
 
 		parent::__construct( array(
@@ -10,17 +10,17 @@ class Subscribe2_List_Table extends WP_List_Table {
 		) );
 	}
 
-	function column_default($item, $column_name){
+	function column_default($item, $column_name) {
 		global $current_tab;
 		if ( $current_tab == 'registered' ) {
-			switch($column_name){
+			switch($column_name) {
 				case 'email':
 					return $item[$column_name];
 				default:
 					return print_r($item,true);
 			}
 		} else {
-			switch($column_name){
+			switch($column_name) {
 				case 'email':
 				case 'date':
 					return $item[$column_name];
@@ -30,7 +30,7 @@ class Subscribe2_List_Table extends WP_List_Table {
 		}
 	}
 
-	function column_email($item){
+	function column_email($item) {
 		global $current_tab;
 		if ( $current_tab == 'registered' ) {
 			$actions = array('edit' => sprintf('<a href="?page=%s&amp;email=%s">Edit</a>', 's2', $item['email']));
@@ -45,11 +45,11 @@ class Subscribe2_List_Table extends WP_List_Table {
 		}
 	}
 
-	function column_cb($item){
+	function column_cb($item) {
 		return sprintf('<input type="checkbox" name="%1$s[]" value="%2$s" />', $this->_args['singular'], $item['email']);
 	}
 
-	function get_columns(){
+	function get_columns() {
 		global $current_tab;
 		if ( $current_tab == 'registered' ) {
 			$columns = array('email' => 'Email');
@@ -105,12 +105,12 @@ class Subscribe2_List_Table extends WP_List_Table {
 
 		$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
 
-		$current_url = remove_query_arg( array( 'hotkeys_highlight_last', 'hotkeys_highlight_first' ), $current_url );
+		$current_url = remove_query_arg( array('hotkeys_highlight_last', 'hotkeys_highlight_first'), $current_url );
 
 		if ( isset($what) ) {
-			$current_url = add_query_arg(array('what' => $what), $current_url);
+			$current_url = add_query_arg( array('what' => $what), $current_url );
 		} elseif ( isset($_REQUEST['what']) ) {
-			$current_url = add_query_arg(array('what' => $_REQUEST['what']), $current_url);
+			$current_url = add_query_arg( array('what' => $_REQUEST['what']), $current_url );
 		}
 
 		$page_links = array();
@@ -203,7 +203,7 @@ class Subscribe2_List_Table extends WP_List_Table {
 		function usort_reorder($a,$b){
 			$orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'email';
 			$order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc';
-			$result = strcmp($a[$orderby], $b[$orderby]);
+			$result = strcasecmp($a[$orderby], $b[$orderby]);
 			return ($order==='asc') ? $result : -$result;
 		}
 		usort($data, 'usort_reorder');

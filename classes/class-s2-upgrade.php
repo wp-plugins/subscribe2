@@ -237,6 +237,12 @@ class s2class_upgrade {
 			}
 		}
 
+		// check the time column again as the upgrade86() function contained a bug
+		// include upgrade-functions for maybe_add_column;
+		if ( !function_exists('maybe_add_column') ) {
+			require_once(ABSPATH . 'wp-admin/install-helper.php');
+		}
+		maybe_add_column($mysubscribe2->public, 'time', "ALTER TABLE $mysubscribe2->public ADD time TIME DEFAULT '00:00:00' NOT NULL AFTER date");
 	} // end upgrade88()
 }
 ?>

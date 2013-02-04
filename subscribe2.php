@@ -11,7 +11,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_butt
 */
 
 /*
-Copyright (C) 2006-12 Matthew Robinson
+Copyright (C) 2006-13 Matthew Robinson
 Based on the Original Subscribe2 plugin by
 Copyright (C) 2005 Scott Merrill (skippy@skippy.net)
 
