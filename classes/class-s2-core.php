@@ -994,7 +994,7 @@ class s2class {
 	function sanitize_email($email) {
 		if ( !is_email($email) ) { return; }
 
-		// ensure that domain is in lowercase as per internet email standards
+		// ensure that domain is in lowercase as per internet email standards http://www.ietf.org/rfc/rfc5321.txt
 		list($name, $domain) = explode('@', $email, 2);
 		return $name . "@" . strtolower($domain);
 	} // end sanitize_email()

@@ -200,7 +200,7 @@ class Subscribe2_List_Table extends WP_List_Table {
 			}
 		}
 
-		function usort_reorder($a,$b){
+		function usort_reorder($a,$b) {
 			$orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'email';
 			$order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc';
 			$result = strcasecmp($a[$orderby], $b[$orderby]);

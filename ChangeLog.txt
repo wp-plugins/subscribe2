@@ -12,7 +12,6 @@
 * Fixed glitch in upgrade85 code that failed to add a new database column when called
 * Sort subscribes into alphabetical order irrespective of case - thanks to mharpen
 
-
 = Version 8.7 by Matthew Robinson =
 
 * Enabled {TITLE} as a keyword in URL Tracking in free version
