@@ -10,7 +10,7 @@
 * Use $wpdb->prefix in preference to $table_prefix
 * Improve functionality of the uninstall script on Multisite installs
 * Fixed glitch in upgrade85 code that failed to add a new database column when called
-* Sort subscribes into alphabetical order irrespective of case - thanks to mharpen
+* Sort subscribers into alphabetical order irrespective of case - thanks to mharpen
 
 = Version 8.7 by Matthew Robinson =
 
