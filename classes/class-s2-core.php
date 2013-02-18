@@ -207,6 +207,10 @@ class s2class {
 	function mail($recipients = array(), $subject = '', $message = '', $type = 'text') {
 		if ( empty($recipients) || '' == $message ) { return; }
 
+		// Replace any escaped html symbols in subject then apply filter
+		$subject = strip_tags(html_entity_decode($subject, ENT_QUOTES));
+		$subject = apply_filters('s2_email_subject', $subject);
+
 		if ( 'html' == $type ) {
 			$headers = $this->headers('html');
 			if ( 'yes' == $this->subscribe2_options['stylesheet'] ) {
@@ -221,10 +225,6 @@ class s2class {
 			$message = wordwrap(strip_tags($message), $this->word_wrap, "\n");
 			$mailtext = apply_filters('s2_plain_email', $message);
 		}
-
-		// Replace any escaped html symbols in subject then apply filter
-		$subject = strip_tags(html_entity_decode($subject, ENT_QUOTES));
-		$subject = apply_filters('s2_email_subject', $subject);
 
 		// Construct BCC headers for sending or send individual emails
 		$bcc = '';
