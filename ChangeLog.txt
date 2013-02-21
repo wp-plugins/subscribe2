@@ -1,3 +1,8 @@
+= Version 8.9 by Matthew Robinson =
+
+* Fix fatal error in the uninstall.php file
+* Correct error using set_url_scheme() function in WordPress version prior to 3.5
+
 = Version 8.8 by Matthew Robinson =
 
 * Added ability to filter both excerpt_length and word_wrap
