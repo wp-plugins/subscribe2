@@ -2,6 +2,7 @@
 
 * Fix fatal error in the uninstall.php file
 * Correct error using set_url_scheme() function in WordPress version prior to 3.5
+* Allow the Widget to post form back to referring page by omitting action for parameter - thanks to Peter Gordon
 
 = Version 8.8 by Matthew Robinson =
 
