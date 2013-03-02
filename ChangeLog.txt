@@ -4,6 +4,7 @@
 * Correct error using set_url_scheme() function in WordPress version prior to 3.5
 * Allow the Widget to post form back to referring page by omitting action for parameter - thanks to Peter Gordon
 * Fix for options being reset on Multisite installs - thanks to Luca
+* Make sure translation strings are loaded during install(), upgrade() and reset() - thanks to Milan Dinić
 
 = Version 8.8 by Matthew Robinson =
 

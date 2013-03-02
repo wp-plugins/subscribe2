@@ -67,6 +67,9 @@ class s2class {
 	Install our table
 	*/
 	function install() {
+		// load our translations and strings
+		$this->load_translations();
+
 		// include upgrade-functions for maybe_create_table;
 		if ( !function_exists('maybe_create_table') ) {
 			require_once(ABSPATH . 'wp-admin/install-helper.php');
@@ -109,6 +112,9 @@ class s2class {
 	Upgrade function for the database and settings
 	*/
 	function upgrade() {
+		// load our translations and strings
+		$this->load_translations();
+
 		require(S2PATH . "classes/class-s2-upgrade.php");
 		global $s2_upgrade;
 		$s2_upgrade = new s2class_upgrade;
@@ -160,6 +166,9 @@ class s2class {
 	Reset our options
 	*/
 	function reset() {
+		// load our translations and strings
+		$this->load_translations();
+
 		delete_option('subscribe2_options');
 		wp_clear_scheduled_hook('s2_digest_cron');
 		unset($this->subscribe2_options);
