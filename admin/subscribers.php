@@ -143,7 +143,7 @@ $S2ListTable->prepare_items();
 // show our form
 echo "<div class=\"wrap\">";
 echo "<div id=\"icon-tools\" class=\"icon32\"></div>";
-$tabs = array('public' => 'Public Subscribers', 'registered' => 'Registered Subscribers');
+$tabs = array('public' => __('Public Subscribers', 'subscribe2'), 'registered' => __('Registered Subscribers', 'subscribe2'));
 echo "<h2 class=\"nav-tab-wrapper\">";
 foreach ( $tabs as $tab_key => $tab_caption ) {
 	$active = ($current_tab == $tab_key) ? "nav-tab-active" : "";
