@@ -1001,6 +1001,7 @@ class s2class {
 	Function to ensure email is compliant with internet messaging standards
 	*/
 	function sanitize_email($email) {
+		$email = trim($email);
 		if ( !is_email($email) ) { return; }
 
 		// ensure that domain is in lowercase as per internet email standards http://www.ietf.org/rfc/rfc5321.txt
