@@ -56,8 +56,8 @@ class Subscribe2_List_Table extends WP_List_Table {
 		} else {
 			$columns = array(
 				'cb'		=> '<input type="checkbox" />',
-				'email'         => _x('Email', 'column name', 'subscribe2'),
-				'date'          => _x('Date', 'column name', 'subscribe2')
+				'email'		=> _x('Email', 'column name', 'subscribe2'),
+				'date'		=> _x('Date', 'column name', 'subscribe2')
 			);
 		}
 		return $columns;
@@ -222,9 +222,9 @@ class Subscribe2_List_Table extends WP_List_Table {
 		$this->items = $data;
 
 		$this->set_pagination_args( array(
-			'total_items' => $total_items,
-			'per_page'    => $per_page,
-			'total_pages' => ceil($total_items/$per_page)
+			'total_items'	=> $total_items,
+			'per_page'		=> $per_page,
+			'total_pages'	=> ceil($total_items/$per_page)
 		) );
 	}
 }
