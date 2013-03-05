@@ -55,9 +55,9 @@ class Subscribe2_List_Table extends WP_List_Table {
 			$columns = array('email' => _x('Email', 'column name', 'subscribe2'));
 		} else {
 			$columns = array(
-				'cb'		=> '<input type="checkbox" />',
-				'email'		=> _x('Email', 'column name', 'subscribe2'),
-				'date'		=> _x('Date', 'column name', 'subscribe2')
+				'cb'	=> '<input type="checkbox" />',
+				'email'	=> _x('Email', 'column name', 'subscribe2'),
+				'date'	=> _x('Date', 'column name', 'subscribe2')
 			);
 		}
 		return $columns;
