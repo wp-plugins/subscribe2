@@ -6,6 +6,7 @@
 * Fix for options being reset on Multisite installs - thanks to Luca
 * Make sure translation strings are loaded during install(), upgrade() and reset() - thanks to Milan Dinić
 * Fix internationalisation of of subscribers list table - thanks to Milan Dinić
+* Use mb_encode_mimeheader on email sender name - thanks by xl32
 
 = Version 8.8 by Matthew Robinson =
 
