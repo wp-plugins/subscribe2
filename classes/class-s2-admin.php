@@ -20,12 +20,6 @@ class s2_admin extends s2class {
 		add_filter('plugin_row_meta', array(&$this, 'plugin_links'), 10, 2);
 
 		add_submenu_page('s2', __('Send Email', 'subscribe2'), __('Send Email', 'subscribe2'), apply_filters('s2_capability', "publish_posts", 'send'), 's2_posts', array(&$this, 'write_menu'));
-		global $wp_version;
-		if ( version_compare($this->wp_release, '3.3', '<') ) {
-			// We don't need this code with WordPress 3.3+
-			add_action("admin_print_scripts-$s2write", array(&$this, 'write_editor_js'));
-			add_action("admin_print_styles-$s2write", array(&$this, 'write_editor_css'));
-		}
 
 		$s2nonce = wp_hash('subscribe2');
 	} // end admin_menu()
@@ -54,32 +48,6 @@ class s2_admin extends s2class {
 		wp_register_script('s2_edit', S2URL . 'include/s2_edit' . $this->script_debug . '.js', array('jquery'), '1.1');
 		wp_enqueue_script('s2_edit');
 	} // end option_form_js()
-
-	function write_editor_css() {
-		if ( function_exists('add_thickbox') ) {
-			add_thickbox();
-		}
-		wp_admin_css();
-	} // end write_editor_css()
-
-	function write_editor_js() {
-		wp_print_scripts('common');
-		wp_print_scripts('jquery-color');
-		wp_print_scripts('utils');
-		wp_print_scripts('editor');
-		if ( function_exists('wp_tiny_mce') ) {
-			// TinyMCE init settings
-			$mce_buttons_2 = array( 'formatselect', 'underline', 'justifyfull', 'forecolor', '|', 'pastetext', 'pasteword', 'removeformat', '|', 'charmap', '|', 'outdent', 'indent', '|', 'undo', 'redo', 'wp_help' );
-			$mce_buttons_2 = implode($mce_buttons_2, ',');
-			$plugins = array( 'safari', 'spellchecker', 'paste', 'wordpress', 'fullscreen', 'tabfocus' );
-			$plugins = implode($plugins, ',');
-			$initArray = array (
-				'theme_advanced_buttons2' => "$mce_buttons_2",
-				'plugins' => "$plugins"
-			);
-			wp_tiny_mce(false, $initArray);
-		}
-	} // end write_editor_js()
 
 	/**
 	Adds a links directly to the settings page from the plugin page
