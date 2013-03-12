@@ -310,7 +310,7 @@ By default Public Subscribers get plain text emails and only Registered Subscrib
 
 WordPress 3.1 and up requires Subscribe2 from the 7.x or 8.x stable branch. The most recent version is hosted via [Wordpress.org](http://wordpress.org/extend/plugins/subscribe2/).
 
-WordPress 2.8 and up requires Subscribe2 from the 6.x stable branch. The most q version is [6.5](http://downloads.wordpress.org/plugin/subscribe2.6.5.zip).
+WordPress 2.8 and up requires Subscribe2 from the 6.x stable branch. The most recent version is [6.5](http://downloads.wordpress.org/plugin/subscribe2.6.5.zip).
 
 WordPress 2.3.x through to 2.7.x require Subscribe2 from the 4.x or 5.x stable branch. The most recent version is [5.9](http://downloads.wordpress.org/plugin/subscribe2.5.9.zip).
 

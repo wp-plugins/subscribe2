@@ -130,30 +130,48 @@ class s2class {
 		$s2_upgrade->upgrade_core();
 		if ( version_compare($this->subscribe2_options['version'], '2.3', '<') ) {
 			$s2_upgrade->upgrade23();
+			$this->subscribe2_options['version'] = '2.3';
+			update_option('subscribe2_options', $this->subscribe2_options);
 		}
 		if ( version_compare($this->subscribe2_options['version'], '5.1', '<') ) {
 			$s2_upgrade->upgrade51();
+			$this->subscribe2_options['version'] = '5.1';
+			update_option('subscribe2_options', $this->subscribe2_options);
 		}
 		if ( version_compare($this->subscribe2_options['version'], '5.6', '<') ) {
 			$s2_upgrade->upgrade56();
+			$this->subscribe2_options['version'] = '5.6';
+			update_option('subscribe2_options', $this->subscribe2_options);
 		}
 		if ( version_compare($this->subscribe2_options['version'], '5.9', '<') ) {
 			$s2_upgrade->upgrade59();
+			$this->subscribe2_options['version'] = '5.9';
+			update_option('subscribe2_options', $this->subscribe2_options);
 		}
 		if ( version_compare($this->subscribe2_options['version'], '6.4', '<') ) {
 			$s2_upgrade->upgrade64();
+			$this->subscribe2_options['version'] = '6.4';
+			update_option('subscribe2_options', $this->subscribe2_options);
 		}
 		if ( version_compare($this->subscribe2_options['version'], '7.0', '<') ) {
 			$s2_upgrade->upgrade70();
+			$this->subscribe2_options['version'] = '7.0';
+			update_option('subscribe2_options', $this->subscribe2_options);
 		}
 		if ( version_compare($this->subscribe2_options['version'], '8.5', '<') ) {
 			$s2_upgrade->upgrade85();
+			$this->subscribe2_options['version'] = '8.5';
+			update_option('subscribe2_options', $this->subscribe2_options);
 		}
 		if ( version_compare($this->subscribe2_options['version'], '8.6', '<') ) {
 			$s2_upgrade->upgrade86();
+			$this->subscribe2_options['version'] = '8.6';
+			update_option('subscribe2_options', $this->subscribe2_options);
 		}
 		if ( version_compare($this->subscribe2_options['version'], '8.8', '<') ) {
 			$s2_upgrade->upgrade88();
+			$this->subscribe2_options['version'] = '8.8';
+			update_option('subscribe2_options', $this->subscribe2_options);
 		}
 
 		$this->subscribe2_options['version'] = S2VERSION;
@@ -173,6 +191,7 @@ class s2class {
 		wp_clear_scheduled_hook('s2_digest_cron');
 		unset($this->subscribe2_options);
 		require(S2PATH . "include/options.php");
+		$this->subscribe2_options['version'] = S2VERSION;
 		update_option('subscribe2_options', $this->subscribe2_options);
 	} // end reset()
 
@@ -736,16 +755,16 @@ class s2class {
 			$check = $wpdb->get_var($wpdb->prepare("SELECT user_email FROM $wpdb->users WHERE user_email=%s", $this->email));
 			if ( $check ) { return; }
 			if ( $confirm ) {
-				$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET active='1', ip=%s WHERE CAST(email as binary)=%s", $this->ip, $email));
+				$wpdb->query($wpdb->prepare("UPDATE $this->public SET active='1', ip=%s WHERE CAST(email as binary)=%s", $this->ip, $email));
 			} else {
-				$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET date=CURDATE(), time=CURTIME() WHERE CAST(email as binary)=%s", $email));
+				$wpdb->query($wpdb->prepare("UPDATE $this->public SET date=CURDATE(), time=CURTIME() WHERE CAST(email as binary)=%s", $email));
 			}
 		} else {
 			if ( $confirm ) {
 				global $current_user;
-				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, time, ip) VALUES (%s, %d, CURDATE(), CURTIME(), %s)", $email, 1, $current_user->user_login));
+				$wpdb->query($wpdb->prepare("INSERT INTO $this->public (email, active, date, time, ip) VALUES (%s, %d, CURDATE(), CURTIME(), %s)", $email, 1, $current_user->user_login));
 			} else {
-				$wpdb->get_results($wpdb->prepare("INSERT INTO $this->public (email, active, date, time, ip) VALUES (%s, %d, CURDATE(), CURTIME(), %s)", $email, 0, $this->ip));
+				$wpdb->query($wpdb->prepare("INSERT INTO $this->public (email, active, date, time, ip) VALUES (%s, %d, CURDATE(), CURTIME(), %s)", $email, 0, $this->ip));
 			}
 		}
 	} // end add()
@@ -757,7 +776,7 @@ class s2class {
 		global $wpdb;
 
 		if ( !is_email($email) ) { return false; }
-		$wpdb->get_results($wpdb->prepare("DELETE FROM $this->public WHERE CAST(email as binary)=%s", $email));
+		$wpdb->query($wpdb->prepare("DELETE FROM $this->public WHERE CAST(email as binary)=%s", $email));
 	} // end delete()
 
 	/**
@@ -773,9 +792,9 @@ class s2class {
 		if ( false === $status ) { return false; }
 
 		if ( '0' == $status ) {
-			$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET active='1', conf_date=CURDATE(), conf_time=CURTIME(), conf_ip=%s WHERE CAST(email as binary)=%s", $this->ip, $email));
+			$wpdb->query($wpdb->prepare("UPDATE $this->public SET active='1', conf_date=CURDATE(), conf_time=CURTIME(), conf_ip=%s WHERE CAST(email as binary)=%s", $this->ip, $email));
 		} else {
-			$wpdb->get_results($wpdb->prepare("UPDATE $this->public SET active='0', conf_date=CURDATE(), conf_time=CURTIME(), conf_ip=%s WHERE CAST(email as binary)=%s", $this->ip, $email));
+			$wpdb->query($wpdb->prepare("UPDATE $this->public SET active='0', conf_date=CURDATE(), conf_time=CURTIME(), conf_ip=%s WHERE CAST(email as binary)=%s", $this->ip, $email));
 		}
 	} // end toggle()
 

@@ -195,11 +195,11 @@ class Subscribe2_List_Table extends WP_List_Table {
 
 		$data = array();
 		if ( $current_tab == 'public' ) {
-			foreach($subscribers as $email) {
+			foreach((array)$subscribers as $email) {
 				$data[] = array('email' => $email, 'date' => $mysubscribe2->signup_date($email));
 			}
 		} else {
-			foreach($subscribers as $email) {
+			foreach((array)$subscribers as $email) {
 				$data[] = array('email' => $email);
 			}
 		}
