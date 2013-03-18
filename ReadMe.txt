@@ -32,9 +32,9 @@ AUTOMATIC INSTALLATION
 
 1. Log in to your WordPress blog and visit Plugins->Add New.
 2. Search for Subscribe2, click "Install Now" and then Activate the Plugin
-3. Click the "Settings" admin menu link, and select "Subscribe2".
+3. Visit the "Subscribe2 -> Settings" menu.
 4. Configure the options to taste, including the email template and any categories which should be excluded from notification
-5. Click the "Tools" admin menu link, and select "Subscribers".
+5. Visit the "Subscribe2 -> Subscribers" menu.
 6. Manually subscribe people as you see fit.
 7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the Subscribe2 token.  Or, if you prefer, you may manually insert the Subscribe2 shortcode or token: [subscribe2] or the HTML invisible `<!--subscribe2-->` ***Ensure the token is on a line by itself and that it has a blank line above and below.***
 This token will automatically be replaced by dynamic subscription information and will display all forms and messages as necessary.
@@ -44,9 +44,9 @@ MANUAL INSTALLATION
 
 1. Copy the entire /subscribe2/ directory into your /wp-content/plugins/ directory.
 2. Activate the plugin.
-3. Click the "Settings" admin menu link, and select "Subscribe2".
+3. Visit the "Subscribe2 -> Settings" menu.
 4. Configure the options to taste, including the email template and any categories which should be excluded from notification
-5. Click the "Tools" admin menu link, and select "Subscribers".
+5. Visit the "Subscribe2 -> Subscribers" menu.
 6. Manually subscribe people as you see fit.
 7. Create a [WordPress Page](http://codex.wordpress.org/Pages) to display the subscription form.  When creating the page, you may click the "S2" button on the QuickBar to automatically insert the Subscribe2 token.  Or, if you prefer, you may manually insert the Subscribe2 shortcode or token: [subscribe2] or the HTML invisible `<!--subscribe2-->` ***Ensure the token is on a line by itself and that it has a blank line above and below.***
 This token will automatically be replaced by dynamic subscription information and will display all forms and messages as necessary.
