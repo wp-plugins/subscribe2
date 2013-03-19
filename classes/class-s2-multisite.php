@@ -160,8 +160,8 @@ class s2_multisite {
 			if ( $changed ) {
 				update_option('sidebar_widgets', $sidebars);
 			}
+			restore_current_blog();
 		}
-		restore_current_blog();
 	} // end namechange_subscribe2_widget()
 }
 ?>

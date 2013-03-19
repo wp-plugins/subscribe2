@@ -164,7 +164,7 @@ class s2class {
 		wp_clear_scheduled_hook('s2_digest_cron');
 		unset($this->subscribe2_options);
 		require(S2PATH . "include/options.php");
-		update_option('subscribe2_options', $this->subscribe2_options);
+		add_option('subscribe2_options', $this->subscribe2_options, '', 'no');
 	} // end reset()
 
 /* ===== mail handling ===== */
