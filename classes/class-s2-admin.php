@@ -234,7 +234,7 @@ class s2_admin extends s2class {
 					echo " checked=\"checked\"";
 				}
 				if ( in_array($cat->term_id, $compulsory) && $name === 'category' ) {
-					echo " checked=\"checked\" DISABLED";
+					echo " DISABLED";
 				}
 				echo " /> <abbr title=\"" . $cat->slug . "\">" . $catName . "</abbr></label><br />\r\n";
 			}
@@ -612,7 +612,7 @@ class s2_admin extends s2class {
 		$ids = $wpdb->get_col("SELECT ID FROM $wpdb->users WHERE user_email IN ($useremails)");
 		$ids = implode(',', array_map(array($this, 'prepare_in_data'), $ids));
 		$sql = "UPDATE $wpdb->usermeta SET meta_value='{$format}' WHERE meta_key='" . $this->get_usermeta_keyname('s2_format') . "' AND user_id IN ($ids)";
-		$wpdb->get_results($sql);
+		$wpdb->query($sql);
 	} // end format_change()
 
 	/**
