@@ -351,8 +351,13 @@ class s2class {
 			}
 		}
 
-		$header['From'] = mb_encode_mimeheader($this->myname, 'UTF-8', 'Q') . " <" . $this->myemail . ">";
-		$header['Reply-To'] = mb_encode_mimeheader($this->myname, 'UTF-8', 'Q') . " <" . $this->myemail . ">";
+		if ( function_exists('mb_encode_mimeheader') ) {
+			$header['From'] = mb_encode_mimeheader($this->myname, 'UTF-8', 'Q') . " <" . $this->myemail . ">";
+			$header['Reply-To'] = mb_encode_mimeheader($this->myname, 'UTF-8', 'Q') . " <" . $this->myemail . ">";
+		} else {
+			$header['From'] = $this->myname. " <" . $this->myemail . ">";
+			$header['Reply-To'] = $this->myname . " <" . $this->myemail . ">";
+		}
 		$header['Return-path'] = "<" . $this->myemail . ">";
 		$header['Precedence'] = "list\nList-Id: " . html_entity_decode(get_option('blogname'), ENT_QUOTES) . "";
 		if ( $type == 'html' ) {
