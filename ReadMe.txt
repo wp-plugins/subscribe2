@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_butt
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.1
 Tested up to: 3.5.1
-Stable tag: 8.9
+Stable tag: 8.9.1
 License: GPL3
 
 Sends a list of subscribers an email notification when new posts are published to your blog

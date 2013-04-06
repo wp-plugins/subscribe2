@@ -1,3 +1,8 @@
+= Version 8.9.1 by Matthew Robinson =
+
+* Check for the existence of the mb_encode_mimeheader function before use as it's optional in PHP builds - thanks to derekmacewen
+* Fix for fatal error in upgrade code due to calling the wrong class
+
 = Version 8.9 by Matthew Robinson =
 
 * Fix fatal error in the uninstall.php file
