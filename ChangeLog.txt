@@ -1,3 +1,20 @@
+= Version 9.0 by Matthew Robinson =
+
+* Added capability to send emails with attachments from Send Email page
+* Added feature that removes unconfirmed public subscribers after 28 days (time frame can be altered with a filter)
+* Added ability to bulk delete Registered Users/Subscribers
+* Use {IMAGE} tag in HTML excerpt emails and digests only, images would be stripped in plain text and included anyway in full content HTML - applies to Subscribe2 HTML only
+* Added help tabs on the plugins admin pages
+* Improved the comparison of barred domains to subscribing email addresses - thanks to SashainSydney
+* Added Text Domain to the plugin header to allow information on plugin page to translate - thanks to qwertysimo
+* Applied a fix to ensure translation of all strings - thanks to qwertysimo
+* NOTE Version 9.0 needs WordPress 3.3 or above
+
+= Version 8.9.1 by Matthew Robinson =
+
+* Check for the existence of the mb_encode_mimeheader function before use as it's optional in PHP builds - thanks to derekmacewen
+* Fix for fatal error in upgrade code due to calling the wrong class
+
 = Version 8.9 by Matthew Robinson =
 
 * Fix fatal error in the uninstall.php file
@@ -8,6 +25,7 @@
 * Fix internationalisation of subscribers list table - thanks to Milan Dinić
 * Use mb_encode_mimeheader on email sender name - thanks to xl32
 * Trim email addresses before sanitising them - thanks to byarts
+* Optimised the upgrade() function for large sites
 
 = Version 8.8 by Matthew Robinson =
 

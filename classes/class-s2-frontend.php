@@ -11,7 +11,8 @@ class s2_frontend extends s2class {
 			'url' => '',
 			'nojs' => 'false',
 			'link' => '',
-			'size' => 20
+			'size' => 20,
+			'wrap' => 'true'
 			), $atts));
 
 		// if link is true return a link to the page with the ajax class
@@ -56,11 +57,17 @@ class s2_frontend extends s2class {
 			$value = __('Enter email address...', 'subscribe2');
 		}
 
+		// if wrap is true add paragraph html tags
+		$wrap_text = '';
+		if ( $wrap == 'true' ) {
+			$wrap_text = '</p><p>';
+		}
+
 		// build default form
 		if ( $nojs == 'true' ) {
-			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" /></p><p>" . $this->input_form_action . "</p></form>";
+			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" />" . $wrap_text . $this->input_form_action . "</p></form>";
 		} else {
-			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" /></p><p>" . $this->input_form_action . "</p></form>\r\n";
+			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" />" . $wrap_text . $this->input_form_action . "</p></form>\r\n";
 		}
 		$this->s2form = $this->form;
 
@@ -302,5 +309,21 @@ class s2_frontend extends s2class {
 		echo "//]]>\r\n";
 		echo "</script>\r\n";
 	} // end add_s2_ajax()
+
+	/**
+	Check email is not from a barred domain
+	*/
+	function is_barred($email = '') {
+		if ( '' == $email ) { return false; }
+
+		$bar_check = false;
+		list($user, $domain) = explode('@', $email, 2);
+		foreach ( preg_split("|[\s,]+|", $this->subscribe2_options['barred']) as $barred_domain ) {
+			if ( strtolower($domain) === strtolower(trim($barred_domain)) ) {
+				$bar_check = true;
+			}
+		}
+		return $bar_check;
+	} // end is_barred()
 }
 ?>

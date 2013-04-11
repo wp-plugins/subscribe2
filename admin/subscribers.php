@@ -5,6 +5,9 @@ if ( !function_exists('add_action') ) {
 
 global $wpdb, $subscribers, $what, $current_tab;
 
+// detect or define which tab we are in
+$current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'public';
+
 // was anything POSTed ?
 if ( isset($_POST['s2_admin']) ) {
 	check_admin_referer('bulk-subscribers');
@@ -38,10 +41,27 @@ if ( isset($_POST['s2_admin']) ) {
 		echo $message;
 		$_POST['what'] = 'confirmed';
 	} elseif ( $_POST['action'] === 'delete' || $_POST['action2'] === 'delete' ) {
-		foreach ( $_POST['subscriber'] as $address ) {
-			$this->delete($address);
+		if ( $current_tab === 'public' ) {
+			foreach ( $_POST['subscriber'] as $address ) {
+				$this->delete($address);
+			}
+			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) deleted!', 'subscribe2') . "</strong></p></div>";
+		} elseif ( $current_tab === 'registered' ) {
+			global $current_user;
+			$users_deleted_error = '';
+			$users_deleted = '';
+			foreach ( $_POST['subscriber'] as $address ) {
+				$user = get_user_by('email', $address);
+				if ( !current_user_can('delete_user', $user->ID) || $user->ID == $current_user->ID ) {
+					$users_deleted_error = __('Delete failed! You cannot delete some or all of these users', 'subscribe2') . "<br />";
+					continue;
+				} else {
+					$users_deleted = __('User(s) deleted! Any posts made by these users were assigned to you', 'subscribe2');
+					//wp_delete_user($user->$id, $current_user->ID);
+				}
+			}
+			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $users_deleted_error . $users_deleted . "</strong></p></div>";
 		}
-		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) deleted!', 'subscribe2') . "</strong></p></div>";
 	} elseif ( $_POST['action'] === 'toggle' || $_POST['action2'] === 'toggle' ) {
 		global $current_user;
 		$this->ip = $current_user->user_login;
@@ -67,8 +87,6 @@ if ( isset($_POST['s2_admin']) ) {
 	}
 }
 
-// detect or define which tab we are in
-$current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'public';
 if ( $current_tab == 'registered' ) {
 	// Get Registered Subscribers
 	$registered = $this->get_registered();

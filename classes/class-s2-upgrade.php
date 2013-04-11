@@ -289,7 +289,7 @@ class s2class_upgrade {
 		// remove unnecessary table data
 		$wpdb->query( "DELETE FROM $wpdb->usermeta WHERE meta_key = 's2_cat'" );
 
-		$sql = "SELECT ID FROM $wpdb->users INNER JOIN $wpdb->usermeta ON ( $wpdb->users.ID = $wpdb->usermeta.user_id) WHERE ( $wpdb->usermeta.meta_key = '" . $this->get_usermeta_keyname('s2_subscribed') . "' AND $wpdb->usermeta.meta_value LIKE ',%' )";
+		$sql = "SELECT ID FROM $wpdb->users INNER JOIN $wpdb->usermeta ON ( $wpdb->users.ID = $wpdb->usermeta.user_id) WHERE ( $wpdb->usermeta.meta_key = '" . $mysubscribe2->get_usermeta_keyname('s2_subscribed') . "' AND $wpdb->usermeta.meta_value LIKE ',%' )";
 		$users = $wpdb->get_results($sql);
 		foreach ( $users as $user ) {
 			// make sure we remove leading ',' from this setting

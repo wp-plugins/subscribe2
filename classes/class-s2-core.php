@@ -44,7 +44,7 @@ class s2class {
 
 		$this->mail_sent = "<p class=\"s2_message\">" . __('Message sent!', 'subscribe2') . "</p>";
 
-		$this->mail_failed = "<p class=\"s2_error\">" . __('Message failed! Check your settings and check with your hosting provider', 'subscribe2') . "</p>";
+		$this->mail_failed = "<p class=\"s2_error\">" . __('Message failed!', 'subscribe2') . "</p>";
 
 		// confirmation messages
 		$this->no_such_email = "<p class=\"s2_error\">" . __('No such email address is registered.', 'subscribe2') . "</p>";
@@ -232,7 +232,7 @@ class s2class {
 	/**
 	Delivers email to recipients in HTML or plaintext
 	*/
-	function mail($recipients = array(), $subject = '', $message = '', $type = 'text') {
+	function mail($recipients = array(), $subject = '', $message = '', $type = 'text', $attachments = array()) {
 		if ( empty($recipients) || '' == $message ) { return; }
 
 		// Replace any escaped html symbols in subject then apply filter
@@ -240,14 +240,14 @@ class s2class {
 		$subject = apply_filters('s2_email_subject', $subject);
 
 		if ( 'html' == $type ) {
-			$headers = $this->headers('html');
+			$headers = $this->headers('html', $attachments);
 			if ( 'yes' == $this->subscribe2_options['stylesheet'] ) {
 				$mailtext = apply_filters('s2_html_email', "<html><head><title>" . $subject . "</title><link rel=\"stylesheet\" href=\"" . get_stylesheet_uri() . "\" type=\"text/css\" media=\"screen\" /></head><body>" . $message . "</body></html>", $subject, $message);
 			} else {
 				$mailtext = apply_filters('s2_html_email', "<html><head><title>" . $subject . "</title></head><body>" . $message . "</body></html>", $subject, $message);
 			}
 		} else {
-			$headers = $this->headers();
+			$headers = $this->headers('text', $attachments);
 			$message = preg_replace('|&[^a][^m][^p].{0,3};|', '', $message);
 			$message = preg_replace('|&amp;|', '&', $message);
 			$message = wordwrap(strip_tags($message), $this->word_wrap, "\n");
@@ -265,9 +265,9 @@ class s2class {
 				if ( !is_email($recipient) || empty($recipient) ) { continue; }
 				// Use the mail queue provided we are not sending a preview
 				if ( function_exists('wpmq_mail') && !$this->preview_email ) {
-					@wp_mail($recipient, $subject, $mailtext, $headers, '', 0);
+					@wp_mail($recipient, $subject, $mailtext, $headers, $attachments, 0);
 				} else {
-					@wp_mail($recipient, $subject, $mailtext, $headers);
+					@wp_mail($recipient, $subject, $mailtext, $headers, $attachments);
 				}
 			}
 			return true;
@@ -316,10 +316,10 @@ class s2class {
 		if ( isset($batch) && !empty($batch) ) {
 			foreach ( $batch as $bcc ) {
 					$newheaders = $headers . "$bcc\n";
-					$status = @wp_mail($this->myemail, $subject, $mailtext, $newheaders);
+					$status = @wp_mail($this->myemail, $subject, $mailtext, $newheaders, $attachments);
 			}
 		} else {
-			$status = @wp_mail($this->myemail, $subject, $mailtext, $headers);
+			$status = @wp_mail($this->myemail, $subject, $mailtext, $headers, $attachments);
 		}
 		return $status;
 	} // end mail()
@@ -327,7 +327,7 @@ class s2class {
 	/**
 	Construct standard set of email headers
 	*/
-	function headers($type = 'text') {
+	function headers($type = 'text', $attachments = array()) {
 		if ( empty($this->myname) || empty($this->myemail) ) {
 			if ( $this->subscribe2_options['sender'] == 'blogname' ) {
 				$this->myname = html_entity_decode(get_option('blogname'), ENT_QUOTES);
@@ -351,14 +351,19 @@ class s2class {
 			}
 		}
 
-		$header['From'] = mb_encode_mimeheader($this->myname, 'UTF-8', 'Q') . " <" . $this->myemail . ">";
-		$header['Reply-To'] = mb_encode_mimeheader($this->myname, 'UTF-8', 'Q') . " <" . $this->myemail . ">";
+		if ( function_exists('mb_encode_mimeheader') ) {
+			$header['From'] = mb_encode_mimeheader($this->myname, 'UTF-8', 'Q') . " <" . $this->myemail . ">";
+			$header['Reply-To'] = mb_encode_mimeheader($this->myname, 'UTF-8', 'Q') . " <" . $this->myemail . ">";
+		} else {
+			$header['From'] = $this->myname. " <" . $this->myemail . ">";
+			$header['Reply-To'] = $this->myname . " <" . $this->myemail . ">";
+		}
 		$header['Return-path'] = "<" . $this->myemail . ">";
 		$header['Precedence'] = "list\nList-Id: " . html_entity_decode(get_option('blogname'), ENT_QUOTES) . "";
-		if ( $type == 'html' ) {
+		if ( empty($attachments) && $type == 'html' ) {
 			// To send HTML mail, the Content-Type header must be set
 			$header['Content-Type'] = get_option('html_type') . "; charset=\"". get_option('blog_charset') . "\"";
-		} else {
+		} elseif ( empty($attachments) && $type == 'text' ) {
 			$header['Content-Type'] = "text/plain; charset=\"". get_option('blog_charset') . "\"";
 		}
 
@@ -596,8 +601,8 @@ class s2class {
 		$plaintext = preg_replace('|[ ]+|', ' ', $plaintext);
 
 		// prepare mail body texts
-		$excerpt_body = str_replace("{POST}", $excerpt, $mailtext);
-		$full_body = str_replace("{POST}", strip_tags($plaintext), $mailtext);
+		$plain_excerpt_body = str_replace("{POST}", $excerpt, $mailtext);
+		$plain_body = str_replace("{POST}", strip_tags($plaintext), $mailtext);
 		$html_body = str_replace("\r\n", "<br />\r\n", $mailtext);
 		$html_body = str_replace("{POST}", $content, $html_body);
 		$html_excerpt_body = str_replace("\r\n", "<br />\r\n", $mailtext);
@@ -606,40 +611,38 @@ class s2class {
 		if ( $preview != '' ) {
 			$this->myemail = $preview;
 			$this->myname = __('Plain Text Excerpt Preview', 'subscribe2');
-			$this->mail(array($preview), $subject, $excerpt_body);
+			$this->mail(array($preview), $subject, $plain_excerpt_body);
 			$this->myname = __('Plain Text Full Preview', 'subscribe2');
-			$this->mail(array($preview), $subject, $full_body);
+			$this->mail(array($preview), $subject, $plain_body);
 			$this->myname = __('HTML Excerpt Preview', 'subscribe2');
 			$this->mail(array($preview), $subject, $html_excerpt_body, 'html');
 			$this->myname = __('HTML Full Preview', 'subscribe2');
 			$this->mail(array($preview), $subject, $html_body, 'html');
 		} else {
+			// Registered Subscribers first
 			// first we send plaintext summary emails
-			$registered = $this->get_registered("cats=$post_cats_string&format=excerpt&author=$post->post_author");
-			if ( empty($registered) ) {
-				$recipients = (array)$public;
-			} elseif ( empty($public) ) {
-				$recipients = (array)$registered;
-			} else {
-				$recipients = array_merge((array)$public, (array)$registered);
-			}
+			$recipients = $this->get_registered("cats=$post_cats_string&format=excerpt&author=$post->post_author");
 			$recipients = apply_filters('s2_send_plain_excerpt_suscribers', $recipients, $post->ID);
-			$this->mail($recipients, $subject, $excerpt_body);
+			$this->mail($recipients, $subject, $plain_excerpt_body);
 
 			// next we send plaintext full content emails
 			$recipients = $this->get_registered("cats=$post_cats_string&format=post&author=$post->post_author");
 			$recipients = apply_filters('s2_send_plain_fullcontent_suscribers', $recipients, $post->ID);
-			$this->mail($recipients, $subject, $full_body);
+			$this->mail($recipients, $subject, $plain_body);
 
 			// next we send html excerpt content emails
 			$recipients = $this->get_registered("cats=$post_cats_string&format=html_excerpt&author=$post->post_author");
 			$recipients = apply_filters('s2_send_html_excerpt_suscribers', $recipients, $post->ID);
 			$this->mail($recipients, $subject, $html_excerpt_body, 'html');
 
-			// finally we send html full content emails
+			// next we send html full content emails
 			$recipients = $this->get_registered("cats=$post_cats_string&format=html&author=$post->post_author");
 			$recipients = apply_filters('s2_send_html_fullcontent_suscribers', $recipients, $post->ID);
 			$this->mail($recipients, $subject, $html_body, 'html');
+
+			// and finally we send to Public Subscribers
+			$recipients = apply_filters('s2_send_public_suscribers', $public, $post->ID);
+			$this->mail($recipients, $subject, $plain_excerpt_body, 'text');
 		}
 	} // end publish()
 
@@ -813,21 +816,6 @@ class s2class {
 	} //end remind()
 
 	/**
-	Check email is not from a barred domain
-	*/
-	function is_barred($email = '') {
-		$barred_option = $this->subscribe2_options['barred'];
-		list($user, $domain) = explode('@', $email, 2);
-		$bar_check = stristr($barred_option, $domain);
-
-		if ( !empty($bar_check) ) {
-			return true;
-		} else {
-			return false;
-		}
-	} // end is_barred()
-
-	/**
 	Is the supplied email address a public subscriber?
 	*/
 	function is_public($email = '') {
@@ -843,42 +831,6 @@ class s2class {
 			return false;
 		}
 	} // end is_public()
-
-	/**
-	Collects the signup date for all public subscribers
-	*/
-	function signup_date($email = '') {
-		if ( '' == $email ) { return false; }
-
-		global $wpdb;
-		if ( !empty($this->signup_dates) ) {
-			return $this->signup_dates[$email];
-		} else {
-			$results = $wpdb->get_results("SELECT email, date FROM $this->public", ARRAY_N);
-			foreach ( $results as $result ) {
-				$this->signup_dates[$result[0]] = $result[1];
-			}
-			return $this->signup_dates[$email];
-		}
-	} // end signup_date()
-
-	/**
-	Collects the ip address for all public subscribers
-	*/
-	function signup_ip($email = '') {
-		if ( '' == $email ) {return false; }
-
-		global $wpdb;
-		if ( !empty($this->signup_ips) ) {
-			return $this->signup_ips[$email];
-		} else {
-			$results = $wpdb->get_results("SELECT email, ip FROM $this->public", ARRAY_N);
-			foreach ( $results as $result ) {
-				$this->signup_ips[$result[0]] = $result[1];
-			}
-			return $this->signup_ips[$email];
-		}
-	} // end signup_ip()
 
 /* ===== Registered User and Subscriber functions ===== */
 	/**
@@ -1632,6 +1584,22 @@ class s2class {
 		}
 	} // end subscribe2_cron()
 
+	function s2cleaner_task() {
+		$unconfirmed = $this->get_public('0');
+		if ( empty($unconfirmed) ) { return; }
+		global $wpdb;
+		$sql = "SELECT email FROM $this->public WHERE active='0' AND date < DATE_SUB(CURDATE(), INTERVAL " . $this->clean_interval . " DAY)";
+		$old_unconfirmed = $wpdb->get_col( $sql );
+		if ( empty($old_unconfirmed) ) {
+			return;
+		} else {
+			foreach ($old_unconfirmed as $email) {
+				$this->delete($email);
+			}
+		}
+		return;
+	} // end s2cleaner_task()
+
 /* ===== Our constructor ===== */
 	/**
 	Subscribe2 constructor
@@ -1666,8 +1634,8 @@ class s2class {
 		}
 
 		// load our translations and strings
-		add_action('init', array(&$this, 'load_translations'), 5);
-		add_action('init', array(&$this, 'load_strings'));
+		add_action('plugins_loaded', array(&$this, 'load_translations'), 5);
+		add_action('plugins_loaded', array(&$this, 'load_strings'));
 
 		// do we need to install anything?
 		$this->public = $wpdb->prefix . "subscribe2";
@@ -1720,6 +1688,11 @@ class s2class {
 		// add action to display counter widget if option is enabled
 		if ( '1' == $this->subscribe2_options['counterwidget'] ) {
 			add_action('widgets_init', array(&$this, 'counter_widget'));
+		}
+
+		// add action to 'clean' unconfirmed Public Subscribers
+		if ( $this->clean_interval > 0 ) {
+			add_action('wp_scheduled_delete', array(&$this, 's2cleaner_task'));
 		}
 
 		// Add actions specific to admin or frontend
@@ -1796,14 +1769,6 @@ class s2class {
 	} // end s2init()
 
 	/**
-	PHP4 Constructor
-	Can be erased when support for WordPress 3.1 is dropped
-	*/
-	function s2class() {
-		$this->__construct();
-	} // end s2class()
-
-	/**
 	PHP5 Constructor
 	Allows dynamic variable setting
 	*/
@@ -1811,6 +1776,7 @@ class s2class {
 		$this->word_wrap = apply_filters('s2_word_wrap', 80);
 		$this->excerpt_length = apply_filters('s2_excerpt_length', 55);
 		$this->site_switching = apply_filters('s2_allow_site_switching', false);
+		$this->clean_interval = apply_filters('s2_clean_interval', 28);
 	} // end __construct()
 
 /* ===== our variables ===== */
@@ -1844,6 +1810,7 @@ class s2class {
 	var $word_wrap;
 	var $excerpt_length;
 	var $site_switching;
+	var $clean_interval;
 
 	// some messages
 	var $please_log_in = '';
