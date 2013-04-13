@@ -16,15 +16,15 @@ class s2class {
 	function load_strings() {
 		// adjust the output of Subscribe2 here
 
-		$this->please_log_in = "<p class=\"s2_message\">" . __('To manage your subscription options please', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-login.php\">" . __('login', 'subscribe2') . "</a>.</p>";
+		$this->please_log_in = "<p class=\"s2_message\">" . sprintf(__('To manage your subscription options please <a href="%1$s">login.</a>', 'subscribe2'), get_option('siteurl') . '/wp-login.php') . "</p>";
 
-		$this->profile = "<p class=\"s2_message\">" . __('You may manage your subscription options from your', 'subscribe2') . " <a href=\"" . get_option('siteurl') . "/wp-admin/admin.php?page=s2\">" . __('profile', 'subscribe2') . "</a>.</p>";
+		$this->profile = "<p class=\"s2_message\">" . sprintf(__('You may manage your subscription options from your <a href="%1$s">profile</a>', 'subscribe2'), get_option('siteurl') . "/wp-admin/admin.php?page=s2") . "</p>";
 		if ( $this->s2_mu === true ) {
 			global $blog_id;
 			$user_ID = get_current_user_id();
 			if ( !is_user_member_of_blog($user_ID, $blog_id) ) {
 				// if we are on multisite and the user is not a member of this blog change the link
-				$this->profile = "<p class=\"s2_message\"><a href=\"" . get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id . "\">" . __('Subscribe', 'subscribe2') . "</a> " . __('to email notifications when this blog posts new content', 'subscribe2') . ".</p>";
+				$this->profile = "<p class=\"s2_message\">" . sprintf(__('<a href="%1$s">Subscribe</a> to email notifications when this blog posts new content.', 'subscribe2'), get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id) . "</p>";
 			}
 		}
 
@@ -1634,8 +1634,8 @@ class s2class {
 		}
 
 		// load our translations and strings
-		add_action('plugins_loaded', array(&$this, 'load_translations'), 5);
-		add_action('plugins_loaded', array(&$this, 'load_strings'));
+		add_action('plugins_loaded', array(&$this, 'load_translations'));
+		add_action('wp', array(&$this, 'load_strings'));
 
 		// do we need to install anything?
 		$this->public = $wpdb->prefix . "subscribe2";
