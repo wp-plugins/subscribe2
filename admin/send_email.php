@@ -51,8 +51,6 @@ if ( isset($_POST['s2_admin']) && 'mail' == $_POST['s2_admin'] ) {
 					'size'     => $_FILES['file']['size'][$key]
 				);
 				$uploads[] = wp_handle_upload($file, array('test_form' => false, 'mimes' => true));
-			} else {
-				$upload_error = true;
 			}
 		}
 		foreach ( $uploads as $upload ) {
