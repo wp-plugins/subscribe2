@@ -1633,9 +1633,8 @@ class s2class {
 			}
 		}
 
-		// load our translations and strings
+		// load our translations
 		add_action('plugins_loaded', array(&$this, 'load_translations'));
-		add_action('wp', array(&$this, 'load_strings'));
 
 		// do we need to install anything?
 		$this->public = $wpdb->prefix . "subscribe2";
@@ -1697,6 +1696,9 @@ class s2class {
 
 		// Add actions specific to admin or frontend
 		if ( is_admin() ) {
+			// load strings
+			add_action('init', array(&$this, 'load_strings'));
+
 			//add menu, authoring and category admin actions
 			add_action('admin_menu', array(&$this, 'admin_menu'));
 			add_action('admin_menu', array(&$this, 's2_meta_init'));
@@ -1742,6 +1744,9 @@ class s2class {
 				exit(0);
 			}
 		} else {
+			// load strings later on frontend for polylang plugin compatibility
+			add_action('wp', array(&$this, 'load_strings'));
+
 			if ( isset($_GET['s2']) ) {
 				// someone is confirming a request
 				if ( defined('DOING_S2_CONFIRM') && DOING_S2_CONFIRM ) { return; }
