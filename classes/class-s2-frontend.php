@@ -224,6 +224,7 @@ class s2_frontend extends s2class {
 					foreach ($wp_user_query as $user) {
 						$recipients[] = $user->user_email;
 					}
+					$recipients = apply_filters('s2_admin_email', $recipients, 'subscribe');
 					$headers = $this->headers();
 					// send individual emails so we don't reveal admin emails to each other
 					foreach ( $recipients as $recipient ) {
@@ -247,6 +248,7 @@ class s2_frontend extends s2class {
 					foreach ($wp_user_query as $user) {
 						$recipients[] = $user->user_email;
 					}
+					$recipients = apply_filters('s2_admin_email', $recipients, 'unsubscribe');
 					$headers = $this->headers();
 					// send individual emails so we don't reveal admin emails to each other
 					foreach ( $recipients as $recipient ) {
