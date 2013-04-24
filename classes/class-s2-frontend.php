@@ -287,11 +287,12 @@ class s2_frontend extends s2class {
 	function add_s2_ajax() {
 		echo "<script type=\"text/javascript\">\r\n";
 		echo "//<![CDATA[\r\n";
-		echo "jQuery(document).ready(function() {\r\n";
-		echo "	var dialog = jQuery('<div></div>');\r\n";
-		echo "	if (jQuery('a.s2popup').attr('id') === 'unsubscribe') {\r\n";
+		echo "var s2jQuery = jQuery.noConflict();\r\n";
+		echo "s2jQuery(document).ready(function() {\r\n";
+		echo "	var dialog = s2jQuery('<div></div>');\r\n";
+		echo "	if (s2jQuery('a.s2popup').attr('id') === 'unsubscribe') {\r\n";
 		echo "		dialog.html('" . do_shortcode('[subscribe2 nojs="true" hide="unsubscribe"]') . "');\r\n";
-		echo "	} else if (jQuery('a.s2popup').attr('id') === 'subscribe') {\r\n";
+		echo "	} else if (s2jQuery('a.s2popup').attr('id') === 'subscribe') {\r\n";
 		echo "		dialog.html('" . do_shortcode('[subscribe2 nojs="true" hide="subscribe"]') . "');\r\n";
 		echo "	} else {\r\n";
 		echo "		dialog.html('" . do_shortcode('[subscribe2 nojs="true"]') . "');\r\n";
@@ -301,7 +302,7 @@ class s2_frontend extends s2class {
 		} else {
 			echo "	dialog.dialog({autoOpen: false, modal: true, zIndex: 10000, title: '" . __('Subscribe to this blog', 'subscribe2') . "'});\r\n";
 		}
-		echo "	jQuery('a.s2popup').click(function(){\r\n";
+		echo "	s2jQuery('a.s2popup').click(function(){\r\n";
 		echo "		dialog.dialog('open');\r\n";
 		echo "		return false;\r\n";
 		echo "	});\r\n";
