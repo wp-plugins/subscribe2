@@ -8,7 +8,9 @@
 * Improved the comparison of barred domains to subscribing email addresses - thanks to SashainSydney
 * Added Text Domain to the plugin header to allow information on plugin page to translate - thanks to qwertysimo
 * Applied a fix to ensure translation of all strings - thanks to qwertysimo
-* Improved some strongs to use sprintf() - thanks to Tom Adams (tomdxw)
+* Improved some strings to use sprintf() - thanks to Tom Adams (tomdxw)
+* Use jQuery.noConflict(); when AJAX is enabled
+* Removed excess span tag from the Counter Widget - thanks to dimagsv
 * NOTE Version 9.0 needs WordPress 3.3 or above
 
 = Version 8.9.1 by Matthew Robinson =

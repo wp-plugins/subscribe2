@@ -10,7 +10,6 @@ License: GPL3
 Sends a list of subscribers an email notification when new posts are published to your blog
 
 == Description ==
-
 Subscribe2 provides a comprehensive subscription management and email notification system for WordPress blogs that sends email notifications to a list of subscribers when you publish new content to your blog.
 
 Email Notifications can be sent on a per-post basis or periodically in a Digest email. Additionally, certain categories can be excluded from inclusion in the notification and posts can be excluded on an individual basis by setting a custom field.
@@ -27,7 +26,6 @@ The format of the email can also be customised for per-post notifications, Subsc
 If you want to send full content HTML emails to Public Subscribers too then upgrade to [Subscribe2 HTML](http://semperplugins.com/plugins/subscribe2-html/).
 
 == Installation ==
-
 AUTOMATIC INSTALLATION
 
 1. Log in to your WordPress blog and visit Plugins->Add New.
@@ -53,9 +51,7 @@ This token will automatically be replaced by dynamic subscription information an
 8. In the WordPress "Settings" area for Subscribe2 select the page name in the "Appearance" section that of the WordPress page created in step 7.
 
 == Frequently Asked Questions ==
-
 = I want HTML email to be the default email type =
-
 You need to pay for the [Subscribe2 HTML version](http://semperplugins.com/plugins/subscribe2-html/).
 
 = Where can I get help? =
@@ -65,12 +61,18 @@ Next you could search in the [WordPress forums](http://wordpress.org/support/), 
 
 If you can't find an answer then post a new topic at the [WordPress forums](http://wordpress.org/support/) or make a [donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2387904) to get my attention!
 
-= Where can I get more information about the plugin features? =
+= Where can I get translation files for Subscribe2, and what do I do with them? =
+All of the translation files I have been given are available at [http://plugins.trac.wordpress.org/browser/subscribe2/i18n/](http://plugins.trac.wordpress.org/browser/subscribe2/i18n/).
 
+You need to download the *.mo file and place it on your server either in a folder called languages/ in the wp-content/plugins/subscribe2/ folder or you can place it in the subscribe2/ folder.
+
+= What if there isn't a translation file for my language? =
+If your language isn't list then you will need to make your own translation by use the *.pot file the is distributed with every release of the code. [This](http://codex.wordpress.org/Translating_WordPress) WordPress Codex page gives more background on how you make translation files.
+
+= Where can I get more information about the plugin features? =
 A comprehensive guide that covers many, if not all, of the Subscribe2 features is available to purchase from the [My WP Works](http://mywpworks.com/store/subscribe2-ebook/)
 
 = Sending post notifications or email with Subscribe2 =
-
 Subscribe2 sends an email at the very moment the post is published. Since Subscribe2 sends live mail with no un-do, it's important to use the Preview function in WordPress to make sure the post has been edited to perfection *before* moving it from Draft to Published mode.
 
 Mail is sent when a post is published - it will not be re-sent if you Update the post later. If you need to send a mailing a second time (e.g. during testing), switch the post to Draft mode, then re-publish it.
@@ -78,7 +80,6 @@ Mail is sent when a post is published - it will not be re-sent if you Update the
 You can also manually send emails to groups of your subscribers using the Send Email page that the plugin creates in the WordPress administration area.
 
 = Where can I find the HTML and CSS templates? =
-
 While the template field in Settings | Subscribe2 does not display HTML by default, feel free to add HTML to it as needed. You can insert references to static images for use as banners, wrap sections of the template in divs or other elements, or do whatever you like.
 
 There is no need to include HTML header data or body tags - just focus on the HTML content, in conjunction with the template tags documented on the settings page.
@@ -107,15 +108,13 @@ Batches will occur for each group of message as described above.  A site like th
 **Restrictions on the number of messages sent**. In order to combat spam many hosts are now implementing time based limitations. This means you are only allowed to send a certain number of messages per unit time, 500 per hour for example. Subscribe2 does not have a work around for this inbuilt but see the next question.
 
 = My host has a limit of X emails per hour / day, can I limit the way Subscribe2 sends emails? =
-
 This is the second most common question I get asked (the first being about emails not being sent which quote often ends up here anyway!). This is more commonly called 'throttling' or 'choking'. PHP is a scripting language and while it is technically possible to throttle emails using script it is not very efficient. It is much better in terms of speed and server overhead (CPU cycles and RAM) to throttle using a server side application.
 
 In the first instance you should try to solve the problem by speaking to your hosting provider about changing the restrictions, move to a less restricting hosting package or change hosting providers.
 
-If the above has not put you off then I spent some time writing a Mail Queue script for Subscribe2 that adds the mails to a database table and sends then in periodic batches. It is available, at a price, [here](http://wpplugins.com/plugin/76/wordpress-mail-queue-wpmq).
+If the above has not put you off then I spent some time writing a Mail Queue script for Subscribe2 that adds the mails to a database table and sends then in periodic batches. It is available, at a price, [here](http://semperplugins.com/plugins/wordpress-mail-queue-wpmq/).
 
 = My Digest emails fail to send, why? =
-
 If you have already worked through all of the above email trouble shooting tips, and you are still not seeing your periodic digest emails send there may be an issue with the WordPress pseudo-cron functions on your server.
 
 The pseudo-cron is WordPress is named after the cron jobs on servers. These are tasks that are run periodically to automate certain functions. In WordPress these tasks include checking for core and plugin updates, publishing scheduled posts and in the case of Subscribe2 sending the digest email. so, if the psuedo-cron is not working the email won't send.
@@ -123,7 +122,6 @@ The pseudo-cron is WordPress is named after the cron jobs on servers. These are 
 some reasons why your pseudo-cron may not be working are explained [here](http://wordpress.org/support/topic/296236#post-1175405). You can also try overcoming these by calling the wp-cron.php file directly and there are even [instructions](http://www.satollo.net/how-to-make-the-wordpress-cron-work) about how to set up a server cron job to do this periodically to restore WordPress pseudo-cron to a working state.
 
 = I'd like to send the Digest email but on a different interval to the ones listed. Is this possible? =
-
 Yes, this is possible, it just requires a little bit of code. Subscribe2 uses the intervals that are currently defined in WordPress (and by any plugins that create additional intervals), so all you need to do is add to the available intervals. Use code like this and simply change the interval time (in seconds) and description.
 
 `function add_my_new_sched($sched) {
@@ -133,7 +131,6 @@ Yes, this is possible, it just requires a little bit of code. Subscribe2 uses th
 add_filter('cron_schedules', 'add_my_new_sched');`
 
 = I'd like to change the size of the image inserted by the {IMAGE} keyword in the paid version of the code. Is this possible? =
-
 Yes, this is possible, it just requires a little bit of code. Subscribe2 introduced a filter in version 8.6 that allows on-the-fly customisation of the image size. Use the code below in a plugin of your own.
 
 `function my_s2_image_size() {
@@ -149,21 +146,17 @@ Yes, this is possible, it just requires a little bit of code. Subscribe2 introdu
 add_filter('s2_image_size', 'my_s2_image_size');`
 
 = When I click on Send Preview in Susbcribe2->Settings I get 4 emails, why =
-
 Subscribe2 supports 4 potential email formats for Susbcribers so you will get a preview for each of the different possibilities.
 
 = Why do I need to create a WordPress Page =
-
 Subscribe2 uses a filter system to display dynamic output to your readers. The token may result in the display of the subscription form, a subscription message, confirmation that an email has been sent, a prompt to log in. This information needs a static location for the output of the filter and a WordPress page is the ideal place for this to happen.
 
 If you decide to use Subscribe2 only using the widget you must still have at least one WordPress page on your site for Subscribe2 to work correctly.
 
 = Why is my admin address getting emails from Subscribe2? =
-
 This plugin sends emails to your subscribers using the BCC (Blind Carbon Copy) header in email messages. Each email is sent TO: the admin address. There may be emails for a plain text excerpt notification, plain text full text and HTML format emails and additionally if the number of recipients per email has been set due to hosting restrictions duplicate copies of these emails will be sent to the admin address.
 
 = I can't find my subscribers / the options / something else =
-
 Subscribe2 creates four (4) new admin menus in the back end of WordPress. These are all under the top level menu header **Subscribe2**.
 
 * Your Subscriptions : Allows the currently logged in user to manage their own subscriptions
@@ -174,7 +167,6 @@ Subscribe2 creates four (4) new admin menus in the back end of WordPress. These 
 **Note:** In versions of the plugin prior to version 7.0 the menus are under the WordPress system at Posts -> Mail Subscribers, Tools -> Subscribers, Users -> Subscriptions and Settings -> Subscribe2.
 
 = I'm confused, what are all the different types of subscriber? =
-
 There are basically only 2 types of subscriber. Public Subscribers and Registered Subscribers.
 
 Public Subscribers have provided their email address for email notification of your new posts. When they enter there address on your site they are sent an email asking them to confirm their request and added to a list of Unconfirmed Subscribers. Once they complete their request by clicking on the link in their email they will become Confirmed Subscribers. They will receive a limited email notification when new post is made or periodically (unless that post is assigned to one of the excluded categories you defined).  These Public Subscribers will receive a plaintext email with an excerpt of the post: either the excerpt you created when making the post, the portion of text before a <!--more--> tag (if present), or the first 50 words or so of the post.
@@ -184,15 +176,12 @@ Registered Users have registered with your WordPress blog (provided you have ena
 **Note** You can send HTML emails to Public Subscribers with the paid [Subscribe2 HTML version](http://semperplugins.com/plugins/subscribe2-html/) of the plugin.
 
 = Can I put the form elsewhere? (header, footer, sidebar without the widget) =
-
 The simple answer is yes you can but this is not supported so you need to figure out any problems that are caused by doing this on your own. Read <a href="http://subscribe2.wordpress.com/2006/09/19/sidebar-without-a-widget/">here</a> for the basic approach.
 
 = I'd like to be able to collect more information from users when they subscribe, can I? =
-
 Get them to register with your blog rather than using the Subscribe2 form. Additional fields would require much more intensive form processing, checking and entry into the database and since you won't then be able to easily use this information to personalise emails there really isn't any point in collecting this data.
 
 = How do I use the Subscribe2 shortcode? =
-
 In version 6.1 of Subscribe2 the new standard WordPress shortcode [subscribe2] was introduced. By default, it behaves same as old Subscribe2 token, `<--subscribe2-->`, which means that it will show the same Subscribe2 output in your chosen page in WordPress or in the Widget.
 
 But it also has advanced options, which are related to form. The default form contains two buttons for subscribing and unsubscribing. You may, for example, only want form that handles unsubscribing, so the shortcode accepts a **hide** parameter to hide one of the buttons.
@@ -208,21 +197,17 @@ There are many scenarios in which to use new options, but here is an example:
 * In the Subscribe2 email template for new post, add text "You can unsubscribe on a following page:" which is followed with link to "Unsubscribe" page
 
 = I can't find or insert the Subscribe2 token or shortcode, help! =
-
 If, for some reason the Subscribe2 button does not appear in your browser window try refreshing your browser and cache (Shift and Reload in Firefox). If this still fails then insert the token manually. In the Rich Text Editor (TinyMCE) make sure you switch to the "code" view and type in [subscribe2] or <!--subscribe2-->.
 
 = My digest email didn't send, how can I resend it? =
-
 In order to force sending you'd need to change the date of publication on the posts from last week or amend the date stamp in the database regarding when the posts should be included from.
 
 If you opt for the latter way look in the options table for the subscribe2_options settings (it's an array) and you'll need to change the 'last_s2cron' value to a timestamp for last week. Then force the cron event to run again with [WP-Crontrol](http://wordpress.org/extend/plugins/wp-crontrol/).
 
 = I would really like Registered users to have the Subscription page themed like my site, is this possible? =
-
 Yes, it is. There is a small extension to Subscribe2 that delivers exactly this functionality. It is available from [Theme Tailors](http://stiofan.themetailors.com/store/products/tt-subscribe2-front-end-plugin/) for just $2.
 
 = How do I make use of the support for Custom Post Types =
-
 In a plugin file for your site or perhaps functions.php in your theme add the following code where 'my_post_type' is change to the name of your custom post type.
 
 `function my_post_types($types) {
@@ -232,7 +217,6 @@ In a plugin file for your site or perhaps functions.php in your theme add the fo
 add_filter('s2_post_types', 'my_post_types');`
 
 = How can I make use of the support for Custom Taxonomies =
-
 In a plugin file for your site or perhaps functions.php in your theme add the following code where 'my_
 taxonomy_type' is change to the name of your custom taxonomy type.
 
@@ -243,7 +227,6 @@ taxonomy_type' is change to the name of your custom taxonomy type.
 add_filter('s2_taxonomies', 'my_taxonomy_types');`
 
 = How do I make use of the new option to AJAXify the form? =
-
 The first thing you will need to do is visit the options page and enable the AJAX setting where it says "Enable AJAX style subscription form?", this will load the necessary javascript onto your WordPress site.
 
 Next you need to decide if you want the link to be on a WordPress page or in your Sidebar with the Widget.
@@ -266,7 +249,6 @@ Well, you need to write a little code and provide a link to the Google API or Mi
 add_filter('s2_jqueryui_css', 'custom_ajax_css');`
 
 = I want to change the kinds of users who can access the Subscribe2 menus. Is that possible? =
-
 Yes, it is possible with a little bit for code either in a custom plugin or your functions.php file in your theme. You use the add_filter() command that is part of WordPress to change the [capability](http://codex.wordpress.org/Roles_and_Capabilities#Capabilities) that allows access to each of the Subscribe2 menus.
 
 `function s2_admin_changes( $capability, $menu ) {
@@ -289,7 +271,6 @@ Yes, it is possible with a little bit for code either in a custom plugin or your
 add_filter('s2_capability', 's2_admin_changes', 10, 2);`
 
 = I want to change the email subject, how do I do that? =
-
 You can change the email subject with the 's2_email_subject' filter. Something like this:
 
 `function s2_subject_changes($subject) {
@@ -299,15 +280,12 @@ You can change the email subject with the 's2_email_subject' filter. Something l
 add_filter('s2_email_subject', 's2_subject_changes');`
 
 = Can I suggest you add X as a feature =
-
 I'm open to suggestions but since the software is written by me for use on my site and then shared for free because others may find it useful as it comes don't expect your suggestion to be implemented unless I'll find it useful.
 
 = I'd like to be able to send my subscribers notifications in HTML =
-
 By default Public Subscribers get plain text emails and only Registered Subscribers can opt to receive email in HTML format. If you really want HTML for all you need to pay for the [Subscribe2 HTML version](http://semperplugins.com/plugins/subscribe2-html/).
 
 = Which version should I be using, I'm on WordPress x.x.x? =
-
 WordPress 3.1 and up requires Subscribe2 from the 7.x or 8.x stable branch. The most recent version is hosted via [Wordpress.org](http://wordpress.org/extend/plugins/subscribe2/).
 
 WordPress 2.8 and up requires Subscribe2 from the 6.x stable branch. The most recent version is [6.5](http://downloads.wordpress.org/plugin/subscribe2.6.5.zip).
@@ -324,16 +302,13 @@ This is usually caused by one of two things. Firstly, it is possible that the fo
 Secondly, make sure that the token ([subscribe2] or <!--subscribe2-->) is correctly entered in your page with a blank line above and below. The easiest way to do this is to deactivate the plugin, visit your WordPress page and view the source. The token should be contained in the source code of the page. If it is not there you either have not correctly entered the token or you have another plugin that is stripping the token from the page code.
 
 == Screenshots ==
-
 1. The Subscribe2->Mail Subscribers admin page generated by the plugin.
 2. The Subscribe2->Subscribers admin page generated by the plugin.
 3. The Subscribe2->Subscriptions admin page generated by the plugin.
 4. The Subscribe2->Subscribe2 admin page generated by the plugin.
 
 == Changelog ==
-
 See [ChangeLog.txt](http://plugins.svn.wordpress.org/subscribe2/trunk/ChangeLog.txt)
 
 == Upgrade Notice ==
-
 See Version History
