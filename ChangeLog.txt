@@ -11,7 +11,7 @@
 * Improved some strings to use sprintf() - thanks to Tom Adams (tomdxw)
 * Use jQuery.noConflict(); when AJAX is enabled
 * Removed excess span tag from the Counter Widget - thanks to dimagsv
-Allow filtering of admin email address for the emails sent when users confirm a subscription or unsubscription - suggested by 3cstudio
+* Allow filtering of admin email address for the emails sent when users confirm a subscription or unsubscription - suggested by 3cstudio
 * NOTE Version 9.0 needs WordPress 3.3 or above
 
 = Version 8.9.1 by Matthew Robinson =
