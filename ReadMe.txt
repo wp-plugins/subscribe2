@@ -270,6 +270,24 @@ Yes, it is possible with a little bit for code either in a custom plugin or your
 
 add_filter('s2_capability', 's2_admin_changes', 10, 2);`
 
+= I want to change the Administrator users that get notifications of new subscriptions and unsubscriptions, how do I do that? =
+In Subscribe2->Settings you can turn off email notifications to Administrator level users when a Public Subscriber joins or leaves but what if you still want an email but to different people? Subscribe2 has a filter that allows you to add and remove users immediately before sending like this:
+
+`function my_admin_filter($recipients = array(), $email) {
+	// $recipients is an array of admin email addresses
+	// $email will be 'subscribe' or 'unsubscribe'
+	if ($email == 'subscribe') {
+		foreach ($recipients as $key => $email) {
+			if ( $email == 'admin@mysite.com') {
+				unset($recipients[$key]);
+			}
+		}
+		$recipients[] = 'different.user@mysite.com';
+	}
+	return $recipients;
+}
+add_filter('s2_admin_email', 'my_admin_filter', 10, 2);`
+
 = I want to change the email subject, how do I do that? =
 You can change the email subject with the 's2_email_subject' filter. Something like this:
 
