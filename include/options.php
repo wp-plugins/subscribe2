@@ -139,7 +139,7 @@ if (!isset($this->subscribe2_options['mailtext'])) {
 } // Default notification email text
 
 if (!isset($this->subscribe2_options['notification_subject'])) {
-	$this->subscribe2_options['notification_subject'] = "[{BLOGNAME}] TITLE";
+	$this->subscribe2_options['notification_subject'] = "[{BLOGNAME}] {TITLE}";
 } // Default notification email subject
 
 if (!isset($this->subscribe2_options['confirm_email'])) {
