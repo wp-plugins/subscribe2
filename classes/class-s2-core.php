@@ -7,7 +7,6 @@ class s2class {
 	function load_translations() {
 		load_plugin_textdomain('subscribe2', false, S2DIR);
 		load_plugin_textdomain('subscribe2', false, S2DIR . "languages/");
-		load_plugin_textdomain('subscribe2', false, WP_LANG_DIR . "/");
 	} // end load_translations()
 
 	/**

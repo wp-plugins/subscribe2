@@ -13,6 +13,7 @@
 * Removed excess span tag from the Counter Widget - thanks to dimagsv
 * Allow filtering of admin email address for the emails sent when users confirm a subscription or unsubscription - suggested by 3cstudio
 * Fixed default email notification subject text - thanks to Steve C @ 3Cstudio
+* Removed ability to have translation files in WP_LANG folder as this is not yet supported in the WordPress core code
 * NOTE Version 9.0 needs WordPress 3.3 or above
 
 = Version 8.9.1 by Matthew Robinson =
