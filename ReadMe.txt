@@ -207,6 +207,15 @@ If you opt for the latter way look in the options table for the subscribe2_optio
 = I would really like Registered users to have the Subscription page themed like my site, is this possible? =
 Yes, it is. There is a small extension to Subscribe2 that delivers exactly this functionality. It is available from [Theme Tailors](http://stiofan.themetailors.com/store/products/tt-subscribe2-front-end-plugin/) for just $2.
 
+= I'd like to change the length of the excerpt included in the email notification. Can I do that? =
+Yes, you can. There is a filter in Subscribe2 that allow you to change from the default of approximately 55 words. An example of the filter code you need would look like this:
+
+`function my_excerpt() {
+	// return whatever number of words you want the excerpt length to be
+	return 30;
+}
+add_filter('s2_excerpt_length', 'my_excerpt');`
+
 = How do I make use of the support for Custom Post Types =
 In a plugin file for your site or perhaps functions.php in your theme add the following code where 'my_post_type' is change to the name of your custom post type.
 
