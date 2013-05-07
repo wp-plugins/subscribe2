@@ -6,7 +6,7 @@ if ( !function_exists('add_action') ) {
 global $wpdb, $subscribers, $what, $current_tab;
 
 // detect or define which tab we are in
-$current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'public';
+$current_tab = isset( $_GET['tab'] ) ? esc_attr($_GET['tab']) : 'public';
 
 // was anything POSTed ?
 if ( isset($_POST['s2_admin']) ) {
@@ -138,13 +138,22 @@ if ( isset($_REQUEST['what']) ) {
 	}
 }
 
-if ( !empty($_POST['s']) ) {
-	foreach ( $subscribers as $subscriber ) {
-		if ( is_numeric(stripos($subscriber, $_POST['s'])) ) {
-			$result[] = $subscriber;
+if ( !empty($_REQUEST['s']) ) {
+	if ( !empty($_POST['s']) ) {
+		foreach ( $subscribers as $subscriber ) {
+			if ( is_numeric(stripos($subscriber, $_POST['s'])) ) {
+				$result[] = $subscriber;
+			}
 		}
+		$subscribers = $result;
+	} else {
+		foreach ( $subscribers as $subscriber ) {
+			if ( is_numeric(stripos($subscriber, $_REQUEST['s'])) ) {
+				$result[] = $subscriber;
+			}
+		}
+		$subscribers = $result;
 	}
-	$subscribers = $result;
 }
 
 if ( !class_exists('WP_List_Table') ) {
@@ -196,7 +205,7 @@ switch ($current_tab) {
 	case 'registered':
 		echo "<div class=\"s2_admin\" id=\"s2_add_subscribers\">\r\n";
 		echo "<h2>" . __('Add/Remove Subscribers', 'subscribe2') . "</h2>\r\n";
-		echo "<p class=\"submit\" style=\"border-top: none;\"><input type=\"button\" class=\"button-primary\" name=\"add_user\" value=\"" . __('Add Registered User', 'subscribe2') . "\" formaction=\"" . admin_url() . "user-new.php\" /></p>\r\n";
+		echo "<p class=\"submit\" style=\"border-top: none;\"><a class=\"button-primary\" href=\"" . admin_url() . "user-new.php\">" . __('Add Registered User', 'subscribe2') . "</a></p>\r\n";
 
 		echo "</div>\r\n";
 

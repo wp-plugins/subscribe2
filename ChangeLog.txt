@@ -14,6 +14,8 @@
 * Allow filtering of admin email address for the emails sent when users confirm a subscription or unsubscription - suggested by 3cstudio
 * Fixed default email notification subject text - thanks to Steve C @ 3Cstudio
 * Removed ability to have translation files in WP_LANG folder as this is not yet supported in the WordPress core code
+* Fixed an issue with pagination of search results - thanks to sijpie
+* Fixed 'Add Registered User' button in Subscribe2->Subscribers, Registered Tab - thanks to qwik3r
 * NOTE Version 9.0 needs WordPress 3.3 or above
 
 = Version 8.9.1 by Matthew Robinson =

@@ -132,6 +132,10 @@ class Subscribe2_List_Table extends WP_List_Table {
 			$current_url = add_query_arg( array('what' => $_REQUEST['what']), $current_url );
 		}
 
+		if ( isset($_POST['s']) ) {
+			$current_url = add_query_arg( array('s' => $_POST['s']), $current_url );
+		}
+
 		$page_links = array();
 
 		$disable_first = $disable_last = '';
