@@ -7,6 +7,8 @@ class s2class {
 	function load_translations() {
 		load_plugin_textdomain('subscribe2', false, S2DIR);
 		load_plugin_textdomain('subscribe2', false, S2DIR . "languages/");
+		$mofile = WP_LANG_DIR . '/subscribe2-' . apply_filters('plugin_locale', get_locale(), 'subscribe2') . '.mo';
+		load_textdomain('subscribe2', $mofile);
 	} // end load_translations()
 
 	/**
