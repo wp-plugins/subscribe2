@@ -647,10 +647,7 @@ class s2_admin extends s2class {
 	Create and display a dropdown list of pages
 	*/
 	function pages_dropdown($s2page) {
-		global $wpdb;
-		$sql = "SELECT ID, post_title FROM $wpdb->posts WHERE post_type='page' AND post_status='publish'";
-		$pages = $wpdb->get_results($sql);
-
+		$pages = get_pages();
 		if ( empty($pages) ) { return; }
 
 		$option = '';
@@ -659,7 +656,14 @@ class s2_admin extends s2class {
 			if ( $page->ID == $s2page ) {
 				$option .= " selected=\"selected\"";
 			}
-			$option .= ">" . $page->post_title . "</option>\r\n";
+			$option .= ">";
+			$parents = array_reverse( get_ancestors($page->ID, 'page') );
+			if ( $parents ) {
+				foreach ( $parents as $parent ) {
+					$option .= get_the_title($parent) . ' &raquo; ';
+				}
+			}
+			$option .= $page->post_title . "</option>\r\n";
 		}
 
 		echo $option;
