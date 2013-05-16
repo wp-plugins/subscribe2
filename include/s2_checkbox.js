@@ -1,19 +1,14 @@
 // version 1.0 - original version
 // version 1.1 - Updated with function fixes and for WordPress 3.2 / jQuery 1.6
 // version 1.2 - Update to work when DISABLED is specified for changes in version 8.5
+// version 1.3 - Update for Subscribe2 9.0 to remove unecessary code now WordPress 3.3 is minimum requirement
 jQuery(document).ready(function () {
 	// function to check or uncheck all when 'checkall' box it toggled
 	jQuery('input[name="checkall"]').click(function () {
 		var checked_status = this.checked;
 		jQuery('input[class="' + this.value + '"]').each(function () {
-			if (jQuery().jquery >= '1.6') {
-				if (jQuery(this).prop('disabled') === false) {
-					this.checked = checked_status;
-				}
-			} else {
-				if (jQuery(this).attr('disabled') === false) {
-					this.checked = checked_status;
-				}
+			if (jQuery(this).prop('disabled') === false) {
+				this.checked = checked_status;
 			}
 		});
 	});
@@ -26,13 +21,7 @@ jQuery(document).ready(function () {
 			} else {
 				checked_status = false;
 			}
-			// jQuery 1.6.1 introduced in WordPress 3.2
-			// following can be simplified when WordPress 3.2 is minimum requirement
-			if (jQuery().jquery >= '1.6') {
-				jQuery('input[value="' + this.className + '"]').prop('checked', checked_status);
-			} else {
-				jQuery('input[value="' + this.className + '"]').attr('checked', checked_status);
-			}
+			jQuery('input[value="' + this.className + '"]').prop('checked', checked_status);
 		});
 	});
 	// function to check or uncheck 'checkall' box when page is loaded
@@ -43,12 +32,6 @@ jQuery(document).ready(function () {
 		} else {
 			checked_status = false;
 		}
-		// jQuery 1.6.1 introduced in WordPress 3.2
-		// following can be simplified when WordPress 3.2 is minimum requirement
-		if (jQuery().jquery >= '1.6') {
-			jQuery('input[value="' + this.className + '"]').prop('checked', checked_status);
-		} else {
-			jQuery('input[value="' + this.className + '"]').attr('checked', checked_status);
-		}
+		jQuery('input[value="' + this.className + '"]').prop('checked', checked_status);
 	});
 });

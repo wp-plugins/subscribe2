@@ -201,7 +201,7 @@ class s2_admin extends s2class {
 			add_filter('mce_external_plugins', array(&$this, 'mce3_plugin'));
 			add_filter('mce_buttons', array(&$this, 'mce3_button'));
 		} else {
-			wp_enqueue_script('subscribe2_button', S2URL . 'include/s2_button2' . $this->script_debug . '.js', array('quicktags'), '2.0' );
+			wp_enqueue_script('subscribe2_button', S2URL . 'include/s2_button' . $this->script_debug . '.js', array('quicktags'), '2.0' );
 		}
 	} // end button_init()
 
