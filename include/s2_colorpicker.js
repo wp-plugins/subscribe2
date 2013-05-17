@@ -22,5 +22,6 @@ jQuery(document).ready(function () {
 		jQuery(this).on('focusout', function (event) {
 			jQuery('#' + picker).slideUp();
 		});
-	}
+		jQuery(this).trigger('focus');
+	});
 });

@@ -134,7 +134,7 @@ class s2_admin extends s2class {
 	Insert Javascript and CSS into admin_header
 	*/
 	function checkbox_form_js() {
-		wp_register_script('s2_checkbox', S2URL . 'include/s2_checkbox' . $this->script_debug . '.js', array('jquery'), '1.2');
+		wp_register_script('s2_checkbox', S2URL . 'include/s2_checkbox' . $this->script_debug . '.js', array('jquery'), '1.3');
 		wp_enqueue_script('s2_checkbox');
 	} //end checkbox_form_js()
 
@@ -228,7 +228,7 @@ class s2_admin extends s2class {
 		if ( stripos($_SERVER['REQUEST_URI'], 'widgets.php' ) !== false ) {
 			wp_enqueue_style('farbtastic');
 			wp_enqueue_script('farbtastic');
-			wp_register_script('s2_colorpicker', S2URL . 'include/s2_colorpicker' . $this->script_debug . '.js', array('farbtastic'), '1.0'); //my js
+			wp_register_script('s2_colorpicker', S2URL . 'include/s2_colorpicker' . $this->script_debug . '.js', array('farbtastic'), '1.1'); //my js
 			wp_enqueue_script('s2_colorpicker');
 		}
 	} // end widget_s2_counter_css_and_js()
