@@ -74,7 +74,10 @@ if ( isset( $_POST['s2_admin']) ) {
 				// send per-post or digest emails
 				$email_freq = $_POST['email_freq'];
 				$scheduled_time = wp_next_scheduled('s2_digest_cron');
-				if ( $email_freq != $this->subscribe2_options['email_freq'] || $_POST['hour'] != date('H', wp_next_scheduled('s2_digest_cron')) ) {
+				$timestamp_offset = get_option('gmt_offset') * 60 * 60;
+				$crondate = (isset($_POST['crondate'])) ? $_POST['crondate'] : 0;
+				$crontime = (isset($_POST['crondate'])) ? $_POST['crontime'] : 0;
+				if ( $email_freq != $this->subscribe2_options['email_freq'] || $crondate != date_i18n(get_option('date_format'), $scheduled_time + $timestamp_offset) || $crontime != date('G', $scheduled_time + $timestamp_offset) ) {
 					$this->subscribe2_options['email_freq'] = $email_freq;
 					wp_clear_scheduled_hook('s2_digest_cron');
 					$scheds = (array)wp_get_schedules();
@@ -86,7 +89,11 @@ if ( isset( $_POST['s2_admin']) ) {
 					} else {
 						// if we are using digest schedule the event and prime last_cron as now
 						$time = time() + $interval;
-						$timestamp = mktime($_POST['hour'], 0, 0, date('m', $time), date('d', $time), date('Y', $time));
+						$srttimestamp = strtotime($crondate) + ($crontime * 60 * 60);
+						if ( $srttimestamp === false || $srttimestamp === 0 ) {
+							$srttimestamp == time();
+						}
+						$timestamp = $srttimestamp - $timestamp_offset;
 						while ($timestamp < time()) {
 							// if we are trying to set the time in the past increment it forward
 							// by the interval period until it is in the future
@@ -220,11 +227,11 @@ switch ($current_tab) {
 		if ( function_exists('wp_schedule_event') ) {
 			echo __('Send Emails', 'subscribe2') . ": <br /><br />\r\n";
 			$this->display_digest_choices();
-			echo __('For digest notifications, date order for posts is', 'subscribe2') . ": \r\n";
+			echo "<p>" . __('For digest notifications, date order for posts is', 'subscribe2') . ": \r\n";
 			echo "<label><input type=\"radio\" name=\"cron_order\" value=\"desc\"" . checked($this->subscribe2_options['cron_order'], 'desc', false) . " /> ";
 			echo __('Descending', 'subscribe2') . "</label>&nbsp;&nbsp;";
 			echo "<label><input type=\"radio\" name=\"cron_order\" value=\"asc\"" . checked($this->subscribe2_options['cron_order'], 'asc', false) . " /> ";
-			echo __('Ascending', 'subscribe2') . "</label><br /><br />\r\n";
+			echo __('Ascending', 'subscribe2') . "</label></p>\r\n";
 		}
 		echo __('Add Tracking Parameters to the Permalink', 'subscribe2') . ": ";
 		echo "<input type=\"text\" name=\"tracking\" value=\"" . stripslashes($this->subscribe2_options['tracking']) . "\" size=\"50\" /> ";

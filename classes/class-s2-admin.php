@@ -146,6 +146,10 @@ class s2_admin extends s2class {
 	function option_form_js() {
 		wp_register_script('s2_edit', S2URL . 'include/s2_edit' . $this->script_debug . '.js', array('jquery'), '1.1');
 		wp_enqueue_script('s2_edit');
+		wp_enqueue_script('jquery-ui-datepicker');
+		wp_enqueue_style('jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css');
+		wp_register_script('s2_date_time', S2URL . 'include/s2_date_time' . $this->script_debug . '.js', array('jquery-ui-datepicker'), '1.0');
+		wp_enqueue_script('s2_date_time');
 	} // end option_form_js()
 
 	/**
@@ -614,26 +618,34 @@ class s2_admin extends s2class {
 			echo "<label><input type=\"radio\" name=\"email_freq\" value=\"" . $key . "\"" . checked($this->subscribe2_options['email_freq'], $key, false) . " />";
 			echo " " . $value['display'] . "</label><br />\r\n";
 		}
-		echo "<br />" . __('Send Digest Notification at UTC', 'subscribe2') . ": \r\n";
-		$hours = array('12am', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm');
-		echo "<select name=\"hour\">\r\n";
-		foreach ( $hours as $key => $value ) {
-			echo "<option value=\"" . $key . "\"";
-			if ( !empty($scheduled_time) && $key == date('H', $scheduled_time) ) {
-				echo " selected=\"selected\"";
-			}
-			echo ">" . $value . "</option>\r\n";
-		}
-		echo "</select>\r\n";
-		echo "<strong><em style=\"color: red\">" . __('Chosen time will be scheduled to a future date in relation to the current UTC time', 'subscribe2') . "</em></strong>\r\n";
 		if ( $scheduled_time ) {
-			$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
+			$date_format = get_option('date_format');
+			$time_format = get_option('time_format');
 			echo "<p>" . __('Current UTC time is', 'subscribe2') . ": \r\n";
-			echo "<strong>" . date_i18n($datetime, false, 'gmt') . "</strong></p>\r\n";
+			echo "<strong>" . date_i18n($date_format . " @ " . $time_format, false, 'gmt') . "</strong></p>\r\n";
 			echo "<p>" . __('Current blog time is', 'subscribe2') . ": \r\n";
-			echo "<strong>" . date_i18n($datetime) . "</strong></p>\r\n";
+			echo "<strong>" . date_i18n($date_format . " @ " . $time_format) . "</strong></p>\r\n";
 			echo "<p>" . __('Next email notification will be sent when your blog time is after', 'subscribe2') . ": \r\n";
-			echo "<strong>" . date_i18n($datetime, $scheduled_time + $offset) . "</strong></p>\r\n";
+			echo "<input type=\"hidden\" id=\"jscrondate\" value=\"" . date_i18n($date_format, $scheduled_time + $offset) . "\" />";
+			echo "<input type=\"hidden\" id=\"jscrontime\" value=\"" . date_i18n($time_format, $scheduled_time + $offset) . "\" />";
+			echo "<span id=\"s2cron_1\"><span id=\"s2crondate\" style=\"background-color: #FFFBCC\">" . date_i18n($date_format, $scheduled_time + $offset) . "</span>";
+			echo " @ <span id=\"s2crontime\" style=\"background-color: #FFFBCC\">" . date_i18n($time_format, $scheduled_time + $offset) . "</span> ";
+			echo "<a href=\"#\" onclick=\"s2_show('cron'); return false;\">" . __('Edit', 'subscribe2') . "</a></span>\n";
+			echo "<span id=\"s2cron_2\">\r\n";
+			echo "<input id=\"s2datepicker\" name=\"crondate\" value=\"" . date_i18n($date_format, $scheduled_time + $offset) . "\">\r\n";
+			$hours = array('12:00 am', '1:00 am', '2:00 am', '3:00 am', '4:00 am', '5:00 am', '6:00 am', '7:00 am', '8:00 am', '9:00 am', '10:00 am', '11:00 am', '12:00 pm', '1:00 pm', '2:00 pm', '3:00 pm', '4:00 pm', '5:00 pm', '6:00 pm', '7:00 pm', '8:00 pm', '9:00 pm', '10:00 pm', '11:00 pm');
+			$current_hour = intval(date_i18n('G', $scheduled_time + $offset));
+			echo "<select name=\"crontime\">\r\n";
+			foreach ( $hours as $key => $value ) {
+				echo "<option value=\"" . $key . "\"";
+				if ( !empty($scheduled_time) && $key === $current_hour ) {
+					echo " selected=\"selected\"";
+				}
+				echo ">" . $value . "</option>\r\n";
+			}
+			echo "</select>\r\n";
+			echo "<a href=\"#\" onclick=\"s2_cron_update('cron'); return false;\">". __('Update', 'subscribe2') . "</a>\n";
+			echo "<a href=\"#\" onclick=\"s2_cron_revert('cron'); return false;\">". __('Revert', 'subscribe2') . "</a></span>\n";
 			if ( !empty($this->subscribe2_options['previous_s2cron']) ) {
 				echo "<p>" . __('Attempt to resend the last Digest Notification email', 'subscribe2') . ": ";
 				echo "<input type=\"submit\" class=\"button-secondary\" name=\"resend\" value=\"" . __('Resend Digest', 'subscribe2') . "\" /></p>\r\n";

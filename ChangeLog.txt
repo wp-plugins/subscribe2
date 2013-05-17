@@ -17,6 +17,7 @@
 * Fixed an issue with pagination of search results - thanks to sijpie
 * Fixed 'Add Registered User' button in Subscribe2->Subscribers, Registered Tab - thanks to qwik3r
 * Improved pages dropdown to an ordered and hierarchical display - thanks to xavierlh1
+* Improved control over digest email scheduling
 * NOTE Version 9.0 needs WordPress 3.3 or above
 
 = Version 8.9.1 by Matthew Robinson =
