@@ -516,13 +516,22 @@ class s2_admin extends s2class {
 		$count['all'] = ($count['confirmed'] + $count['unconfirmed'] + $count['all_users']);
 		// get subscribers to individual categories but only if we are using per-post notifications
 		if ( $this->subscribe2_options['email_freq'] == 'never' ) {
+			$compulsory = explode(',', $this->subscribe2_options['compulsory']);
 			if ( $this->s2_mu ) {
 				foreach ( $all_cats as $cat ) {
-					$count[$cat->name] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(a.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key=%s", $this->get_usermeta_keyname('s2_cat') . $cat->term_id));
+					if ( in_array($cat->term_id, $compulsory) ) {
+						$count[$cat->name] = $count['all_users'];
+					} else {
+						$count[$cat->name] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(a.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key=%s", $this->get_usermeta_keyname('s2_cat') . $cat->term_id));
+					}
 				}
 			} else {
 				foreach ( $all_cats as $cat ) {
-					$count[$cat->name] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key=%s", $this->get_usermeta_keyname('s2_cat') . $cat->term_id));
+					if ( in_array($cat->term_id, $compulsory) ) {
+						$count[$cat->name] = $count['all_users'];
+					} else {
+						$count[$cat->name] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(meta_value) FROM $wpdb->usermeta WHERE meta_key=%s", $this->get_usermeta_keyname('s2_cat') . $cat->term_id));
+					}
 				}
 			}
 		}
