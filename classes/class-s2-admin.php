@@ -158,6 +158,7 @@ class s2_admin extends s2class {
 	function plugin_links($links, $file) {
 		if ( $file == S2DIR.'subscribe2.php' ) {
 			$links[] = "<a href='admin.php?page=s2_settings'>" . __('Settings', 'subscribe2') . "</a>";
+			$links[] = "<a href='http://plugins.trac.wordpress.org/browser/subscribe2/i18n/'>" . __('Translation Files', 'subscribe2') . "</a>";
 			$links[] = "<a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904'><b>" . __('Donate', 'subscribe2') . "</b></a>";
 		}
 		return $links;

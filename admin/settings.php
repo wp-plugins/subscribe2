@@ -444,6 +444,7 @@ switch ($current_tab) {
 		echo "</p>";
 		echo "<h3>" . __('Links', 'subscribe2') . "</h3>\r\n";
 		echo "<a href=\"http://wordpress.org/extend/plugins/subscribe2/\">" . __('Plugin Site', 'subscribe2') . "</a><br />";
+		echo "<a href='http://plugins.trac.wordpress.org/browser/subscribe2/i18n/'>" . __('Translation Files', 'subscribe2') . "</a><br />";
 		echo "<a href=\"http://wordpress.org/support/plugin/subscribe2\">" . __('Plugin Forum', 'subscribe2') . "</a><br />";
 		echo "<a href=\"http://subscribe2.wordpress.com/\">" . __('Plugin Blog', 'subscribe2') . "</a><br />";
 		echo "<a href=\"https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904\">" . __('Make a donation via PayPal', 'subscribe2') . "</a>";
