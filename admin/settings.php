@@ -124,6 +124,21 @@ if ( empty($id) ) {
 	echo "<div id=\"page_message\" class=\"error\"><p class=\"s2_error\"><strong>$this->no_page</strong></p></div>";
 }
 
+if ( $this->subscribe2_options['email_freq'] != 'never' ) {
+	$disallowed_keywords = array('{TITLE}', '{PERMALINK}', '{DATE}', '{TIME}', '{LINK}', '{ACTION}');
+} else {
+	$disallowed_keywords = array('{POSTTIME}', '{TABLE}', '{TABLELINKS}', '{COUNT}', '{LINK}', '{ACTION}');
+}
+$disallowed = false;
+foreach ( $disallowed_keywords as $disallowed_keyword ) {
+	if ( strstr($this->subscribe2_options['mailtext'], $disallowed_keyword) !== false ) {
+		$disallowed[] = $disallowed_keyword;
+	}
+}
+if ( $disallowed !== false ) {
+	echo "<div id=\"page_message\" class=\"error\"><p class=\"s2_error\"><strong>$this->disallowed_keywords</strong><br>" . implode($disallowed, ', ') . "</p></div>";
+}
+
 // send error message if sender email address is off-domain
 if ( $this->subscribe2_options['sender'] == 'blogname' ) {
 	$sender = get_bloginfo('admin_email');
@@ -262,7 +277,7 @@ switch ($current_tab) {
 		echo "<dt><b>{POST}</b></dt><dd>" . __("the excerpt or the entire post<br />(<i>based on the subscriber's preferences</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>{POSTTIME}</b></dt><dd>" . __("the excerpt of the post and the time it was posted<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>{TABLE}</b></dt><dd>" . __("a list of post titles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
-		echo "<dt><b>{TABLELINKS}</b></dt><dd>" . __("a list of post titles followed by links to the atricles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{TABLELINKS}</b></dt><dd>" . __("a list of post titles followed by links to the articles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>{PERMALINK}</b></dt><dd>" . __("the post's permalink<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>{TINYLINK}</b></dt><dd>" . __("the post's permalink after conversion by TinyURL", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>{DATE}</b></dt><dd>" . __("the date the post was made<br />(<i>for per-post emails only</i>)", "subscribe2") . "</dd>\r\n";
