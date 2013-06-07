@@ -136,7 +136,7 @@ foreach ( $disallowed_keywords as $disallowed_keyword ) {
 	}
 }
 if ( $disallowed !== false ) {
-	echo "<div id=\"page_message\" class=\"error\"><p class=\"s2_error\"><strong>$this->disallowed_keywords</strong><br>" . implode($disallowed, ', ') . "</p></div>";
+	echo "<div id=\"keyword_message\" class=\"error\"><p class=\"s2_error\"><strong>$this->disallowed_keywords</strong><br>" . implode($disallowed, ', ') . "</p></div>";
 }
 
 // send error message if sender email address is off-domain
