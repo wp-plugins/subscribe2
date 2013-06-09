@@ -40,19 +40,22 @@ if ( isset($_POST['s2_admin']) && 'mail' == $_POST['s2_admin'] ) {
 		global $user_email;
 		$recipients[] = $user_email;
 	}
-	if ( $_FILES['file'] ) {
-		foreach ($_FILES['file']['name'] as $key => $value) {
-			if ( $_FILES['file']['error'][$key] === 0 ) {
-				$file = array(
-					'name'     => $_FILES['file']['name'][$key],
-					'type'     => $_FILES['file']['type'][$key],
-					'tmp_name' => $_FILES['file']['tmp_name'][$key],
-					'error'    => $_FILES['file']['error'][$key],
-					'size'     => $_FILES['file']['size'][$key]
-				);
-				$uploads[] = wp_handle_upload($file, array('test_form' => false));
-			}
+
+	$uploads = array();
+	foreach ($_FILES['file']['name'] as $key => $value) {
+		if ( $_FILES['file']['error'][$key] === 0 ) {
+			$file = array(
+				'name'     => $_FILES['file']['name'][$key],
+				'type'     => $_FILES['file']['type'][$key],
+				'tmp_name' => $_FILES['file']['tmp_name'][$key],
+				'error'    => $_FILES['file']['error'][$key],
+				'size'     => $_FILES['file']['size'][$key]
+			);
+			$uploads[] = wp_handle_upload($file, array('test_form' => false));
 		}
+	}
+	$attachments = array();
+	if ( !empty($uploads) ) {
 		foreach ( $uploads as $upload ) {
 			if ( !isset($upload['error']) ) {
 				$attachments[] = $upload['file'];
@@ -60,8 +63,6 @@ if ( isset($_POST['s2_admin']) && 'mail' == $_POST['s2_admin'] ) {
 				$upload_error = $upload['error'];
 			}
 		}
-	} else {
-		$attachments = array();
 	}
 
 	if ( empty($body) ) {
