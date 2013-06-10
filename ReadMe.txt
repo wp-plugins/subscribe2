@@ -1,5 +1,5 @@
 === Subscribe2 ===
-Contributors: MattyRob, Skippy, RavanH
+Contributors: MattyRob, Skippy, RavanH, bhadaway
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.3

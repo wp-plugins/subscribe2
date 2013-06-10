@@ -10,6 +10,7 @@ class s2_frontend extends s2class {
 			'id'    => '',
 			'url' => '',
 			'nojs' => 'false',
+			'noantispam' => 'false',
 			'link' => '',
 			'size' => 20,
 			'wrap' => 'true'
@@ -63,11 +64,20 @@ class s2_frontend extends s2class {
 			$wrap_text = '</p><p>';
 		}
 
+		// deploy some anti-spam measures
+		$antispam_text = '';
+		if ( $noantispam != 'true' ) {
+			$antispam_text = "<span style=\"display:none !important\">";
+			$antispam_text .= "<label for=\"name\">Leave Blank:</label><input type=\"text\" id=\"name\" name=\"name\" />";
+			$antispam_text .= "<label for=\"url\">Don't Change:</label><input type=\"text\" id=\"url\" name=\"url\" value=\"http://\" />";
+			$antispam_text .= "</span>";
+		}
+
 		// build default form
 		if ( $nojs == 'true' ) {
-			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" />" . $wrap_text . $this->input_form_action . "</p></form>";
+			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" />" . $wrap_text . $this->input_form_action . "</p></form>";
 		} else {
-			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" /><p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" />" . $wrap_text . $this->input_form_action . "</p></form>\r\n";
+			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" />" . $wrap_text . $this->input_form_action . "</p></form>\r\n";
 		}
 		$this->s2form = $this->form;
 
@@ -77,6 +87,10 @@ class s2_frontend extends s2class {
 			$this->s2form = $this->profile;
 		}
 		if ( isset($_POST['subscribe']) || isset($_POST['unsubscribe']) ) {
+			// anti spam sign up measure
+			if ( $_POST['name'] != '' || $_POST['url'] != 'http://' ) {
+				return $this->error;
+			}
 			global $wpdb, $user_email;
 			$this->email = $this->sanitize_email($_POST['email']);
 			if ( !is_email($this->email) ) {
