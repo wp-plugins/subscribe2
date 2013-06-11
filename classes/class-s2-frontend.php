@@ -89,7 +89,8 @@ class s2_frontend extends s2class {
 		if ( isset($_POST['subscribe']) || isset($_POST['unsubscribe']) ) {
 			// anti spam sign up measure
 			if ( $_POST['name'] != '' || $_POST['url'] != 'http://' ) {
-				return $this->error;
+				// looks like some invisible-to-user fields were changed; falsely report success
+				return $this->confirmation_sent;
 			}
 			global $wpdb, $user_email;
 			$this->email = $this->sanitize_email($_POST['email']);
