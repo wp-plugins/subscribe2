@@ -19,10 +19,10 @@
 * Improved pages dropdown to an ordered and hierarchical display - thanks to xavierlh1
 * Improved control over digest email scheduling - proposed by Jason Lemahieu
 * Fixed Subscriber Dropdown counts for Compulsory categories
-* Add link to Tranlation files to the plugin page and the miscellaneous tab of the Subscribe2->Settings page - props eyephone21
+* Added a link to Tranlation files to the plugin page and the miscellaneous tab of the Subscribe2->Settings page - props eyephone21
 * Added {KEYWORD} checking in the template to warn users of disallowed keywords - proposed by Jason Lemahieu
-* Fixed some notices in the Send Email page - thanks to Brian Hadaway (bhadaway)
-* Added anti-spam measures to the sign up form - thanks to Brian Hadaway (bhadaway)
+* Fixed some notices in the Send Email page - thanks to Bryan Hadaway (bhadaway)
+* Added anti-spam measures to the sign up form - thanks to Bryan Hadaway (bhadaway)
 * NOTE Version 9.0 needs WordPress 3.3 or above
 
 = Version 8.9.1 by Matthew Robinson =
