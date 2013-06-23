@@ -170,13 +170,13 @@ class s2_frontend extends s2class {
 		global $wpdb;
 
 		if ( 0 != $this->subscribe2_options['s2page'] ) {
-			return "page_id=" . $this->subscribe2_options['s2page'];
+			return array('page_id' => $this->subscribe2_options['s2page']);
 		} else {
 			$id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_type='page' AND post_status='publish' LIMIT 1");
 			if ( $id ) {
-				return "page_id=$id";
+				return array('page_id' =>  $id);
 			} else {
-				return "showposts=1";
+				return array('showposts' => 1);
 			}
 		}
 	} // end query_filter()
