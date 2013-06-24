@@ -24,6 +24,7 @@
 * Fixed some notices in the Send Email page - thanks to Bryan Hadaway (bhadaway)
 * Added anti-spam measures to the sign up form - thanks to Bryan Hadaway (bhadaway)
 * Update query_filter() function to hook into the 'request' filter instead of the deprecated 'query_filter'
+* Added a default 'Select a page' option to the page dropdown to highlight the need to have a published page select
 * NOTE Version 9.0 needs WordPress 3.3 or above
 
 = Version 8.9.1 by Matthew Robinson =

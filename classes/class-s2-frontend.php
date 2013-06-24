@@ -174,7 +174,7 @@ class s2_frontend extends s2class {
 		} else {
 			$id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_type='page' AND post_status='publish' LIMIT 1");
 			if ( $id ) {
-				return array('page_id' =>  $id);
+				return array('page_id' => $id);
 			} else {
 				return array('showposts' => 1);
 			}
