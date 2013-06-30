@@ -225,7 +225,7 @@ class s2_frontend extends s2class {
 
 		if ( '1' == $action ) {
 			// make this subscription active
-			$this->message = $this->added;
+			$this->message = apply_filters('s2_subscribe_confirmed', $this->added);
 			if ( '1' != $current ) {
 				$this->ip = $_SERVER['REMOTE_ADDR'];
 				$this->toggle($this->email);
@@ -250,7 +250,7 @@ class s2_frontend extends s2class {
 			$this->filtered = 1;
 		} elseif ( '0' == $action ) {
 			// remove this subscriber
-			$this->message = $this->deleted;
+			$this->message = apply_filters('s2_unsubscribe_confirmed', $this->deleted);
 			if ( '0' != $current ) {
 				$this->delete($this->email);
 				if ( $this->subscribe2_options['admin_email'] == 'unsubs' || $this->subscribe2_options['admin_email'] == 'both' ) {

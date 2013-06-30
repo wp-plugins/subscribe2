@@ -235,6 +235,21 @@ taxonomy_type' is change to the name of your custom taxonomy type.
 }
 add_filter('s2_taxonomies', 'my_taxonomy_types');`
 
+= I want to personalise the message displayed when someone subscribes or unsubscribes, how do I do that? =
+There is a filter for both of these in Subscribe2 from version 9.0 and upwards. To use it you need to create a little filter code plugin, an example is below:
+
+`function subscribe_change($message) {
+	$message .= "<p>A warm welcome to our blog. We hope you enjoy our emails.</p>";
+	return $message;
+}
+add_filter('s2_subscribe_confirmed', 'subscribe_change');
+
+function unsubscribe_change($message) {
+	$message .= "<p>We're sorry to see you leave, come back anytime.</p>";
+	return $message;
+}
+add_filter('s2_unsubscribe_confirmed', 'unsubscribe_change');`
+
 = How do I make use of the new option to AJAXify the form? =
 The first thing you will need to do is visit the options page and enable the AJAX setting where it says "Enable AJAX style subscription form?", this will load the necessary javascript onto your WordPress site.
 

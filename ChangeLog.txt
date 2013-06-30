@@ -25,6 +25,7 @@
 * Added anti-spam measures to the sign up form - thanks to Bryan Hadaway (bhadaway)
 * Update query_filter() function to hook into the 'request' filter instead of the deprecated 'query_filter'
 * Added a default 'Select a page' option to the page dropdown to highlight the need to have a published page select
+* Added filters to the subscription and unsubscription confirmation messages to allow personalisation - see FAQs for example functions
 * NOTE Version 9.0 needs WordPress 3.3 or above
 
 = Version 8.9.1 by Matthew Robinson =
