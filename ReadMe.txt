@@ -205,7 +205,7 @@ In order to force sending you'd need to change the date of publication on the po
 If you opt for the latter way look in the options table for the subscribe2_options settings (it's an array) and you'll need to change the 'last_s2cron' value to a timestamp for last week. Then force the cron event to run again with [WP-Crontrol](http://wordpress.org/extend/plugins/wp-crontrol/).
 
 = I would really like Registered users to have the Subscription page themed like my site, is this possible? =
-Yes, it is. There is a small extension to Subscribe2 that delivers exactly this functionality. It is available from [Theme Tailors](http://stiofan.themetailors.com/store/products/tt-subscribe2-front-end-plugin/) for just $2.
+Yes, it is. There is a small extension to Subscribe2 that delivers exactly this functionality. It is available from [Theme Tailors](http://stiofan.themetailors.com/store/products/tt-subscribe2-front-end-plugin/) for just $5.
 
 = I'd like to change the length of the excerpt included in the email notification. Can I do that? =
 Yes, you can. There is a filter in Subscribe2 that allow you to change from the default of approximately 55 words. An example of the filter code you need would look like this:
