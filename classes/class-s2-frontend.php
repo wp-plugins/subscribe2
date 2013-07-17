@@ -169,6 +169,12 @@ class s2_frontend extends s2class {
 
 		global $wpdb;
 
+		// brute force Simple Facebook Connect to bypass compatiblity issues
+		$priority = has_filter('wp_head', 'sfc_base_meta');
+		if ( $priority !== false ) {
+			remove_action('wp_head', 'sfc_base_meta', $priority);
+		}
+
 		if ( 0 != $this->subscribe2_options['s2page'] ) {
 			return array('page_id' => $this->subscribe2_options['s2page']);
 		} else {
