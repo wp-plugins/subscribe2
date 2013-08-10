@@ -542,6 +542,7 @@ class s2class {
 		$plaintext = preg_replace('|<s[^>]*>(.*)<\/s>|Ui','', $plaintext);
 		$plaintext = preg_replace('|<strike[^>]*>(.*)<\/strike>|Ui','', $plaintext);
 		$plaintext = preg_replace('|<del[^>]*>(.*)<\/del>|Ui','', $plaintext);
+		$plaintext = trim(strip_tags($plaintext));
 
 		$gallid = '[gallery id="' . $post->ID . '"';
 		$content = str_replace('[gallery', $gallid, $post->post_content);
@@ -605,7 +606,7 @@ class s2class {
 
 		// prepare mail body texts
 		$plain_excerpt_body = str_replace("{POST}", $excerpt, $mailtext);
-		$plain_body = str_replace("{POST}", strip_tags($plaintext), $mailtext);
+		$plain_body = str_replace("{POST}", $plaintext, $mailtext);
 		$html_body = str_replace("\r\n", "<br />\r\n", $mailtext);
 		$html_body = str_replace("{POST}", $content, $html_body);
 		$html_excerpt_body = str_replace("\r\n", "<br />\r\n", $mailtext);
@@ -1339,7 +1340,7 @@ class s2class {
 	} // end add_weekly_sched()
 
 	/**
-	Send a daily digest of today's new posts
+	Send a digest of recent new posts
 	*/
 	function subscribe2_cron($preview = '', $resend = '') {
 		if ( defined('DOING_S2_CRON') && DOING_S2_CRON ) { return; }
