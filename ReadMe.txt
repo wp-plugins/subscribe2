@@ -69,9 +69,6 @@ You need to download the *.mo file and place it on your server either in a folde
 = What if there isn't a translation file for my language? =
 If your language isn't list then you will need to make your own translation by use the *.pot file the is distributed with every release of the code. [This](http://codex.wordpress.org/Translating_WordPress) WordPress Codex page gives more background on how you make translation files.
 
-= Where can I get more information about the plugin features? =
-A comprehensive guide that covers many, if not all, of the Subscribe2 features is available to purchase from the [My WP Works](http://mywpworks.com/store/subscribe2-ebook/)
-
 = Sending post notifications or email with Subscribe2 =
 Subscribe2 sends an email at the very moment the post is published. Since Subscribe2 sends live mail with no un-do, it's important to use the Preview function in WordPress to make sure the post has been edited to perfection *before* moving it from Draft to Published mode.
 
