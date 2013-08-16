@@ -40,7 +40,7 @@ if ( isset($_POST['s2_admin']) ) {
 		}
 		echo $message;
 		$_POST['what'] = 'confirmed';
-	} elseif ( $_POST['action'] === 'delete' || $_POST['action2'] === 'delete' ) {
+	} elseif ( (isset($_POST['action']) && $_POST['action'] === 'delete') || (isset($_POST['action2']) && $_POST['action2'] === 'delete') ) {
 		if ( $current_tab === 'public' ) {
 			foreach ( $_POST['subscriber'] as $address ) {
 				$this->delete($address);
@@ -62,7 +62,7 @@ if ( isset($_POST['s2_admin']) ) {
 			}
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $users_deleted_error . $users_deleted . "</strong></p></div>";
 		}
-	} elseif ( $_POST['action'] === 'toggle' || $_POST['action2'] === 'toggle' ) {
+	} elseif ( (isset($_POST['action']) && $_POST['action'] === 'toggle') || (isset($_POST['action2']) && $_POST['action2'] === 'toggle') ) {
 		global $current_user;
 		$this->ip = $current_user->user_login;
 		foreach ( $_POST['subscriber'] as $address ) {

@@ -28,6 +28,7 @@
 * Added filters to the subscription and unsubscription confirmation messages to allow personalisation - see FAQs for example functions
 * Remove Simple Facebook Connect action during subscription and unsubscription confirmation to ensure user messages are displayed
 * Improved white space stripping in the plaintext full content email
+* Fixed a PHP notice on the Subscribe2->Subscribers page - thanks to emile.swain
 * NOTE Version 9.0 needs WordPress 3.3 or above
 
 = Version 8.9.1 by Matthew Robinson =

@@ -69,7 +69,7 @@ class s2_frontend extends s2class {
 		if ( $noantispam != 'true' ) {
 			$antispam_text = "<span style=\"display:none !important\">";
 			$antispam_text .= "<label for=\"name\">Leave Blank:</label><input type=\"text\" id=\"name\" name=\"name\" />";
-			$antispam_text .= "<label for=\"url\">Don't Change:</label><input type=\"text\" id=\"url\" name=\"url\" value=\"http://\" />";
+			$antispam_text .= "<label for=\"uri\">Don't Change:</label><input type=\"text\" id=\"uri\" name=\"uri\" value=\"http://\" />";
 			$antispam_text .= "</span>";
 		}
 
@@ -88,7 +88,7 @@ class s2_frontend extends s2class {
 		}
 		if ( isset($_POST['subscribe']) || isset($_POST['unsubscribe']) ) {
 			// anti spam sign up measure
-			if ( $_POST['name'] != '' || $_POST['url'] != 'http://' ) {
+			if ( $_POST['name'] != '' || $_POST['uri'] != 'http://' ) {
 				// looks like some invisible-to-user fields were changed; falsely report success
 				return $this->confirmation_sent;
 			}
