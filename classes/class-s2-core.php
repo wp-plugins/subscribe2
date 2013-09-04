@@ -955,9 +955,9 @@ class s2class {
 		}
 
 		if ( $this->s2_mu ) {
-			$sql = "SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities'" . $AND;
+			$sql = $wpdb->prepare("SELECT a.user_id FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS e ON a.user_id = e.user_id " . $JOIN . "WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND e.meta_key=%s AND e.meta_value <> ''" . $AND, $this->get_usermeta_keyname('s2_subscribed'));
 		} else {
-			$sql = $wpdb->prepare("SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key=%s" . $AND, $this->get_usermeta_keyname('s2_subscribed'));
+			$sql = $wpdb->prepare("SELECT a.user_id FROM $wpdb->usermeta AS a " . $JOIN . "WHERE a.meta_key=%s AND a.meta_value <> ''" . $AND, $this->get_usermeta_keyname('s2_subscribed'));
 		}
 		$result = $wpdb->get_col($sql);
 		if ( $result ) {

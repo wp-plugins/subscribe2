@@ -510,9 +510,9 @@ class s2_admin extends s2class {
 			$count['all_users'] = $wpdb->get_var("SELECT COUNT(ID) FROM $wpdb->users");
 		}
 		if ( $this->s2_mu ) {
-			$count['registered'] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "capabilities' AND meta_key=%s", $this->get_usermeta_keyname('s2_subscribed')));
+			$count['registered'] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(b.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key=%s AND b.meta_value  <> ''", $this->get_usermeta_keyname('s2_subscribed')));
 		} else {
-			$count['registered'] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key=%s", $this->get_usermeta_keyname('s2_subscribed')));
+			$count['registered'] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key=%s AND meta_value <> ''", $this->get_usermeta_keyname('s2_subscribed')));
 		}
 		$count['all'] = ($count['confirmed'] + $count['unconfirmed'] + $count['all_users']);
 		// get subscribers to individual categories but only if we are using per-post notifications

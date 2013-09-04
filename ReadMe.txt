@@ -197,9 +197,9 @@ There are many scenarios in which to use new options, but here is an example:
 If, for some reason the Subscribe2 button does not appear in your browser window try refreshing your browser and cache (Shift and Reload in Firefox). If this still fails then insert the token manually. In the Rich Text Editor (TinyMCE) make sure you switch to the "code" view and type in [subscribe2] or <!--subscribe2-->.
 
 = My digest email didn't send, how can I resend it? =
-In order to force sending you'd need to change the date of publication on the posts from last week or amend the date stamp in the database regarding when the posts should be included from.
+If for some reason you wish to resend the last digest email you should find a Resend Digest button on the Subscribe2->Settings page under the Email Settings tab. If the button is not there then you are either in per-post mode or there isn't a previous digest to re-send.
 
-If you opt for the latter way look in the options table for the subscribe2_options settings (it's an array) and you'll need to change the 'last_s2cron' value to a timestamp for last week. Then force the cron event to run again with [WP-Crontrol](http://wordpress.org/extend/plugins/wp-crontrol/).
+In per post mode, to resend edit the post you want to re-send and change the status to draft and save, then publish the post again.
 
 = I would really like Registered users to have the Subscription page themed like my site, is this possible? =
 Yes, it is. There is a small extension to Subscribe2 that delivers exactly this functionality. It is available from [Theme Tailors](http://stiofan.themetailors.com/store/products/tt-subscribe2-front-end-plugin/) for just $5.
