@@ -182,7 +182,7 @@ switch ($current_tab) {
 		// settings for outgoing emails
 		echo "<div class=\"s2_admin\" id=\"s2_notification_settings\">\r\n";
 		echo "<p>\r\n";
-		echo __('Restrict the number of recipients per email to (0 for unlimited)', 'subscribe2') . ': ';
+		echo __('Restrict the number of <strong>recipients per email</strong> to (0 for unlimited)', 'subscribe2') . ': ';
 		echo "<span id=\"s2bcclimit_1\"><span id=\"s2bcclimit\" style=\"background-color: #FFFBCC\">" . $this->subscribe2_options['bcclimit'] . "</span> ";
 		echo "<a href=\"#\" onclick=\"s2_show('bcclimit'); return false;\">" . __('Edit', 'subscribe2') . "</a></span>\n";
 		echo "<span id=\"s2bcclimit_2\">\r\n";
