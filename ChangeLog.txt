@@ -29,6 +29,7 @@
 * Remove Simple Facebook Connect action during subscription and unsubscription confirmation to ensure user messages are displayed
 * Improved white space stripping in the plaintext full content email
 * Fixed a PHP notice on the Subscribe2->Subscribers page - thanks to emile.swain
+* Fixes the non-working 'check all' boxes in WordPress 3.6 and above
 * NOTE Version 9.0 needs WordPress 3.3 or above
 
 = Version 8.9.1 by Matthew Robinson =
