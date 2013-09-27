@@ -1,3 +1,8 @@
+= Version 9.1 by Matthew Robinson =
+
+* Shortcode parameters are now not case sensitive
+* Fixed AJAX mode to work with new Anti Spam code
+
 = Version 9.0 by Matthew Robinson =
 
 * Added capability to send emails with attachments from Send Email page
