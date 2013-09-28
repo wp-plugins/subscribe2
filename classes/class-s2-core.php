@@ -1394,6 +1394,7 @@ class s2class {
 			}
 		} else {
 			// we are sending a preview
+			$now = $prev = $last = current_time('mysql');
 			$posts = get_posts('numberposts=1');
 		}
 

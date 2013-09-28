@@ -2,6 +2,7 @@
 
 * Shortcode parameters are now not case sensitive
 * Fixed AJAX mode to work with new Anti Spam code
+* Suppress undefined variable warnings when sending Digest Email previews
 
 = Version 9.0 by Matthew Robinson =
 
