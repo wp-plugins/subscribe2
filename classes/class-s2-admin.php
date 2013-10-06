@@ -320,6 +320,53 @@ class s2_admin extends s2class {
 	} // end signup_ip()
 
 	/**
+	Export subscriber emails and other details to CSV
+	*/
+	function prepare_export( $subscribers ) {
+		$subscribers = explode(",\r\n", $subscribers);
+		natcasesort($subscribers);
+
+		$exportcsv = _x('User Email,User Type,User Name,Confirm Date,IP', 'Comma Separated Column Header names for CSV Export' , 'subscribe2');
+		$all_cats = $this->all_cats(false, 'ID');
+
+		foreach ($all_cats as $cat) {
+			$exportcsv .= "," . $cat->cat_name;
+			$cat_ids[] = $cat->term_id;
+		}
+		$exportcsv .= "\r\n";
+
+		if ( !function_exists('get_userdata') ) {
+			require_once(ABSPATH . WPINC . '/pluggable.php');
+		}
+
+		foreach ( $subscribers as $subscriber ) {
+			if ( $this->is_registered($subscriber) ) {
+				$user_ID = $this->get_user_id( $subscriber );
+				$user_info = get_userdata( $user_ID );
+
+				$cats = explode(',', get_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), true));
+				$subscribed_cats = '';
+				foreach ( $cat_ids as $cat ) {
+					(in_array($cat, $cats)) ? $subscribed_cats .= ",Yes" : $subscribed_cats .= ",No";
+				}
+
+				$exportcsv .= $subscriber . ',';
+				$exportcsv .= __('Registered User', 'subscribe2');
+				$exportcsv .= ',' . $user_info->display_name;
+				$exportcsv .= ',,' . $subscribed_cats . "\r\n";
+			} else {
+				if ( $this->is_public($subscriber) === '1' ) {
+					$exportcsv .= $subscriber . ',' . __('Confirmed Public Subscriber', 'subscribe2') . ',,' . $this->signup_date($subscriber) . ',' . $this->signup_ip($subscriber) . "\r\n";
+				} elseif ( $this->is_public($subscriber) === '0' ) {
+					$exportcsv .= $subscriber . ',' . __('Unconfirmed Public Subscriber', 'subscribe2') . ',,' . $this->signup_date($subscriber) . ',' . $this->signup_ip($subscriber) . "\r\n";
+				}
+			}
+		}
+
+		return $exportcsv;
+	} // end prepare_export()
+
+	/**
 	Display a table of categories with checkboxes
 	Optionally pre-select those categories specified
 	*/

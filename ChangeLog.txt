@@ -3,6 +3,7 @@
 * Shortcode parameters are now not case sensitive
 * Fixed AJAX mode to work with new Anti Spam code
 * Suppress undefined variable warnings when sending Digest Email previews
+* Include Signup Date and IP for Public Subscribers in CSV Export - props Taylor4484
 
 = Version 9.0 by Matthew Robinson =
 
