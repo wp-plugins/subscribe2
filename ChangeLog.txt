@@ -5,6 +5,7 @@
 * Suppress undefined variable warnings when sending Digest Email previews
 * Include Signup Date and IP for Public Subscribers in CSV Export - props Taylor4484
 * Fix for Sticky Posts in the digest returning errant posts - thanks to belg4mit
+* Move FAQs to external site to allow more timely updates
 
 = Version 9.0 by Matthew Robinson =
 
