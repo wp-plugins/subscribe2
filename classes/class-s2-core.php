@@ -1353,9 +1353,10 @@ class s2class {
 
 		// Collect sticky posts if desired
 		if ( $this->subscribe2_options['stickies'] == 'yes' ) {
-			$stickies = get_posts(array('post__in' => get_option('sticky_posts')));
-			if ( !empty($stickies) ) {
-				$posts = array_merge((array)$stickies, (array)$posts);
+			$sticky_ids = get_option('sticky_posts');
+			if ( !empty($sticky_ids) ) {
+				$sticky_posts = get_posts( array('post__in' => $sticky_ids) );
+				$posts = array_merge((array)$sticky_posts, (array)$posts);
 			}
 		}
 
