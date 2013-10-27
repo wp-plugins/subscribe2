@@ -223,6 +223,7 @@ if ( $this->s2_mu && !isset($_GET['email']) ) {
 		restore_current_blog();
 	}
 
+	echo "<div class=\"s2_admin\" id=\"s2_mu_sites\">\r\n";
 	if ( !empty($blogs_subscribed) ) {
 		ksort($blogs_subscribed);
 		echo "<h2>" . __('Subscribed Blogs', 'subscribe2') . "</h2>\r\n";
@@ -264,6 +265,7 @@ if ( $this->s2_mu && !isset($_GET['email']) ) {
 		}
 		echo "</ul>\r\n";
 	}
+	echo "</div>\r\n";
 }
 
 echo "</div>\r\n";
