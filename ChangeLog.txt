@@ -9,6 +9,7 @@
 * Add ability to hide other Multisite blogs with CSS in the Subscribe2->Your Subscriptions page (DIV id of 's2_mu_sites') - props cblsysadmin
 * Add 's2_form' filter to allow dynamic alterations to the default form - props adam_jack
 * Conduct more thorough checking for Public and Registered emails when adding users in the admin pages - thanks to MadtownLems
+* Introduce the {REFERENCELINKS} keyword - props manu1033
 
 = Version 9.0 by Matthew Robinson =
 
