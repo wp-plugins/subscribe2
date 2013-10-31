@@ -542,7 +542,27 @@ class s2class {
 		$plaintext = preg_replace('|<s[^>]*>(.*)<\/s>|Ui','', $plaintext);
 		$plaintext = preg_replace('|<strike[^>]*>(.*)<\/strike>|Ui','', $plaintext);
 		$plaintext = preg_replace('|<del[^>]*>(.*)<\/del>|Ui','', $plaintext);
-		$plaintext = trim(strip_tags($plaintext));
+
+		if ( strstr($mailtext, "{REFERENCELINKS}") ) {
+			$mailtext = str_replace("{REFERENCELINKS}", '', $mailtext);
+			$plaintext_links = '';
+			$i = 0;
+			while (preg_match('|<a([^>]*)>(.*)<\/a>|Ui', $plaintext, $matches)) {
+				if (preg_match('|href="([^"]*)"|', $matches[1], $link_matches)){
+					$plaintext_links .= sprintf("[%d] %s\r\n", ++$i, $link_matches[1]);
+					$link_replacement = sprintf("%s [%d]", $matches[2], $i);
+				} else {
+					$link_replacement = $matches[2];
+				}
+				$plaintext = preg_replace('|<a[^>]*>(.*)<\/a>|Ui', $link_replacement, $plaintext, 1);
+			}
+		}
+
+ 		$plaintext = trim(strip_tags($plaintext));
+
+		if ($plaintext_links != '') {
+			$plaintext .= "\r\n\r\n" . trim($plaintext_links);
+		}
 
 		$gallid = '[gallery id="' . $post->ID . '"';
 		$content = str_replace('[gallery', $gallid, $post->post_content);
@@ -562,14 +582,14 @@ class s2class {
 		$excerpt = $post->post_excerpt;
 		if ( '' == $excerpt ) {
 			// no excerpt, is there a <!--more--> ?
-			if ( false !== strpos($plaintext, '<!--more-->') ) {
-				list($excerpt, $more) = explode('<!--more-->', $plaintext, 2);
+			if ( false !== strpos($content, '<!--more-->') ) {
+				list($excerpt, $more) = explode('<!--more-->', $content, 2);
 				// strip leading and trailing whitespace
 				$excerpt = strip_tags($excerpt);
 				$excerpt = trim($excerpt);
 			} else {
 				// no <!--more-->, so grab the first 55 words
-				$excerpt = strip_tags($plaintext);
+				$excerpt = strip_tags($content);
 				$words = explode(' ', $excerpt, $this->excerpt_length + 1);
 				if (count($words) > $this->excerpt_length) {
 					array_pop($words);
