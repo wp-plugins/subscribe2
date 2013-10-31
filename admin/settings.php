@@ -261,7 +261,7 @@ switch ($current_tab) {
 		echo "<p>\r\n";
 		echo "<table style=\"width: 100%; border-collapse: separate; border-spacing: 5px; *border-collapse: expression('separate', cellSpacing = '5px');\" class=\"editform\">\r\n";
 		echo "<tr><td style=\"vertical-align: top; height: 350px; min-height: 350px;\">";
-		echo __('New Post email (must not be empty)', 'subscribe2') . ":<br />\r\n";
+		echo __('Notification email (must not be empty)', 'subscribe2') . ":<br />\r\n";
 		echo __('Subject Line', 'subscribe2') . ": ";
 		echo "<input type=\"text\" name=\"notification_subject\" value=\"" . stripslashes($this->subscribe2_options['notification_subject']) . "\" size=\"45\" />";
 		echo "<br />\r\n";
@@ -278,6 +278,7 @@ switch ($current_tab) {
 		echo "<dt><b>{POSTTIME}</b></dt><dd>" . __("the excerpt of the post and the time it was posted<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>{TABLE}</b></dt><dd>" . __("a list of post titles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>{TABLELINKS}</b></dt><dd>" . __("a list of post titles followed by links to the articles<br />(<i>for digest emails only</i>)", 'subscribe2') . "</dd>\r\n";
+		echo "<dt><b>{REFERENCELINKS}</b></dt><dd>" . __("a reference style list of links at the end of the email with corresponding numbers in the content<br />(<i>for the full content plain text per-post email only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>{PERMALINK}</b></dt><dd>" . __("the post's permalink<br />(<i>for per-post emails only</i>)", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>{TINYLINK}</b></dt><dd>" . __("the post's permalink after conversion by TinyURL", 'subscribe2') . "</dd>\r\n";
 		echo "<dt><b>{DATE}</b></dt><dd>" . __("the date the post was made<br />(<i>for per-post emails only</i>)", "subscribe2") . "</dd>\r\n";

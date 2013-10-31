@@ -42,16 +42,18 @@ if ( isset($_POST['s2_admin']) && 'mail' == $_POST['s2_admin'] ) {
 	}
 
 	$uploads = array();
-	foreach ($_FILES['file']['name'] as $key => $value) {
-		if ( $_FILES['file']['error'][$key] === 0 ) {
-			$file = array(
-				'name'     => $_FILES['file']['name'][$key],
-				'type'     => $_FILES['file']['type'][$key],
-				'tmp_name' => $_FILES['file']['tmp_name'][$key],
-				'error'    => $_FILES['file']['error'][$key],
-				'size'     => $_FILES['file']['size'][$key]
-			);
-			$uploads[] = wp_handle_upload($file, array('test_form' => false));
+	if ( !empty($_FILES) ) {
+		foreach ($_FILES['file']['name'] as $key => $value) {
+			if ( $_FILES['file']['error'][$key] === 0 ) {
+				$file = array(
+					'name'     => $_FILES['file']['name'][$key],
+					'type'     => $_FILES['file']['type'][$key],
+					'tmp_name' => $_FILES['file']['tmp_name'][$key],
+					'error'    => $_FILES['file']['error'][$key],
+					'size'     => $_FILES['file']['size'][$key]
+				);
+				$uploads[] = wp_handle_upload($file, array('test_form' => false));
+			}
 		}
 	}
 	$attachments = array();

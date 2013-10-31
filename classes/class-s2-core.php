@@ -1198,7 +1198,7 @@ class s2class {
 		if ( is_user_logged_in() ) {
 			echo $this->profile;
 		} else {
-			echo "<p style=\"width: auto;\"><label><input type=\"checkbox\" name=\"s2_comment_request\" value=\"1\" " . checked($this->subscribe2_options['comment_def'], 'yes', false) . "/>" . __('Check here to Subscribe to notifications for new posts', 'subscribe2') . "</label></p>";
+			echo "<p style=\"width: auto;\"><label><input type=\"checkbox\" name=\"s2_comment_request\" value=\"1\" " . checked($this->subscribe2_options['comment_def'], 'yes', false) . "/> " . __('Check here to Subscribe to notifications for new posts', 'subscribe2') . "</label></p>";
 		}
 	} // end s2_comment_meta_form()
 
@@ -1214,6 +1214,7 @@ class s2class {
 					break;
 				case '1':
 					// Approved so add
+					$comment = get_comment($comment_ID);
 					$is_public = $this->is_public($comment->comment_author_email);
 					if ( $is_public == 0 ) {
 						$this->toggle($comment->comment_author_email);

@@ -12,19 +12,25 @@ $current_tab = isset( $_GET['tab'] ) ? esc_attr($_GET['tab']) : 'public';
 if ( isset($_POST['s2_admin']) ) {
 	check_admin_referer('bulk-subscribers');
 	if ( !empty($_POST['addresses']) ) {
-		$sub_error = '';
+		$reg_sub_error = '';
+		$pub_sub_error = '';
 		$unsub_error = '';
+		$message = '';
 		foreach ( preg_split("|[\s,]+|", $_POST['addresses']) as $email ) {
 			$email = $this->sanitize_email($email);
-			if ( is_email($email) && $_POST['subscribe'] ) {
+			if ( is_email($email) && isset($_POST['subscribe']) ) {
 				if ( $this->is_public($email) !== false ) {
-					('' == $sub_error) ? $sub_error = "$email" : $sub_error .= ", $email";
+					('' == $pub_sub_error) ? $pub_sub_error = "$email" : $pub_sub_error .= ", $email";
+					continue;
+				}
+				if ( $this->is_registered($email) ) {
+					('' == $reg_sub_error) ? $reg_sub_error = "$email" : $reg_sub_error .= ", $email";
 					continue;
 				}
 				$this->add($email, true);
 				$message = "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) subscribed!', 'subscribe2') . "</strong></p></div>";
-			} elseif ( is_email($email) && $_POST['unsubscribe'] ) {
-				if ( $this->is_public($email) === false ) {
+			} elseif ( is_email($email) && isset($_POST['unsubscribe']) ) {
+				if ( $this->is_public($email) === false || $this->is_registered($email) ) {
 					('' == $unsub_error) ? $unsub_error = "$email" : $unsub_error .= ", $email";
 					continue;
 				}
@@ -32,13 +38,18 @@ if ( isset($_POST['s2_admin']) ) {
 				$message = "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Address(es) unsubscribed!', 'subscribe2') . "</strong></p></div>";
 			}
 		}
-		if ( $sub_error != '' ) {
-			echo "<div id=\"message\" class=\"error\"><p><strong>" . __('Some emails were not processed, the following were already subscribed' , 'subscribe2') . ":<br />$sub_error</strong></p></div>";
+		if ( $reg_sub_error != '' ) {
+			echo "<div id=\"message\" class=\"error\"><p><strong>" . __('Some emails were not processed, the following are already Registered Subscribers' , 'subscribe2') . ":<br />$reg_sub_error</strong></p></div>";
+		}
+		if ( $pub_sub_error != '' ) {
+			echo "<div id=\"message\" class=\"error\"><p><strong>" . __('Some emails were not processed, the following are already Public Subscribers' , 'subscribe2') . ":<br />$pub_sub_error</strong></p></div>";
 		}
 		if ( $unsub_error != '' ) {
 			echo "<div id=\"message\" class=\"error\"><p><strong>" . __('Some emails were not processed, the following were not in the database' , 'subscribe2') . ":<br />$unsub_error</strong></p></div>";
 		}
-		echo $message;
+		if ( $message != '' ) {
+			echo $message;
+		}
 		$_POST['what'] = 'confirmed';
 	} elseif ( (isset($_POST['action']) && $_POST['action'] === 'delete') || (isset($_POST['action2']) && $_POST['action2'] === 'delete') ) {
 		if ( $current_tab === 'public' ) {

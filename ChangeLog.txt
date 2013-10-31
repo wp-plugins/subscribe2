@@ -7,7 +7,8 @@
 * Fix for Sticky Posts in the digest returning errant posts - thanks to belg4mit
 * Move FAQs to external site to allow more timely updates
 * Add ability to hide other Multisite blogs with CSS in the Subscribe2->Your Subscriptions page (DIV id of 's2_mu_sites') - props cblsysadmin
-* Add 's2_form' filter to allow dynamic alterations to the default form- props adam_jack
+* Add 's2_form' filter to allow dynamic alterations to the default form - props adam_jack
+* Conduct more thorough checking for Public and Registered emails when adding users in the admin pages - thanks to MadtownLems
 
 = Version 9.0 by Matthew Robinson =
 
