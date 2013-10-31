@@ -125,7 +125,7 @@ if ( empty($id) ) {
 }
 
 if ( $this->subscribe2_options['email_freq'] != 'never' ) {
-	$disallowed_keywords = array('{TITLE}', '{PERMALINK}', '{DATE}', '{TIME}', '{LINK}', '{ACTION}');
+	$disallowed_keywords = array('{TITLE}', '{PERMALINK}', '{DATE}', '{TIME}', '{LINK}', '{ACTION}', '{REFERENCELINKS}');
 } else {
 	$disallowed_keywords = array('{POSTTIME}', '{TABLE}', '{TABLELINKS}', '{COUNT}', '{LINK}', '{ACTION}');
 }
