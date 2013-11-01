@@ -542,6 +542,7 @@ class s2class {
 		$plaintext = preg_replace('|<s[^>]*>(.*)<\/s>|Ui','', $plaintext);
 		$plaintext = preg_replace('|<strike[^>]*>(.*)<\/strike>|Ui','', $plaintext);
 		$plaintext = preg_replace('|<del[^>]*>(.*)<\/del>|Ui','', $plaintext);
+		$excerpttext = $plaintext;
 
 		if ( strstr($mailtext, "{REFERENCELINKS}") ) {
 			$mailtext = str_replace("{REFERENCELINKS}", '', $mailtext);
@@ -582,14 +583,13 @@ class s2class {
 		$excerpt = $post->post_excerpt;
 		if ( '' == $excerpt ) {
 			// no excerpt, is there a <!--more--> ?
-			if ( false !== strpos($content, '<!--more-->') ) {
-				list($excerpt, $more) = explode('<!--more-->', $content, 2);
-				// strip leading and trailing whitespace
-				$excerpt = strip_tags($excerpt);
-				$excerpt = trim($excerpt);
+			if ( false !== strpos($excerpttext, '<!--more-->') ) {
+				list($excerpt, $more) = explode('<!--more-->', $excerpttext, 2);
+				// strip tags and trailing whitespace
+				$excerpt = trim(strip_tags($excerpt));
 			} else {
 				// no <!--more-->, so grab the first 55 words
-				$excerpt = strip_tags($content);
+				$excerpt = trim(strip_tags($excerpttext));
 				$words = explode(' ', $excerpt, $this->excerpt_length + 1);
 				if (count($words) > $this->excerpt_length) {
 					array_pop($words);
