@@ -323,6 +323,7 @@ class s2_admin extends s2class {
 	Export subscriber emails and other details to CSV
 	*/
 	function prepare_export( $subscribers ) {
+		if ( empty($subscribers) ) { return; }
 		$subscribers = explode(",\r\n", $subscribers);
 		natcasesort($subscribers);
 
