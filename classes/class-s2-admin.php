@@ -331,7 +331,7 @@ class s2_admin extends s2class {
 		$all_cats = $this->all_cats(false, 'ID');
 
 		foreach ($all_cats as $cat) {
-			$exportcsv .= "," . $cat->cat_name;
+			$exportcsv .= "," . html_entity_decode($cat->cat_name, ENT_QUOTES);
 			$cat_ids[] = $cat->term_id;
 		}
 		$exportcsv .= "\r\n";
