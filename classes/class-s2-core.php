@@ -43,8 +43,6 @@ class s2class {
 
 		$this->no_page = __('You must to create a WordPress page for this plugin to work correctly.', 'subscribe2');
 
-		$this->disallowed_keywords = __('Your chosen email type (per-post or digest) does not support the following keywords:', 'subscribe2');
-
 		$this->mail_sent = "<p class=\"s2_message\">" . __('Message sent!', 'subscribe2') . "</p>";
 
 		$this->mail_failed = "<p class=\"s2_error\">" . __('Message failed!', 'subscribe2') . "</p>";

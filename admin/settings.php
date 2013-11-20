@@ -136,7 +136,9 @@ foreach ( $disallowed_keywords as $disallowed_keyword ) {
 	}
 }
 if ( $disallowed !== false ) {
-	echo "<div id=\"keyword_message\" class=\"error\"><p class=\"s2_error\"><strong>$this->disallowed_keywords</strong><br>" . implode($disallowed, ', ') . "</p></div>";
+	$disallowed_keywords = __('Your chosen email type (per-post or digest) does not support the following keywords:', 'subscribe2');
+	$template_link = "<a href = \"" . admin_url('admin.php?page=s2_settings&tab=templates') . "\">" . __('Modify your template', 'subscribe2') . "</a>";
+	echo "<div id=\"keyword_message\" class=\"error\"><p class=\"s2_error\"><strong>$disallowed_keywords</strong><br />" . implode($disallowed, ', ') . "<br />" . $template_link . "</p></div>";
 }
 
 // send error message if sender email address is off-domain

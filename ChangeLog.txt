@@ -11,6 +11,9 @@
 * Conduct more thorough checking for Public and Registered emails when adding users in the admin pages - thanks to MadtownLems
 * Introduce the {REFERENCELINKS} keyword - props manu1033
 * Fix link to jQuery CSS for servers using HTTPS connections - props Christian (aka Alariel)
+* Introduce link to Templates page with unsupported keywords are detected - props MadtownLems
+* Ensure all JavaScript passes the JSHint WordPress Coding Standards
+* Initialise ‘colorpicker’ boxes on page load so they are coloured before first user click
 
 = Version 9.0 by Matthew Robinson =
 
