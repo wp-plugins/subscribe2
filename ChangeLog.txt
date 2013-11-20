@@ -14,6 +14,7 @@
 * Introduce link to Templates page with unsupported keywords are detected - props MadtownLems
 * Ensure all JavaScript passes the JSHint WordPress Coding Standards
 * Initialise ‘colorpicker’ boxes on page load so they are coloured before first user click
+* Only add a new Weekly schedule if it doesn’t already exist
 
 = Version 9.0 by Matthew Robinson =
 
