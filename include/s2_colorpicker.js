@@ -16,7 +16,7 @@ jQuery( document ).ready(function () {
 			}
 		});
 		jQuery( this ).on( 'focusin', function () {
-			jQuery( '.s2_colorpicker' ).hide();
+			jQuery( '.s2_colorpicker' ).slideUp();
 			jQuery.farbtastic( '#' + picker ).linkTo( this );
 			jQuery( '#' + picker ).slideDown();
 		});
@@ -30,7 +30,7 @@ jQuery( document ).ready(function () {
 			field = jQuery( this ).attr( 'id' ).substr( 0, 20 );
 		if ( -1 !== jQuery( this ).attr( 'id' ).search( field ) ) {
 			picker = jQuery( this ).attr( 'id' );
+			jQuery.farbtastic( '#' + picker ).linkTo( this );
 		}
-		jQuery.farbtastic( '#' + picker ).linkTo( this );
 	});
 });
