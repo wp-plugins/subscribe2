@@ -8,10 +8,10 @@ jQuery( document ).ready(function () {
 		}
 		jQuery( this ).addClass( 's2_initialised' );
 		var picker,
-			field = jQuery( this ).attr( 'id' ).substr( 0, 20 );
+			field = this.id.substr( 0, 20 );
 		jQuery( '.s2_colorpicker' ).each(function () {
-			if ( -1 !== jQuery( this ).attr( 'id' ).search( field ) ) {
-				picker = jQuery( this ).attr( 'id' );
+			if ( -1 !== this.id.search( field ) ) {
+				picker = this.id;
 				return false; // stop looping
 			}
 		});
@@ -26,11 +26,6 @@ jQuery( document ).ready(function () {
 		jQuery( this ).trigger( 'focus' );
 	});
 	jQuery( '.colorpickerField' ).each(function () {
-		var picker,
-			field = jQuery( this ).attr( 'id' ).substr( 0, 20 );
-		if ( -1 !== jQuery( this ).attr( 'id' ).search( field ) ) {
-			picker = jQuery( this ).attr( 'id' );
-			jQuery.farbtastic( '#' + picker ).linkTo( this );
-		}
+		jQuery.farbtastic( '#' + this.id ).linkTo( this );
 	});
 });

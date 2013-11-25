@@ -15,6 +15,7 @@
 * Ensure all JavaScript passes the JSHint WordPress Coding Standards
 * Initialise ‘colorpicker’ boxes on page load so they are coloured before first user click
 * Only add a new Weekly schedule if it doesn’t already exist
+* Use trim() on post excerpt to account for blank but non-empty excerpts
 
 = Version 9.0 by Matthew Robinson =
 

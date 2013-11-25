@@ -578,7 +578,7 @@ class s2class {
 		$content = apply_filters('the_content', $content);
 		$content = str_replace("]]>", "]]&gt", $content);
 
-		$excerpt = $post->post_excerpt;
+		$excerpt = trim($post->post_excerpt);
 		if ( '' == $excerpt ) {
 			// no excerpt, is there a <!--more--> ?
 			if ( false !== strpos($excerpttext, '<!--more-->') ) {
@@ -596,7 +596,7 @@ class s2class {
 				}
 			}
 		}
-		$html_excerpt = $post->post_excerpt;
+		$html_excerpt = trim($post->post_excerpt);
 		if ( '' == $html_excerpt ) {
 			// no excerpt, is there a <!--more--> ?
 			if ( false !== strpos($content, '<!--more-->') ) {
@@ -1486,7 +1486,7 @@ class s2class {
 			$message_post .= "\r\n";
 			$message_posttime .= "\r\n";
 
-			( !empty($post->post_excerpt) ) ? $excerpt = $post->post_excerpt : $excerpt = '';
+			( !empty($post->post_excerpt) ) ? $excerpt = trim($post->post_excerpt) : $excerpt = '';
 			if ( '' == $excerpt ) {
 				// no excerpt, is there a <!--more--> ?
 				if ( false !== strpos($post->post_content, '<!--more-->') ) {
