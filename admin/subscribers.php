@@ -180,7 +180,9 @@ $S2ListTable->prepare_items();
 
 // show our form
 echo "<div class=\"wrap\">";
-echo "<div id=\"icon-tools\" class=\"icon32\"></div>";
+if ( version_compare($GLOBALS['wp_version'], '3.8', '<=') ) {
+	echo "<div id=\"icon-tools\" class=\"icon32\"></div>";
+}
 $tabs = array('public' => __('Public Subscribers', 'subscribe2'), 'registered' => __('Registered Subscribers', 'subscribe2'));
 echo "<h2 class=\"nav-tab-wrapper\">";
 foreach ( $tabs as $tab_key => $tab_caption ) {

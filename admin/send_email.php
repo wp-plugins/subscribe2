@@ -93,7 +93,9 @@ if ( isset($_POST['s2_admin']) && 'mail' == $_POST['s2_admin'] ) {
 
 // show our form
 echo "<div class=\"wrap\">";
-echo "<div id=\"icon-edit\" class=\"icon32\"></div>";
+if ( version_compare($GLOBALS['wp_version'], '3.8', '<=') ) {
+	echo "<div id=\"icon-edit\" class=\"icon32\"></div>";
+}
 echo "<h2>" . __('Send an email to subscribers', 'subscribe2') . "</h2>\r\n";
 echo "<form method=\"post\" enctype=\"multipart/form-data\">\r\n";
 if ( function_exists('wp_nonce_field') ) {

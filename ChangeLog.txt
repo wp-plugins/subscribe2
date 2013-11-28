@@ -16,6 +16,7 @@
 * Initialise ‘colorpicker’ boxes on page load so they are coloured before first user click
 * Only add a new Weekly schedule if it doesn’t already exist
 * Use trim() on post excerpt to account for blank but non-empty excerpts
+* Don't display screen icons in WordPress 3.8 as they are hidden by CSS - see ticket http://core.trac.wordpress.org/ticket/26119
 
 = Version 9.0 by Matthew Robinson =
 

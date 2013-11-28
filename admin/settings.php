@@ -158,7 +158,9 @@ $current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'email';
 
 // show our form
 echo "<div class=\"wrap\">";
-echo "<div id=\"icon-options-general\" class=\"icon32\"></div>";
+if ( version_compare($GLOBALS['wp_version'], '3.8', '<=') ) {
+	echo "<div id=\"icon-options-general\" class=\"icon32\"></div>";
+}
 $tabs = array('email' => __('Email Settings', 'subscribe2'),
 	'templates' => __('Templates', 'subscribe2'),
 	'registered' => __('Registered Users', 'subscribe2'),
