@@ -9,7 +9,7 @@
 			pbreplaced = [],
 			pbRE = new RegExp(/(\[|<!--)subscribe2.*(\]|-->)/g),
 			replacer = function ( str ) {
-				if ( str.indexOf( 'class="mceSubscribe2' ) !== -1 ) {
+				if ( -1 !== str.indexOf( 'class="mceSubscribe2' ) ) {
 					str = pbreplaced[i];
 				}
 				return str;
@@ -65,13 +65,13 @@
 			// replace any other instances with the default shortcode
 			ed.onPostProcess.add(function ( ed, o ) {
 				if ( o.get ) {
-					if ( pbreplaced !== null ) {
+					if ( null !== pbreplaced ) {
 						for ( i = 0; i < pbreplaced.length; i++ ) {
 							o.content = o.content.replace(/<img[^>]+>/, replacer );
 						}
 					}
 					o.content = o.content.replace( /<img[^>]+>/g, function ( im ) {
-						if ( im.indexOf( 'class="mceSubscribe2' ) !== -1 ) {
+						if ( -1 !== im.indexOf( 'class="mceSubscribe2' ) ) {
 							im = shortcode;
 						}
 						return im;
