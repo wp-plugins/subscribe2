@@ -415,6 +415,7 @@ switch ($current_tab) {
 		// WordPress page ID where subscribe2 token is used
 		echo __('Set default Subscribe2 page as', 'subscribe2') . ': ';
 		echo "<select name=\"s2page\">\r\n";
+		echo "<option value=\"0\">" . __('Select a page', 'subscribe2') . "</option>\r\n";
 		$this->pages_dropdown($this->subscribe2_options['s2page']);
 		echo "</select>\r\n";
 
