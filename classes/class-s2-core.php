@@ -546,10 +546,10 @@ class s2class {
 			$mailtext = str_replace("{REFERENCELINKS}", '', $mailtext);
 			$plaintext_links = '';
 			$i = 0;
-			while (preg_match('|<a([^>]*)>(.*)<\/a>|Ui', $plaintext, $matches)) {
-				if (preg_match('|href="([^"]*)"|', $matches[1], $link_matches)){
-					$plaintext_links .= sprintf("[%d] %s\r\n", ++$i, $link_matches[1]);
-					$link_replacement = sprintf("%s [%d]", $matches[2], $i);
+			while ( preg_match('|<a([^>]*)>(.*)<\/a>|Ui', $plaintext, $matches) ) {
+				if ( preg_match('|href="([^"]*)"|', $matches[1], $link_matches) ){
+					$plaintext_links .= sprintf( "[%d] %s\r\n", ++$i, $link_matches[1] );
+					$link_replacement = sprintf( "%s [%d]", $matches[2], $i );
 				} else {
 					$link_replacement = $matches[2];
 				}
@@ -559,7 +559,7 @@ class s2class {
 
  		$plaintext = trim(strip_tags($plaintext));
 
-		if ($plaintext_links != '') {
+		if (strstr($mailtext, "{REFERENCELINKS}") && $plaintext_links != '' ) {
 			$plaintext .= "\r\n\r\n" . trim($plaintext_links);
 		}
 
