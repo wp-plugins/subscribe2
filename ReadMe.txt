@@ -3,7 +3,7 @@ Contributors: MattyRob, Skippy, RavanH, bhadaway
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.3
-Tested up to: 3.6.1
+Tested up to: 3.7.1
 Stable tag: 9.0
 License: GPL3
 
@@ -51,7 +51,6 @@ This token will automatically be replaced by dynamic subscription information an
 8. In the WordPress "Settings" area for Subscribe2 select the page name in the "Appearance" section that of the WordPress page created in step 7.
 
 == Frequently Asked Questions ==
-
 [Visit FAQ site](http://subscribe2.wordpress.com/support/faqs/)
 
 == Screenshots ==

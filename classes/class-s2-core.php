@@ -559,7 +559,7 @@ class s2class {
 
  		$plaintext = trim(strip_tags($plaintext));
 
-		if (strstr($mailtext, "{REFERENCELINKS}") && $plaintext_links != '' ) {
+		if ( strstr($mailtext, "{REFERENCELINKS}") && $plaintext_links != '' ) {
 			$plaintext .= "\r\n\r\n" . trim($plaintext_links);
 		}
 
@@ -1201,7 +1201,7 @@ class s2class {
 	function register_post($user_ID = 0) {
 		global $_POST;
 		if ( 0 == $user_ID ) { return; }
-		if ( 'yes' == $this->subscribe2_options['autosub'] || ( 'on' == $_POST['reg_subscribe'] && 'wpreg' == $this->subscribe2_options['autosub'] ) ) {
+		if ( 'yes' == $this->subscribe2_options['autosub'] || ( isset($_POST['reg_subscribe']) && 'on' == $_POST['reg_subscribe'] && 'wpreg' == $this->subscribe2_options['autosub'] ) ) {
 			$this->register($user_ID, true);
 		} else {
 			$this->register($user_ID, false);
