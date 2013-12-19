@@ -701,7 +701,8 @@ class s2class {
 			$body = $this->substitute(stripslashes($this->subscribe2_options['remind_email']));
 			$subject = $this->substitute(stripslashes($this->subscribe2_options['remind_subject']));
 		} else {
-			$body = $this->substitute(stripslashes($this->subscribe2_options['confirm_email']));
+			$body = apply_filters('s2_confirm_email', stripslashes($this->subscribe2_options['confirm_email']), $what);
+			$body = $this->substitute($body);
 			if ( 'add' == $what ) {
 				$body = str_replace("{ACTION}", $this->subscribe, $body);
 				$subject = str_replace("{ACTION}", $this->subscribe, $this->subscribe2_options['confirm_subject']);

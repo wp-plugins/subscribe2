@@ -17,6 +17,7 @@
 * Only add a new Weekly schedule if it doesn’t already exist
 * Use trim() on post excerpt to account for blank but non-empty excerpts
 * Don't display screen icons in WordPress 3.8 as they are hidden by CSS - see ticket http://core.trac.wordpress.org/ticket/26119
+* Added 's2_confirm_email' filter to allow amendment or replacement of the subscribe and unsubscribe emails - proposed by Tim Büttner
 
 = Version 9.0 by Matthew Robinson =
 
