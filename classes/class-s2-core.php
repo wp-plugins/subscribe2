@@ -644,26 +644,26 @@ class s2class {
 			// Registered Subscribers first
 			// first we send plaintext summary emails
 			$recipients = $this->get_registered("cats=$post_cats_string&format=excerpt&author=$post->post_author");
-			$recipients = apply_filters('s2_send_plain_excerpt_suscribers', $recipients, $post->ID);
+			$recipients = apply_filters('s2_send_plain_excerpt_subscribers', $recipients, $post->ID);
 			$this->mail($recipients, $subject, $plain_excerpt_body);
 
 			// next we send plaintext full content emails
 			$recipients = $this->get_registered("cats=$post_cats_string&format=post&author=$post->post_author");
-			$recipients = apply_filters('s2_send_plain_fullcontent_suscribers', $recipients, $post->ID);
+			$recipients = apply_filters('s2_send_plain_fullcontent_subscribers', $recipients, $post->ID);
 			$this->mail($recipients, $subject, $plain_body);
 
 			// next we send html excerpt content emails
 			$recipients = $this->get_registered("cats=$post_cats_string&format=html_excerpt&author=$post->post_author");
-			$recipients = apply_filters('s2_send_html_excerpt_suscribers', $recipients, $post->ID);
+			$recipients = apply_filters('s2_send_html_excerpt_subscribers', $recipients, $post->ID);
 			$this->mail($recipients, $subject, $html_excerpt_body, 'html');
 
 			// next we send html full content emails
 			$recipients = $this->get_registered("cats=$post_cats_string&format=html&author=$post->post_author");
-			$recipients = apply_filters('s2_send_html_fullcontent_suscribers', $recipients, $post->ID);
+			$recipients = apply_filters('s2_send_html_fullcontent_subscribers', $recipients, $post->ID);
 			$this->mail($recipients, $subject, $html_body, 'html');
 
 			// and finally we send to Public Subscribers
-			$recipients = apply_filters('s2_send_public_suscribers', $public, $post->ID);
+			$recipients = apply_filters('s2_send_public_subscribers', $public, $post->ID);
 			$this->mail($recipients, $subject, $plain_excerpt_body, 'text');
 		}
 	} // end publish()

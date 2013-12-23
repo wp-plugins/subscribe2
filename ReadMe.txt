@@ -3,7 +3,7 @@ Contributors: MattyRob, Skippy, RavanH, bhadaway
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.3
-Tested up to: 3.7.1
+Tested up to: 3.8
 Stable tag: 9.0
 License: GPL3
 
