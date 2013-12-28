@@ -41,7 +41,7 @@ class s2class {
 
 		$this->error = "<p class=\"s2_error\">" . __('Sorry, there seems to be an error on the server. Please try again later.', 'subscribe2') . "</p>";
 
-		$this->no_page = __('You must to create a WordPress page for this plugin to work correctly.', 'subscribe2');
+		$this->no_page = __('You must create a WordPress page for this plugin to work correctly.', 'subscribe2');
 
 		$this->mail_sent = "<p class=\"s2_message\">" . __('Message sent!', 'subscribe2') . "</p>";
 
@@ -1641,17 +1641,15 @@ class s2class {
 		if ( $this->subscribe2_options['email_freq'] != 'never' ) {
 			add_action('s2_digest_cron', array(&$this, 'subscribe2_cron'));
 		} else {
-			add_action('new_to_publish', array(&$this, 'publish'));
-			add_action('draft_to_publish', array(&$this, 'publish'));
-			add_action('auto-draft_to_publish', array(&$this, 'publish'));
-			add_action('pending_to_publish', array(&$this, 'publish'));
-			add_action('private_to_publish', array(&$this, 'publish'));
-			add_action('future_to_publish', array(&$this, 'publish'));
+			$statuses = apply_filters('s2_post_statuses', array('new', 'draft', 'auto-draft', 'pending'));
 			if ( $this->subscribe2_options['private'] == 'yes' ) {
-				add_action('new_to_private', array(&$this, 'publish'));
-				add_action('draft_to_private', array(&$this, 'publish'));
-				add_action('auto-draft_to_private', array(&$this, 'publish'));
-				add_action('pending_to_private', array(&$this, 'publish'));
+				foreach ( $statuses as $status ) {
+					add_action("{$status}_to_private", array(&$this, 'publish'));
+				}
+			}
+			array_push($statuses, 'private', 'future');
+			foreach ( $statuses as $status ) {
+				add_action("{$status}_to_publish", array(&$this, 'publish'));
 			}
 		}
 		// add actions for comment subscribers
