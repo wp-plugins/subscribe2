@@ -534,9 +534,8 @@ class s2class {
 		$mailtext = stripslashes($this->substitute($mailtext));
 
 		$plaintext = $post->post_content;
-		if ( function_exists('strip_shortcodes') ) {
-			$plaintext = strip_shortcodes($plaintext);
-		}
+		$plaintext = strip_shortcodes($plaintext);
+
 		$plaintext = preg_replace('|<s[^>]*>(.*)<\/s>|Ui','', $plaintext);
 		$plaintext = preg_replace('|<strike[^>]*>(.*)<\/strike>|Ui','', $plaintext);
 		$plaintext = preg_replace('|<del[^>]*>(.*)<\/del>|Ui','', $plaintext);
@@ -1493,14 +1492,10 @@ class s2class {
 				if ( false !== strpos($post->post_content, '<!--more-->') ) {
 					list($excerpt, $more) = explode('<!--more-->', $post->post_content, 2);
 					$excerpt = strip_tags($excerpt);
-					if ( function_exists('strip_shortcodes') ) {
-						$excerpt = strip_shortcodes($excerpt);
-					}
+					$excerpt = strip_shortcodes($excerpt);
 				} else {
 					$excerpt = strip_tags($post->post_content);
-					if ( function_exists('strip_shortcodes') ) {
-						$excerpt = strip_shortcodes($excerpt);
-					}
+					$excerpt = strip_shortcodes($excerpt);
 					$words = explode(' ', $excerpt, $this->excerpt_length + 1);
 					if ( count($words) > $this->excerpt_length ) {
 						array_pop($words);
