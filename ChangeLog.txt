@@ -20,6 +20,7 @@
 * Added 's2_confirm_email' filter to allow amendment or replacement of the subscribe and unsubscribe emails - proposed by Tim Büttner
 * Fixed a typo in the names of the five 's2_send_{email_type}_subscribers' hooks - thanks to robertjj
 * Introduced the 's2_post_statuses' to allow for custom post status transitions, for example with the 'Edit Flow' plugin
+* Fix for failed deletion of Registered Subscribers in Subscribe2->Subscribers page - thanks to Russ Michaels
 
 = Version 9.0 by Matthew Robinson =
 
