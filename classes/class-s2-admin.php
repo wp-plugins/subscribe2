@@ -234,7 +234,7 @@ class s2_admin extends s2class {
 		if ( stripos($_SERVER['REQUEST_URI'], 'widgets.php' ) !== false ) {
 			wp_enqueue_style('farbtastic');
 			wp_enqueue_script('farbtastic');
-			wp_register_script('s2_colorpicker', S2URL . 'include/s2_colorpicker' . $this->script_debug . '.js', array('farbtastic'), '1.1'); //my js
+			wp_register_script('s2_colorpicker', S2URL . 'include/s2_colorpicker' . $this->script_debug . '.js', array('farbtastic'), '1.2');
 			wp_enqueue_script('s2_colorpicker');
 		}
 	} // end widget_s2_counter_css_and_js()
@@ -323,6 +323,7 @@ class s2_admin extends s2class {
 	Export subscriber emails and other details to CSV
 	*/
 	function prepare_export( $subscribers ) {
+		if ( empty($subscribers) ) { return; }
 		$subscribers = explode(",\r\n", $subscribers);
 		natcasesort($subscribers);
 
@@ -330,7 +331,7 @@ class s2_admin extends s2class {
 		$all_cats = $this->all_cats(false, 'ID');
 
 		foreach ($all_cats as $cat) {
-			$exportcsv .= "," . $cat->cat_name;
+			$exportcsv .= "," . html_entity_decode($cat->cat_name, ENT_QUOTES);
 			$cat_ids[] = $cat->term_id;
 		}
 		$exportcsv .= "\r\n";
@@ -720,7 +721,6 @@ class s2_admin extends s2class {
 		$pages = get_pages();
 		if ( empty($pages) ) { return; }
 
-		$option = "<option value=\"0\">" . __('Select a page', 'subscribe2') . "</option>\r\n";
 		foreach ( $pages as $page ) {
 			$option .= "<option value=\"" . $page->ID . "\"";
 			if ( $page->ID == $s2page ) {

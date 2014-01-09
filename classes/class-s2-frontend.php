@@ -78,7 +78,7 @@ class s2_frontend extends s2class {
 		} else {
 			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" />" . $wrap_text . $this->input_form_action . "</p></form>\r\n";
 		}
-		$this->s2form = $this->form;
+		$this->s2form = apply_filters('s2_form', $this->form);
 
 		global $user_ID;
 		get_currentuserinfo();
@@ -299,7 +299,11 @@ class s2_frontend extends s2class {
 	function add_ajax() {
 		// enqueue the jQuery script we need and let WordPress handle the dependencies
 		wp_enqueue_script('jquery-ui-dialog');
-		wp_register_style('jquery-ui-style', apply_filters('s2_jqueryui_css', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/ui-darkness/jquery-ui.css'));
+		$css = 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/ui-darkness/jquery-ui.css';
+		if ( is_ssl() ) {
+			$css = str_replace('http:', 'https:', $css);
+		}
+		wp_register_style('jquery-ui-style', apply_filters('s2_jqueryui_css', $css));
 		wp_enqueue_style('jquery-ui-style');
 	} // end add_ajax()
 

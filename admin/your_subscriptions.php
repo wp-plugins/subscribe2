@@ -92,7 +92,9 @@ if ( isset($_POST['s2_admin']) && 'user' == $_POST['s2_admin'] ) {
 
 // show our form
 echo "<div class=\"wrap\">";
-echo "<div id=\"icon-users\" class=\"icon32\"></div>";
+if ( version_compare($GLOBALS['wp_version'], '3.8', '<=') ) {
+	echo "<div id=\"icon-users\" class=\"icon32\"></div>";
+}
 echo "<h2>" . __('Notification Settings', 'subscribe2') . "</h2>\r\n";
 if ( isset($_GET['email']) ) {
 	$user = get_userdata($user_ID);
