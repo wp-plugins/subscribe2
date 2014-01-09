@@ -1397,13 +1397,13 @@ class s2class {
 			$posts = get_posts('numberposts=1');
 		}
 
-// Collect sticky posts if desired
-if ( $this->subscribe2_options['stickies'] == 'yes' ) {
-	$stickies = get_posts(array('post__in' => get_option('sticky_posts')));
-	if ( !empty($stickies) ) {
-		$posts = array_merge((array)$stickies, (array)$posts);
-	}
-}
+		// Collect sticky posts if desired
+		if ( $this->subscribe2_options['stickies'] == 'yes' ) {
+			$stickies = get_posts(array('post__in' => get_option('sticky_posts')));
+			if ( !empty($stickies) ) {
+				$posts = array_merge((array)$stickies, (array)$posts);
+			}
+		}
 
 		// do we have any posts?
 		if ( empty($posts) && !has_filter('s2_digest_email') ) { return false; }
