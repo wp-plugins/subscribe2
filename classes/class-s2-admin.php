@@ -709,7 +709,7 @@ class s2_admin extends s2class {
 			echo "</select>\r\n";
 			echo "<a href=\"#\" onclick=\"s2_cron_update('cron'); return false;\">". __('Update', 'subscribe2') . "</a>\n";
 			echo "<a href=\"#\" onclick=\"s2_cron_revert('cron'); return false;\">". __('Revert', 'subscribe2') . "</a></span>\n";
-			if ( !empty($this->subscribe2_options['previous_s2cron']) ) {
+			if ( !empty($this->subscribe2_options['last_s2cron']) ) {
 				echo "<p>" . __('Attempt to resend the last Digest Notification email', 'subscribe2') . ": ";
 				echo "<input type=\"submit\" class=\"button-secondary\" name=\"resend\" value=\"" . __('Resend Digest', 'subscribe2') . "\" /></p>\r\n";
 			}

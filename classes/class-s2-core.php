@@ -174,6 +174,10 @@ class s2class {
 			$this->subscribe2_options['version'] = '8.8';
 			update_option('subscribe2_options', $this->subscribe2_options);
 		}
+		if ( version_compare($this->subscribe2_options['version'], '10.0', '<') ) {
+			$s2_upgrade->upgrade100();
+			$this->subscribe2_options['version'] = '10.0';
+		}
 
 		$this->subscribe2_options['version'] = S2VERSION;
 		update_option('subscribe2_options', $this->subscribe2_options);
@@ -1347,7 +1351,24 @@ class s2class {
 	} // end add_weekly_sched()
 
 	/**
-	Send a digest of recent new posts
+	Handle post transitions for the digest email
+	*/
+	function digest_post_transitions($new_status, $old_status, $post) {
+		if ( $new_status === $old_status ) { return; }
+
+		if ( $this->subscribe2_options['pages'] == 'yes' ) {
+			$s2_post_types = array('page', 'post');
+		} else {
+			$s2_post_types = array('post');
+		}
+		$s2_post_types = apply_filters('s2_post_types', $s2_post_types);
+		if ( !in_array($post->post_type, $s2_post_types) ) { return; }
+
+		update_post_meta( $post->ID, '_s2_digest_post_status', ( 'publish' === $new_status ) ? 'pending' : 'draft' );
+	} // end digest_post_transitions()
+
+	/**
+	Send a daily digest of today's new posts
 	*/
 	function subscribe2_cron($preview = '', $resend = '') {
 		if ( defined('DOING_S2_CRON') && DOING_S2_CRON ) { return; }
@@ -1355,17 +1376,6 @@ class s2class {
 		global $wpdb, $post;
 
 		if ( '' == $preview ) {
-			// update last_s2cron execution time before completing or bailing
-			$now = current_time('mysql');
-			$prev = $this->subscribe2_options['last_s2cron'];
-			$last = $this->subscribe2_options['previous_s2cron'];
-			$this->subscribe2_options['last_s2cron'] = $now;
-			$this->subscribe2_options['previous_s2cron'] = $prev;
-			if ( '' == $resend ) {
-				// update sending times provided this is not a resend
-				update_option('subscribe2_options', $this->subscribe2_options);
-			}
-
 			// set up SQL query based on options
 			if ( $this->subscribe2_options['private'] == 'yes' ) {
 				$status	= "'publish', 'private'";
@@ -1381,27 +1391,25 @@ class s2class {
 				$s2_post_types = array('post');
 			}
 			$s2_post_types = apply_filters('s2_post_types', $s2_post_types);
-			foreach( $s2_post_types as $post_type ) {
+			foreach ( $s2_post_types as $post_type ) {
 				('' == $type) ? $type = $wpdb->prepare("%s", $post_type) : $type .= $wpdb->prepare(", %s", $post_type);
 			}
 
 			// collect posts
 			if ( $resend == 'resend' ) {
-				if ( $this->subscribe2_options['cron_order'] == 'desc' ) {
-					$posts = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= %s AND post_date < %s AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC", $last, $prev));
-				} else {
-					$posts = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= %s AND post_date < %s AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC", $last, $prev));
-				}
+				$query = new WP_Query( array(
+					'post__in' => explode(',', $this->subscribe2_options['last_s2cron']),
+					'ignore_sticky_posts' => 1,
+					'order' => ($this->subscribe2_options['cron_order'] === 'desc') ? "DESC" : "ASC"
+					) );
+				$posts = $query->posts;
 			} else {
-				if ( $this->subscribe2_options['cron_order'] == 'desc' ) {
-					$posts = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= %s AND post_date < %s AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date DESC", $prev, $now));
-				} else {
-					$posts = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts WHERE post_date >= %s AND post_date < %s AND post_status IN ($status) AND post_type IN ($type) ORDER BY post_date ASC", $prev, $now));
-				}
+				$sql = "SELECT ID, post_title, post_excerpt, post_content, post_type, post_password, post_date, post_author FROM $wpdb->posts AS a INNER JOIN $wpdb->postmeta AS b ON b.post_id = a.ID";
+				$sql .= " AND b.meta_key = '_s2_digest_post_status' AND b.meta_value = 'pending' WHERE post_status IN ($status) AND post_type IN ($type) ORDER BY post_date " . (($this->subscribe2_options['cron_order'] === 'desc') ? 'DESC' : 'ASC');
+				$posts = $wpdb->get_results($sql);
 			}
 		} else {
 			// we are sending a preview
-			$now = $prev = $last = current_time('mysql');
 			$posts = get_posts('numberposts=1');
 		}
 
@@ -1470,6 +1478,13 @@ class s2class {
 			if ( $check ) {
 				continue;
 			}
+
+			if ( isset($sticky_ids) && !in_array($post->ID, $sticky_ids) ) {
+				$digest_post_ids[] = $post->ID;
+			} else {
+				$digest_post_ids[] = $post->ID;
+			}
+
 			$post_title = html_entity_decode($post->post_title, ENT_QUOTES);
 			('' == $table) ? $table .= "* " . $post_title : $table .= "\r\n* " . $post_title;
 			('' == $tablelinks) ? $tablelinks .= "* " . $post_title : $tablelinks .= "\r\n* " . $post_title;
@@ -1540,6 +1555,12 @@ class s2class {
 			$message_posttime .= $excerpt . "\r\n\r\n";
 		}
 
+		foreach ( $digest_post_ids as $digest_post_id ) {
+			update_post_meta($digest_post_id, '_s2_digest_post_status', 'done');
+		}
+		$this->subscribe2_options['last_s2cron'] = implode(',', $digest_post_ids);
+		update_option('subscribe2_options', $this->subscribe2_options);
+
 		// we add a blank line after each post excerpt now trim white space that occurs for the last post
 		$message_post = trim($message_post);
 		$message_posttime = trim($message_posttime);
@@ -1602,7 +1623,7 @@ class s2class {
 		if ( empty($old_unconfirmed) ) {
 			return;
 		} else {
-			foreach ($old_unconfirmed as $email) {
+			foreach ( $old_unconfirmed as $email ) {
 				$this->delete($email);
 			}
 		}
@@ -1665,6 +1686,7 @@ class s2class {
 		// add actions for processing posts based on per-post or cron email settings
 		if ( $this->subscribe2_options['email_freq'] != 'never' ) {
 			add_action('s2_digest_cron', array(&$this, 'subscribe2_cron'));
+			add_action('transition_post_status', array(&$this, 'digest_post_transitions'), 10, 3);
 		} else {
 			$statuses = apply_filters('s2_post_statuses', array('new', 'draft', 'auto-draft', 'pending'));
 			if ( $this->subscribe2_options['private'] == 'yes' ) {

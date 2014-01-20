@@ -85,7 +85,6 @@ if ( isset( $_POST['s2_admin']) ) {
 					if ( $interval == 0 ) {
 						// if we are on per-post emails remove last_cron entry
 						unset($this->subscribe2_options['last_s2cron']);
-						unset($this->subscribe2_options['previous_s2cron']);
 					} else {
 						// if we are using digest schedule the event and prime last_cron as now
 						$time = time() + $interval;
@@ -100,9 +99,6 @@ if ( isset( $_POST['s2_admin']) ) {
 							$timestamp += $interval;
 						}
 						wp_schedule_event($timestamp, $email_freq, 's2_digest_cron');
-						if ( !isset($this->subscribe2_options['last_s2cron']) ) {
-							$this->subscribe2_options['last_s2cron'] = current_time('mysql');
-						}
 					}
 				}
 			} else {

@@ -338,5 +338,13 @@ class s2class_upgrade {
 		}
 		maybe_add_column($mysubscribe2->public, 'time', "ALTER TABLE $mysubscribe2->public ADD time TIME DEFAULT '00:00:00' NOT NULL AFTER date");
 	} // end upgrade88()
+
+	function upgrade100() {
+		global $mysubscribe2;
+		if ( $mysubscribe2->subscribe2_options['email_freq'] != 'never' ) {
+			$mysubscribe2->subscribe2_options['last_s2cron'] = '';
+			unset($mysubscribe2->subscribe2_options['previous_s2cron']);
+		}
+	} // end upgrade100()
 }
 ?>
