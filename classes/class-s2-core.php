@@ -617,6 +617,14 @@ class s2class {
 			}
 		}
 
+		// maybe add social media sharing buttons
+		$social = apply_filters('s2_social_links', array('facebook', 'twitter'));
+		if ( !empty($social) ) {
+			$social_buttons = $this->social_buttons($social);
+			$content .= $social_buttons;
+			$html_excerpt .= $social_buttons;
+		}
+
 		// remove excess white space from with $excerpt and $plaintext
 		$excerpt = preg_replace('|[ ]+|', ' ', $excerpt);
 		$plaintext = preg_replace('|[ ]+|', ' ', $plaintext);
@@ -666,6 +674,23 @@ class s2class {
 			$this->mail($recipients, $subject, $plain_excerpt_body, 'text');
 		}
 	} // end publish()
+
+	/**
+	Function to create social network sharing buttons
+	*/
+	function social_buttons($social) {
+		$social_buttons = '';
+		if ( in_array('facebook', $social) ) {
+			$social_buttons .= '<a href="http://api.addthis.com/oexchange/0.8/forward/facebook/offer?url=' . urlencode($this->permalink) . '" target="_blank" ><img src="http://cache.addthiscdn.com/icons/v1/thumbs/facebook.gif" border="0" style="margin: 1px;" alt="' . __('Like', 'subscribe2') . '" /></a>';
+		}
+		if ( in_array('twitter', $social) ) {
+			$social_buttons .= '<a href="http://api.addthis.com/oexchange/0.8/forward/twitter/offer?url=' . urlencode($this->permalink) . '&amp;title=' . urlencode(strip_tags($this->post_title)) . '" target="_blank" ><img src="http://cache.addthiscdn.com/icons/v1/thumbs/twitter.gif" border="0" style="margin: 1px;" alt="' . __('Tweet', 'subscribe2') . '" /></a>';
+		}
+		if ( in_array('google', $social) ) {
+			$social_buttons .= '<a href="http://api.addthis.com/oexchange/0.8/forward/google_plusone_share/offer?url=' . urlencode($this->permalink) . '&amp;title=' . urlencode(strip_tags($this->post_title)) . '" target="_blank" ><img src="http://cache.addthiscdn.com/icons/v1/thumbs/google_plusone.gif" border="0" style="margin: 1px;" alt="' . __('Google+', 'subscribe2') . '" /></a>';
+		}
+		return apply_filters('s2_social_buttons', $social_buttons);
+	} // end social_buttons()
 
 	/**
 	Send confirmation email to a public subscriber
@@ -1629,7 +1654,7 @@ class s2class {
 		}
 
 		// add core actions
-		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'));
+		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'), 20);
 		// add actions for automatic subscription based on option settings
 		add_action('register_form', array(&$this, 'register_form'));
 		add_action('user_register', array(&$this, 'register_post'));
