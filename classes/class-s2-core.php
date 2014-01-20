@@ -1124,7 +1124,7 @@ class s2class {
 		$all_cats = array();
 		$s2_taxonomies = apply_filters('s2_taxonomies', array('category'));
 
-		foreach( $s2_taxonomies as $taxonomy ) {
+		foreach ( $s2_taxonomies as $taxonomy ) {
 			if ( taxonomy_exists($taxonomy) ) {
 				$all_cats = array_merge($all_cats, get_categories(array('hide_empty' => false, 'orderby' => $orderby, 'taxonomy' => $taxonomy)));
 			}
@@ -1307,10 +1307,15 @@ class s2class {
 	Add a weekly event to cron
 	*/
 	function add_weekly_sched($scheds) {
+		$exists = false;
 		foreach ( $scheds as $sched ) {
-			if ( array_search(604800, $sched) === false ) {
-				$scheds['weekly'] = array('interval' => 604800, 'display' => __('Weekly', 'subscribe2'));
+			if ( array_search(604800, $sched) ) {
+				$exists = true;
 			}
+		}
+
+		if ( !$exists ) {
+			$scheds['weekly'] = array('interval' => 604800, 'display' => __('Weekly', 'subscribe2'));
 		}
 
 		return $scheds;

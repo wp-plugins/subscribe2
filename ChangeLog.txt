@@ -1,3 +1,7 @@
+= Version 10.0 by Matthew Robinson =
+
+* Only add 'weekly' cron schedule interval if it does not already exist
+
 = Version 9.1 by Matthew Robinson =
 
 * Shortcode parameters are now not case sensitive
