@@ -1,6 +1,8 @@
 = Version 10.0 by Matthew Robinson =
 
 * Only add 'weekly' cron schedule interval if it does not already exist
+* Add capability to add social media share buttons to HTML emails
+* Update editor plugin for TinyMCE version 4 bundled with WordPress 3.9
 
 = Version 9.1 by Matthew Robinson =
 

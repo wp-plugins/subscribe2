@@ -3,11 +3,11 @@
 	tinymce.create( 'tinymce.plugins.Subscribe2Plugin', {
 		init : function ( ed, url ) {
 			var i = 0,
-			pb = '<img src="' + url + '/../include/spacer.gif" class="mceSubscribe2 mceItemNoResize" />',
+			pb = '<p><img src="' + url + '/../include/spacer.gif" class="mceSubscribe2 mceItemNoResize" /></p>',
 			cls = 'mceSubscribe2',
 			shortcode = '[subscribe2]',
 			pbreplaced = [],
-			pbRE = new RegExp(/(\[|<!--)subscribe2.*(\]|-->)/g),
+			pbRE = new RegExp(/(\[|<!--)subscribe2.*?(\]|-->)/g),
 			replacer = function ( str ) {
 				if ( -1 !== str.indexOf( 'class="mceSubscribe2' ) ) {
 					str = pbreplaced[i];
@@ -28,7 +28,7 @@
 			});
 
 			// load the CSS and enable it on the right class
-			ed.onInit.add(function () {
+			ed.on('init', function () {
 				ed.dom.loadCSS( url + '/css/content.css' );
 
 				if ( ed.theme.onResolveName ) {
@@ -41,36 +41,29 @@
 			});
 
 			// allow selection of the image placeholder
-			ed.onClick.add(function ( ed, e ) {
-				e = e.target;
-
-				if ( e.nodeName === 'IMG' && ed.dom.hasClass( e, cls ) ) {
-					ed.selection.select( e );
+			ed.on('click', function ( ed ) {
+				if ( ed.toElement.nodeName === 'IMG' && ed.toElement.className === cls ) {
+					ed.selection.select( ed );
 				}
-			});
-
-			// re-enable the CSS when the node changes
-			ed.onNodeChange.add(function ( ed, cm, n ) {
-				cm.setActive( 'subscribe2', n.nodeName === 'IMG' && ed.dom.hasClass( n, cls ) );
 			});
 
 			// create an array of replaced shortcodes so we have additional parameters
 			// then swap in the graphic
-			ed.onBeforeSetContent.add(function ( ed, o ) {
-				pbreplaced = o.content.match( pbRE );
-				o.content = o.content.replace( pbRE, pb );
+			ed.on('BeforeSetContent', function ( ed ) {
+				pbreplaced = ed.content.match( pbRE );
+				ed.content = ed.content.replace( pbRE, pb );
 			});
 
 			// swap back the array of shortcodes to preserve parameters
 			// replace any other instances with the default shortcode
-			ed.onPostProcess.add(function ( ed, o ) {
-				if ( o.get ) {
+			ed.on('PostProcess', function ( ed ) {
+				if ( ed.get ) {
 					if ( null !== pbreplaced ) {
 						for ( i = 0; i < pbreplaced.length; i++ ) {
-							o.content = o.content.replace(/<img[^>]+>/, replacer );
+							ed.content = ed.content.replace(/<img[^>]+>/, replacer );
 						}
 					}
-					o.content = o.content.replace( /<img[^>]+>/g, function ( im ) {
+					ed.content = ed.content.replace( /<img[^>]+>/g, function ( im ) {
 						if ( -1 !== im.indexOf( 'class="mceSubscribe2' ) ) {
 							im = shortcode;
 						}

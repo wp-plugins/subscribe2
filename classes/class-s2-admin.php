@@ -204,8 +204,8 @@ class s2_admin extends s2class {
 		if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) { return; }
 		if ( 'true' == get_user_option('rich_editing') ) {
 			// Hook into the rich text editor
-			add_filter('mce_external_plugins', array(&$this, 'mce3_plugin'));
-			add_filter('mce_buttons', array(&$this, 'mce3_button'));
+			add_filter('mce_external_plugins', array(&$this, 'mce_plugin'));
+			add_filter('mce_buttons', array(&$this, 'mce_button'));
 		} else {
 			wp_enqueue_script('subscribe2_button', S2URL . 'include/s2_button' . $this->script_debug . '.js', array('quicktags'), '2.0' );
 		}
@@ -214,13 +214,17 @@ class s2_admin extends s2class {
 	/**
 	Add buttons for Rich Text Editor
 	*/
-	function mce3_plugin($arr) {
-		$path = S2URL . 'tinymce3/editor_plugin' . $this->script_debug . '.js';
+	function mce_plugin($arr) {
+		if ( version_compare($this->wp_release, '3.9', '<') ) {
+			$path = S2URL . 'tinymce/editor_plugin3' . $this->script_debug . '.js';
+		} else {
+			$path = S2URL . 'tinymce/editor_plugin4' . $this->script_debug . '.js';
+		}
 		$arr['subscribe2'] = $path;
 		return $arr;
 	} // end mce3_plugin()
 
-	function mce3_button($arr) {
+	function mce_button($arr) {
 		$arr[] = 'subscribe2';
 		return $arr;
 	} // end mce3_button()
