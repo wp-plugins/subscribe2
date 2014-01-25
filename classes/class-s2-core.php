@@ -1630,6 +1630,14 @@ class s2class {
 		return;
 	} // end s2cleaner_task()
 
+	/**
+	Jetpack comments doesn't play nice, this function kills that module
+	*/
+	function s2_hide_jetpack_comments($modules) {
+		unset( $modules['stats'] );
+		return $modules;
+	} // end s2_kill_jetpack_comments()
+
 /* ===== Our constructor ===== */
 	/**
 	Subscribe2 constructor
@@ -1701,6 +1709,7 @@ class s2class {
 		}
 		// add actions for comment subscribers
 		if ( 'no' != $this->subscribe2_options['comment_subs'] ) {
+			add_filter('jetpack_get_available_modules', array(&$this, 's2_hide_jetpack_comments'));
 			if ( 'before' == $this->subscribe2_options['comment_subs'] ) {
 				add_action('comment_form_after_fields', array(&$this, 's2_comment_meta_form'));
 			} else {
