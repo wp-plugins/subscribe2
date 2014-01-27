@@ -5,6 +5,7 @@
 * Update editor plugin for TinyMCE version 4 bundled with WordPress 3.9
 * Rework Digest emails to collect posts based on transition status rather than time - see ticket https://plugins.trac.wordpress.org/ticket/2058
 * Hide comment form subscription options if using Jetpack Comments and improve compatibility
+* Fixed an error in the Registered User deletion code - thanks to Jay Wasack
 
 = Version 9.1 by Matthew Robinson =
 
