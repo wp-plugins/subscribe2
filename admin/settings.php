@@ -139,10 +139,10 @@ if ( $disallowed !== false ) {
 
 // send error message if sender email address is off-domain
 if ( $this->subscribe2_options['sender'] == 'blogname' ) {
-	$sender = get_bloginfo('admin_email');
+	$sender = $this->sanitize_email(get_bloginfo('admin_email'));
 } else {
 	$userdata = $this->get_userdata($this->subscribe2_options['sender']);
-	$sender = $userdata->user_email;
+	$sender = $this->sanitize_email($userdata->user_email);
 }
 list($user, $domain) = explode('@', $sender, 2);
 if ( !strstr($_SERVER['SERVER_NAME'], $domain) && $this->subscribe2_options['sender'] != 'author' ) {

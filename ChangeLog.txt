@@ -6,6 +6,7 @@
 * Rework Digest emails to collect posts based on transition status rather than time - see ticket https://plugins.trac.wordpress.org/ticket/2058
 * Hide comment form subscription options if using Jetpack Comments and improve compatibility
 * Fixed an error in the Registered User deletion code - thanks to Jay Wasack
+* Improved domain name comparison for sender email check - props garypardun
 
 = Version 9.1 by Matthew Robinson =
 
