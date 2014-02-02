@@ -88,7 +88,7 @@ class s2_admin extends s2class {
 			'id' => 's2-settings-help3',
 			'title' => __('Templates', 'subscribe2'),
 			'content' => '<p>' . __('This section allows you to customise the content of your notification emails.', 'subscribe2') .
-			'</p><p>'. __('There are special {KEYWORDS} that are used by Subscribe2 to place content into the final email. The template also accept regular text and HTML as desired in the final emaisl.', 'subscribe2') .
+			'</p><p>'. __('There are special {KEYWORDS} that are used by Subscribe2 to place content into the final email. The template also accepts regular text and HTML as desired in the final emails.', 'subscribe2') .
 			'</p><p>'. __('The {KEYWORDS} are listed on the right of the templates, note that some are for per post emails only and some are for digest emails only. Make sure the correct keywords are used based upon the Email Settings.', 'subscribe2') . '</p>'
 		));
 		$screen->add_help_tab(array(
@@ -222,12 +222,12 @@ class s2_admin extends s2class {
 		}
 		$arr['subscribe2'] = $path;
 		return $arr;
-	} // end mce3_plugin()
+	} // end mce_plugin()
 
 	function mce_button($arr) {
 		$arr[] = 'subscribe2';
 		return $arr;
-	} // end mce3_button()
+	} // end mce_button()
 
 /* ===== widget functions ===== */
 	/**
