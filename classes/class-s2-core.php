@@ -231,7 +231,7 @@ class s2class {
 		$string = str_replace("{TAGS}", $this->post_tag_names, $string);
 		$string = str_replace("{COUNT}", $this->post_count, $string);
 
-		return $string;
+		return apply_filters('s2_custom_keywords', $string);
 	} // end substitute()
 
 	/**
