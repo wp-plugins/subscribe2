@@ -1307,11 +1307,7 @@ class s2class {
 	Add a weekly event to cron
 	*/
 	function add_weekly_sched($scheds) {
-		foreach ( $scheds as $sched ) {
-			if ( array_search(604800, $sched) === false ) {
-				$scheds['weekly'] = array('interval' => 604800, 'display' => __('Weekly', 'subscribe2'));
-			}
-		}
+		$scheds['weekly'] = array('interval' => 604800, 'display' => __('Weekly', 'subscribe2'));
 
 		return $scheds;
 	} // end add_weekly_sched()

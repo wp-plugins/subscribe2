@@ -68,7 +68,7 @@ if ( isset($_POST['s2_admin']) ) {
 					continue;
 				} else {
 					$users_deleted = __('User(s) deleted! Any posts made by these users were assigned to you', 'subscribe2');
-					wp_delete_user($user->$id, $current_user->ID);
+					wp_delete_user($user->ID, $current_user->ID);
 				}
 			}
 			echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . $users_deleted_error . $users_deleted . "</strong></p></div>";
