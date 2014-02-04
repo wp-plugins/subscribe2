@@ -139,14 +139,14 @@ if ( $disallowed !== false ) {
 
 // send error message if sender email address is off-domain
 if ( $this->subscribe2_options['sender'] == 'blogname' ) {
-	$sender = $this->sanitize_email(get_bloginfo('admin_email'));
+	$sender = get_bloginfo('admin_email');
 } else {
 	$userdata = $this->get_userdata($this->subscribe2_options['sender']);
-	$sender = $this->sanitize_email($userdata->user_email);
+	$sender = $userdata->user_email;
 }
 list($user, $domain) = explode('@', $sender, 2);
-if ( !strstr($_SERVER['SERVER_NAME'], $domain) && $this->subscribe2_options['sender'] != 'author' ) {
-	echo "<div id=\"sender_message\" class=\"error\"><p class=\"s2_error\"><strong>" . __('You appear to be sending notifications from an email address from a different domain name to your blog, this may result in failed emails', 'subscribe2') . "</strong></p></div>";
+if ( !stristr($_SERVER['SERVER_NAME'], $domain) && $this->subscribe2_options['sender'] != 'author' ) {
+	echo "<div id=\"sender_message\" class=\"error\"><p class=\"s2_error\"><strong>" . sprintf(__('You appear to be sending notifications from %1$s, which has a different domain name than your blog server %2$s. This may result in failed emails.', 'subscribe2'), $sender, $_SERVER['SERVER_NAME']) . "</strong></p></div>";
 }
 
 // detect or define which tab we are in
