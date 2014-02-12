@@ -1571,8 +1571,8 @@ class s2class {
 		$message_posttime = preg_replace("|[\r\n]{3,}|", "\r\n\r\n", $message_posttime);
 
 		// apply filter to allow external content to be inserted or content manipulated
-		$message_post = apply_filters('s2_digest_email', $message_post, $now, $prev, $last, $this->subscribe2_options['cron_order']);
-		$message_posttime = apply_filters('s2_digest_email', $message_posttime, $now, $prev, $last, $this->subscribe2_options['cron_order']);
+		$message_post = apply_filters('s2_digest_email', $message_post);
+		$message_posttime = apply_filters('s2_digest_email', $message_posttime);
 
 		//sanity check - don't send a mail if the content is empty
 		if ( !$message_post && !$message_posttime && !$table && !$tablelinks ) {
