@@ -7,6 +7,7 @@
 * Hide comment form subscription options if using Jetpack Comments and improve compatibility
 * Fixed typos in the Help tab on the Settings page
 * Improved domain name comparison for sender email check - props garypardun
+* Tidied load_string() function and moved it to class-s2-frontend.php as all strings are not for user side only
 * Ensure 's2_authors' keys exist on all sites and for all Registered Users as per illmasterc’s bug report
 * Introduce 's2_mu_blog_list' filter to allow filter of blog list for WordPress Multisite installs - props careb
 * Enable built-in widget by default - props by MadtownLems

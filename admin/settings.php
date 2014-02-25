@@ -10,7 +10,7 @@ if ( isset( $_POST['s2_admin']) ) {
 	check_admin_referer('subscribe2-options_subscribers' . $s2nonce);
 	if ( isset($_POST['reset']) ) {
 		$this->reset();
-		echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_reset</strong></p></div>";
+		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Options reset!', 'subscribe2') . "</strong></p></div>";
 	} elseif ( isset($_POST['preview']) ) {
 		global $user_email, $post;
 		$this->preview_email = true;
@@ -108,7 +108,7 @@ if ( isset( $_POST['s2_admin']) ) {
 			}
 		}
 
-		echo "<div id=\"message\" class=\"updated fade\"><p><strong>$this->options_saved</strong></p></div>";
+		echo "<div id=\"message\" class=\"updated fade\"><p><strong>" . __('Options saved!', 'subscribe2') . "</strong></p></div>";
 		update_option('subscribe2_options', $this->subscribe2_options);
 	}
 }
@@ -117,7 +117,7 @@ if ( isset( $_POST['s2_admin']) ) {
 $sql = "SELECT ID FROM $wpdb->posts WHERE post_type='page' AND post_status='publish' LIMIT 1";
 $id = $wpdb->get_var($sql);
 if ( empty($id) ) {
-	echo "<div id=\"page_message\" class=\"error\"><p class=\"s2_error\"><strong>$this->no_page</strong></p></div>";
+	echo "<div id=\"page_message\" class=\"error\"><p class=\"s2_error\"><strong>" . __('You must create a WordPress page for this plugin to work correctly.', 'subscribe2') . "</strong></p></div>";
 }
 
 if ( $this->subscribe2_options['email_freq'] != 'never' ) {

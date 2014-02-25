@@ -1,5 +1,45 @@
 <?php
 class s2_frontend extends s2class {
+	/**
+	Load all our strings
+	*/
+	function load_strings() {
+		$this->please_log_in = "<p class=\"s2_message\">" . sprintf(__('To manage your subscription options please <a href="%1$s">login.</a>', 'subscribe2'), get_option('siteurl') . '/wp-login.php') . "</p>";
+
+		$this->profile = "<p class=\"s2_message\">" . sprintf(__('You may manage your subscription options from your <a href="%1$s">profile</a>', 'subscribe2'), get_option('siteurl') . "/wp-admin/admin.php?page=s2") . "</p>";
+		if ( $this->s2_mu === true ) {
+			global $blog_id;
+			$user_ID = get_current_user_id();
+			if ( !is_user_member_of_blog($user_ID, $blog_id) ) {
+				// if we are on multisite and the user is not a member of this blog change the link
+				$this->profile = "<p class=\"s2_message\">" . sprintf(__('<a href="%1$s">Subscribe</a> to email notifications when this blog posts new content.', 'subscribe2'), get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id) . "</p>";
+			}
+		}
+
+		$this->confirmation_sent = "<p class=\"s2_message\">" . __('A confirmation message is on its way!', 'subscribe2') . "</p>";
+
+		$this->already_subscribed = "<p class=\"s2_error\">" . __('That email address is already subscribed.', 'subscribe2') . "</p>";
+
+		$this->not_subscribed = "<p class=\"s2_error\">" . __('That email address is not subscribed.', 'subscribe2') . "</p>";
+
+		$this->not_an_email = "<p class=\"s2_error\">" . __('Sorry, but that does not look like an email address to me.', 'subscribe2') . "</p>";
+
+		$this->barred_domain = "<p class=\"s2_error\">" . __('Sorry, email addresses at that domain are currently barred due to spam, please use an alternative email address.', 'subscribe2') . "</p>";
+
+		$this->error = "<p class=\"s2_error\">" . __('Sorry, there seems to be an error on the server. Please try again later.', 'subscribe2') . "</p>";
+
+		// confirmation messages
+		$this->no_such_email = "<p class=\"s2_error\">" . __('No such email address is registered.', 'subscribe2') . "</p>";
+
+		$this->added = "<p class=\"s2_message\">" . __('You have successfully subscribed!', 'subscribe2') . "</p>";
+
+		$this->deleted = "<p class=\"s2_message\">" . __('You have successfully unsubscribed.', 'subscribe2') . "</p>";
+
+		/**/$this->subscribe = __('subscribe', 'subscribe2'); //ACTION replacement in subscribing confirmation email
+
+		/**/$this->unsubscribe = __('unsubscribe', 'subscribe2'); //ACTION replacement in unsubscribing in confirmation email
+	} // end load_strings()
+
 /* ===== template and filter functions ===== */
 	/**
 	Display our form; also handles (un)subscribe requests
@@ -99,6 +139,13 @@ class s2_frontend extends s2class {
 				$this->s2form = $this->form . $this->barred_domain;
 			} else {
 				$this->ip = $_POST['ip'];
+				if ( is_int($this->lockout) && $this->lockout > 0 ) {
+					$date = date('H:i:s.u', $this->lockout);
+					$ips = $wpdb->get_col($wpdb->prepare("SELECT ip FROM $this->public WHERE date = CURDATE() AND time > SUBTIME(CURTIME(), %s)", $date));
+					if ( in_array($this->ip, $ips) ) {
+						return __('Slow down, you move too fast.', 'subscribe2');
+					}
+				}
 				// does the supplied email belong to a registered user?
 				$check = $wpdb->get_var($wpdb->prepare("SELECT user_email FROM $wpdb->users WHERE user_email = %s", $this->email));
 				if ( '' != $check ) {

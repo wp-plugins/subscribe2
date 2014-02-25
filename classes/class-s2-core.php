@@ -11,58 +11,6 @@ class s2class {
 		load_textdomain('subscribe2', $mofile);
 	} // end load_translations()
 
-	/**
-	Load all our strings
-	*/
-	function load_strings() {
-		// adjust the output of Subscribe2 here
-
-		$this->please_log_in = "<p class=\"s2_message\">" . sprintf(__('To manage your subscription options please <a href="%1$s">login.</a>', 'subscribe2'), get_option('siteurl') . '/wp-login.php') . "</p>";
-
-		$this->profile = "<p class=\"s2_message\">" . sprintf(__('You may manage your subscription options from your <a href="%1$s">profile</a>', 'subscribe2'), get_option('siteurl') . "/wp-admin/admin.php?page=s2") . "</p>";
-		if ( $this->s2_mu === true ) {
-			global $blog_id;
-			$user_ID = get_current_user_id();
-			if ( !is_user_member_of_blog($user_ID, $blog_id) ) {
-				// if we are on multisite and the user is not a member of this blog change the link
-				$this->profile = "<p class=\"s2_message\">" . sprintf(__('<a href="%1$s">Subscribe</a> to email notifications when this blog posts new content.', 'subscribe2'), get_option('siteurl') . "/wp-admin/?s2mu_subscribe=" . $blog_id) . "</p>";
-			}
-		}
-
-		$this->confirmation_sent = "<p class=\"s2_message\">" . __('A confirmation message is on its way!', 'subscribe2') . "</p>";
-
-		$this->already_subscribed = "<p class=\"s2_error\">" . __('That email address is already subscribed.', 'subscribe2') . "</p>";
-
-		$this->not_subscribed = "<p class=\"s2_error\">" . __('That email address is not subscribed.', 'subscribe2') . "</p>";
-
-		$this->not_an_email = "<p class=\"s2_error\">" . __('Sorry, but that does not look like an email address to me.', 'subscribe2') . "</p>";
-
-		$this->barred_domain = "<p class=\"s2_error\">" . __('Sorry, email addresses at that domain are currently barred due to spam, please use an alternative email address.', 'subscribe2') . "</p>";
-
-		$this->error = "<p class=\"s2_error\">" . __('Sorry, there seems to be an error on the server. Please try again later.', 'subscribe2') . "</p>";
-
-		$this->no_page = __('You must create a WordPress page for this plugin to work correctly.', 'subscribe2');
-
-		$this->mail_sent = "<p class=\"s2_message\">" . __('Message sent!', 'subscribe2') . "</p>";
-
-		$this->mail_failed = "<p class=\"s2_error\">" . __('Message failed!', 'subscribe2') . "</p>";
-
-		// confirmation messages
-		$this->no_such_email = "<p class=\"s2_error\">" . __('No such email address is registered.', 'subscribe2') . "</p>";
-
-		$this->added = "<p class=\"s2_message\">" . __('You have successfully subscribed!', 'subscribe2') . "</p>";
-
-		$this->deleted = "<p class=\"s2_message\">" . __('You have successfully unsubscribed.', 'subscribe2') . "</p>";
-
-		$this->subscribe = __('subscribe', 'subscribe2'); //ACTION replacement in subscribing confirmation email
-
-		$this->unsubscribe = __('unsubscribe', 'subscribe2'); //ACTION replacement in unsubscribing in confirmation email
-
-		// menu strings
-		$this->options_saved = __('Options saved!', 'subscribe2');
-		$this->options_reset = __('Options reset!', 'subscribe2');
-	} // end load_strings()
-
 /* ===== Install, upgrade, reset ===== */
 	/**
 	Install our table
@@ -1734,9 +1682,6 @@ class s2class {
 
 		// Add actions specific to admin or frontend
 		if ( is_admin() ) {
-			// load strings
-			add_action('init', array(&$this, 'load_strings'));
-
 			//add menu, authoring and category admin actions
 			add_action('admin_menu', array(&$this, 'admin_menu'));
 			add_action('admin_menu', array(&$this, 's2_meta_init'));
@@ -1820,6 +1765,7 @@ class s2class {
 		$this->excerpt_length = apply_filters('s2_excerpt_length', 55);
 		$this->site_switching = apply_filters('s2_allow_site_switching', false);
 		$this->clean_interval = apply_filters('s2_clean_interval', 28);
+		$this->lockout = apply_filters('s2_lockout', 0);
 	} // end __construct()
 
 /* ===== our variables ===== */
@@ -1873,7 +1819,5 @@ class s2class {
 	var $subscribe = '';
 	var $unsubscribe = '';
 	var $confirm_subject = '';
-	var $options_saved = '';
-	var $options_reset = '';
 } // end class subscribe2
 ?>
