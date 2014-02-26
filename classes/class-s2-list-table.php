@@ -33,7 +33,7 @@ class Subscribe2_List_Table extends WP_List_Table {
 	function column_email($item) {
 		global $current_tab;
 		if ( $current_tab == 'registered' ) {
-			$actions = array('edit' => sprintf('<a href="?page=%s&amp;email=%s">%s</a>', 's2', $item['email'], __('Edit', 'subscribe2')));
+			$actions = array('edit' => sprintf('<a href="?page=%s&amp;email=%s">%s</a>', 's2', urlencode($item['email']), __('Edit', 'subscribe2')));
 			return sprintf('%1$s %2$s', $item['email'], $this->row_actions($actions));
 		} else {
 			global $mysubscribe2;

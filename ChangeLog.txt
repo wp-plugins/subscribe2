@@ -12,6 +12,7 @@
 * Introduce 's2_mu_blog_list' filter to allow filter of blog list for WordPress Multisite installs - props careb
 * Enable built-in widget by default - props by MadtownLems
 * Use a better method for unendcoding HTML special characters for plain text emails - proposed by Dainius Kaupaitis
+* Fixed a bug affecting handling of Registered users with email aliases (e.g. name+alias@gmail.com) - thanks to Alexandre (bosseal)
 
 = Version 9.2 by Matthew Robinson =
 
