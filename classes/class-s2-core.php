@@ -201,8 +201,7 @@ class s2class {
 			}
 		} else {
 			$headers = $this->headers('text', $attachments);
-			$message = preg_replace('|&[^a][^m][^p].{0,3};|', '', $message);
-			$message = preg_replace('|&amp;|', '&', $message);
+			$message = html_entity_decode($message, ENT_NOQUOTES, 'UTF-8');
 			$message = wordwrap(strip_tags($message), $this->word_wrap, "\n");
 			$mailtext = apply_filters('s2_plain_email', $message);
 		}

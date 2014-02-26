@@ -11,6 +11,7 @@
 * Ensure 's2_authors' keys exist on all sites and for all Registered Users as per illmasterc’s bug report
 * Introduce 's2_mu_blog_list' filter to allow filter of blog list for WordPress Multisite installs - props careb
 * Enable built-in widget by default - props by MadtownLems
+* Use a better method for unendcoding HTML special characters for plain text emails - proposed by Dainius Kaupaitis
 
 = Version 9.2 by Matthew Robinson =
 
