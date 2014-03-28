@@ -303,9 +303,10 @@ class s2class {
 			}
 		}
 
+		$char_set = get_option('blog_charset');
 		if ( function_exists('mb_encode_mimeheader') ) {
-			$header['From'] = mb_encode_mimeheader($this->myname, 'UTF-8', 'Q') . " <" . $this->myemail . ">";
-			$header['Reply-To'] = mb_encode_mimeheader($this->myname, 'UTF-8', 'Q') . " <" . $this->myemail . ">";
+			$header['From'] = mb_encode_mimeheader($this->myname, $char_set, 'Q') . " <" . $this->myemail . ">";
+			$header['Reply-To'] = mb_encode_mimeheader($this->myname, $char_set, 'Q') . " <" . $this->myemail . ">";
 		} else {
 			$header['From'] = $this->myname. " <" . $this->myemail . ">";
 			$header['Reply-To'] = $this->myname . " <" . $this->myemail . ">";
@@ -314,9 +315,9 @@ class s2class {
 		$header['Precedence'] = "list\nList-Id: " . html_entity_decode(get_option('blogname'), ENT_QUOTES) . "";
 		if ( empty($attachments) && $type == 'html' ) {
 			// To send HTML mail, the Content-Type header must be set
-			$header['Content-Type'] = get_option('html_type') . "; charset=\"". get_option('blog_charset') . "\"";
+			$header['Content-Type'] = get_option('html_type') . "; charset=\"". $char_set . "\"";
 		} elseif ( empty($attachments) && $type == 'text' ) {
-			$header['Content-Type'] = "text/plain; charset=\"". get_option('blog_charset') . "\"";
+			$header['Content-Type'] = "text/plain; charset=\"". $char_set . "\"";
 		}
 
 		// apply header filter to allow on-the-fly amendments
@@ -1382,11 +1383,11 @@ class s2class {
 		$tablelinks = '';
 		$message_post= '';
 		$message_posttime = '';
+		$s2_taxonomies = apply_filters('s2_taxonomies', array('category'));
 		foreach ( $posts as $post ) {
 			// keep an array of post ids and skip if we've already done it once
 			if ( in_array($post->ID, $ids) ) { continue; }
 			$ids[] = $post->ID;
-			$s2_taxonomies = apply_filters('s2_taxonomies', array('category'));
 			$post_cats = wp_get_object_terms($post->ID, $s2_taxonomies, array('fields' => 'ids'));
 			$post_cats_string = implode(',', $post_cats);
 			$all_post_cats = array_unique(array_merge($all_post_cats, $post_cats));
@@ -1517,6 +1518,10 @@ class s2class {
 		$message_post = preg_replace("|[\r\n]{3,}|", "\r\n\r\n", $message_post);
 		$message_posttime = preg_replace("|[\r\n]{3,}|", "\r\n\r\n", $message_posttime);
 
+		// apply filter to allow custom keywords
+		$message_post = apply_filters('s2_custom_keywords', $message_post, $digest_post_ids);
+		$message_posttime = apply_filters('s2_custom_keywords', $message_posttime, $digest_post_ids);
+
 		// apply filter to allow external content to be inserted or content manipulated
 		$message_post = apply_filters('s2_digest_email', $message_post);
 		$message_posttime = apply_filters('s2_digest_email', $message_posttime);
@@ -1632,11 +1637,13 @@ class s2class {
 		// add core actions
 		add_filter('cron_schedules', array(&$this, 'add_weekly_sched'), 20);
 		// add actions for automatic subscription based on option settings
-		add_action('register_form', array(&$this, 'register_form'));
-		add_action('user_register', array(&$this, 'register_post'));
 		if ( $this->s2_mu ) {
+			add_action('wpmu_activate_user', array(&$s2class_multisite, 'wpmu_add_user'));
 			add_action('add_user_to_blog', array(&$s2class_multisite, 'wpmu_add_user'), 10);
 			add_action('remove_user_from_blog', array(&$s2class_multisite, 'wpmu_remove_user'), 10);
+		} else {
+			add_action('register_form', array(&$this, 'register_form'));
+			add_action('user_register', array(&$this, 'register_post'));
 		}
 		// add actions for processing posts based on per-post or cron email settings
 		if ( $this->subscribe2_options['email_freq'] != 'never' ) {
