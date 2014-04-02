@@ -660,7 +660,7 @@ class s2class {
 		// HASH = wp_hash of email address
 		// ID = user's ID in the subscribe2 table
 		// use home instead of siteurl incase index.php is not in core wordpress directory
-		$link = get_option('home') . "/?s2=";
+		$link = apply_filters('s2_confirm_link', get_option('home')) . "/?s2=";
 
 		if ( 'add' == $what ) {
 			$link .= '1';
