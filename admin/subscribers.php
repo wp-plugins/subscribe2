@@ -287,6 +287,21 @@ if ( $current_tab === 'registered' ) {
 }
 echo "</form></div>\r\n";
 
+if ( $current_tab === 'registered' ) {
+	echo "<script type=\"text/javascript\">\r\n";
+	echo "function s2_delete_check() {\r\n";
+	echo "	var action1 = document.getElementById('doaction');\r\n";
+	echo "	action1.onclick = submitHandler;\r\n";
+	echo "	var action2 = document.getElementById('doaction2');\r\n";
+	echo "	action2.onclick = submitHandler;\r\n";
+	echo "	function submitHandler() {\r\n";
+	echo "		var agree=confirm('" . __('You are about to delete user account(s). Are you sure?', 'subscribe2') . "'); if (agree) return true; else return false;\r\n";
+	echo "	}\r\n";
+	echo "}\r\n";
+	echo "window.onload=s2_delete_check;\r\n";
+	echo "</script>\r\n";
+}
+
 include(ABSPATH . 'wp-admin/admin-footer.php');
 // just to be sure
 die;

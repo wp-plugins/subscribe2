@@ -1,4 +1,4 @@
-= Version 9.4 by Matthew Robinson =
+= Version 9.3 by Matthew Robinson =
 
 * Only add 'weekly' cron schedule interval if it does not already exist
 * Add capability to add social media share buttons to HTML emails
@@ -16,6 +16,7 @@
 * Improved Character Set encoding of some email headers
 * Improved user registration hooking for Multisite installs - thanks to dsl255
 * Introduce a filter to allow filtering of the confirm link URL - props diddledan
+* Introduce a confirmation box for Registered User deletion - props geoorgge1968
 
 = Version 9.2 by Matthew Robinson =
 
