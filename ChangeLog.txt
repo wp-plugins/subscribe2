@@ -17,6 +17,7 @@
 * Improved user registration hooking for Multisite installs - thanks to dsl255
 * Introduce a filter to allow filtering of the confirm link URL - props diddledan
 * Introduce a confirmation box for Registered User deletion - props geoorgge1968
+* Improved Bulk Management user experience by retaining submitted settings
 
 = Version 9.2 by Matthew Robinson =
 
