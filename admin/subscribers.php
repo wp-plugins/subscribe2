@@ -273,7 +273,11 @@ if ( $current_tab === 'registered' ) {
 		echo "<br />" . __('Action to perform', 'subscribe2') . ":\r\n";
 		echo "<label><input type=\"radio\" name=\"manage\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
 		echo "<label><input type=\"radio\" name=\"manage\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . "</label><br /><br />\r\n";
-		$this->display_category_form($categories);
+		if ( '1' === $this->subscribe2_options['reg_override'] ) {
+			$this->display_category_form($categories, 1);
+		} else {
+			$this->display_category_form($categories, 0);
+		}
 		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_categories\" value=\"" . __('Bulk Update Categories', 'subscribe2') . "\" /></p>";
 		echo "<br />" . __('Send email as', 'subscribe2') . ":\r\n";
 		echo "<label><input type=\"radio\" name=\"format\" value=\"html\"" . checked($format, 'html', false) . " /> " . __('HTML - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
