@@ -260,26 +260,42 @@ if ( $current_tab === 'registered' ) {
 	echo "<div class=\"s2_admin\" id=\"s2_bulk_manage\">\r\n";
 	echo "<h2>" . __('Bulk Management', 'subscribe2') . "</h2>\r\n";
 	if ( $this->subscribe2_options['email_freq'] == 'never' ) {
+		$categories = array();
+		if ( isset($_POST['category']) ) {
+			$categories = $_POST['category'];
+		}
+		$format = '';
+		if ( isset($_POST['format']) ) {
+			$format = $_POST['format'];
+		}
 		echo __('Preferences for Registered Users selected in the filter above can be changed using this section.', 'subscribe2') . "<br />\r\n";
 		echo "<strong><em style=\"color: red\">" . __('Consider User Privacy as changes cannot be undone', 'subscribe2') . "</em></strong><br />\r\n";
 		echo "<br />" . __('Action to perform', 'subscribe2') . ":\r\n";
 		echo "<label><input type=\"radio\" name=\"manage\" value=\"subscribe\" checked=\"checked\" /> " . __('Subscribe', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
 		echo "<label><input type=\"radio\" name=\"manage\" value=\"unsubscribe\" /> " . __('Unsubscribe', 'subscribe2') . "</label><br /><br />\r\n";
-		$this->display_category_form($_POST['category']);
+		if ( '1' === $this->subscribe2_options['reg_override'] ) {
+			$this->display_category_form($categories, 1);
+		} else {
+			$this->display_category_form($categories, 0);
+		}
 		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_categories\" value=\"" . __('Bulk Update Categories', 'subscribe2') . "\" /></p>";
 		echo "<br />" . __('Send email as', 'subscribe2') . ":\r\n";
-		echo "<label><input type=\"radio\" name=\"format\" value=\"html\"" . checked($_POST['format'], 'html', false) . " /> " . __('HTML - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
-		echo "<label><input type=\"radio\" name=\"format\" value=\"html_excerpt\"" . checked($_POST['format'], 'html_excerpt', false) . " /> " . __('HTML - Excerpt', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
-		echo "<label><input type=\"radio\" name=\"format\" value=\"post\"" . checked($_POST['format'], 'post', false) . " /> " . __('Plain Text - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
-		echo "<label><input type=\"radio\" name=\"format\" value=\"excerpt\"" . checked($_POST['format'], 'excerpt', false) . "/> " . __('Plain Text - Excerpt', 'subscribe2') . "</label>\r\n";
+		echo "<label><input type=\"radio\" name=\"format\" value=\"html\"" . checked($format, 'html', false) . " /> " . __('HTML - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
+		echo "<label><input type=\"radio\" name=\"format\" value=\"html_excerpt\"" . checked($format, 'html_excerpt', false) . " /> " . __('HTML - Excerpt', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
+		echo "<label><input type=\"radio\" name=\"format\" value=\"post\"" . checked($format, 'post', false) . " /> " . __('Plain Text - Full', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
+		echo "<label><input type=\"radio\" name=\"format\" value=\"excerpt\"" . checked($format, 'excerpt', false) . "/> " . __('Plain Text - Excerpt', 'subscribe2') . "</label>\r\n";
 		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_format\" value=\"" . __('Bulk Update Format', 'subscribe2') . "\" /></p>";
 	} else {
+		$sub_cats = '';
+		if ( isset($_POST['sub_category']) ) {
+			$sub_cats = $_POST['sub_category'];
+		}
 		echo __('Preferences for Registered Users selected in the filter above can be changed using this section.', 'subscribe2') . "<br />\r\n";
 		echo "<strong><em style=\"color: red\">" . __('Consider User Privacy as changes cannot be undone', 'subscribe2') . "</em></strong><br />\r\n";
 		echo "<br />" . __('Subscribe Selected Users to receive a periodic digest notification', 'subscribe2') . ":\r\n";
-		echo "<label><input type=\"radio\" name=\"sub_category\" value=\"digest\"" . checked($_POST['sub_category'], 'digest', false) . " /> ";
+		echo "<label><input type=\"radio\" name=\"sub_category\" value=\"digest\"" . checked($sub_cats, 'digest', false) . " /> ";
 		echo __('Yes', 'subscribe2') . "</label>&nbsp;&nbsp;\r\n";
-		echo "<label><input type=\"radio\" name=\"sub_category\" value=\"-1\"" . checked($_POST['sub_category'], '-1', false) . " /> ";
+		echo "<label><input type=\"radio\" name=\"sub_category\" value=\"-1\"" . checked($sub_cats, '-1', false) . " /> ";
 		echo __('No', 'subscribe2') . "</label>";
 		echo "<p class=\"submit\"><input type=\"submit\" class=\"button-primary\" name=\"sub_digest\" value=\"" . __('Bulk Update Digest Subscription', 'subscribe2') . "\" /></p>";
 	}
