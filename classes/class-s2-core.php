@@ -1340,7 +1340,11 @@ class s2class {
 			}
 			$s2_post_types = apply_filters('s2_post_types', $s2_post_types);
 			foreach ( $s2_post_types as $post_type ) {
-				('' == $type) ? $type = $wpdb->prepare("%s", $post_type) : $type .= $wpdb->prepare(", %s", $post_type);
+				if ( !isset($type) ) {
+					$type = $wpdb->prepare("%s", $post_type);
+				} else {
+					$type .= $wpdb->prepare(", %s", $post_type);
+				}
 			}
 
 			// collect posts
@@ -1383,6 +1387,7 @@ class s2class {
 		$tablelinks = '';
 		$message_post= '';
 		$message_posttime = '';
+		$digest_post_ids = array();
 		$s2_taxonomies = apply_filters('s2_taxonomies', array('category'));
 		foreach ( $posts as $post ) {
 			// keep an array of post ids and skip if we've already done it once

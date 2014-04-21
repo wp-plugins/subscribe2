@@ -3,6 +3,7 @@
 * Fix for non-existing variable errors on Subscribe2->Subscribers page - thanks to bapakrob and perezlr
 * Don’t display Excluded Categories in Bulk Management is Registered users cannot override the exclusion
 * Fix for disappearing Jetpack Stats module - thanks to desertravenart
+* Fix for undefined variable notices in the digest emails
 
 = Version 9.3 by Matthew Robinson =
 
