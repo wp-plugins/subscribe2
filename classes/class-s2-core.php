@@ -1366,6 +1366,7 @@ class s2class {
 		}
 
 		// Collect sticky posts if desired
+		$sticky_ids = array();
 		if ( $this->subscribe2_options['stickies'] == 'yes' ) {
 			$sticky_ids = get_option('sticky_posts');
 			if ( !empty($sticky_ids) ) {
@@ -1376,19 +1377,21 @@ class s2class {
 
 		// do we have any posts?
 		if ( empty($posts) && !has_filter('s2_digest_email') ) { return false; }
-		$this->post_count = count($posts);
 
 		// if we have posts, let's prepare the digest
+		// define some variables needed for the digest
 		$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 		$all_post_cats = array();
 		$ids = array();
+		$digest_post_ids = array();
 		$mailtext = apply_filters('s2_email_template', $this->subscribe2_options['mailtext']);
 		$table = '';
 		$tablelinks = '';
 		$message_post= '';
 		$message_posttime = '';
-		$digest_post_ids = array();
+		$this->post_count = count($posts);
 		$s2_taxonomies = apply_filters('s2_taxonomies', array('category'));
+
 		foreach ( $posts as $post ) {
 			// keep an array of post ids and skip if we've already done it once
 			if ( in_array($post->ID, $ids) ) { continue; }
@@ -1432,11 +1435,7 @@ class s2class {
 				continue;
 			}
 
-			if ( isset($sticky_ids) && !in_array($post->ID, $sticky_ids) ) {
-				$digest_post_ids[] = $post->ID;
-			} else {
-				$digest_post_ids[] = $post->ID;
-			}
+			$digest_post_ids[] = $post->ID;
 
 			$post_title = html_entity_decode($post->post_title, ENT_QUOTES);
 			('' == $table) ? $table .= "* " . $post_title : $table .= "\r\n* " . $post_title;
@@ -1508,8 +1507,13 @@ class s2class {
 			$message_posttime .= $excerpt . "\r\n\r\n";
 		}
 
-		foreach ( $digest_post_ids as $digest_post_id ) {
-			update_post_meta($digest_post_id, '_s2_digest_post_status', 'done');
+		// update post_meta data for sent ids but not sticky posts
+		foreach ( $ids as $id ) {
+			if ( !empty($sticky_ids) && !in_array($id, $sticky_ids) ) {
+				update_post_meta($id, '_s2_digest_post_status', 'done');
+			} else {
+				update_post_meta($id, '_s2_digest_post_status', 'done');
+			}
 		}
 		$this->subscribe2_options['last_s2cron'] = implode(',', $digest_post_ids);
 		update_option('subscribe2_options', $this->subscribe2_options);
@@ -1522,10 +1526,6 @@ class s2class {
 		$message_posttime = preg_replace('|[ ]+|', ' ', $message_posttime);
 		$message_post = preg_replace("|[\r\n]{3,}|", "\r\n\r\n", $message_post);
 		$message_posttime = preg_replace("|[\r\n]{3,}|", "\r\n\r\n", $message_posttime);
-
-		// apply filter to allow custom keywords
-		$message_post = apply_filters('s2_custom_keywords', $message_post, $digest_post_ids);
-		$message_posttime = apply_filters('s2_custom_keywords', $message_posttime, $digest_post_ids);
 
 		// apply filter to allow external content to be inserted or content manipulated
 		$message_post = apply_filters('s2_digest_email', $message_post);
@@ -1555,6 +1555,9 @@ class s2class {
 		$mailtext = str_replace("{TABLE}", $table, $mailtext);
 		$mailtext = str_replace("{POSTTIME}", $message_posttime, $mailtext);
 		$mailtext = str_replace("{POST}", $message_post, $mailtext);
+
+		// apply filter to allow custom keywords
+		$mailtext = apply_filters('s2_custom_keywords', $mailtext, $digest_post_ids);
 		$mailtext = stripslashes($this->substitute($mailtext));
 
 		// prepare recipients
