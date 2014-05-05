@@ -122,9 +122,9 @@ class s2class {
 			$this->subscribe2_options['version'] = '8.8';
 			update_option('subscribe2_options', $this->subscribe2_options);
 		}
-		if ( version_compare($this->subscribe2_options['version'], '10.0', '<') ) {
+		if ( version_compare($this->subscribe2_options['version'], '9.5', '<') ) {
 			$s2_upgrade->upgrade100();
-			$this->subscribe2_options['version'] = '10.0';
+			$this->subscribe2_options['version'] = '9.5';
 		}
 
 		$this->subscribe2_options['version'] = S2VERSION;

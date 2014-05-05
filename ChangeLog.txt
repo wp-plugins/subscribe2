@@ -2,6 +2,7 @@
 
 * Improved placement and usage of the ‘s2_custom_keywords’ filter in the digest emails
 * Fix for some undefined variable notices
+* Fixes for database connectivity in the upgrade class file - thanks to rushu25
 
 = Version 9.4 by Matthew Robinson =
 
