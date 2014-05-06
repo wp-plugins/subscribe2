@@ -56,8 +56,8 @@ class s2_frontend extends s2class {
 			), $atts));
 
 		// if link is true return a link to the page with the ajax class
-		if ( $link !== '' && !is_user_logged_in() ) {
-			$hide_id = ($hide === '') ? "": " id=\"" . strtolower($hide) . "\"";
+		if ( '' !== $link && !is_user_logged_in() ) {
+			$hide_id = ('' === $hide) ? "": " id=\"" . strtolower($hide) . "\"";
 			$this->s2form = "<a href=\"" . get_permalink($this->subscribe2_options['s2page']) . "\" class=\"s2popup\"" . $hide_id . ">" . $link . "</a>\r\n";
 			return $this->s2form;
 		}
@@ -80,9 +80,9 @@ class s2_frontend extends s2class {
 		$action = '';
 		if ( is_numeric($id) ) {
 			$action = " action=\"" . get_permalink( $id ) . "\"";
-		} elseif ( $id === 'home' ) {
+		} elseif ( 'home' === $id ) {
 			$action = " action=\"" . get_site_url() . "\"";
-		} elseif ( $id === 'self' ) {
+		} elseif ( 'self' === $id ) {
 			$action = '';
 		} elseif ( $this->subscribe2_options['s2page'] > 0 ) {
 			$action = " action=\"" . get_permalink( $this->subscribe2_options['s2page'] ) . "\"";
@@ -91,7 +91,7 @@ class s2_frontend extends s2class {
 		// allow remote setting of email in form
 		if ( isset($_REQUEST['email']) && is_email($_REQUEST['email']) ) {
 			$value = $this->sanitize_email($_REQUEST['email']);
-		} elseif ( strtolower($nojs) == 'true' ) {
+		} elseif ( 'true' == strtolower($nojs) ) {
 			$value = '';
 		} else {
 			$value = __('Enter email address...', 'subscribe2');
@@ -99,13 +99,13 @@ class s2_frontend extends s2class {
 
 		// if wrap is true add paragraph html tags
 		$wrap_text = '';
-		if ( strtolower($wrap) == 'true' ) {
+		if ( 'true' == strtolower($wrap) ) {
 			$wrap_text = '</p><p>';
 		}
 
 		// deploy some anti-spam measures
 		$antispam_text = '';
-		if ( strtolower($noantispam) != 'true' ) {
+		if ( 'true' != strtolower($noantispam) ) {
 			$antispam_text = "<span style=\"display:none !important\">";
 			$antispam_text .= "<label for=\"name\">Leave Blank:</label><input type=\"text\" id=\"name\" name=\"name\" />";
 			$antispam_text .= "<label for=\"uri\">Do Not Change:</label><input type=\"text\" id=\"uri\" name=\"uri\" value=\"http://\" />";
@@ -113,7 +113,7 @@ class s2_frontend extends s2class {
 		}
 
 		// build default form
-		if ( strtolower($nojs) == 'true' ) {
+		if ( 'true' == strtolower($nojs) ) {
 			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" />" . $wrap_text . $this->input_form_action . "</p></form>";
 		} else {
 			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" />" . $wrap_text . $this->input_form_action . "</p></form>\r\n";
@@ -127,7 +127,7 @@ class s2_frontend extends s2class {
 		}
 		if ( isset($_POST['subscribe']) || isset($_POST['unsubscribe']) ) {
 			// anti spam sign up measure
-			if ( $_POST['name'] != '' || $_POST['uri'] != 'http://' ) {
+			if ( ( isset($_POST['name']) && '' != $_POST['name'] ) || ( isset($_POST['uri']) && 'http://' != $_POST['uri'] ) ) {
 				// looks like some invisible-to-user fields were changed; falsely report success
 				return $this->confirmation_sent;
 			}
