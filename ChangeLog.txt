@@ -4,6 +4,7 @@
 * Fix for some undefined variable notices
 * Fixes for database connectivity in the upgrade class file - thanks to rushu25
 * Fix for bug when antispam measures are disabled - thanks to serinx
+* Add option to Sidebar Widget to not wrap the button below the form
 
 = Version 9.4 by Matthew Robinson =
 
