@@ -49,7 +49,7 @@ if ( !function_exists( 'is_plugin_active_for_network' ) ) {
 
 if ( is_plugin_active_for_network(plugin_basename(__FILE__)) ) {
 	deactivate_plugins( plugin_basename(__FILE__) );
-	$exit_msg = __('Subscribe2 cannot be activated as a network plugin. Please activate it at on a site level', 'subscribe2');
+	$exit_msg = __('Subscribe2 cannot be activated as a network plugin. Please activate it on a site level', 'subscribe2');
 	exit($exit_msg);
 }
 
