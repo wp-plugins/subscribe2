@@ -58,7 +58,7 @@ class s2_frontend extends s2class {
 		// if link is true return a link to the page with the ajax class
 		if ( '' !== $args['link'] && !is_user_logged_in() ) {
 			$hide_id = ('' === $args['hide']) ? "": " id=\"" . strtolower($args['hide']) . "\"";
-			$this->s2form = "<a href=\"" . get_permalink($this->subscribe2_options['s2page']) . "\" class=\"s2popup\"" . $hide_id . ">" . $link . "</a>\r\n";
+			$this->s2form = "<a href=\"" . get_permalink($this->subscribe2_options['s2page']) . "\" class=\"s2popup\"" . $hide_id . ">" . $args['link'] . "</a>\r\n";
 			return $this->s2form;
 		}
 
@@ -79,7 +79,7 @@ class s2_frontend extends s2class {
 		// if ID is provided, get permalink
 		$action = '';
 		if ( is_numeric($args['id']) ) {
-			$action = " action=\"" . get_permalink( $id ) . "\"";
+			$action = " action=\"" . get_permalink( $args['id'] ) . "\"";
 		} elseif ( 'home' === $args['id'] ) {
 			$action = " action=\"" . get_site_url() . "\"";
 		} elseif ( 'self' === $args['id'] ) {
