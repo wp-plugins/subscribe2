@@ -13,7 +13,6 @@ class S2_Form_widget extends WP_Widget {
 	Displays the Widget
 	*/
 	function widget($args, $instance) {
-		extract($args);
 		$title = empty($instance['title']) ? __('Subscribe2', 'subscribe2') : $instance['title'];
 		$div = empty($instance['div']) ? 'search' : $instance['div'];
 		$widgetprecontent = empty($instance['widgetprecontent']) ? '' : $instance['widgetprecontent'];
@@ -46,8 +45,10 @@ class S2_Form_widget extends WP_Widget {
 			$nowrap = " wrap=\"false\"";
 		}
 		$shortcode = "[subscribe2" . $hide . $postid . $size . $nojs . $noantispam . $nowrap . "]";
-		echo $before_widget;
-		echo $before_title . $title . $after_title;
+		echo $args['before_widget'];
+		if ( !empty($title) ) {
+			echo $args['before_title'] . $title . $args['after_title'];
+		}
 		echo "<div class=\"" . $div . "\">";
 		$content = do_shortcode( $shortcode );
 		if ( !empty($widgetprecontent) ) {
@@ -58,7 +59,7 @@ class S2_Form_widget extends WP_Widget {
 			echo $widgetpostcontent;
 		}
 		echo "</div>";
-		echo $after_widget;
+		echo $args['after_widget'];
 	}
 
 	/**

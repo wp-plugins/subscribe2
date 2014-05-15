@@ -6,6 +6,7 @@
 * Fix for bug when antispam measures are disabled - thanks to serinx
 * Add option to Sidebar Widget to not wrap the button below the form
 * Straightened quotes in the ChangeLog
+* Remove all uses of PHP extract() function as per core ticket (https://core.trac.wordpress.org/ticket/22400)
 
 = Version 9.4 by Matthew Robinson =
 
