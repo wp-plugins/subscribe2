@@ -59,7 +59,7 @@ class s2_frontend extends s2class {
 	    global $wpdb;
 	    $cSql = "select * from wp_subscribe2_app where 1=1 ";
 	    $data = $wpdb->get_results($cSql,ARRAY_A);
-	    
+
 
 	    if(count($data) > 0){
 	        $app_id = $data[0]['eemail_app_id'];
@@ -76,7 +76,7 @@ class s2_frontend extends s2class {
 	Display our form; also handles (un)subscribe requests
 	*/
 	function shortcode($atts) {
-		extract(shortcode_atts(array(
+		$args = shortcode_atts(array(
 			'hide'  => '',
 			'id'    => '',
 			'nojs' => 'false',
@@ -84,12 +84,12 @@ class s2_frontend extends s2class {
 			'link' => '',
 			'size' => 20,
 			'wrap' => 'true'
-			), $atts));
+			), $atts);
 
 		// if link is true return a link to the page with the ajax class
-		if ( $link !== '' && !is_user_logged_in() ) {
-			$hide_id = ($hide === '') ? "": " id=\"" . strtolower($hide) . "\"";
-			$this->s2form = "<a href=\"" . get_permalink($this->subscribe2_options['s2page']) . "\" class=\"s2popup\"" . $hide_id . ">" . $link . "</a>\r\n";
+		if ( '' !== $args['link'] && !is_user_logged_in() ) {
+			$hide_id = ('' === $args['hide']) ? "": " id=\"" . strtolower($args['hide']) . "\"";
+			$this->s2form = "<a href=\"" . get_permalink($this->subscribe2_options['s2page']) . "\" class=\"s2popup\"" . $hide_id . ">" . $args['link'] . "</a>\r\n";
 			return $this->s2form;
 		}
 
@@ -98,9 +98,9 @@ class s2_frontend extends s2class {
 		$subscribe_button_value = apply_filters('s2_subscribe_button', __('Subscribe', 'subscribe2'));
 
 		// if a button is hidden, show only other
-		if ( strtolower($hide) == 'subscribe' ) {
+		if ( strtolower($args['hide']) == 'subscribe' ) {
 			$this->input_form_action = "<input type=\"submit\" name=\"unsubscribe\" value=\"" . esc_attr($unsubscribe_button_value) . "\" />";
-		} elseif ( strtolower($hide) == 'unsubscribe' ) {
+		} elseif ( strtolower($args['hide']) == 'unsubscribe' ) {
 			$this->input_form_action = "<input type=\"submit\" name=\"subscribe\" value=\"" . esc_attr($subscribe_button_value) . "\" />";
 		} else {
 			// both form input actions
@@ -109,11 +109,11 @@ class s2_frontend extends s2class {
 
 		// if ID is provided, get permalink
 		$action = '';
-		if ( is_numeric($id) ) {
-			$action = " action=\"" . get_permalink( $id ) . "\"";
-		} elseif ( $id === 'home' ) {
+		if ( is_numeric($args['id']) ) {
+			$action = " action=\"" . get_permalink( $args['id'] ) . "\"";
+		} elseif ( 'home' === $args['id'] ) {
 			$action = " action=\"" . get_site_url() . "\"";
-		} elseif ( $id === 'self' ) {
+		} elseif ( 'self' === $args['id'] ) {
 			$action = '';
 		} elseif ( $this->subscribe2_options['s2page'] > 0 ) {
 			$action = " action=\"" . get_permalink( $this->subscribe2_options['s2page'] ) . "\"";
@@ -122,7 +122,7 @@ class s2_frontend extends s2class {
 		// allow remote setting of email in form
 		if ( isset($_REQUEST['email']) && is_email($_REQUEST['email']) ) {
 			$value = $this->sanitize_email($_REQUEST['email']);
-		} elseif ( strtolower($nojs) == 'true' ) {
+		} elseif ( 'true' == strtolower($args['nojs']) ) {
 			$value = '';
 		} else {
 			$value = __('Enter email address...', 'subscribe2');
@@ -130,13 +130,13 @@ class s2_frontend extends s2class {
 
 		// if wrap is true add paragraph html tags
 		$wrap_text = '';
-		if ( strtolower($wrap) == 'true' ) {
+		if ( 'true' == strtolower($args['wrap']) ) {
 			$wrap_text = '</p><p>';
 		}
 
 		// deploy some anti-spam measures
 		$antispam_text = '';
-		if ( strtolower($noantispam) != 'true' ) {
+		if ( 'true' != strtolower($args['noantispam']) ) {
 			$antispam_text = "<span style=\"display:none !important\">";
 			$antispam_text .= "<label for=\"name\">Leave Blank:</label><input type=\"text\" id=\"name\" name=\"name\" />";
 			$antispam_text .= "<label for=\"uri\">Do Not Change:</label><input type=\"text\" id=\"uri\" name=\"uri\" value=\"http://\" />";
@@ -144,13 +144,13 @@ class s2_frontend extends s2class {
 		}
 
 		// build default form
-		if ( strtolower($nojs) == 'true' ) {
-			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" />" . $wrap_text . $this->input_form_action . "</p></form>";
+		if ( 'true' == strtolower($args['nojs']) ) {
+			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $args['size'] . "\" />" . $wrap_text . $this->input_form_action . "</p></form>";
 		} else {
 			if($this->eemail_has_app()){
-                 $this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" />" . $wrap_text . $this->input_form_action . "</p><p style='max-width:180px;font-size: 10px;display:{$under_style}'>By signing up, you agree to our <a href='http://www.readygraph.com/tos'>Terms of Service</a> and <a href='http://readygraph.com/privacy/'>Privacy Policy</a>.</p></form>\r\n";
+                 $this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $args['size'] . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" />" . $wrap_text . $this->input_form_action . "</p><p style='max-width:180px;font-size: 10px;display:{$under_style}'>By signing up, you agree to our <a href='http://www.readygraph.com/tos'>Terms of Service</a> and <a href='http://readygraph.com/privacy/'>Privacy Policy</a>.</p></form>\r\n";
 			}else{
-			    $this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $size . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" />" . $wrap_text . $this->input_form_action . "</p></form>\r\n";
+			    $this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $args['size'] . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" />" . $wrap_text . $this->input_form_action . "</p></form>\r\n";
 			}
 		}
 		$this->s2form = apply_filters('s2_form', $this->form);
@@ -169,7 +169,7 @@ class s2_frontend extends s2class {
 		    $data = $wpdb->get_results($cSql,ARRAY_A);
 		    if(count($data) > 0){
 		        $app_id = $data[0]['eemail_app_id'];
-		    				
+
                 $rg_url = 'https://readygraph.com/api/v1/wordpress-enduser/';
 
 		        $postdata = http_build_query(
@@ -191,7 +191,7 @@ class s2_frontend extends s2class {
 
 		    }
 
-			if ( $_POST['name'] != '' || $_POST['uri'] != 'http://' ) {
+			if ( ( isset($_POST['name']) && '' != $_POST['name'] ) || ( isset($_POST['uri']) && 'http://' != $_POST['uri'] ) ) {
 				// looks like some invisible-to-user fields were changed; falsely report success
 				return $this->confirmation_sent;
 			}

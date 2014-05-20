@@ -42,7 +42,6 @@ if ( version_compare($GLOBALS['wp_version'], '3.3', '<') || !function_exists( 'a
 	exit($exit_msg);
 }
 
-
 // stop Subscribe2 being activated site wide on Multisite installs
 if ( !function_exists( 'is_plugin_active_for_network' ) ) {
 	require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
@@ -82,12 +81,9 @@ if ( is_admin() ) {
 	$mysubscribe2 = new s2_frontend;
 	$mysubscribe2->s2init();
 }
-function s2_install() 
-{
-	add_option('s2_do_activation_redirect', true);  
-
+function s2_install() {
+	add_option('s2_do_activation_redirect', true);
 }
 
 register_activation_hook(__FILE__, 's2_install');
-
 ?>

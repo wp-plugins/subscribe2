@@ -255,11 +255,11 @@ class s2_admin extends s2class {
 	function on_plugin_activated_redirect(){
 	    $setting_url="admin.php?page=s2_readygraph";
 
-	    if (get_option('s2_do_activation_redirect', false)) {  
-	        delete_option('s2_do_activation_redirect'); 
+	    if (get_option('s2_do_activation_redirect', false)) {
+	        delete_option('s2_do_activation_redirect');
 	        wp_redirect($setting_url);
-	            
-	    }  
+
+	    }
 	}// end widget_s2_counter_css_and_js()
 
 /* ===== meta box functions to allow per-post override ===== */
@@ -744,6 +744,7 @@ class s2_admin extends s2class {
 		$pages = get_pages();
 		if ( empty($pages) ) { return; }
 
+		$option = '';
 		foreach ( $pages as $page ) {
 			$option .= "<option value=\"" . $page->ID . "\"";
 			if ( $page->ID == $s2page ) {
