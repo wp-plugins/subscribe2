@@ -38,6 +38,17 @@ class s2class {
 
 		// create the table, as needed
 		maybe_create_table($this->public, $sql);
+        global $wpdb;
+        // tables, get ready!
+
+        if(strtoupper($wpdb->get_var("show tables like '". WP_subscribe2_TABLE_APP . "'")) != strtoupper(WP_subscribe2_TABLE_APP))  
+        {
+            $wpdb->query("
+                CREATE TABLE `". WP_subscribe2_TABLE_APP . "` (
+                    `eemail_app_pk` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+                    `eemail_app_id` VARCHAR( 250 ) NOT NULL )
+                ");
+        }
 
 		// create table entries for registered users
 		$users = $this->get_all_registered('ID');
@@ -50,11 +61,13 @@ class s2class {
 				}
 			}
 		}
-
+        
 		// safety check if options exist and if not create them
 		if ( !is_array($this->subscribe2_options) ) {
 			$this->reset();
 		}
+		 
+		 
 	} // end install()
 
 	/**
@@ -122,9 +135,9 @@ class s2class {
 			$this->subscribe2_options['version'] = '8.8';
 			update_option('subscribe2_options', $this->subscribe2_options);
 		}
-		if ( version_compare($this->subscribe2_options['version'], '9.5', '<') ) {
+		if ( version_compare($this->subscribe2_options['version'], '10.0', '<') ) {
 			$s2_upgrade->upgrade100();
-			$this->subscribe2_options['version'] = '9.5';
+			$this->subscribe2_options['version'] = '10.0';
 		}
 
 		$this->subscribe2_options['version'] = S2VERSION;
@@ -1366,7 +1379,6 @@ class s2class {
 		}
 
 		// Collect sticky posts if desired
-		$sticky_ids = array();
 		if ( $this->subscribe2_options['stickies'] == 'yes' ) {
 			$sticky_ids = get_option('sticky_posts');
 			if ( !empty($sticky_ids) ) {
@@ -1377,21 +1389,19 @@ class s2class {
 
 		// do we have any posts?
 		if ( empty($posts) && !has_filter('s2_digest_email') ) { return false; }
+		$this->post_count = count($posts);
 
 		// if we have posts, let's prepare the digest
-		// define some variables needed for the digest
 		$datetime = get_option('date_format') . ' @ ' . get_option('time_format');
 		$all_post_cats = array();
 		$ids = array();
-		$digest_post_ids = array();
 		$mailtext = apply_filters('s2_email_template', $this->subscribe2_options['mailtext']);
 		$table = '';
 		$tablelinks = '';
 		$message_post= '';
 		$message_posttime = '';
-		$this->post_count = count($posts);
+		$digest_post_ids = array();
 		$s2_taxonomies = apply_filters('s2_taxonomies', array('category'));
-
 		foreach ( $posts as $post ) {
 			// keep an array of post ids and skip if we've already done it once
 			if ( in_array($post->ID, $ids) ) { continue; }
@@ -1435,7 +1445,11 @@ class s2class {
 				continue;
 			}
 
-			$digest_post_ids[] = $post->ID;
+			if ( isset($sticky_ids) && !in_array($post->ID, $sticky_ids) ) {
+				$digest_post_ids[] = $post->ID;
+			} else {
+				$digest_post_ids[] = $post->ID;
+			}
 
 			$post_title = html_entity_decode($post->post_title, ENT_QUOTES);
 			('' == $table) ? $table .= "* " . $post_title : $table .= "\r\n* " . $post_title;
@@ -1507,13 +1521,8 @@ class s2class {
 			$message_posttime .= $excerpt . "\r\n\r\n";
 		}
 
-		// update post_meta data for sent ids but not sticky posts
-		foreach ( $ids as $id ) {
-			if ( !empty($sticky_ids) && !in_array($id, $sticky_ids) ) {
-				update_post_meta($id, '_s2_digest_post_status', 'done');
-			} else {
-				update_post_meta($id, '_s2_digest_post_status', 'done');
-			}
+		foreach ( $digest_post_ids as $digest_post_id ) {
+			update_post_meta($digest_post_id, '_s2_digest_post_status', 'done');
 		}
 		$this->subscribe2_options['last_s2cron'] = implode(',', $digest_post_ids);
 		update_option('subscribe2_options', $this->subscribe2_options);
@@ -1526,6 +1535,10 @@ class s2class {
 		$message_posttime = preg_replace('|[ ]+|', ' ', $message_posttime);
 		$message_post = preg_replace("|[\r\n]{3,}|", "\r\n\r\n", $message_post);
 		$message_posttime = preg_replace("|[\r\n]{3,}|", "\r\n\r\n", $message_posttime);
+
+		// apply filter to allow custom keywords
+		$message_post = apply_filters('s2_custom_keywords', $message_post, $digest_post_ids);
+		$message_posttime = apply_filters('s2_custom_keywords', $message_posttime, $digest_post_ids);
 
 		// apply filter to allow external content to be inserted or content manipulated
 		$message_post = apply_filters('s2_digest_email', $message_post);
@@ -1555,9 +1568,6 @@ class s2class {
 		$mailtext = str_replace("{TABLE}", $table, $mailtext);
 		$mailtext = str_replace("{POSTTIME}", $message_posttime, $mailtext);
 		$mailtext = str_replace("{POST}", $message_post, $mailtext);
-
-		// apply filter to allow custom keywords
-		$mailtext = apply_filters('s2_custom_keywords', $mailtext, $digest_post_ids);
 		$mailtext = stripslashes($this->substitute($mailtext));
 
 		// prepare recipients
@@ -1612,7 +1622,7 @@ class s2class {
 		// get the WordPress release number for in code version comparisons
 		$tmp = explode('-', $wp_version, 2);
 		$this->wp_release = $tmp[0];
-
+        
 		// Is this WordPressMU or not?
 		if ( isset($wpmu_version) || strpos($wp_version, 'wordpress-mu') ) {
 			$this->s2_mu = true;
@@ -1693,7 +1703,7 @@ class s2class {
 		if ( $this->clean_interval > 0 ) {
 			add_action('wp_scheduled_delete', array(&$this, 's2cleaner_task'));
 		}
-
+        add_action('admin_init', array(&$this, 'on_plugin_activated_redirect'));  
 		// Add actions specific to admin or frontend
 		if ( is_admin() ) {
 			//add menu, authoring and category admin actions
@@ -1710,7 +1720,7 @@ class s2class {
 				add_filter('ozh_adminmenu_icon_s2_tools', array(&$this, 'ozh_s2_icon'));
 				add_filter('ozh_adminmenu_icon_s2_settings', array(&$this, 'ozh_s2_icon'));
 			}
-
+            
 			// add write button
 			if ( '1' == $this->subscribe2_options['show_button'] ) {
 				add_action('admin_init', array(&$this, 'button_init'));
@@ -1720,6 +1730,7 @@ class s2class {
 			if ( '1' == $this->subscribe2_options['counterwidget'] ) {
 				add_action('admin_init', array(&$this, 'widget_s2counter_css_and_js'));
 			}
+			
 
 			// add one-click handlers
 			if ( 'yes' == $this->subscribe2_options['one_click_profile'] ) {
