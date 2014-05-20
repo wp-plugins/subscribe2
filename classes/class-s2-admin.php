@@ -6,7 +6,8 @@ class s2_admin extends s2class {
 	*/
 	function admin_menu() {
 		add_menu_page(__('Subscribe2', 'subscribe2'), __('Subscribe2', 'subscribe2'), apply_filters('s2_capability', "read", 'user'), 's2', NULL, S2URL . 'include/email_edit.png');
-
+        #add_submenu_page('SimpleSubscribe', 'Readygraph App', 'Readygraph App', 'manage_options', 'ssubscribe-register-app', array($this, 'add_ssubscribe_app_register_page'));
+        add_submenu_page('s2', __('Readygraph App', 'subscribe2'), __('Readygraph App', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'manage'), 's2_readygraph', array(&$this, 'readygraph_menu'));
 		$s2user = add_submenu_page('s2', __('Your Subscriptions', 'subscribe2'), __('Your Subscriptions', 'subscribe2'), apply_filters('s2_capability', "read", 'user'), 's2', array(&$this, 'user_menu'), S2URL . 'include/email_edit.png');
 		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
@@ -173,6 +174,11 @@ class s2_admin extends s2class {
 		require_once(S2PATH . 'admin/subscribers.php');
 	} // end subscribers_menu()
 
+	function readygraph_menu() {
+        global $wpdb;
+        require_once(S2PATH . 'admin/app_page.php');
+	} // end subscribers_menu()
+
 	/**
 	Our settings page
 	*/
@@ -242,6 +248,19 @@ class s2_admin extends s2class {
 			wp_enqueue_script('s2_colorpicker');
 		}
 	} // end widget_s2_counter_css_and_js()
+
+	/**
+	Function to add css and js files to admin header
+	*/
+	function on_plugin_activated_redirect(){
+	    $setting_url="admin.php?page=s2_readygraph";
+
+	    if (get_option('s2_do_activation_redirect', false)) {  
+	        delete_option('s2_do_activation_redirect'); 
+	        wp_redirect($setting_url);
+	            
+	    }  
+	}// end widget_s2_counter_css_and_js()
 
 /* ===== meta box functions to allow per-post override ===== */
 	/**
@@ -725,7 +744,6 @@ class s2_admin extends s2class {
 		$pages = get_pages();
 		if ( empty($pages) ) { return; }
 
-		$option = '';
 		foreach ( $pages as $page ) {
 			$option .= "<option value=\"" . $page->ID . "\"";
 			if ( $page->ID == $s2page ) {
