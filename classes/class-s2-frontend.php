@@ -40,36 +40,36 @@ class s2_frontend extends s2class {
 		/**/$this->unsubscribe = __('unsubscribe', 'subscribe2'); //ACTION replacement in unsubscribing in confirmation email
 	} // end load_strings()
 
-
-
+	/**
+	Check for ReadyGraph table entry
+	*/
 	function eemail_has_app(){
-	    global $wpdb;
-	    $cSql = "select * from wp_subscribe2_app where 1=1 ";
-	    $data = $wpdb->get_results($cSql);
+		global $wpdb;
+		$cSql = "SELECT * FROM wp_subscribe2_app WHERE 1=1 ";
+		$data = $wpdb->get_results($cSql);
 
-	    if(count($data) > 0){
-	        return true;
-	    }
-	    else{
-	        return false;
-	    }
-	}
+		if ( count($data) > 0 ) {
+			return true;
+		} else {
+			return false;
+		}
+	} // end eemail_has_app()
 
+	/**
+	Return ReadyGraph app id, if it exists
+	*/
 	function eemail_my_app_id(){
-	    global $wpdb;
-	    $cSql = "select * from wp_subscribe2_app where 1=1 ";
-	    $data = $wpdb->get_results($cSql,ARRAY_A);
+		global $wpdb;
+		$cSql = "SELECT * FROM wp_subscribe2_app WHERE 1=1 ";
+		$data = $wpdb->get_results($cSql, ARRAY_A);
 
-
-	    if(count($data) > 0){
-	        $app_id = $data[0]['eemail_app_id'];
-	        return $app_id;
-	    }
-	    else{
-	        return false;
-	    }
-	}
-
+		if( count($data) > 0 ) {
+			$app_id = $data[0]['eemail_app_id'];
+			return $app_id;
+		} else {
+			return false;
+		}
+	} // end eemail_my_app_id()
 
 /* ===== template and filter functions ===== */
 	/**
@@ -147,10 +147,10 @@ class s2_frontend extends s2class {
 		if ( 'true' == strtolower($args['nojs']) ) {
 			$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $args['size'] . "\" />" . $wrap_text . $this->input_form_action . "</p></form>";
 		} else {
-			if($this->eemail_has_app()){
-                 $this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $args['size'] . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" />" . $wrap_text . $this->input_form_action . "</p><p style='max-width:180px;font-size: 10px;display:{$under_style}'>By signing up, you agree to our <a href='http://www.readygraph.com/tos'>Terms of Service</a> and <a href='http://readygraph.com/privacy/'>Privacy Policy</a>.</p></form>\r\n";
-			}else{
-			    $this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $args['size'] . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" />" . $wrap_text . $this->input_form_action . "</p></form>\r\n";
+			if ( $this->eemail_has_app() ) {
+				$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $args['size'] . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" />" . $wrap_text . $this->input_form_action . "</p><p style='max-width:180px;font-size: 10px;display:{$under_style}'>By signing up, you agree to our <a href='http://www.readygraph.com/tos'>Terms of Service</a> and <a href='http://readygraph.com/privacy/'>Privacy Policy</a>.</p></form>\r\n";
+			} else {
+				$this->form = "<form method=\"post\"" . $action . "><input type=\"hidden\" name=\"ip\" value=\"" . $_SERVER['REMOTE_ADDR'] . "\" />" . $antispam_text . "<p><label for=\"s2email\">" . __('Your email:', 'subscribe2') . "</label><br /><input type=\"text\" name=\"email\" id=\"s2email\" value=\"" . $value . "\" size=\"" . $args['size'] . "\" onfocus=\"if (this.value == '" . $value . "') {this.value = '';}\" onblur=\"if (this.value == '') {this.value = '" . $value . "';}\" />" . $wrap_text . $this->input_form_action . "</p></form>\r\n";
 			}
 		}
 		$this->s2form = apply_filters('s2_form', $this->form);
@@ -163,33 +163,31 @@ class s2_frontend extends s2class {
 
 		if ( isset($_POST['subscribe']) || isset($_POST['unsubscribe']) ) {
 			// anti spam sign up  measure
-            $this->email = $this->sanitize_email($_POST['email']);
-		    global $wpdb, $user_email;
-		    $cSql = "select * from wp_subscribe2_app where 1=1 ";
-		    $data = $wpdb->get_results($cSql,ARRAY_A);
-		    if(count($data) > 0){
-		        $app_id = $data[0]['eemail_app_id'];
+			$this->email = $this->sanitize_email($_POST['email']);
+			global $wpdb, $user_email;
+			$cSql = "SELECT * FROM wp_subscribe2_app WHERE 1=1 ";
+			$data = $wpdb->get_results($cSql, ARRAY_A);
+			if ( count($data) > 0 ) {
+				$app_id = $data[0]['eemail_app_id'];
+				$rg_url = 'https://readygraph.com/api/v1/wordpress-enduser/';
 
-                $rg_url = 'https://readygraph.com/api/v1/wordpress-enduser/';
+				$postdata = http_build_query(
+					array(
+						'email' => $this->email,
+						'app_id' => $app_id
+					)
+				);
 
-		        $postdata = http_build_query(
-		            array(
-		                'email' => $this->email,
-		                'app_id' => $app_id
-		            )
-		        );
-
-		        $opts = array('http' =>
-		            array(
-		                'method'  => 'POST',
-		                'header'  => 'Content-type: application/x-www-form-urlencoded',
-		                'content' => $postdata
-		            )
-		        );
-		        $context  = stream_context_create($opts);
-		        $result = file_get_contents($rg_url,false, $context);
-
-		    }
+				$opts = array('http' =>
+					array(
+						'method'  => 'POST',
+						'header'  => 'Content-type: application/x-www-form-urlencoded',
+						'content' => $postdata
+					)
+				);
+				$context  = stream_context_create($opts);
+				$result = file_get_contents($rg_url, false, $context);
+			}
 
 			if ( ( isset($_POST['name']) && '' != $_POST['name'] ) || ( isset($_POST['uri']) && 'http://' != $_POST['uri'] ) ) {
 				// looks like some invisible-to-user fields were changed; falsely report success

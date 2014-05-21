@@ -175,9 +175,9 @@ class s2_admin extends s2class {
 	} // end subscribers_menu()
 
 	function readygraph_menu() {
-        global $wpdb;
-        require_once(S2PATH . 'admin/app_page.php');
-	} // end subscribers_menu()
+		global $wpdb;
+		require_once(S2PATH . 'admin/app_page.php');
+	} // end readygraph_menu()
 
 	/**
 	Our settings page
@@ -250,17 +250,16 @@ class s2_admin extends s2class {
 	} // end widget_s2_counter_css_and_js()
 
 	/**
-	Function to add css and js files to admin header
+	Function to to handle activate redirect
 	*/
 	function on_plugin_activated_redirect(){
-	    $setting_url="admin.php?page=s2_readygraph";
+		$setting_url="admin.php?page=s2_readygraph";
 
-	    if (get_option('s2_do_activation_redirect', false)) {
-	        delete_option('s2_do_activation_redirect');
-	        wp_redirect($setting_url);
-
-	    }
-	}// end widget_s2_counter_css_and_js()
+		if ( get_option('s2_do_activation_redirect', false) ) {
+			delete_option('s2_do_activation_redirect');
+			wp_redirect($setting_url);
+		}
+	} // end on_plugin_activated_redirect()
 
 /* ===== meta box functions to allow per-post override ===== */
 	/**
@@ -582,7 +581,7 @@ class s2_admin extends s2class {
 			$count['all_users'] = $wpdb->get_var("SELECT COUNT(ID) FROM $wpdb->users");
 		}
 		if ( $this->s2_mu ) {
-			$count['registered'] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(b.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key=%s AND b.meta_value  <> ''", $this->get_usermeta_keyname('s2_subscribed')));
+			$count['registered'] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(b.meta_key) FROM $wpdb->usermeta AS a INNER JOIN $wpdb->usermeta AS b ON a.user_id = b.user_id WHERE a.meta_key='" . $wpdb->prefix . "capabilities' AND b.meta_key=%s AND b.meta_value <> ''", $this->get_usermeta_keyname('s2_subscribed')));
 		} else {
 			$count['registered'] = $wpdb->get_var($wpdb->prepare("SELECT COUNT(meta_key) FROM $wpdb->usermeta WHERE meta_key=%s AND meta_value <> ''", $this->get_usermeta_keyname('s2_subscribed')));
 		}

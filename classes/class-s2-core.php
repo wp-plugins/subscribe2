@@ -1037,7 +1037,7 @@ class s2class {
 			}
 			update_user_meta($user_ID, $this->get_usermeta_keyname('s2_autosub'), $this->subscribe2_options['autosub_def']);
 			// if the are no existing subscriptions, create them if we have consent
-			if (  true === $consent ) {
+			if ( true === $consent ) {
 				update_user_meta($user_ID, $this->get_usermeta_keyname('s2_subscribed'), $cats);
 				foreach ( explode(',', $cats) as $cat ) {
 					update_user_meta($user_ID, $this->get_usermeta_keyname('s2_cat') . $cat, $cat);
@@ -1704,7 +1704,7 @@ class s2class {
 		if ( $this->clean_interval > 0 ) {
 			add_action('wp_scheduled_delete', array(&$this, 's2cleaner_task'));
 		}
-        add_action('admin_init', array(&$this, 'on_plugin_activated_redirect'));
+		add_action('admin_init', array(&$this, 'on_plugin_activated_redirect'));
 		// Add actions specific to admin or frontend
 		if ( is_admin() ) {
 			//add menu, authoring and category admin actions
