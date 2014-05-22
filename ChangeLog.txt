@@ -1,3 +1,11 @@
+= Version 10.1 = 
+
+* Fix for jQuery conflict - props Greg Ross
+
+= Version 10.0 =
+
+* Introduced changes for ReadyGraph integration
+
 = Version 9.5 by Matthew Robinson =
 
 * Improved placement and usage of the 's2_custom_keywords' filter in the digest emails

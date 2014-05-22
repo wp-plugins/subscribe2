@@ -40,13 +40,6 @@
 				}
 			});
 
-			// allow selection of the image placeholder
-			ed.on('click', function ( ed ) {
-				if ( ed.toElement.nodeName === 'IMG' && ed.toElement.className === cls ) {
-					ed.selection.select( ed );
-				}
-			});
-
 			// create an array of replaced shortcodes so we have additional parameters
 			// then swap in the graphic
 			ed.on('BeforeSetContent', function ( ed ) {
