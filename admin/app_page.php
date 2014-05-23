@@ -57,7 +57,7 @@ if ( isset($this->subscribe2_options['readygraph_id']) && $this->subscribe2_opti
 
 			<p style="max-width:180px;font-size: 10px;"><?php printf( __('By signing up, you agree to our <a href="%1$s">Terms of Service</a> and <a href="%2$s">Privacy Policy</a>', 'subscribe2'), esc_url('http://www.readygraph.com/tos'), esc_url('http://readygraph.com/privacy/') ); ?>.</p>
 			<p style="margin-top:10px;">
-			<input type="submit" style="text-shadow:none;background:#36812E;width:193px;background-color:#36812E;color:white;" value="Continue to place widget" id="register-app-submit" class="button" name="Submit">
+			<input type="submit" style="text-shadow:none;background:#36812E;width:193px;background-color:#36812E;color:white;" value="<?php _e('Continue to place widget', 'subscribe2'); ?>" id="register-app-submit" class="button" name="Submit">
 			</p>
 		</div>
 
@@ -74,7 +74,7 @@ if ( isset($this->subscribe2_options['readygraph_id']) && $this->subscribe2_opti
 			<input type="password" id="signin-password" name="eemail_on_homepage">
 			</p>
 			<p style="padding-top:10px;">
-			<input type="submit" style="width:193px;color:" value="Sign In" id="signin-submit" class="button add-new-h2" name="Submit">
+			<input type="submit" style="width:193px;color:" value="<?php _e('Sign In', 'subscribe2'); ?>" id="signin-submit" class="button add-new-h2" name="Submit">
 			</p>
 		</div>
 		</div>
