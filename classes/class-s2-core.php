@@ -38,17 +38,6 @@ class s2class {
 
 		// create the table, as needed
 		maybe_create_table($this->public, $sql);
-        global $wpdb;
-        // tables, get ready!
-
-        if(strtoupper($wpdb->get_var("show tables like '". WP_subscribe2_TABLE_APP . "'")) != strtoupper(WP_subscribe2_TABLE_APP))
-        {
-            $wpdb->query("
-                CREATE TABLE `". WP_subscribe2_TABLE_APP . "` (
-                    `eemail_app_pk` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-                    `eemail_app_id` VARCHAR( 250 ) NOT NULL )
-                ");
-        }
 
 		// create table entries for registered users
 		$users = $this->get_all_registered('ID');
@@ -133,9 +122,9 @@ class s2class {
 			$this->subscribe2_options['version'] = '8.8';
 			update_option('subscribe2_options', $this->subscribe2_options);
 		}
-		if ( version_compare($this->subscribe2_options['version'], '10.0', '<') ) {
-			$s2_upgrade->upgrade100();
-			$this->subscribe2_options['version'] = '10.0';
+		if ( version_compare($this->subscribe2_options['version'], '9.5', '<') ) {
+			$s2_upgrade->upgrade95();
+			$this->subscribe2_options['version'] = '9.5';
 		}
 
 		$this->subscribe2_options['version'] = S2VERSION;

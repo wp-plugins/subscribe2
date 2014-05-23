@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 10.0
+Version: 10.1
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Licence: GPL3
@@ -55,13 +55,10 @@ if ( is_plugin_active_for_network(plugin_basename(__FILE__)) ) {
 
 // our version number. Don't touch this or any line below
 // unless you know exactly what you are doing
-define( 'S2VERSION', '9.4' );
+define( 'S2VERSION', '10.1' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', trailingslashit(dirname(plugin_basename(__FILE__))) );
 define( 'S2URL', plugin_dir_url(dirname(__FILE__)) . S2DIR );
-global $wpdb, $wp_version;
-define("WP_subscribe2_TABLE_APP", $wpdb->prefix . "subscribe2_app");
-
 
 // Set maximum execution time to 5 minutes - won't affect safe mode
 $safe_mode = array('On', 'ON', 'on', 1);
@@ -81,9 +78,9 @@ if ( is_admin() ) {
 	$mysubscribe2 = new s2_frontend;
 	$mysubscribe2->s2init();
 }
+
 function s2_install() {
 	add_option('s2_do_activation_redirect', true);
 }
-
 register_activation_hook(__FILE__, 's2_install');
 ?>

@@ -1,10 +1,12 @@
-= Version 10.1 = 
+= Version 10.1 by Matthew Robinson =
 
-* Fix for jQuery conflict - props Greg Ross
+* Revert introduction of ReadyGraph features until they are production ready
+* Resolve a critical SQL Injection vulnerability introduced in recent code
+* Fix jQuery conflict caused by TinyMCE4 plugin - props Greg Ross
 
 = Version 10.0 =
 
-* Introduced changes for ReadyGraph integration
+* Initial introduction of ReadyGraph features
 
 = Version 9.5 by Matthew Robinson =
 

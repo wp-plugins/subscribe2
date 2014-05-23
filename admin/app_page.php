@@ -1,26 +1,24 @@
 <?php
-global $wpdb;
-$app_id = $_GET["app_id"];
-if($app_id){
-  $sSql = "insert into ".WP_subscribe2_TABLE_APP." VALUES ('1', '".$app_id."') ";
-  $data = $wpdb->get_results($sSql);
+if ( !function_exists('add_action') ) {
+	exit();
 }
-?>
 
-<?php
-	$cSql = "SELECT * FROM ".WP_subscribe2_TABLE_APP." WHERE 1=1 ";
-	$result = $wpdb->get_results($cSql);
-	if ( count($result) > 0 ) {
-	?>
+if ( isset($_GET["app_id"]) && is_numeric($_GET["app_id"]) ) {
+	$this->subscribe2_options['readygraph_id'] = $_GET["app_id"];
+	update_option('subscribe2_options', $this->subscribe2_options);
+}
+
+if ( isset($this->subscribe2_options['readygraph_id']) && $this->subscribe2_options['readygraph_id'] > 0 ) {
+?>
 	<div class="wrap">
 		<div id="icon-plugins" class="icon32"></div>
-		<h2>Final Step: Place the widget on your site to get started</h2>
-		<h3>Drag the widget to a prominent place to maximize signups.</h3>
-		<a class="button add-new-h2" style="text-shadow:none;background:#36812E;background-color:#36812E;color:white;" href="widgets.php">Place Widget Now</a>
-		<p>Tips</p>
+		<h2><?php _e('Final Step: Place the widget on your site to get started', 'subscribe2'); ?></h2>
+		<h3><?php _e('Drag the widget to a prominent place to maximize signups', 'subscribe2'); ?>.</h3>
+		<a class="button add-new-h2" style="text-shadow:none;background:#36812E;background-color:#36812E;color:white;" href="widgets.php"><?php _e('Place Widget Now', 'subscribe2'); ?></a>
+		<p><?php _e('Tips', 'subscribe2'); ?></p>
 		<ul>
-		<li>-Already have the widget in place? Manage your ReadyGraph account <a href="http://readygraph.com/application/insights/"> here</a></li>
-		<li>-Need help? Email <a href="mailto:nick@readygraph.com">nick@readygraph.com</a> or click <a href="http://readygraph.com">here</a> </li>
+		<li>-<?php printf( __('Already have the widget in place? Manage your ReadyGraph account <a href="%s">here</a>', 'subscribe2'), esc_url('http://readygraph.com/application/insights/') ); ?></li>
+		<li>-<?php printf( __('Need help? Email <a href="%1$s">%2$s</a> or click <a href="%3$s">here</a>', 'subscribe2'), esc_attr('mailto:nick@readygraph.com'), esc_attr('nick@readygraph.com'), esc_url('http://readygraph.com') ); ?></li>
 		</ul>
 	</div>
 
@@ -28,36 +26,36 @@ if($app_id){
 
 	<div class="wrap">
 	<div id="icon-plugins" class="icon32"></div>
-		<h2>Simple Subscribe, Now with Readygraph </h2>
-		<h3>Activate Readygraph features to optimize Simple Subscribe functionality</h3>
+		<h2><?php _e('Subscribe2, Now with Readygraph', 'subscribe2'); ?></h2>
+		<h3><?php _e('Activate Readygraph features to optimize Subscribe2 functionality', 'subscribe2'); ?></h3>
 		<p style="display:none;color:red;" id="error"></p>
 		<div class="register-left" style="float: left; width:25%;">
 		<div class="form-wrap">
-			<h3>Free Signup </h3>
+			<h3><?php _e('Free Signup', 'subscribe2'); ?></h3>
 			<p>
-			<label for="tag-title">Site URL</label>
+			<label for="register-url"><?php _e('Site URL', 'subscribe2'); ?></label>
 			<input type="text" id="register-url" name="eemail_on_homepage">
 			</p>
 
 			<p>
-			<label for="tag-title">Name</label>
+			<label for="register-name"><?php _e('Name', 'subscribe2'); ?></label>
 			<input type="text" id="register-name" name="eemail_on_homepage">
 			</p>
 
 			<p>
-			<label for="tag-title">Email</label>
+			<label for="register-email"><?php _e('Email', 'subscribe2'); ?></label>
 			<input type="text" id="register-email" name="eemail_on_homepage">
 			</p>
 			<p>
-			<label for="tag-title">Password</label>
+			<label for="register-password"><?php _e('Password', 'subscribe2'); ?></label>
 			<input type="password" id="register-password" name="eemail_on_homepage">
 			</p>
 			<p>
-			<label for="tag-title">Confirm Password</label>
+			<label for="register-password1"><?php _e('Confirm Password', 'subscribe2'); ?></label>
 			<input type="password" id="register-password1" name="eemail_on_homepage">
 			</p>
 
-			<p style="max-width:180px;font-size: 10px;">By signing up, you agree to our <a href="http://www.readygraph.com	os">Terms of Service</a> and <a href='http://readygraph.com/privacy/'>Privacy Policy</a>.</p>
+			<p style="max-width:180px;font-size: 10px;"><?php printf( __('By signing up, you agree to our <a href="%1$s">Terms of Service</a> and <a href="%2$s">Privacy Policy</a>', 'subscribe2'), esc_url('http://www.readygraph.com/tos'), esc_url('http://readygraph.com/privacy/') ); ?>.</p>
 			<p style="margin-top:10px;">
 			<input type="submit" style="text-shadow:none;background:#36812E;width:193px;background-color:#36812E;color:white;" value="Continue to place widget" id="register-app-submit" class="button" name="Submit">
 			</p>
@@ -67,12 +65,12 @@ if($app_id){
 		<div class="register-mid" style="float: left;width:25%;">
 			<div class="form-wrap">
 			<p>
-			<h3>Already a member?</h3>
-			<label for="tag-title">Email</label>
+			<h3><?php _e('Already a member?', 'subscribe2'); ?></h3>
+			<label for="signin-email"><?php _e('Email', 'subscribe2'); ?></label>
 			<input type="text" id="signin-email" name="eemail_on_homepage">
 			</p>
 			<p>
-			<label for="tag-title">Password</label>
+			<label for="signin-password"><?php _e('Password', 'subscribe2'); ?></label>
 			<input type="password" id="signin-password" name="eemail_on_homepage">
 			</p>
 			<p style="padding-top:10px;">
@@ -83,21 +81,19 @@ if($app_id){
 		<div class="register-right" style="float:left;width:35%;">
 			<div class="form-wrap alert" style="font-size: 16px;background-color: #F9F8F3;border: 2px solid #EBECE8;border-radius: 6px;padding: 16px 45px 16px 30px;">
 			<p>
-			<h3>Signup For These Benefits:</h3>
-			<p>-Grow your subscribers faster</p>
-			<p>-Engage users with automated email updates</p>
-			<p>-Enhanced email deliverablility</p>
-			<p>-Track performace with user-activity analytics</p>
+			<h3><?php _e('Signup For These Benefits', 'subscribe2'); ?>:</h3>
+			<p>-<?php _e('Grow your subscribers faster', 'subscribe2'); ?></p>
+			<p>-<?php _e('Engage users with automated email updates', 'subscribe2'); ?></p>
+			<p>-<?php _e('Enhanced email deliverablility', 'subscribe2'); ?></p>
+			<p>-<?php _e('Track performace with user-activity analytics', 'subscribe2'); ?></p>
 			</div>
 		</div>
 	<?php } ?>
 
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript">
-
-$('#signin-submit').click(function(e){
-	var email = $('#signin-email').val();
-	var password = $('#signin-password').val();
+jQuery('#signin-submit').click(function(e){
+	var email = jQuery('#signin-email').val();
+	var password = jQuery('#signin-password').val();
 	if (!email) {
 		alert('email is empty!');
 		return;
@@ -106,7 +102,7 @@ $('#signin-submit').click(function(e){
 		alert('password is empty');
 		return;
 	}
-	$.ajax({
+	jQuery.ajax({
 		type: 'GET',
 		url: 'https://readygraph.com/api/v1/wordpress-login/',
 		data: {
@@ -119,19 +115,19 @@ $('#signin-submit').click(function(e){
 				var pathname = window.location.href;
 				window.location = pathname + "&app_id="+response.data.app_id;
 			} else {
-				$('#error').text(response.error);
-				$('#error').show();
+				jQuery('#error').text(response.error);
+				jQuery('#error').show();
 			}
 		}
 	});
 });
 
-$('#register-app-submit').click(function(e){
-	var email = $('#register-email').val();
-	var site_url = $('#register-url').val();
-	var first_name = $('#register-name').val();
-	var password = $('#register-password').val();
-	var password2 = $('#register-password1').val();
+jQuery('#register-app-submit').click(function(e){
+	var email = jQuery('#register-email').val();
+	var site_url = jQuery('#register-url').val();
+	var first_name = jQuery('#register-name').val();
+	var password = jQuery('#register-password').val();
+	var password2 = jQuery('#register-password1').val();
 	if (!site_url) {
 		alert('Site Url is empty.');
 		return;
@@ -145,7 +141,7 @@ $('#register-app-submit').click(function(e){
 		return;
 	}
 
-	$.ajax({
+	jQuery.ajax({
 		type: 'POST',
 		url: 'https://readygraph.com/api/v1/wordpress-signup/',
 		data: {
@@ -154,7 +150,7 @@ $('#register-app-submit').click(function(e){
 			'first_name': first_name,
 			'password' : password,
 			'password2' : password2,
-			'source':'subscribe2'
+			'source' : 'subscribe2'
 		},
 		dataType: 'json',
 		success: function(response) {
@@ -162,11 +158,16 @@ $('#register-app-submit').click(function(e){
 				var pathname = window.location.href;
 				window.location = pathname + "&app_id="+response.data.app_id;
 			} else {
-				$('#error').text(response.error);
-				$('#error').show();
+				jQuery('#error').text(response.error);
+				jQuery('#error').show();
 			}
 		}
 	});
 
 });
 </script>
+<?php
+include(ABSPATH . 'wp-admin/admin-footer.php');
+// just to be sure
+die;
+?>

@@ -6,12 +6,14 @@ class s2_admin extends s2class {
 	*/
 	function admin_menu() {
 		add_menu_page(__('Subscribe2', 'subscribe2'), __('Subscribe2', 'subscribe2'), apply_filters('s2_capability', "read", 'user'), 's2', NULL, S2URL . 'include/email_edit.png');
-        #add_submenu_page('SimpleSubscribe', 'Readygraph App', 'Readygraph App', 'manage_options', 'ssubscribe-register-app', array($this, 'add_ssubscribe_app_register_page'));
-        add_submenu_page('s2', __('Readygraph App', 'subscribe2'), __('Readygraph App', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'manage'), 's2_readygraph', array(&$this, 'readygraph_menu'));
+
 		$s2user = add_submenu_page('s2', __('Your Subscriptions', 'subscribe2'), __('Your Subscriptions', 'subscribe2'), apply_filters('s2_capability', "read", 'user'), 's2', array(&$this, 'user_menu'), S2URL . 'include/email_edit.png');
 		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
 		add_action('load-' . $s2user, array(&$this, 'user_help'));
+
+		$s2readygraph = add_submenu_page('s2', __('Readygraph App', 'subscribe2'), __('Readygraph App', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'readygraph'), 's2_readygraph', array(&$this, 'readygraph_menu'));
+		add_action("admin_print_scripts-$s2readygraph", array(&$this, 'readygraph_js'));
 
 		$s2subscribers = add_submenu_page('s2', __('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'manage'), 's2_tools', array(&$this, 'subscribers_menu'));
 		add_action("admin_print_scripts-$s2subscribers", array(&$this, 'checkbox_form_js'));
@@ -153,6 +155,13 @@ class s2_admin extends s2class {
 		wp_register_script('s2_date_time', S2URL . 'include/s2_date_time' . $this->script_debug . '.js', array('jquery-ui-datepicker'), '1.0');
 		wp_enqueue_script('s2_date_time');
 	} // end option_form_js()
+
+	/**
+	Enqueue jQuery for ReadyGraph
+	*/
+	function readygraph_js() {
+		wp_enqueue_script('jquery');
+	} // end readygraph_js()
 
 	/**
 	Adds a links directly to the settings page from the plugin page
