@@ -30,7 +30,7 @@ The format of the email can also be customised for per-post notifications, Subsc
 If you want to send full content HTML emails to Public Subscribers too then upgrade to [Subscribe2 HTML](http://semperplugins.com/plugins/subscribe2-html/).
 
 = ReadyGraph App =
-This menu item allows users to sign up for a free ReadyGraph account, or sync an existing free ReadyGraph account.  Once a ReadyGraph account is synced, this menu item is where the user manages their ReadyGraph account, views email addresses, sends emails to their community members, and views insights on user growth.
+COMING SOON: This menu item allows users to sign up for a free ReadyGraph account, or sync an existing free ReadyGraph account.  Once a ReadyGraph account is synced, this menu item is where the user manages their ReadyGraph account, views email addresses, sends emails to their community members, and views insights on user growth.
 
 == Installation ==
 
