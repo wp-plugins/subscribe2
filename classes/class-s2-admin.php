@@ -161,14 +161,6 @@ class s2_admin extends s2class {
 	*/
 	function readygraph_js() {
 		wp_enqueue_script('jquery');
-		wp_register_script('s2_readygraph', S2URL . 'include/s2_readygraph' . $this->script_debug . '.js', array('jquery'), '1.0');
-		wp_enqueue_script('s2_readygraph');
-		wp_localize_script('s2_readygraph', 'objectL10n', array(
-			'emailempty'  => __('Email is empty!', 'subscribe2'),
-			'passwordempty' => __('Password is empty!', 'subscribe2'),
-			'urlempty' => __('Site Url is empty!', 'subscribe2'),
-			'passwordmatch' => __('Password is not matching!', 'subscribe2')
-		) );
 	} // end readygraph_js()
 
 	/**

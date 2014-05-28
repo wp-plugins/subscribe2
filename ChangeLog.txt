@@ -1,3 +1,7 @@
+
+= Version 10.2 by Matthew Robinson =
+* Fix bugs for readygraph features
+
 = Version 10.1 by Matthew Robinson =
 
 * Revert introduction of ReadyGraph features until they are production ready
