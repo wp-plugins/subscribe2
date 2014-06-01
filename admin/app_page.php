@@ -7,8 +7,8 @@ if ( isset($_GET["app_id"]) && is_numeric($_GET["app_id"]) ) {
 	update_option('readygraph_api', intval($_GET["app_id"]));
 }
 
-$readygraph_id = get_option('readygraph_api');
-if ( isset($readygraph_id) && $readygraph_id > 0 ) {
+$readygraph_api = get_option('readygraph_api');
+if ( isset($readygraph_api) && $readygraph_api > 0 ) {
 ?>
 	<div class="wrap">
 		<div id="icon-plugins" class="icon32"></div>
