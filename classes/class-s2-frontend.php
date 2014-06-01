@@ -114,7 +114,8 @@ class s2_frontend extends s2class {
 
 		// ReadyGraph end user message
 		$readygraph_message = '';
-		if ( isset($this->subscribe2_options['readygraph_id']) && is_numeric($this->subscribe2_options['readygraph_id']) && $this->subscribe2_options['readygraph_id'] > 0) {
+		$readygraph_api = get_option('readygraph_api');
+		if ( is_numeric($readygraph_api) && $readygraph_api > 0) {
 			$readygraph_message = "<p style='max-width:180px;font-size: 10px;'>" . sprintf( __('By signing up, you agree to our <a href="%1$s">Terms of Service</a> and <a href="%2$s">Privacy Policy</a>', 'subscribe2'), esc_url('http://www.readygraph.com/tos'), esc_url('http://readygraph.com/privacy/') ) . ".</p>";
 		}
 

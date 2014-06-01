@@ -51,7 +51,7 @@ class s2class {
 			}
 		}
 
-		//option to store ReadyGraph API Key
+		// option to store ReadyGraph API Key
 		add_option('readygraph_api', "include your api_key");
 
 		// safety check if options exist and if not create them
