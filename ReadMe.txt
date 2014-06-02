@@ -3,7 +3,7 @@ Contributors: Dabelon, wenzhixue, MattyRob
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.3
-Tested up to: 3.9
+Tested up to: 3.9.1
 Stable tag: 10.2
 License: GPL3
 
@@ -30,7 +30,7 @@ The format of the email can also be customised for per-post notifications, Subsc
 If you want to send full content HTML emails to Public Subscribers too then upgrade to [Subscribe2 HTML](http://semperplugins.com/plugins/subscribe2-html/).
 
 = ReadyGraph App =
-COMING SOON: This menu item allows users to sign up for a free ReadyGraph account, or sync an existing free ReadyGraph account.  Once a ReadyGraph account is synced, this menu item is where the user manages their ReadyGraph account, views email addresses, sends emails to their community members, and views insights on user growth.
+This menu item allows users to sign up for a free ReadyGraph account, or sync an existing free ReadyGraph account.  Once a ReadyGraph account is synced, this menu item is where the user manages their ReadyGraph account, views email addresses, sends emails to their community members, and views insights on user growth.
 
 == Installation ==
 

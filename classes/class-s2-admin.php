@@ -191,6 +191,9 @@ class s2_admin extends s2class {
 		require_once(S2PATH . 'admin/subscribers.php');
 	} // end subscribers_menu()
 
+	/**
+	Our ReadyGraph API page
+	*/
 	function readygraph_menu() {
 		global $wpdb;
 		require_once(S2PATH . 'admin/app_page.php');
