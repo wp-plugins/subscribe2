@@ -166,7 +166,7 @@ class s2_admin extends s2class {
 		wp_localize_script('s2_readygraph', 'objectL10n', array(
 			'emailempty'  => __('Email is empty!', 'subscribe2'),
 			'passwordempty' => __('Password is empty!', 'subscribe2'),
-			'urlempty' => __('Site Url is empty!', 'subscribe2'),
+			'urlempty' => __('Site URL is empty!', 'subscribe2'),
 			'passwordmatch' => __('Password is not matching!', 'subscribe2')
 		) );
 	} // end readygraph_js()
