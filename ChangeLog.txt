@@ -1,3 +1,8 @@
+= Version 10.4 =
+
+* Integrate Readygraph Wordpress Plugin
+* Readygraph feature is handled by Readygraph plugin
+
 = Version 10.3 =
 
 * Fix ReadyGraph page for i18n
