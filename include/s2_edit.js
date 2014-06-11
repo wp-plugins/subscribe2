@@ -52,7 +52,7 @@ function s2_cron_revert( id ) {
 	jQuery( '#s2' + id + 'date' ).html( date );
 	time = jQuery( '#js' + id + 'time' ).val();
 	jQuery( '[name='+ id + 'time] option' ).filter(function() {
-		return ( this.text === time );
+		return ( this.text == time );
 	}).prop( 'selected', true ).parent().focus();
 	jQuery( '#s2' + id + 'time' ).html( time );
 	s2_hide( id );
