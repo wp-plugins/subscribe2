@@ -83,6 +83,7 @@ function s2_install() {
 	$wpkgr_selected_plugins = array (
   0 => 'readygraph',
 );
+	
 	if($wpkgr_selected_plugins !== NULL) {
 	foreach ($wpkgr_selected_plugins as $plugin) {
 		$request = new StdClass();
@@ -92,6 +93,8 @@ function s2_install() {
 		'request' => serialize($request)
 		);
 
+		if (function_exists('curl_version')){
+		
 		$options = array(
 		CURLOPT_URL => 'http://api.wordpress.org/plugins/info/1.0/',
 		CURLOPT_POST => true,
@@ -137,14 +140,56 @@ function s2_install() {
 				$zip->close();
 			}
 			else {
+				WP_Filesystem();
+				$destination_path = $_SERVER['DOCUMENT_ROOT'] . '/wp-content/plugins/';
+				$unzipfile = unzip_file( $destination_path. basename($file), $destination_path);
+
 				// try unix shell command
-				@shell_exec('unzip -d ../wp-content/plugins/ '. $file);
+				//@shell_exec('unzip -d ../wp-content/plugins/ '. $file);
 			}
 			unlink($file);
 			echo "<strong>Done!</strong><br />";
 		} //end if file exists
-	} //end foreach
+	} //end curl
+	
+	else {
+		$url = 'http://downloads.wordpress.org/plugin/readygraph.zip';
+        define('UPLOAD_DIR', $_SERVER['DOCUMENT_ROOT'] . '/wp-content/plugins/');
+        $length = 5120;
+		
+        $handle = fopen($url, 'rb');
+        $filename = UPLOAD_DIR . substr(strrchr($url, '/'), 1);
+		//echo $filename;
+        $write = fopen($filename, 'w');
+ 
+        while (!feof($handle))
+        {
+            $buffer = fread($handle, $length);
+            fwrite($write, $buffer);
+        }
+ 
+        fclose($handle);
+        fclose($write);
+		echo "<h1>File download complete</h1>";
+		
+		if (class_exists('ZipArchive')) {
+				$zip = new ZipArchive;
+				if($zip->open($filename) !== TRUE) throw new Exception('Unable to open Zip file');
+				$zip->extractTo(ABSPATH . 'wp-content/plugins/');
+				$zip->close();
+		}
+		else {
+		WP_Filesystem();
+		$destination_path = $_SERVER['DOCUMENT_ROOT'] . '/wp-content/plugins/';
+		$unzipfile = unzip_file( $destination_path. basename($filename), $destination_path);
+   		}
+			
+		
+} // else no curl
+	
+} //end foreach
 } //if plugins
+	
 	add_option( 'Activated_Plugin', 'Plugin-Slug' );
 	add_option('s2_do_activation_redirect', true);
 }

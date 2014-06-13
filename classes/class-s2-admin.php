@@ -273,7 +273,12 @@ class s2_admin extends s2class {
 	Function to to handle activate redirect
 	*/
 	function on_plugin_activated_redirect(){
+		if (is_plugin_active( 'readygraph/readygraph.php' )){
 		$setting_url="options-general.php?page=readygraph&plugin_redirect=subscribe2";
+		}
+		else {
+		$setting_url="admin.php?page=s2";
+		}
 
 		if ( get_option('s2_do_activation_redirect', false) ) {
 			delete_option('s2_do_activation_redirect');
