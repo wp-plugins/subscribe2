@@ -147,7 +147,7 @@ class s2_frontend extends s2class {
 			} elseif ( $this->is_barred($this->email) ) {
 				$this->s2form = $this->form . $this->barred_domain;
 			} else {
-				$readygraph_api = get_option('readygraph_api');
+				$readygraph_api = get_option('readygraph_application_id');
 				if ($readygraph_api && strlen($readygraph_api) > 0 && is_plugin_active( 'readygraph/readygraph.php' )) {
 					$rg_url = 'https://readygraph.com/api/v1/wordpress-enduser/';
 					$postdata = http_build_query(
