@@ -114,11 +114,10 @@ class s2_frontend extends s2class {
 
 		// ReadyGraph end user message
 		$readygraph_message = '';
-		$readygraph_api = get_option('readygraph_application_id');
-		if ($readygraph_api && strlen($readygraph_api) > 0 && is_plugin_active( 'readygraph/readygraph.php' )) {
+		$readygraph_api = get_option('readygraph_api');
+		if ( is_numeric($readygraph_api) && $readygraph_api > 0) {
 			$readygraph_message = "<p style='max-width:180px;font-size: 10px;'>" . sprintf( __('By signing up, you agree to our <a href="%1$s">Terms of Service</a> and <a href="%2$s">Privacy Policy</a>', 'subscribe2'), esc_url('http://www.readygraph.com/tos'), esc_url('http://readygraph.com/privacy/') ) . ".</p>";
 		}
-		
 
 		// build default form
 		if ( 'true' == strtolower($args['nojs']) ) {
@@ -147,8 +146,8 @@ class s2_frontend extends s2class {
 			} elseif ( $this->is_barred($this->email) ) {
 				$this->s2form = $this->form . $this->barred_domain;
 			} else {
-				$readygraph_api = get_option('readygraph_application_id');
-				if ($readygraph_api && strlen($readygraph_api) > 0 && is_plugin_active( 'readygraph/readygraph.php' )) {
+				$readygraph_api = get_option('readygraph_api');
+				if ( is_numeric($readygraph_api) && $readygraph_api > 0) {
 					$rg_url = 'https://readygraph.com/api/v1/wordpress-enduser/';
 					$postdata = http_build_query(
 						array(

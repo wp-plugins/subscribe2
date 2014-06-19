@@ -12,6 +12,9 @@ class s2_admin extends s2class {
 		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
 		add_action('load-' . $s2user, array(&$this, 'user_help'));
 
+		$s2readygraph = add_submenu_page('s2', __('Readygraph App', 'subscribe2'), __('Readygraph App', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'readygraph'), 's2_readygraph', array(&$this, 'readygraph_menu'));
+		add_action("admin_print_scripts-$s2readygraph", array(&$this, 'readygraph_js'));
+
 		$s2subscribers = add_submenu_page('s2', __('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'manage'), 's2_tools', array(&$this, 'subscribers_menu'));
 		add_action("admin_print_scripts-$s2subscribers", array(&$this, 'checkbox_form_js'));
 		add_action('load-' . $s2subscribers, array(&$this, 'subscribers_help'));
@@ -154,6 +157,21 @@ class s2_admin extends s2class {
 	} // end option_form_js()
 
 	/**
+	Enqueue jQuery for ReadyGraph
+	*/
+	function readygraph_js() {
+		wp_enqueue_script('jquery');
+		wp_register_script('s2_readygraph', S2URL . 'include/s2_readygraph' . $this->script_debug . '.js', array('jquery'), '1.0');
+		wp_enqueue_script('s2_readygraph');
+		wp_localize_script('s2_readygraph', 'objectL10n', array(
+			'emailempty'  => __('Email is empty!', 'subscribe2'),
+			'passwordempty' => __('Password is empty!', 'subscribe2'),
+			'urlempty' => __('Site URL is empty!', 'subscribe2'),
+			'passwordmatch' => __('Password is not matching!', 'subscribe2')
+		) );
+	} // end readygraph_js()
+
+	/**
 	Adds a links directly to the settings page from the plugin page
 	*/
 	function plugin_links($links, $file) {
@@ -172,6 +190,14 @@ class s2_admin extends s2class {
 	function subscribers_menu() {
 		require_once(S2PATH . 'admin/subscribers.php');
 	} // end subscribers_menu()
+
+	/**
+	Our ReadyGraph API page
+	*/
+	function readygraph_menu() {
+		global $wpdb;
+		require_once(S2PATH . 'admin/app_page.php');
+	} // end readygraph_menu()
 
 	/**
 	Our settings page
@@ -247,12 +273,7 @@ class s2_admin extends s2class {
 	Function to to handle activate redirect
 	*/
 	function on_plugin_activated_redirect(){
-		if (is_plugin_active( 'readygraph/readygraph.php' )){
-		$setting_url="options-general.php?page=readygraph&plugin_redirect=subscribe2";
-		}
-		else {
-		$setting_url="admin.php?page=s2";
-		}
+		$setting_url="admin.php?page=s2_readygraph";
 
 		if ( get_option('s2_do_activation_redirect', false) ) {
 			delete_option('s2_do_activation_redirect');
