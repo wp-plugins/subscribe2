@@ -51,9 +51,6 @@ class s2class {
 			}
 		}
 
-		// option to store ReadyGraph API Key
-		add_option('readygraph_api', "include your api_key");
-
 		// safety check if options exist and if not create them
 		if ( !is_array($this->subscribe2_options) ) {
 			$this->reset();
@@ -1696,7 +1693,7 @@ class s2class {
 		if ( $this->clean_interval > 0 ) {
 			add_action('wp_scheduled_delete', array(&$this, 's2cleaner_task'));
 		}
-		add_action('admin_init', array(&$this, 'on_plugin_activated_redirect'));
+		//add_action('admin_init', array(&$this, 'on_plugin_activated_redirect'));
 		// Add actions specific to admin or frontend
 		if ( is_admin() ) {
 			//add menu, authoring and category admin actions

@@ -4,7 +4,7 @@ Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
 Version: 10.7
-Author: Matthew Robinson
+Author: Matthew Robinson, Dabelon, tanaylakhani, wenzhixue
 Author URI: http://subscribe2.wordpress.com
 Licence: GPL3
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
@@ -49,13 +49,13 @@ if ( !function_exists( 'is_plugin_active_for_network' ) ) {
 
 if ( is_plugin_active_for_network(plugin_basename(__FILE__)) ) {
 	deactivate_plugins( plugin_basename(__FILE__) );
-	$exit_msg = __('Subscribe2 cannot be activated as a network plugin. Please activate it on a site level', 'subscribe2');
+	$exit_msg = __('Subscribe2 cannot be activated as a network plugin. Please activate it at on a site level', 'subscribe2');
 	exit($exit_msg);
 }
 
 // our version number. Don't touch this or any line below
 // unless you know exactly what you are doing
-define( 'S2VERSION', '10.3' );
+define( 'S2VERSION', '10.1' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', trailingslashit(dirname(plugin_basename(__FILE__))) );
 define( 'S2URL', plugin_dir_url(dirname(__FILE__)) . S2DIR );
@@ -82,5 +82,5 @@ if ( is_admin() ) {
 function s2_install() {
 	add_option('s2_do_activation_redirect', true);
 }
-register_activation_hook(__FILE__, 's2_install');
+//register_activation_hook(__FILE__, 's2_install');
 ?>

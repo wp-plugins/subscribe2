@@ -238,7 +238,7 @@ class s2class_upgrade {
 	} // end upgrade64()
 
 	function upgrade70() {
-		global $mysubscribe2, $wpdb;
+		global $mysubscribe2;
 		if ( version_compare($mysubscribe2->wp_release, '3.5', '<') ) {
 			$users = $wpdb->get_col($wpdb->prepare("SELECT ID from $wpdb->users WHERE ID NOT IN (SELECT user_id from $wpdb->usermeta WHERE meta_key=%s", $mysubscribe2->get_usermeta_keyname('s2_authors')));
 			foreach ( $users as $user_ID ) {
