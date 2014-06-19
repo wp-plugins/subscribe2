@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 10.3
+Version: 10.7
 Author: Matthew Robinson
 Author URI: http://subscribe2.wordpress.com
 Licence: GPL3
