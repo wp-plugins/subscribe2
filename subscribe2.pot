@@ -2,15 +2,116 @@
 # This file is distributed under the same license as the Subscribe2 package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Subscribe2 9.4\n"
-"Report-Msgid-Bugs-To: http://wordpress.org/support/plugin/Subscribe2\n"
-"POT-Creation-Date: 2014-04-21 20:27:19+00:00\n"
+"Project-Id-Version: Subscribe2 10.3\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/support/plugin/subscribe2\n"
+"POT-Creation-Date: 2014-06-03 20:53:48+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2014-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: admin/app_page.php:15
+msgid "Final Step: Place the widget on your site to get started"
+msgstr ""
+
+#: admin/app_page.php:16
+msgid "Drag the widget to a prominent place to maximize signups"
+msgstr ""
+
+#: admin/app_page.php:17
+msgid "Place Widget Now"
+msgstr ""
+
+#: admin/app_page.php:18
+msgid "Tips"
+msgstr ""
+
+#: admin/app_page.php:20
+msgid ""
+"Already have the widget in place? Manage your ReadyGraph account <a href=\"%s"
+"\">here</a>"
+msgstr ""
+
+#: admin/app_page.php:21
+msgid ""
+"Need help? Email <a href=\"%1$s\">%2$s</a> or click <a href=\"%3$s\">here</a>"
+msgstr ""
+
+#: admin/app_page.php:24
+msgid "Unlink ReadyGraph Account"
+msgstr ""
+
+#: admin/app_page.php:31
+msgid "Subscribe2, Now with Readygraph"
+msgstr ""
+
+#: admin/app_page.php:32
+msgid "Activate Readygraph features to optimize Subscribe2 functionality"
+msgstr ""
+
+#: admin/app_page.php:36
+msgid "Free Signup"
+msgstr ""
+
+#: admin/app_page.php:38
+msgid "Site URL"
+msgstr ""
+
+#: admin/app_page.php:43
+msgid "Name"
+msgstr ""
+
+#: admin/app_page.php:48 admin/app_page.php:73
+msgid "Email"
+msgstr ""
+
+#: admin/app_page.php:53 admin/app_page.php:78
+msgid "Password"
+msgstr ""
+
+#: admin/app_page.php:58
+msgid "Confirm Password"
+msgstr ""
+
+#: admin/app_page.php:62 classes/class-s2-frontend.php:119
+msgid ""
+"By signing up, you agree to our <a href=\"%1$s\">Terms of Service</a> and <a "
+"href=\"%2$s\">Privacy Policy</a>"
+msgstr ""
+
+#: admin/app_page.php:64
+msgid "Continue to place widget"
+msgstr ""
+
+#: admin/app_page.php:71
+msgid "Already a member?"
+msgstr ""
+
+#: admin/app_page.php:83
+msgid "Sign In"
+msgstr ""
+
+#: admin/app_page.php:90
+msgid "Signup For These Benefits"
+msgstr ""
+
+#: admin/app_page.php:91
+msgid "Grow your subscribers faster"
+msgstr ""
+
+#: admin/app_page.php:92
+msgid "Engage users with automated email updates"
+msgstr ""
+
+#: admin/app_page.php:93
+msgid "Enhanced email deliverablility"
+msgstr ""
+
+#: admin/app_page.php:94
+msgid "Track performace with user-activity analytics"
+msgstr ""
 
 #: admin/send_email.php:71
 msgid "Your email was empty"
@@ -102,23 +203,23 @@ msgid ""
 "domain name than your blog server %2$s. This may result in failed emails."
 msgstr ""
 
-#: admin/settings.php:160 classes/class-s2-admin.php:81
+#: admin/settings.php:160 classes/class-s2-admin.php:84
 msgid "Email Settings"
 msgstr ""
 
-#: admin/settings.php:161 classes/class-s2-admin.php:89
+#: admin/settings.php:161 classes/class-s2-admin.php:92
 msgid "Templates"
 msgstr ""
 
-#: admin/settings.php:162 classes/class-s2-admin.php:96
+#: admin/settings.php:162 classes/class-s2-admin.php:99
 msgid "Registered Users"
 msgstr ""
 
-#: admin/settings.php:163 classes/class-s2-admin.php:103
+#: admin/settings.php:163 classes/class-s2-admin.php:106
 msgid "Appearance"
 msgstr ""
 
-#: admin/settings.php:164 classes/class-s2-admin.php:110
+#: admin/settings.php:164 classes/class-s2-admin.php:113
 msgid "Miscellaneous"
 msgstr ""
 
@@ -129,17 +230,17 @@ msgid ""
 msgstr ""
 
 #: admin/settings.php:187 admin/settings.php:424
-#: classes/class-s2-admin.php:696 classes/class-s2-list-table.php:36
+#: classes/class-s2-admin.php:734 classes/class-s2-list-table.php:36
 msgid "Edit"
 msgstr ""
 
 #: admin/settings.php:190 admin/settings.php:427
-#: classes/class-s2-admin.php:710
+#: classes/class-s2-admin.php:748
 msgid "Update"
 msgstr ""
 
 #: admin/settings.php:191 admin/settings.php:428
-#: classes/class-s2-admin.php:711
+#: classes/class-s2-admin.php:749
 msgid "Revert"
 msgstr ""
 
@@ -520,7 +621,7 @@ msgstr ""
 msgid "Plugin Site"
 msgstr ""
 
-#: admin/settings.php:467 classes/class-s2-admin.php:162
+#: admin/settings.php:467 classes/class-s2-admin.php:180
 msgid "Translation Files"
 msgstr ""
 
@@ -613,13 +714,13 @@ msgstr ""
 msgid "Digest Subscription updated for Selected Registered Users!"
 msgstr ""
 
-#: admin/subscribers.php:186 classes/class-s2-admin.php:60
-#: classes/class-s2-admin.php:542
+#: admin/subscribers.php:186 classes/class-s2-admin.php:63
+#: classes/class-s2-admin.php:580
 msgid "Public Subscribers"
 msgstr ""
 
-#: admin/subscribers.php:186 classes/class-s2-admin.php:65
-#: classes/class-s2-admin.php:546
+#: admin/subscribers.php:186 classes/class-s2-admin.php:68
+#: classes/class-s2-admin.php:584
 msgid "Registered Subscribers"
 msgstr ""
 
@@ -783,9 +884,9 @@ msgstr ""
 msgid "Subscribe to new blogs"
 msgstr ""
 
-#. #-#-#-#-#  Subscribe2.pot (Subscribe2 9.4)  #-#-#-#-#
+#. #-#-#-#-#  subscribe2.pot (Subscribe2 10.3)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: classes/class-s2-admin.php:8 include/widget.php:17
+#: classes/class-s2-admin.php:8 include/widget.php:16
 msgid "Subscribe2"
 msgstr ""
 
@@ -794,30 +895,34 @@ msgid "Your Subscriptions"
 msgstr ""
 
 #: classes/class-s2-admin.php:15
+msgid "Readygraph App"
+msgstr ""
+
+#: classes/class-s2-admin.php:18
 msgid "Subscribers"
 msgstr ""
 
-#: classes/class-s2-admin.php:19 classes/class-s2-admin.php:161
+#: classes/class-s2-admin.php:22 classes/class-s2-admin.php:179
 msgid "Settings"
 msgstr ""
 
-#: classes/class-s2-admin.php:25
+#: classes/class-s2-admin.php:28
 msgid "Send Email"
 msgstr ""
 
-#: classes/class-s2-admin.php:39 classes/class-s2-admin.php:45
-#: classes/class-s2-admin.php:55 classes/class-s2-admin.php:76
-#: classes/class-s2-admin.php:121
+#: classes/class-s2-admin.php:42 classes/class-s2-admin.php:48
+#: classes/class-s2-admin.php:58 classes/class-s2-admin.php:79
+#: classes/class-s2-admin.php:124
 msgid "Overview"
 msgstr ""
 
-#: classes/class-s2-admin.php:40
+#: classes/class-s2-admin.php:43
 msgid ""
 "From this page you can opt in or out of receiving a periodical digest style "
 "email of blog posts."
 msgstr ""
 
-#: classes/class-s2-admin.php:46
+#: classes/class-s2-admin.php:49
 msgid ""
 "From this page you can control your subscription preferences. Choose the "
 "email format you wish to receive, which categories you would like to receive "
@@ -825,36 +930,36 @@ msgid ""
 "like to read."
 msgstr ""
 
-#: classes/class-s2-admin.php:56
+#: classes/class-s2-admin.php:59
 msgid "From this page you can manage your subscribers."
 msgstr ""
 
-#: classes/class-s2-admin.php:61
+#: classes/class-s2-admin.php:64
 msgid ""
 "Public Subscribers are subscribers who have used the plugin form and only "
 "provided their email address."
 msgstr ""
 
-#: classes/class-s2-admin.php:61
+#: classes/class-s2-admin.php:64
 msgid ""
 "On this page public subscribers can be viewed, searched, deleted and also "
 "toggled between Confirmed and Unconfirmed status."
 msgstr ""
 
-#: classes/class-s2-admin.php:66
+#: classes/class-s2-admin.php:69
 msgid ""
 "Registered Subscribers are subscribers who have registered in WordPress and "
 "have a username and password."
 msgstr ""
 
-#: classes/class-s2-admin.php:67
+#: classes/class-s2-admin.php:70
 msgid ""
 "Registered Subscribers have greater personal control over their "
 "subscription. They can change the format of the email and also select which "
 "categories and authors they want to receive notifications about."
 msgstr ""
 
-#: classes/class-s2-admin.php:68
+#: classes/class-s2-admin.php:71
 msgid ""
 "On this page registered subscribers can be viewed and searched. User "
 "accounts can be deleted from here with any posts created by those users "
@@ -862,17 +967,17 @@ msgid ""
 "to all user settings changing their subscription email format and categories."
 msgstr ""
 
-#: classes/class-s2-admin.php:77
+#: classes/class-s2-admin.php:80
 msgid "From this page you can adjust the Settings for Subscribe2."
 msgstr ""
 
-#: classes/class-s2-admin.php:82
+#: classes/class-s2-admin.php:85
 msgid ""
 "This section allows you to specify settings that apply to the emails "
 "generated by the site."
 msgstr ""
 
-#: classes/class-s2-admin.php:83
+#: classes/class-s2-admin.php:86
 msgid ""
 "Emails can be sent to individual subscribers by setting the number of "
 "recipients per email to 1. A setting greater than one will group recipients "
@@ -881,7 +986,7 @@ msgid ""
 "looks less like spam email to filters but takes longer to process."
 msgstr ""
 
-#: classes/class-s2-admin.php:84
+#: classes/class-s2-admin.php:87
 msgid ""
 "This section is also where the sender of the email on this page is chosen. "
 "You can choose Post Author or your Blogname but it is recommended to create "
@@ -890,7 +995,7 @@ msgid ""
 "sites web address) and then use this account."
 msgstr ""
 
-#: classes/class-s2-admin.php:85
+#: classes/class-s2-admin.php:88
 msgid ""
 "This page also configures the frequency of emails. This can be at the time "
 "new posts are made (per post) or periodically with an excerpt of each post "
@@ -898,59 +1003,59 @@ msgid ""
 "protected) can also be configured here."
 msgstr ""
 
-#: classes/class-s2-admin.php:90
+#: classes/class-s2-admin.php:93
 msgid ""
 "This section allows you to customise the content of your notification emails."
 msgstr ""
 
-#: classes/class-s2-admin.php:91
+#: classes/class-s2-admin.php:94
 msgid ""
 "There are special {KEYWORDS} that are used by Subscribe2 to place content "
 "into the final email. The template also accepts regular text and HTML as "
 "desired in the final emails."
 msgstr ""
 
-#: classes/class-s2-admin.php:92
+#: classes/class-s2-admin.php:95
 msgid ""
 "The {KEYWORDS} are listed on the right of the templates, note that some are "
 "for per post emails only and some are for digest emails only. Make sure the "
 "correct keywords are used based upon the Email Settings."
 msgstr ""
 
-#: classes/class-s2-admin.php:97
+#: classes/class-s2-admin.php:100
 msgid ""
 "This section allows settings that apply to Registered Subscribers to be "
 "configured."
 msgstr ""
 
-#: classes/class-s2-admin.php:98
+#: classes/class-s2-admin.php:101
 msgid ""
 "Categories can be made compulsory so emails are always sent for posts in "
 "these categories. They can also be excludes so that emails are not "
 "generated. Excluded categories take precedence over Compulsory categories."
 msgstr ""
 
-#: classes/class-s2-admin.php:99
+#: classes/class-s2-admin.php:102
 msgid ""
 "A set of default settings for new users can also be specified using the Auto "
 "Subscribe section. Settings specified here will be applied to any newly "
 "created user accounts while Subscribe2 is activated."
 msgstr ""
 
-#: classes/class-s2-admin.php:104
+#: classes/class-s2-admin.php:107
 msgid ""
 "This section allows you to enable several aspect of the plugin such as "
 "Widgets and editor buttons."
 msgstr ""
 
-#: classes/class-s2-admin.php:105
+#: classes/class-s2-admin.php:108
 msgid ""
 "AJAX mode can be enabled that is intended to work with the shortcode link "
 "parameter so that a dialog opens in the centre of the browser rather then "
 "using the regular form."
 msgstr ""
 
-#: classes/class-s2-admin.php:106
+#: classes/class-s2-admin.php:109
 msgid ""
 "The email over ride check box can be set to be automatically checked for "
 "every new post and page from here to, this may be useful if you will only "
@@ -958,200 +1063,216 @@ msgid ""
 "uncheck this box just before you publish your content."
 msgstr ""
 
-#: classes/class-s2-admin.php:111
+#: classes/class-s2-admin.php:114
 msgid ""
 "This section contains a place to bar specified domains from becoming Public "
 "Subscribers and links to help and support pages."
 msgstr ""
 
-#: classes/class-s2-admin.php:112
+#: classes/class-s2-admin.php:115
 msgid ""
 "In the paid Subscribe2 HTML version there is also a place here to enter a "
 "license code so that updates can be accessed automatically."
 msgstr ""
 
-#: classes/class-s2-admin.php:122
+#: classes/class-s2-admin.php:125
 msgid ""
 "From this page you can send emails to the recipients in the group selected "
 "in the drop down."
 msgstr ""
 
-#: classes/class-s2-admin.php:123
+#: classes/class-s2-admin.php:126
 msgid ""
 "<strong>Preview</strong> will send a preview of the email to the currently "
 "logged in user. <strong>Send</strong> will send the email to the recipient "
 "list."
 msgstr ""
 
-#: classes/class-s2-admin.php:163
+#: classes/class-s2-admin.php:167
+msgid "Email is empty!"
+msgstr ""
+
+#: classes/class-s2-admin.php:168
+msgid "Password is empty!"
+msgstr ""
+
+#: classes/class-s2-admin.php:169
+msgid "Site URL is empty!"
+msgstr ""
+
+#: classes/class-s2-admin.php:170
+msgid "Password is not matching!"
+msgstr ""
+
+#: classes/class-s2-admin.php:181
 msgid "Donate"
 msgstr ""
 
-#: classes/class-s2-admin.php:251 classes/class-s2-admin.php:252
+#: classes/class-s2-admin.php:289 classes/class-s2-admin.php:290
 msgid "Subscribe2 Notification Override"
 msgstr ""
 
-#: classes/class-s2-admin.php:262
+#: classes/class-s2-admin.php:300
 msgid ""
 "Check here to disable sending of an email notification for this post/page"
 msgstr ""
 
-#: classes/class-s2-admin.php:334
+#: classes/class-s2-admin.php:372
 msgctxt "Comma Separated Column Header names for CSV Export"
 msgid "User Email,User Type,User Name,Confirm Date,IP"
 msgstr ""
 
-#: classes/class-s2-admin.php:359
+#: classes/class-s2-admin.php:397
 msgid "Registered User"
 msgstr ""
 
-#: classes/class-s2-admin.php:364
+#: classes/class-s2-admin.php:402
 msgid "Confirmed Public Subscriber"
 msgstr ""
 
-#: classes/class-s2-admin.php:366
+#: classes/class-s2-admin.php:404
 msgid "Unconfirmed Public Subscriber"
 msgstr ""
 
-#: classes/class-s2-admin.php:392 classes/class-s2-admin.php:449
-#: classes/class-s2-admin.php:489
+#: classes/class-s2-admin.php:430 classes/class-s2-admin.php:487
+#: classes/class-s2-admin.php:527
 msgid "Select / Unselect All"
 msgstr ""
 
-#: classes/class-s2-admin.php:541
+#: classes/class-s2-admin.php:579
 msgid "All Users and Subscribers"
 msgstr ""
 
-#: classes/class-s2-admin.php:543
+#: classes/class-s2-admin.php:581
 msgid "Confirmed"
 msgstr ""
 
-#: classes/class-s2-admin.php:544
+#: classes/class-s2-admin.php:582
 msgid "Unconfirmed"
 msgstr ""
 
-#: classes/class-s2-admin.php:545
+#: classes/class-s2-admin.php:583
 msgid "All Registered Users"
 msgstr ""
 
-#: classes/class-s2-admin.php:641
+#: classes/class-s2-admin.php:679
 msgid "Post Author"
 msgstr ""
 
-#: classes/class-s2-admin.php:665
+#: classes/class-s2-admin.php:703
 msgid ""
 "The WordPress cron functions may be disabled on this server. Digest "
 "notifications may not work."
 msgstr ""
 
-#: classes/class-s2-admin.php:670
+#: classes/class-s2-admin.php:708
 msgid "For each Post"
 msgstr ""
 
-#: classes/class-s2-admin.php:687
+#: classes/class-s2-admin.php:725
 msgid "Current UTC time is"
 msgstr ""
 
-#: classes/class-s2-admin.php:689
+#: classes/class-s2-admin.php:727
 msgid "Current blog time is"
 msgstr ""
 
-#: classes/class-s2-admin.php:691
+#: classes/class-s2-admin.php:729
 msgid "Next email notification will be sent when your blog time is after"
 msgstr ""
 
-#: classes/class-s2-admin.php:713
+#: classes/class-s2-admin.php:751
 msgid "Attempt to resend the last Digest Notification email"
 msgstr ""
 
-#: classes/class-s2-admin.php:714
+#: classes/class-s2-admin.php:752
 msgid "Resend Digest"
 msgstr ""
 
-#: classes/class-s2-admin.php:952
+#: classes/class-s2-admin.php:991
 msgid "Email subscription"
 msgstr ""
 
-#: classes/class-s2-admin.php:954
+#: classes/class-s2-admin.php:993
 msgid "Subscribe / Unsubscribe"
 msgstr ""
 
-#: classes/class-s2-admin.php:955
+#: classes/class-s2-admin.php:994
 msgid "Receive notifications"
 msgstr ""
 
-#: classes/class-s2-admin.php:956
+#: classes/class-s2-admin.php:995
 msgid ""
 "Check if you want to receive email notification when new posts are published"
 msgstr ""
 
-#: classes/class-s2-core.php:594
+#: classes/class-s2-core.php:597
 msgid "Plain Text Excerpt Preview"
 msgstr ""
 
-#: classes/class-s2-core.php:596
+#: classes/class-s2-core.php:599
 msgid "Plain Text Full Preview"
 msgstr ""
 
-#: classes/class-s2-core.php:598
+#: classes/class-s2-core.php:601
 msgid "HTML Excerpt Preview"
 msgstr ""
 
-#: classes/class-s2-core.php:600
+#: classes/class-s2-core.php:603
 msgid "HTML Full Preview"
 msgstr ""
 
-#: classes/class-s2-core.php:636
+#: classes/class-s2-core.php:639
 msgid "Like"
 msgstr ""
 
-#: classes/class-s2-core.php:639
+#: classes/class-s2-core.php:642
 msgid "Tweet"
 msgstr ""
 
-#: classes/class-s2-core.php:642
+#: classes/class-s2-core.php:645
 msgid "Google+"
 msgstr ""
 
-#: classes/class-s2-core.php:1164
+#: classes/class-s2-core.php:1167
 msgid "Check here to Subscribe to email notifications for new posts"
 msgstr ""
 
-#: classes/class-s2-core.php:1170
+#: classes/class-s2-core.php:1173
 msgid ""
 "By registering with this blog you are also agreeing to receive email "
 "notifications for new posts but you can unsubscribe at anytime"
 msgstr ""
 
-#: classes/class-s2-core.php:1196
+#: classes/class-s2-core.php:1199
 msgid "Check here to Subscribe to notifications for new posts"
 msgstr ""
 
-#: classes/class-s2-core.php:1295
+#: classes/class-s2-core.php:1298
 msgid "Weekly"
 msgstr ""
 
-#: classes/class-s2-core.php:1449 classes/class-s2-core.php:1450
+#: classes/class-s2-core.php:1451 classes/class-s2-core.php:1452
 msgid "Author"
 msgstr ""
 
-#: classes/class-s2-core.php:1456
+#: classes/class-s2-core.php:1458
 msgid "Posted on"
 msgstr ""
 
-#: classes/class-s2-core.php:1474 classes/class-s2-core.php:1475
+#: classes/class-s2-core.php:1476 classes/class-s2-core.php:1477
 msgid "Posted in"
 msgstr ""
 
-#: classes/class-s2-core.php:1480 classes/class-s2-core.php:1481
+#: classes/class-s2-core.php:1482 classes/class-s2-core.php:1483
 msgid "Tagged as"
 msgstr ""
 
-#: classes/class-s2-core.php:1553
+#: classes/class-s2-core.php:1556
 msgid "Digest Email"
 msgstr ""
 
-#: classes/class-s2-core.php:1563
+#: classes/class-s2-core.php:1569
 msgid "Digest Preview"
 msgstr ""
 
@@ -1222,43 +1343,43 @@ msgstr ""
 msgid "Enter email address..."
 msgstr ""
 
-#: classes/class-s2-frontend.php:117 classes/class-s2-frontend.php:119
+#: classes/class-s2-frontend.php:124 classes/class-s2-frontend.php:126
 msgid "Your email:"
 msgstr ""
 
-#: classes/class-s2-frontend.php:146
+#: classes/class-s2-frontend.php:174
 msgid "Slow down, you move too fast."
 msgstr ""
 
-#: classes/class-s2-frontend.php:245
+#: classes/class-s2-frontend.php:273
 msgid "Subscription Confirmation"
 msgstr ""
 
-#: classes/class-s2-frontend.php:247
+#: classes/class-s2-frontend.php:275
 msgid "Unsubscription Confirmation"
 msgstr ""
 
-#: classes/class-s2-frontend.php:286
+#: classes/class-s2-frontend.php:314
 msgid "New Subscription"
 msgstr ""
 
-#: classes/class-s2-frontend.php:288
+#: classes/class-s2-frontend.php:316
 msgid "subscribed to email notifications!"
 msgstr ""
 
-#: classes/class-s2-frontend.php:310
+#: classes/class-s2-frontend.php:338
 msgid "New Unsubscription"
 msgstr ""
 
-#: classes/class-s2-frontend.php:312
+#: classes/class-s2-frontend.php:340
 msgid "unsubscribed from email notifications!"
 msgstr ""
 
-#: classes/class-s2-frontend.php:339
+#: classes/class-s2-frontend.php:367
 msgid "[Un]Subscribe to Posts"
 msgstr ""
 
-#: classes/class-s2-frontend.php:374 classes/class-s2-frontend.php:376
+#: classes/class-s2-frontend.php:402 classes/class-s2-frontend.php:404
 msgid "Subscribe to this blog"
 msgstr ""
 
@@ -1281,34 +1402,34 @@ msgstr ""
 msgid "Toggle"
 msgstr ""
 
-#: classes/class-s2-list-table.php:113
+#: classes/class-s2-list-table.php:119
 msgid "1 item"
 msgid_plural "%s items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: classes/class-s2-list-table.php:149
+#: classes/class-s2-list-table.php:157
 msgid "Go to the first page"
 msgstr ""
 
-#: classes/class-s2-list-table.php:156
+#: classes/class-s2-list-table.php:164
 msgid "Go to the previous page"
 msgstr ""
 
-#: classes/class-s2-list-table.php:165
+#: classes/class-s2-list-table.php:173
 msgid "Current page"
 msgstr ""
 
-#: classes/class-s2-list-table.php:171
+#: classes/class-s2-list-table.php:180
 msgctxt "paging"
 msgid "%1$s of %2$s"
 msgstr ""
 
-#: classes/class-s2-list-table.php:175
+#: classes/class-s2-list-table.php:184
 msgid "Go to the next page"
 msgstr ""
 
-#: classes/class-s2-list-table.php:182
+#: classes/class-s2-list-table.php:191
 msgid "Go to the last page"
 msgstr ""
 
@@ -1417,68 +1538,72 @@ msgstr ""
 msgid "(Un)Subscribe to Posts"
 msgstr ""
 
-#: include/widget.php:107
+#: include/widget.php:114
 msgid "Title"
 msgstr ""
 
-#: include/widget.php:109
+#: include/widget.php:116
 msgid "Div class name"
 msgstr ""
 
-#: include/widget.php:111
+#: include/widget.php:118
 msgid "Pre-Content"
 msgstr ""
 
-#: include/widget.php:113
+#: include/widget.php:120
 msgid "Post-Content"
 msgstr ""
 
-#: include/widget.php:115
+#: include/widget.php:122
 msgid "Text Box Size"
 msgstr ""
 
-#: include/widget.php:117
+#: include/widget.php:124
 msgid "Display options"
 msgstr ""
 
-#: include/widget.php:118
+#: include/widget.php:125
 msgid "Show complete form"
 msgstr ""
 
-#: include/widget.php:119
+#: include/widget.php:126
 msgid "Hide Subscribe button"
 msgstr ""
 
-#: include/widget.php:120
+#: include/widget.php:127
 msgid "Hide Unsubscribe button"
 msgstr ""
 
-#: include/widget.php:122
+#: include/widget.php:129
 msgid "Show as link"
 msgstr ""
 
-#: include/widget.php:125
+#: include/widget.php:132
 msgid "Post form content to page"
 msgstr ""
 
-#: include/widget.php:127
+#: include/widget.php:134
 msgid "Use Subscribe2 Default"
 msgstr ""
 
-#: include/widget.php:130
+#: include/widget.php:137
 msgid "Use Home Page"
 msgstr ""
 
-#: include/widget.php:133
+#: include/widget.php:140
 msgid "Use Referring Page"
 msgstr ""
 
-#: include/widget.php:136
+#: include/widget.php:143
 msgid "Disable JavaScript"
 msgstr ""
 
-#: include/widget.php:139
+#: include/widget.php:146
 msgid "Disable Anti-spam measures"
+msgstr ""
+
+#: include/widget.php:149
+msgid "Disable wrapping of form buttons"
 msgstr ""
 
 #: subscribe2.php:37
@@ -1493,13 +1618,13 @@ msgstr ""
 
 #: subscribe2.php:52
 msgid ""
-"Subscribe2 cannot be activated as a network plugin. Please activate it at on "
-"a site level"
+"Subscribe2 cannot be activated as a network plugin. Please activate it on a "
+"site level"
 msgstr ""
 
-#. #-#-#-#-#  Subscribe2.pot (Subscribe2 9.4)  #-#-#-#-#
+#. #-#-#-#-#  subscribe2.pot (Subscribe2 10.3)  #-#-#-#-#
 #. Plugin URI of the plugin/theme
-#. #-#-#-#-#  Subscribe2.pot (Subscribe2 9.4)  #-#-#-#-#
+#. #-#-#-#-#  subscribe2.pot (Subscribe2 10.3)  #-#-#-#-#
 #. Author URI of the plugin/theme
 msgid "http://subscribe2.wordpress.com"
 msgstr ""

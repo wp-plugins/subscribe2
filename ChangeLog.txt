@@ -1,6 +1,19 @@
+= Version 10.8 =
+
+* Re-Integrate Readygraph Features into Subscribe2
+* Disconnect readygraph option inside readygraph settings page
+
 = Version 10.7 =
 
-* Reverted back to version 10.3
+* Roll back to version with basic Readygraph - v.10.3
+
+= Version 10.6 =
+
+* Bug Fix
+
+= Version 10.5 =
+
+* Bug Fix
 
 = Version 10.4 =
 
