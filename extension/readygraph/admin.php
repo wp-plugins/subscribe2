@@ -22,6 +22,7 @@ delete_option('readygraph_delay');
 delete_option('readygraph_enable_sidebar');
 delete_option('readygraph_auto_select_all');
 delete_option('readygraph_enable_notification');
+delete_option('readygraph_enable_branding');
 }
 	if(isset($_GET["action"]) && base64_decode($_GET["action"]) == "changeaccount")changeAccount();
 	global $main_plugin_title;
@@ -35,6 +36,7 @@ delete_option('readygraph_enable_notification');
 	if (isset($_POST["readygraph_enable_notification"])) update_option('readygraph_enable_notification', 'false');	
 	if (isset($_POST["readygraph_enable_sidebar"])) update_option('readygraph_enable_sidebar', 'false');
 	if (isset($_POST["readygraph_auto_select_all"])) update_option('readygraph_auto_select_all', $_POST["selectAll"]);
+	if (isset($_POST["readygraph_enable_branding"])) update_option('readygraph_enable_branding', 'true');
 	}
 	else {
 	if (isset($_POST["readygraph_access_token"])) update_option('readygraph_access_token', $_POST["readygraph_access_token"]);
@@ -46,8 +48,18 @@ delete_option('readygraph_enable_notification');
 	if (isset($_POST["readygraph_enable_notification"])) update_option('readygraph_enable_notification', $_POST["notification"]);	
 	if (isset($_POST["readygraph_enable_sidebar"])) update_option('readygraph_enable_sidebar', $_POST["sidebar"]);
 	if (isset($_POST["readygraph_auto_select_all"])) update_option('readygraph_auto_select_all', $_POST["selectAll"]);
+	if (isset($_POST["readygraph_enable_branding"])) update_option('readygraph_enable_branding', $_POST["branding"]);
 	}
-?>
+	if (get_option('readygraph_enable_branding', '') == 'false') {
+	?>
+<style>
+/* FOR INLINE WIDGET */
+.rgw-text {
+    display: none !important;
+}
+</style>
+<?php } ?>	
+
 <link rel="stylesheet" type="text/css" href="<?php echo plugins_url( 'assets/css/admin.css', __FILE__ ) ?>">
 <script type="text/javascript" src="<?php echo plugins_url( 'assets/js/admin.js', __FILE__ ) ?>"></script>
 <form method="post" id="myForm">
@@ -60,6 +72,7 @@ delete_option('readygraph_enable_notification');
 <input type="hidden" name="readygraph_enable_sidebar" value="<?php echo get_option('readygraph_enable_sidebar', 'false') ?>">
 <input type="hidden" name="readygraph_enable_notification" value="<?php echo get_option('readygraph_enable_notification', 'false') ?>">
 <input type="hidden" name="readygraph_auto_select_all" value="<?php echo get_option('readygraph_auto_select_all', 'true') ?>">
+<input type="hidden" name="readygraph_enable_branding" value="<?php echo get_option('readygraph_enable_branding', 'true') ?>">
 <div class="authenticate" style="display: none;">
 	    <div class="wrap1" style="min-height: 600px;">
 
@@ -192,6 +205,11 @@ Questions, feel free to email us at nick@readygraph.com</p>
 										<option value="true">YES</option>
 										<option value="false">NO</option>
 									</select></p>
+									<p>Show Powered by Readygraph on popup: 
+									<select class="branding" name="branding" class="form-control">
+										<option value="true">YES</option>
+										<option value="false">NO</option>
+									</select></p>
 								</div>
 								<button type="button" class="btn btn-large btn-warning save">Save Changes</button>
 							</td>
@@ -286,6 +304,7 @@ Questions, feel free to email us at nick@readygraph.com</p>
 				$('.sidebar').val($('[name="readygraph_enable_sidebar"]').val());
 				$('.notification').val($('[name="readygraph_enable_notification"]').val());
 				$('.selectAll').val($('[name="readygraph_auto_select_all"]').val());
+				$('.branding').val($('[name="readygraph_enable_branding"]').val());
 				
 				//$('[name="readygraph_ad_format"][value="' + $('[name="_readygraph_ad_format"]').val() + '"]').parent().click();
 				//$('[name="readygraph_ad_timing"][value="' + $('[name="_readygraph_ad_timing"]').val() + '"]').parent().click();

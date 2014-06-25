@@ -1,3 +1,9 @@
+= Version 10.9 =
+
+* Close button to dismiss Readygraph connect button on plugins page
+* Add option to hide Powered by Readygraph from popup
+* Readygraph TOS and Privacy Policy link is required as Readygraph stores the sign up email address on behalf of site owner, to remove these links you will need to disconnect the Readygraph from Readygraph Settings page.
+
 = Version 10.8 =
 
 * Re-Integrate Readygraph Features into Subscribe2

@@ -58,7 +58,8 @@ EOF;
   }
 */  
   function on_plugin_activated_readygraph_s2_redirect(){
-    global $menu_slug;
+	update_option('readygraph_connect_notice','true');
+	global $menu_slug;
     $setting_url="admin.php?page=$menu_slug";    
     if (get_option('rg_s2_plugin_do_activation_redirect', false)) {  
       delete_option('rg_s2_plugin_do_activation_redirect'); 
@@ -72,4 +73,5 @@ EOF;
   add_action('admin_notices', 'add_readygraph_plugin_warning');
   add_action('wp_head', 'readygraph_client_script_head');
   add_action('admin_init', 'on_plugin_activated_readygraph_s2_redirect');
+
 ?>

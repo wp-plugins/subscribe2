@@ -55,7 +55,8 @@ function add_readygraph_plugin_warning() {
   if (get_option('readygraph_access_token', '') != '') return;
 
   global $hook_suffix, $current_user, $menu_slug;
-  if ( $hook_suffix == 'plugins.php' ) {              
+  if(isset($_GET["readygraph_notice"]) && $_GET["readygraph_notice"] == "dismiss") update_option('readygraph_connect_notice','false');
+  if ( $hook_suffix == 'plugins.php' && get_option('readygraph_connect_notice') == 'true' ) {              
     echo '<div class="updated" style="padding: 0; margin: 0; border: none; background: none;">  
       <style type="text/css">  
         .readygraph_activate {
@@ -129,6 +130,11 @@ function add_readygraph_plugin_warning() {
           color:#FFF;
           font-weight:normal
         }
+		.aa_close {
+		position: absolute;
+		right: 18px;
+		top: 18px;
+		}
       </style>                       
       <form name="readygraph_activate" action="'.admin_url( 'admin.php?page=' . $menu_slug).'" method="POST"> 
         <input type="hidden" name="return" value="1"/>
@@ -138,7 +144,8 @@ function add_readygraph_plugin_warning() {
           <div class="aa_button" onclick="document.readygraph_activate.submit();">  
             '.__('Connect Your ReadyGraph Account').'
           </div>  
-          <div class="aa_description">'.__('<strong>Almost done</strong> - connect your account to start getting users.').'</div>  
+          <div class="aa_description">'.__('<strong>Almost done</strong> - connect your account to start getting users.').'</div>
+			<div class="aa_close"><a href="' . $_SERVER["PHP_SELF"] . '?readygraph_notice=dismiss"><img src="'.plugin_dir_url( __FILE__ ).'assets/dialog_close.png"></a></div>
         </div>  
       </form>  
     </div>';      
@@ -148,7 +155,15 @@ function add_readygraph_plugin_warning() {
 function readygraph_client_script_head() {
 	global $readygraph_email_subscribe;
 	if (get_option('readygraph_access_token', '') != '') {
+	if (get_option('readygraph_enable_branding', '') == 'false') {
 	?>
+<style>
+/* FOR INLINE WIDGET */
+.rgw-text {
+    display: none !important;
+}
+</style>
+<?php } ?>	
 <script type='text/javascript'>
 var d = top.document;
 var h = d.getElementsByTagName('head')[0], script = d.createElement('script');
@@ -170,6 +185,13 @@ script.onload = function(e) {
 			function process(userInfo) {
 				//<?php echo $readygraph_email_subscribe ?>
 				//subscribe(userInfo.get('email'), userInfo.get('first_name'), userInfo.get('last_name'));
+				var email = userInfo.get('email');
+				var first_name = userInfo.get('first_name');
+				var last_name = userInfo.get('last_name');
+
+				//alert(email);
+				//alert(first_name);
+				//alert(last_name);
 			}
 			readygraph.framework.authentication.getUserInfo(function(userInfo) {
 				if (userInfo.get('uid') != null) {
