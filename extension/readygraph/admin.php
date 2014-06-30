@@ -23,6 +23,8 @@ delete_option('readygraph_enable_sidebar');
 delete_option('readygraph_auto_select_all');
 delete_option('readygraph_enable_notification');
 delete_option('readygraph_enable_branding');
+delete_option('readygraph_send_blog_updates');
+wp_clear_scheduled_hook( 'rg_cron_hook' );
 }
 	if(isset($_GET["action"]) && base64_decode($_GET["action"]) == "changeaccount")changeAccount();
 	global $main_plugin_title;
@@ -33,10 +35,11 @@ delete_option('readygraph_enable_branding');
 	if (isset($_POST["readygraph_application_id"])) update_option('readygraph_application_id', $_POST["readygraph_application_id"]);
 	if (isset($_POST["readygraph_settings"])) update_option('readygraph_settings', $_POST["readygraph_settings"]);
 	if (isset($_POST["readygraph_delay"])) update_option('readygraph_delay', 5000);
-	if (isset($_POST["readygraph_enable_notification"])) update_option('readygraph_enable_notification', 'false');	
+	if (isset($_POST["readygraph_enable_notification"])) update_option('readygraph_enable_notification', 'true');	
 	if (isset($_POST["readygraph_enable_sidebar"])) update_option('readygraph_enable_sidebar', 'false');
 	if (isset($_POST["readygraph_auto_select_all"])) update_option('readygraph_auto_select_all', $_POST["selectAll"]);
-	if (isset($_POST["readygraph_enable_branding"])) update_option('readygraph_enable_branding', 'true');
+	if (isset($_POST["readygraph_enable_branding"])) update_option('readygraph_enable_branding', 'false');
+	if (isset($_POST["readygraph_send_blog_updates"])) update_option('readygraph_send_blog_updates', 'true');
 	}
 	else {
 	if (isset($_POST["readygraph_access_token"])) update_option('readygraph_access_token', $_POST["readygraph_access_token"]);
@@ -49,6 +52,7 @@ delete_option('readygraph_enable_branding');
 	if (isset($_POST["readygraph_enable_sidebar"])) update_option('readygraph_enable_sidebar', $_POST["sidebar"]);
 	if (isset($_POST["readygraph_auto_select_all"])) update_option('readygraph_auto_select_all', $_POST["selectAll"]);
 	if (isset($_POST["readygraph_enable_branding"])) update_option('readygraph_enable_branding', $_POST["branding"]);
+	if (isset($_POST["readygraph_send_blog_updates"])) update_option('readygraph_send_blog_updates', $_POST["blog_updates"]);
 	}
 	if (get_option('readygraph_enable_branding', '') == 'false') {
 	?>
@@ -70,9 +74,10 @@ delete_option('readygraph_enable_branding');
 <input type="hidden" name="readygraph_settings" value="<?php echo htmlentities(str_replace("\\\"", "\"", get_option('readygraph_settings', '{}'))) ?>">
 <input type="hidden" name="readygraph_delay" value="<?php echo get_option('readygraph_delay', '5000') ?>">
 <input type="hidden" name="readygraph_enable_sidebar" value="<?php echo get_option('readygraph_enable_sidebar', 'false') ?>">
-<input type="hidden" name="readygraph_enable_notification" value="<?php echo get_option('readygraph_enable_notification', 'false') ?>">
+<input type="hidden" name="readygraph_enable_notification" value="<?php echo get_option('readygraph_enable_notification', 'true') ?>">
 <input type="hidden" name="readygraph_auto_select_all" value="<?php echo get_option('readygraph_auto_select_all', 'true') ?>">
-<input type="hidden" name="readygraph_enable_branding" value="<?php echo get_option('readygraph_enable_branding', 'true') ?>">
+<input type="hidden" name="readygraph_enable_branding" value="<?php echo get_option('readygraph_enable_branding', 'false') ?>">
+<input type="hidden" name="readygraph_send_blog_updates" value="<?php echo get_option('readygraph_send_blog_updates', 'true') ?>">
 <div class="authenticate" style="display: none;">
 	    <div class="wrap1" style="min-height: 600px;">
 
@@ -162,13 +167,13 @@ Questions, feel free to email us at nick@readygraph.com</p>
 										<label class="btn btn-primary rg-vertical-tab" tab="DEFAULT">
 											<input type="radio" name="options" id="option4"> Invitation Page
 										</label>
-										<a href="#" class="help-tooltip"><img src="../wp-content/plugins/readygraph/admin/assets/Help-icon.png" width="15px" style="margin-left:10px;"/><span><img class="callout" src="../wp-content/plugins/readygraph/admin/assets/callout_black.gif" /><strong>ReadyGraph Plugin Settings</strong><br />You can directly edit the text in the orange box below.<br /></span></a>
+										<a href="#" class="help-tooltip"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/Help-icon.png" width="15px" style="margin-left:10px;"/><span><img class="callout" src="<?php echo plugin_dir_url( __FILE__ );?>assets/callout_black.gif" /><strong>ReadyGraph Plugin Settings</strong><br />You can directly edit the text in the orange box below.<br /></span></a>
 									</div>
 									<div class="rg-preview-widget" style=""></div>
 							</td>
-							<td style="border-left: solid 1px #cccccc; text-align: center;">
+							<td style="border-left: solid 1px #cccccc; text-align: left;padding-left: 25px;">
 								<div style="padding: 20px 0;">
-								<p>To configure Automated Email Settings, <a href="https://readygraph.com/application/customize/settings/advance/">Click here</a><a href="#" class="help-tooltip"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/Help-icon.png" width="15px" style="margin-left:10px;"/><span><img class="callout" src="../wp-content/plugins/readygraph/admin/assets/callout_black.gif" /><strong>ReadyGraph Auto Email Settings</strong><br />ReadyGraph helps you maximize the engagement of your list by sending automated email campaigns on your behalf (welcome emails, weekly digests, social emails, etc.).  You can customize these emails and turn on and off campaigns depending on your goals.<br /></span></a></p>
+								<p>To configure Automated Email Settings, <a href="https://readygraph.com/application/customize/settings/advance/">Click here</a><a href="#" class="help-tooltip"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/Help-icon.png" width="15px" style="margin-left:10px;"/><span><img class="callout" src="<?php echo plugin_dir_url( __FILE__ );?>assets/callout_black.gif" /><strong>ReadyGraph Auto Email Settings</strong><br />ReadyGraph helps you maximize the engagement of your list by sending automated email campaigns on your behalf (welcome emails, weekly digests, social emails, etc.).  You can customize these emails and turn on and off campaigns depending on your goals.<br /></span></a></p>
 									<br />
 
 									<p> To mass e-mail all your subscribers, <a href="https://readygraph.com/application/insights/">Click here</a></p><br />
@@ -189,12 +194,12 @@ Questions, feel free to email us at nick@readygraph.com</p>
 										<option value="600000">10 minute</option>
 										<option value="900000">15 minute</option>
 										<option value="1200000">20 minute</option>
-									</select><a href="#" class="help-tooltip"><img src="../wp-content/plugins/readygraph/admin/assets/Help-icon.png" width="15px" style="margin-left:10px;"/><span><img class="callout" src="../wp-content/plugins/readygraph/admin/assets/callout_black.gif" /><strong>ReadyGraph Popup Settings</strong><br />ReadyGraph's intelligent registration popup maximizes signups to your list.  You can adjust it so that it displays to users after a preset time.  Shorter times will yield more signups. <br /></span></a></p><br />
+									</select><a href="#" class="help-tooltip"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/Help-icon.png" width="15px" style="margin-left:10px;"/><span><img class="callout" src="<?php echo plugin_dir_url( __FILE__ );?>assets/callout_black.gif" /><strong>ReadyGraph Popup Settings</strong><br />ReadyGraph's intelligent registration popup maximizes signups to your list.  You can adjust it so that it displays to users after a preset time.  Shorter times will yield more signups. <br /></span></a></p><br />
 									<p>Enable Sidebar: 
 									<select class="sidebar" name="sidebar" class="form-control">
 										<option value="true">YES</option>
 										<option value="false">NO</option>
-									</select><a href="#" class="help-tooltip"><img src="../wp-content/plugins/readygraph/admin/assets/Help-icon.png" width="15px" style="margin-left:10px;"/><span><img class="callout" src="../wp-content/plugins/readygraph/admin/assets/callout_black.gif" /><strong>ReadyGraph Social Feed Settings</strong><br />You can add an optional social sidebar to your site that allows users the ability to share and discuss the best content on your site.  For an example, click here.<br /></span></a></p><br />
+									</select><a href="#" class="help-tooltip"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/Help-icon.png" width="15px" style="margin-left:10px;"/><span><img class="callout" src="<?php echo plugin_dir_url( __FILE__ );?>assets/callout_black.gif" /><strong>ReadyGraph Social Feed Settings</strong><br />You can add an optional social sidebar to your site that allows users the ability to share and discuss the best content on your site.  For an example, click here.<br /></span></a></p><br />
 									<p>Enable Lower Right Notification: 
 									<select class="notification" name="notification" class="form-control">
 										<option value="true">YES</option>
@@ -210,8 +215,13 @@ Questions, feel free to email us at nick@readygraph.com</p>
 										<option value="true">YES</option>
 										<option value="false">NO</option>
 									</select></p>
+									<p>Include blog updates in weekly email digest of Readygraph: 
+									<select class="blog_updates" name="blog_updates" class="form-control">
+										<option value="true">YES</option>
+										<option value="false">NO</option>
+									</select></p>
 								</div>
-								<button type="button" class="btn btn-large btn-warning save">Save Changes</button>
+								<button type="button" class="btn btn-large btn-warning save" style="float: right;">Save Changes</button>
 							</td>
 					</tr>
 			</table>
@@ -305,6 +315,7 @@ Questions, feel free to email us at nick@readygraph.com</p>
 				$('.notification').val($('[name="readygraph_enable_notification"]').val());
 				$('.selectAll').val($('[name="readygraph_auto_select_all"]').val());
 				$('.branding').val($('[name="readygraph_enable_branding"]').val());
+				$('.blog_updates').val($('[name="readygraph_send_blog_updates"]').val());
 				
 				//$('[name="readygraph_ad_format"][value="' + $('[name="_readygraph_ad_format"]').val() + '"]').parent().click();
 				//$('[name="readygraph_ad_timing"][value="' + $('[name="_readygraph_ad_timing"]').val() + '"]').parent().click();

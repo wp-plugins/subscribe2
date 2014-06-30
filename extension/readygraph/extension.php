@@ -150,6 +150,9 @@ function add_readygraph_plugin_warning() {
       </form>  
     </div>';      
   }
+  else{
+  //do nothing
+  }
 }
 
 function readygraph_client_script_head() {

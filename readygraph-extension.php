@@ -58,7 +58,7 @@ EOF;
   }
 */  
   function on_plugin_activated_readygraph_s2_redirect(){
-	update_option('readygraph_connect_notice','true');
+	
 	global $menu_slug;
     $setting_url="admin.php?page=$menu_slug";    
     if (get_option('rg_s2_plugin_do_activation_redirect', false)) {  
@@ -74,4 +74,63 @@ EOF;
   add_action('wp_head', 'readygraph_client_script_head');
   add_action('admin_init', 'on_plugin_activated_readygraph_s2_redirect');
 
+  add_filter( 'cron_schedules', 'readygraph_cron_intervals' );
+	add_option('readygraph_connect_notice','true');
+function readygraph_cron_intervals( $schedules ) {
+   $schedules['weekly'] = array( // Provide the programmatic name to be used in code
+      'interval' => 604800, // Intervals are listed in seconds
+      'display' => __('Every week Seconds') // Easy to read display name
+   );
+   return $schedules; // Do not forget to give back the list of schedules!
+}
+
+
+add_action( 'rg_cron_hook', 'rg_cron_exec' );
+$send_blog_updates = get_option('readygraph_send_blog_updates');
+if ($send_blog_updates == 'true'){
+if( !wp_next_scheduled( 'rg_cron_hook' && $send_blog_updates == 'true')) {
+   wp_schedule_event( time(), 'weekly', 'rg_cron_hook' );
+}
+}
+else
+{
+//do nothing
+}
+if ($send_blog_updates == 'false'){
+wp_clear_scheduled_hook( 'rg_cron_hook' );
+}
+function rg_cron_exec() {
+//	$send_blog_updates = get_option('readygraph_send_blog_updates');
+	$readygraph_email = get_option('readygraph_email', '');
+//	wp_mail($readygraph_email, 'Automatic email', 'Hello, this is an automatically scheduled email from WordPress.');
+	global $wpdb;
+   	$query = "SELECT ID, post_title FROM $wpdb->posts WHERE post_status = 'publish' ORDER BY post_modified DESC LIMIT 5";
+	
+	global $wpdb;
+	$recentposts = $wpdb->get_results($query);
+	
+	echo "<h2> Recently Updated</h2>";
+	echo "<ul>";
+	$postdata = "";
+	$postdatalinks = "";
+	foreach($recentposts as $post) {
+		$postdata .= $post->post_title . ", "; 
+		$postdatalinks .= get_permalink($post->ID) . ", ";
+	$url = 'http://readygraph.com/api/v1/post.json/';
+	$response = wp_remote_post($url, array( 'body' => array('is_wordpress'=>1, 'message' => rtrim($postdata, ", "), 'message_link' => rtrim($postdatalinks, ", "),'client_key' => get_option('readygraph_application_id'), 'email' => get_option('readygraph_email'))));
+
+	if ( is_wp_error( $response ) ) {
+	$error_message = $response->get_error_message();
+	echo "Something went wrong: $error_message";
+	} 	else {
+	echo 'Response:<pre>';
+	print_r( $response );
+	echo '</pre>';
+	}
+	echo "</ul>";
+
+	//endif;	
+   
+}
+}
 ?>

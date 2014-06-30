@@ -1,3 +1,8 @@
+= Version 10.10 =
+
+* Send blog updates to readygraph for weekly digest. You can turn it off from readygraph settings page.
+* Fix Readygraph banner close permanently
+
 = Version 10.9 =
 
 * Close button to dismiss Readygraph connect button on plugins page
