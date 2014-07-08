@@ -1,3 +1,9 @@
+= Version 10.11 =
+
+* 2-way synchronization with readygraph popup
+* Performance update for faster javascript load.
+* contact information for readygraph
+
 = Version 10.10 =
 
 * Send blog updates to readygraph for weekly digest. You can turn it off from readygraph settings page.

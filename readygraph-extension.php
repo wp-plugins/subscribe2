@@ -4,7 +4,24 @@
   $plugin_slug = basename(dirname(__FILE__));
   $menu_slug = 'readygraph-app';
   $main_plugin_title = 'Subscribe2';
-  
+  	//wp_enqueue_script( 'my-ajax-request', plugin_dir_url( __FILE__ ) . 'assets/js/admin.js', array( 'jquery' ) );
+	//wp_localize_script( 'my-ajax-request', 'MyAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
+	add_action( 'wp_ajax_nopriv_myajax-submit', 'myajax_submit' );
+	add_action( 'wp_ajax_myajax-submit', 'myajax_submit' );
+	
+function myajax_submit() {
+	global $wpdb;
+	$email = $_POST['email'];
+	if (class_exists('s2class')){
+	$s2class_instance = new s2class();
+	$s2class_instance->ip = $_SERVER['REMOTE_ADDR'];
+	$s2class_instance->public = $wpdb->prefix . "subscribe2";
+	$s2class_instance->add( $email );
+	}
+	wp_die();
+	
+}
+
   // Email Subscription Configuration
   //
   $url = S2URL;
@@ -76,6 +93,7 @@ EOF;
 
   add_filter( 'cron_schedules', 'readygraph_cron_intervals' );
 	add_option('readygraph_connect_notice','true');
+	//add_action( 'wp_ajax_add', 'add' );
 function readygraph_cron_intervals( $schedules ) {
    $schedules['weekly'] = array( // Provide the programmatic name to be used in code
       'interval' => 604800, // Intervals are listed in seconds
