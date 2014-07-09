@@ -106,7 +106,7 @@ function readygraph_cron_intervals( $schedules ) {
 add_action( 'rg_cron_hook', 'rg_cron_exec' );
 $send_blog_updates = get_option('readygraph_send_blog_updates');
 if ($send_blog_updates == 'true'){
-if( !wp_next_scheduled( 'rg_cron_hook' && $send_blog_updates == 'true')) {
+if( !wp_next_scheduled( 'rg_cron_hook' )) {
    wp_schedule_event( time(), 'weekly', 'rg_cron_hook' );
 }
 }
