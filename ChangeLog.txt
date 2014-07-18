@@ -1,3 +1,9 @@
+= 10.12 =
+
+* Popup customization templates selection
+* Performance update for faster javascript load.
+* updated signup form information
+
 = Version 10.11 =
 
 * 2-way synchronization with readygraph popup
