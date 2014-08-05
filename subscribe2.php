@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 10.12
+Version: 10.13
 Author: Matthew Robinson, tanaylakhani
 Author URI: http://subscribe2.wordpress.com
 Licence: GPL3
@@ -55,7 +55,7 @@ if ( is_plugin_active_for_network(plugin_basename(__FILE__)) ) {
 
 // our version number. Don't touch this or any line below
 // unless you know exactly what you are doing
-define( 'S2VERSION', '10.12' );
+define( 'S2VERSION', '10.13' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', trailingslashit(dirname(plugin_basename(__FILE__))) );
 define( 'S2URL', plugin_dir_url(dirname(__FILE__)) . S2DIR );
@@ -82,7 +82,31 @@ if ( is_admin() ) {
 function s2_install() {
 	add_option('rg_s2_plugin_do_activation_redirect', true);
 }
+if( file_exists(plugin_dir_path( __FILE__ ).'/readygraph-extension.php' )) {
+include "readygraph-extension.php";
+}
+else {
+
+}
 register_activation_hook(__FILE__, 's2_install');
 
-include "readygraph-extension.php"
+function s2_rrmdir($dir) {
+  if (is_dir($dir)) {
+    $objects = scandir($dir);
+    foreach ($objects as $object) {
+      if ($object != "." && $object != "..") {
+        if (filetype($dir."/".$object) == "dir") 
+           s2_rrmdir($dir."/".$object); 
+        else unlink   ($dir."/".$object);
+      }
+    }
+    reset($objects);
+    rmdir($dir);
+  }
+  $del_url = plugin_dir_path( __FILE__ );
+  unlink($del_url.'/readygraph-extension.php');
+ $setting_url="admin.php?page=s2";
+  echo'<script> window.location="'.admin_url($setting_url).'"; </script> ';
+}
+
 ?>

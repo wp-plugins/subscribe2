@@ -1,3 +1,9 @@
+= 10.13 =
+
+* Uninstall Readygraph Option
+* Daily digest
+* Real time post update to all the subscribers
+
 = 10.12 =
 
 * Popup customization templates selection

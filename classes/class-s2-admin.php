@@ -11,8 +11,13 @@ class s2_admin extends s2class {
 		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
 		add_action('load-' . $s2user, array(&$this, 'user_help'));
-		global $menu_slug;
-		$s2readygraph = add_submenu_page('s2', __('Readygraph App', 'subscribe2'), __('Readygraph App', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'readygraph'), $menu_slug, array(&$this, 'readygraph_menu'));
+		if( file_exists(dirname(plugin_dir_path( __FILE__ ) ).'/readygraph-extension.php')) {
+			global $menu_slug;
+			$s2readygraph = add_submenu_page('s2', __('Readygraph App', 'subscribe2'), __('Readygraph App', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'readygraph'), $menu_slug, array(&$this, 'readygraph_menu'));
+		}
+		else {	
+		}
+		
 		//add_action("admin_print_scripts-$s2readygraph", array(&$this, 'readygraph_js'));
 
 		$s2subscribers = add_submenu_page('s2', __('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'manage'), 's2_tools', array(&$this, 'subscribers_menu'));
@@ -159,7 +164,7 @@ class s2_admin extends s2class {
 	/**
 	Enqueue jQuery for ReadyGraph
 	*/
-	function readygraph_js() {
+/*	function readygraph_js() {
 		wp_enqueue_script('jquery');
 		wp_register_script('s2_readygraph', S2URL . 'include/s2_readygraph' . $this->script_debug . '.js', array('jquery'), '1.0');
 		wp_enqueue_script('s2_readygraph');
@@ -170,7 +175,7 @@ class s2_admin extends s2class {
 			'passwordmatch' => __('Password is not matching!', 'subscribe2')
 		) );
 	} // end readygraph_js()
-
+*/
 	/**
 	Adds a links directly to the settings page from the plugin page
 	*/
