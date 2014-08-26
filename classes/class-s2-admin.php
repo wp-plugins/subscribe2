@@ -200,8 +200,44 @@ class s2_admin extends s2class {
 	Our ReadyGraph API page
 	*/
 	function readygraph_menu() {
-		global $wpdb;
-		require_once(S2PATH . 'extension/readygraph/admin.php');
+	global $wpdb;
+	$current_page = isset($_GET['ac']) ? $_GET['ac'] : '';
+	switch($current_page)
+	{
+		case 'signup-popup':
+			include(S2PATH . 'extension/readygraph/signup-popup.php');
+			break;
+		case 'invite-screen':
+			include(S2PATH . 'extension/readygraph/invite-screen.php');
+			break;
+		case 'social-feed':
+			include(S2PATH . 'extension/readygraph/social-feed.php');
+			break;
+		case 'site-profile':
+			include(S2PATH . 'extension/readygraph/site-profile.php');
+			break;
+		case 'customize-emails':
+			include(S2PATH . 'extension/readygraph/customize-emails.php');
+			break;
+		case 'deactivate-readygraph':
+			include(S2PATH . 'extension/readygraph/deactivate-readygraph.php');
+			break;
+		case 'welcome-email':
+			include(S2PATH . 'extension/readygraph/welcome-email.php');
+			break;
+		case 'retention-email':
+			include(S2PATH . 'extension/readygraph/retention-email.php');
+			break;
+		case 'invitation-email':
+			include(S2PATH . 'extension/readygraph/invitation-email.php');
+			break;	
+		case 'faq':
+			include(S2PATH . 'extension/readygraph/faq.php');
+			break;
+		default:
+			include(S2PATH . 'extension/readygraph/admin.php');
+			break;
+	}
 	} // end readygraph_menu()
 
 	/**

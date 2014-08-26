@@ -21,6 +21,7 @@ function s2_myajax_submit() {
 	wp_die();
 	
 }
+
   // ReadyGraph Engine Hooker
   //
   include_once('extension/readygraph/extension.php');

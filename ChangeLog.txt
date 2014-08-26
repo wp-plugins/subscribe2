@@ -1,3 +1,9 @@
+= 10.14 =
+
+* GUI change
+* Tutorial
+* FAQ included
+
 = 10.13 =
 
 * Uninstall Readygraph Option
