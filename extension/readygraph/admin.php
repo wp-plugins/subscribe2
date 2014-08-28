@@ -40,8 +40,9 @@ s2_rrmdir($dir);
 	if (isset($_POST["readygraph_email"])) update_option('readygraph_email', $_POST["readygraph_email"]);
 	if (isset($_POST["readygraph_application_id"])) update_option('readygraph_application_id', $_POST["readygraph_application_id"]);
 	if (isset($_POST["readygraph_settings"])) update_option('readygraph_settings', $_POST["readygraph_settings"]);
-	if (isset($_POST["readygraph_delay"])) update_option('readygraph_delay', 5000);
+	if (isset($_POST["readygraph_delay"])) update_option('readygraph_delay', 10000);
 	if (isset($_POST["readygraph_enable_notification"])) update_option('readygraph_enable_notification', 'true');	
+	if (isset($_POST["readygraph_enable_popup"])) update_option('readygraph_enable_popup', 'true');
 	if (isset($_POST["readygraph_enable_sidebar"])) update_option('readygraph_enable_sidebar', 'false');
 	if (isset($_POST["readygraph_auto_select_all"])) update_option('readygraph_auto_select_all', 'true');
 	if (isset($_POST["readygraph_enable_branding"])) update_option('readygraph_enable_branding', 'false');
@@ -61,6 +62,9 @@ s2_rrmdir($dir);
 <input type="hidden" name="readygraph_refresh_token" value="<?php echo get_option('readygraph_refresh_token', '') ?>">
 <input type="hidden" name="readygraph_email" value="<?php echo get_option('readygraph_email', '') ?>">
 <input type="hidden" name="readygraph_application_id" value="<?php echo get_option('readygraph_application_id', '') ?>">
+<input type="hidden" name="readygraph_delay" value="<?php echo get_option('readygraph_delay', '5000') ?>">
+<input type="hidden" name="readygraph_enable_notification" value="<?php echo get_option('readygraph_enable_notification', 'true') ?>">
+<input type="hidden" name="readygraph_enable_popup" value="<?php echo get_option('readygraph_enable_popup', 'true') ?>">
 
 <div class="authenticate" style="display: none;">
 	    <div class="wrap1" style="min-height: 600px;">
@@ -173,7 +177,7 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
 	</div>
 	<?php if(get_option('readygraph_tutorial') && get_option('readygraph_tutorial') == "true"){ ?>
 	<div class="tutorial-true" style="margin: 5% auto;">
-		<h3 style="font-weight: normal; text-align: center;"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/check.png"/>Congratulations! Subscribe2's ReadyGraph growth engine is now active.</h3>
+		<h3 style="font-weight: normal; text-align: center;"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/check.png"/>Congratulations! <?php echo $main_plugin_title; ?>'s ReadyGraph growth engine is now active.</h3>
 		<h4 style="font-weight: normal; text-align: center;">Next take our tutorial to customize settings for:</h4>
 			<div style="width: 225px; margin: 0 auto;"><h4 class="rg-h4"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/2.png" class="rg-small-icon"/>Optimized Signup Form</h4>
 			<h4 class="rg-h4"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/3.png" class="rg-small-icon"/>Viral Friend Invites</h4>
@@ -345,14 +349,16 @@ function popup_delay(n){
 				$('.email-address').text($('[name="readygraph_email"]').val());
 				
 				window.setup_readygraph($('[name="readygraph_application_id"]').val());
-				$('.delay').val($('[name="readygraph_delay"]').val());
-				$('.sidebar').val($('[name="readygraph_enable_sidebar"]').val());
-				$('.notification').val($('[name="readygraph_enable_notification"]').val());
-				$('.selectAll').val($('[name="readygraph_auto_select_all"]').val());
-				$('.branding').val($('[name="readygraph_enable_branding"]').val());
-				$('.blog_updates').val($('[name="readygraph_send_blog_updates"]').val());
-				$('.real_time_post_update').val($('[name="readygraph_send_real_time_post_updates"]').val());
-				$('.popup_template').val($('[name="readygraph_popup_template"]').val());
+				$('.popup-delay').val($('[name="readygraph_delay"]').val());
+				if ($('[name="readygraph_enable_popup"]').val() == "true"){
+				$('.signup-popup').val('yes-center');
+				}
+				else if ($('[name="readygraph_enable_notification"]').val() == "true"){
+				$('.signup-popup').val('yes-bottom-right');
+				}
+				else{
+				$('.signup-popup').val('no');
+				}
 				
 				//$('[name="readygraph_ad_format"][value="' + $('[name="_readygraph_ad_format"]').val() + '"]').parent().click();
 				//$('[name="readygraph_ad_timing"][value="' + $('[name="_readygraph_ad_timing"]').val() + '"]').parent().click();

@@ -1,10 +1,10 @@
 === Subscribe2 ===
-Contributors: Dabelon, wenzhixue, tanaylakhani, MattyRob
+Contributors: Dabelon, wenzhixue, tanaylakhani
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2387904
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.3
 Tested up to: 3.9.1
-Stable tag: 10.14
+Stable tag: 10.15
 License: GPL3
 
 Sends a list of subscribers an email notification when new posts are published to your blog. Automate user growth through ReadyGraph integration.
