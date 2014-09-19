@@ -1,3 +1,9 @@
+= 10.16 =
+
+* XSS security fix
+* ReadyGraph Premium Features
+* UI Tweaks
+
 = 10.15 =
 
 * Bug Fix - disable popup

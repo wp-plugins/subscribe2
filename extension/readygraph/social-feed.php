@@ -98,41 +98,46 @@ s2_rrmdir($dir);
 		<div style="clear: both;"></div>
 	</div>
 		<!-- write menu code-->
-	<div class="readygraph-menu">
-	<div class="menu-tabs"><h4>Grow Users</h4>
-		<ul>
-			<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=signup-popup">Signup Popup</a></li>
-			<li><a href="https://readygraph.com/application/insights/" target="_blank">User Statistics</a></li>
-			<li><a href="#"></a></li>
-		</ul>
-	</div>
-	<div class="menu-tabs"><h4>Email Users</h4>
-		<ul>
-			<li><a href="https://readygraph.com/application/customize/settings/email/welcome/" target="_blank">Retention Email</a></li>
-			<li><a href="https://readygraph.com/application/customize/settings/email/invitation/" target="_blank">Invitation Email</a></li>
-			<li><a href="http://readygraph.com/application/insights/" target="_blank">Custom Email</a></li>
-		</ul>
-	</div>
-	<div class="menu-tabs"><h4>Engage Users</h4>
-		<ul>
-			<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=social-feed">Social Feed</a></li>
-			<li><a href="#">Social Followers</a></li>
-			<li><a href="#">Feedback Survey</a></li>
-		</ul>
-	</div>
-	<div class="menu-tabs"><h4>Basic Settings</h4>
-		<ul>
-			<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=site-profile">Site Profile</a></li>
-			<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=feature-settings">Feature Settings</a></li>
-			
-		</ul>
-	</div>
-		<div class="menu-tabs" style="float:right"><h4>&nbsp;</h4>
+
+	<div class="readygraph-nav-menu">
+	<ul><li>Grow Users
+	  <ul>
+		<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=signup-popup">Signup Popup</a></li>
+		<li><a href="https://readygraph.com/application/insights/" target="_blank">User Statistics</a></li>
+		<li><a href="#"></a></li>
+	  </ul>
+	</li>
+  <li>Email Users
+	<ul>
+		<li><a href="https://readygraph.com/application/customize/settings/email/welcome/" target="_blank">Retention Email</a></li>
+		<li><a href="https://readygraph.com/application/customize/settings/email/invitation/" target="_blank">Invitation Email</a></li>
+		<li><a href="http://readygraph.com/application/insights/" target="_blank">Custom Email</a></li>
+    </ul>
+  </li>
+  <li>
+    Engage Users
+    <ul>
+		<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=social-feed">Social Feed</a></li>
+		<li><a href="#">Social Followers</a></li>
+		<li><a href="#">Feedback Survey</a></li>
+    </ul>
+  </li>
+  <li>Basic Settings
+    <ul>
+		<li><a href="#">Site Profile</a></li>
+		<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=feature-settings">Feature Settings</a></li>
+	</ul>
+  </li>
+</ul>
+	<div class="btn-group" style="margin: 8px 10px 0 10px;">
 		<p><a href="mailto:info@readygraph.com" style="color: #b1c1ca" >Help <img src="<?php echo plugin_dir_url( __FILE__ );?>assets/9.png"/></a></p>
+	</div>
+	<div class="btn-group" style="margin: 8px 10px 0 10px;">
 		<p>
 		<a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=faq" style="color: #b1c1ca" >FAQ  <img src="<?php echo plugin_dir_url( __FILE__ );?>assets/10.png" /></a></p>
-			
-		</ul>
+	</div>
+	<div class="btn-group" style="">
+		<p><a href="https://readygraph.com/accounts/payment/?email=<?php echo get_option('readygraph_email', '') ?>" target="_blank" style="color: #b1c1ca" ><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/go-premium.png" height="40px" style="margin:5px" /></a></p>
 	</div>
 	</div>
 	<div><a href="#">Engage Users</a> > Social Feed</div>
@@ -151,9 +156,9 @@ s2_rrmdir($dir);
 						<option value="false">NO</option>
 					</select><a href="#" class="help-tooltip"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/Help-icon.png" width="15px" style="margin-left:10px;"/><span><img class="callout" src="<?php echo plugin_dir_url( __FILE__ );?>assets/callout_black.gif" /><strong>ReadyGraph Social Feed Settings</strong><br />You can add an optional social sidebar to your site that allows users the ability to share and discuss the best content on your site.  For an example, click here.<br /></span></a>
 				</p><br />
-				<div class="save-changes"><button type="submit" class="btn btn-large btn-warning save-next" formaction="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=customize-emails&source=social-feed" style="float: right;margin: 15px">Save Changes & Next</button>
+				<div class="save-changes"><?php if(get_option('readygraph_tutorial') && get_option('readygraph_tutorial') == "true"){ ?><button type="submit" class="btn btn-large btn-warning save-next" formaction="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=customize-emails&source=social-feed" style="float: right;margin: 15px">Save Changes & Next</button><?php } ?>
 			<button type="submit" class="btn btn-large btn-warning save" formaction="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=social-feed" style="float: right;margin: 15px">Save Changes</button>
-			<button type="submit" class="btn btn-large btn-warning save-previous" formaction="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=signup-popup" style="float: right;margin: 15px">Previous</button>
+			<?php if(get_option('readygraph_tutorial') && get_option('readygraph_tutorial') == "true"){ ?><button type="submit" class="btn btn-large btn-warning save-previous" formaction="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=signup-popup" style="float: right;margin: 15px">Previous</button><?php } ?>
 			</div>
 				</div>
 				

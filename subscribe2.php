@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 10.15
+Version: 10.16
 Author: Matthew Robinson, Tanay Lakhani
 Author URI: http://subscribe2.wordpress.com
 Licence: GPL3
@@ -55,7 +55,7 @@ if ( is_plugin_active_for_network(plugin_basename(__FILE__)) ) {
 
 // our version number. Don't touch this or any line below
 // unless you know exactly what you are doing
-define( 'S2VERSION', '10.15' );
+define( 'S2VERSION', '10.16' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', trailingslashit(dirname(plugin_basename(__FILE__))) );
 define( 'S2URL', plugin_dir_url(dirname(__FILE__)) . S2DIR );
@@ -123,5 +123,6 @@ delete_option('readygraph_enable_branding');
 delete_option('readygraph_send_blog_updates');
 delete_option('readygraph_send_real_time_post_updates');
 delete_option('readygraph_popup_template');
+delete_option('readygraph_upgrade_notice');
 }
 ?>

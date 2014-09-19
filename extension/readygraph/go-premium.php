@@ -34,16 +34,22 @@ s2_rrmdir($dir);
 	echo '<script>window.location.replace("'.$current_url[0].'");</script>';
 	}
 	else {
-		if(isset($_GET["source"]) && $_GET["source"] == "social-feed"){
-			if (isset($_POST["readygraph_access_token"])) update_option('readygraph_access_token', $_POST["readygraph_access_token"]);
-			if (isset($_POST["readygraph_refresh_token"])) update_option('readygraph_refresh_token', $_POST["readygraph_refresh_token"]);
-			if (isset($_POST["readygraph_email"])) update_option('readygraph_email', $_POST["readygraph_email"]);
-			if (isset($_POST["readygraph_application_id"])) update_option('readygraph_application_id', $_POST["readygraph_application_id"]);	
-			if (isset($_POST["readygraph_enable_sidebar"])) update_option('readygraph_enable_sidebar', $_POST["sidebar"]);
-		}
-		
+	if (isset($_POST["readygraph_access_token"])) update_option('readygraph_access_token', $_POST["readygraph_access_token"]);
+	if (isset($_POST["readygraph_refresh_token"])) update_option('readygraph_refresh_token', $_POST["readygraph_refresh_token"]);
+	if (isset($_POST["readygraph_email"])) update_option('readygraph_email', $_POST["readygraph_email"]);
+	if (isset($_POST["readygraph_application_id"])) update_option('readygraph_application_id', $_POST["readygraph_application_id"]);
+	if (isset($_POST["readygraph_settings"])) update_option('readygraph_settings', $_POST["readygraph_settings"]);
+	if (isset($_POST["retentionemaileditor"])) update_option('readygraph_invite_email', $_POST["retentionemaileditor"]);
 	}
-?>	
+	if (get_option('readygraph_enable_branding', '') == 'false') {
+	?>
+<style>
+/* FOR INLINE WIDGET */
+.rgw-text {
+    display: none !important;
+}
+</style>
+<?php } ?>	
 
 <link rel="stylesheet" type="text/css" href="<?php echo plugins_url( 'assets/css/admin.css', __FILE__ ) ?>">
 <script type="text/javascript" src="<?php echo plugins_url( 'assets/js/admin.js', __FILE__ ) ?>"></script>
@@ -52,6 +58,16 @@ s2_rrmdir($dir);
 <input type="hidden" name="readygraph_refresh_token" value="<?php echo get_option('readygraph_refresh_token', '') ?>">
 <input type="hidden" name="readygraph_email" value="<?php echo get_option('readygraph_email', '') ?>">
 <input type="hidden" name="readygraph_application_id" value="<?php echo get_option('readygraph_application_id', '') ?>">
+<input type="hidden" name="readygraph_settings" value="<?php echo htmlentities(str_replace("\\\"", "\"", get_option('readygraph_settings', '{}'))) ?>">
+<input type="hidden" name="readygraph_delay" value="<?php echo get_option('readygraph_delay', '5000') ?>">
+<input type="hidden" name="readygraph_enable_sidebar" value="<?php echo get_option('readygraph_enable_sidebar', 'false') ?>">
+<input type="hidden" name="readygraph_enable_notification" value="<?php echo get_option('readygraph_enable_notification', 'true') ?>">
+<input type="hidden" name="readygraph_auto_select_all" value="<?php echo get_option('readygraph_auto_select_all', 'true') ?>">
+<input type="hidden" name="readygraph_enable_branding" value="<?php echo get_option('readygraph_enable_branding', 'false') ?>">
+<input type="hidden" name="readygraph_send_blog_updates" value="<?php echo get_option('readygraph_send_blog_updates', 'true') ?>">
+<input type="hidden" name="readygraph_send_real_time_post_updates" value="<?php echo get_option('readygraph_send_real_time_post_updates', 'false') ?>">
+<input type="hidden" name="readygraph_popup_template" value="<?php echo get_option('readygraph_popup_template', 'default-template') ?>">
+
 
 <div class="authenticate" style="display: none;">
 	    <div class="wrap1" style="min-height: 600px;">
@@ -129,7 +145,7 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
 	<div class="readygraph-nav-menu">
 	<ul><li>Grow Users
 	  <ul>
-		<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=signup-popup">Signup Popup</a></li>
+		<li><a href="<?php $current_url = explode("?", $_SERVER['REQUEST_URI']); echo $current_url[0];?>?page=readygraph-app&ac=signup-popup">Signup Popup</a></li>
 		<li><a href="https://readygraph.com/application/insights/" target="_blank">User Statistics</a></li>
 		<li><a href="#"></a></li>
 	  </ul>
@@ -144,7 +160,7 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
   <li>
     Engage Users
     <ul>
-		<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=social-feed">Social Feed</a></li>
+		<li><a href="<?php $current_url = explode("?", $_SERVER['REQUEST_URI']); echo $current_url[0];?>?page=readygraph-app&ac=social-feed">Social Feed</a></li>
 		<li><a href="#">Social Followers</a></li>
 		<li><a href="#">Feedback Survey</a></li>
     </ul>
@@ -152,7 +168,7 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
   <li>Basic Settings
     <ul>
 		<li><a href="#">Site Profile</a></li>
-		<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=feature-settings">Feature Settings</a></li>
+		<li><a href="<?php $current_url = explode("?", $_SERVER['REQUEST_URI']); echo $current_url[0];?>?page=readygraph-app&ac=feature-settings">Feature Settings</a></li>
 	</ul>
   </li>
 </ul>
@@ -161,26 +177,42 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
 	</div>
 	<div class="btn-group" style="margin: 8px 10px 0 10px;">
 		<p>
-		<a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=faq" style="color: #b1c1ca" >FAQ  <img src="<?php echo plugin_dir_url( __FILE__ );?>assets/10.png" /></a></p>
+		<a href="<?php $current_url = explode("?", $_SERVER['REQUEST_URI']); echo $current_url[0];?>?page=readygraph-app&ac=faq" style="color: #b1c1ca" >FAQ  <img src="<?php echo plugin_dir_url( __FILE__ );?>assets/10.png" /></a></p>
 	</div>
 	<div class="btn-group" style="">
 		<p><a href="https://readygraph.com/accounts/payment/?email=<?php echo get_option('readygraph_email', '') ?>" target="_blank" style="color: #b1c1ca" ><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/go-premium.png" height="40px" style="margin:5px" /></a></p>
 	</div>
 	</div>
-	<div class="tutorial-true" style="margin: 5% auto;">
-		<h3 style="font-weight: normal; text-align: center;">Next Step: Customize automated emails to engage your userbase</h3>
-		<h4 style="font-weight: normal; text-align: center;">Head over to ReadyGraph.com to customize emails such as:</h4>
-		
-			<div style="width: 275px; margin: 0 auto;"><ol><li>Welcome Email</li>
-			<li>Friend Invite Email</li>
-			<li>Updates of new content you post</li>
-			<li>Several More</li></ol>
+	<div style="margin: 3% 5%">
+		<img src="<?php echo plugin_dir_url( __FILE__ );?>assets/15.png" style="float: right;margin-left: 10%;" width="310px" height="350px">
+		<h3><strong>Effortlessly Increase Your Site's Userbase</strong></h3>
 			
-			<div class="save-changes" style="font-weight: normal; text-align: center;"><button type="button" class="btn btn-large btn-warning save-next" onclick="window.open('https://readygraph.com/application/customize/settings/advance/');return false;" style="margin: 15px">Customize Email</button><br>
-			<a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=basic-settings" style="margin: 15px">Skip, End Tutorial</a>
-			</div></div>
+			<h4> Scale your audience faster with our Premium Growth Features:</h4>
+			<div style="width: 60%;">
+			<h4 class="rg-h4"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/round-check.png" class="rg-small-icon"/>Your site promoted to 10,000 New Users Every Month in our Community Email Update</h4>
+			<h4 class="rg-h4"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/round-check.png" class="rg-small-icon"/>Unlimited Viral Email/Facebook Invites</h4>
+			<h4 class="rg-h4"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/round-check.png" class="rg-small-icon"/>Unlimited Blog Post Notifications</h4>
+			<h4 class="rg-h4"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/round-check.png" class="rg-small-icon"/>Premium Phone/Email Support</h4>
+			<h4 class="rg-h4"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/round-check.png" class="rg-small-icon"/>More Premium Features Added All The Time!</h4>
+			<br>
+			<a href="https://readygraph.com/accounts/payment/?email=<?php echo get_option('readygraph_email', '') ?>" target="_blank"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/go-premium.png" height="40px" style="margin:5px"/></a>
+			</div>
+			<div style="margin: 65px 0; width: 100%; display: block;">
+				<div class="rg-three-column" style="float: left">
+					<img src="<?php echo plugin_dir_url( __FILE__ );?>assets/12.png" height="40px" style="margin:15px"/>Explosive Website Growth
+				</div>
+				<div class="rg-three-column" style="float: left">
+					<img src="<?php echo plugin_dir_url( __FILE__ );?>assets/13.png" height="40px" style="margin:15px"/>Develop a Community of Users
+				</div>
+				<div class="rg-three-column" style="float: left">
+					<img src="<?php echo plugin_dir_url( __FILE__ );?>assets/14.png" height="40px" style="margin:15px"/>Track Growth with Powerful Analytics
+				</div>
+			</div>
+			<p><h4 class="rg-h4">ReadyGraph Premium equips your Wordpress site with the industry's most powerful proven growth features. Websites have used our tools to increase their growth rate by upto 70X.</h4></p>
+			<p><h4 class="rg-h4">Don't keep keep your website a secret! Set your growth to "full-blast" with ReadyGraph.</h4>	</p>
+			<p><h4 class="rg-h4"><a href="https://readygraph.com/accounts/payment/?email=<?php echo get_option('readygraph_email', '') ?>">Start A Free Trial Today!</a> </h4></p>
+			
 	</div>
-	
 </div>
 </form>
 <script type="text/javascript" src="https://readygraph.com/scripts/readygraph.js"></script>
@@ -215,7 +247,6 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
 			$(document.body).bind('click', parent_disable);
 		});
 		$(".change-account").click(function() {
-			document.cookie="readygraph_tutorial=true"
 			var url = authHost + '/oauth/authenticate?client_id=' + settings.clientId + '&redirect_uri=' + encodeURIComponent(location.href.replace('#' + location.hash,"")) + '&response_type=token';
 			var logout = authHost + '/oauth/logout?redirect=' + encodeURIComponent(url);
 			openPopup(logout);

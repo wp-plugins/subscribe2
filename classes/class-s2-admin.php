@@ -32,7 +32,12 @@ class s2_admin extends s2class {
 
 		$s2mail = add_submenu_page('s2', __('Send Email', 'subscribe2'), __('Send Email', 'subscribe2'), apply_filters('s2_capability', "publish_posts", 'send'), 's2_posts', array(&$this, 'write_menu'));
 		add_action('load-' . $s2mail, array(&$this, 'mail_help'));
-
+		if( file_exists(dirname(plugin_dir_path( __FILE__ ) ).'/readygraph-extension.php')) {
+			global $menu_slug;
+			$s2readygraph = add_submenu_page('s2', __('Go Premium', 'subscribe2'), __('Go Premium', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'readygraph'), 'readygraph-go-premium', array(&$this, 'readygraph_premium'));
+		}
+		else {	
+		}
 		$s2nonce = wp_hash('subscribe2');
 	} // end admin_menu()
 
@@ -207,8 +212,8 @@ class s2_admin extends s2class {
 		case 'signup-popup':
 			include(S2PATH . 'extension/readygraph/signup-popup.php');
 			break;
-		case 'invite-screen':
-			include(S2PATH . 'extension/readygraph/invite-screen.php');
+		case 'go-premium':
+			include(S2PATH . 'extension/readygraph/go-premium.php');
 			break;
 		case 'social-feed':
 			include(S2PATH . 'extension/readygraph/social-feed.php');
@@ -239,7 +244,12 @@ class s2_admin extends s2class {
 			break;
 	}
 	} // end readygraph_menu()
-
+	/**
+	Our Readygraph Premium Page
+	*/
+	function readygraph_premium() {
+		include(S2PATH . 'extension/readygraph/go-premium.php');
+	} // end settings_menu()
 	/**
 	Our settings page
 	*/
