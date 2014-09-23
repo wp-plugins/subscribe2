@@ -195,10 +195,7 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
 			</div></div>
 	</div>
 	<?php } else { ?>
-	<?php if(get_option('readygraph_upgrade_notice') && get_option('readygraph_upgrade_notice') == "true") { ?><div class="upgrade-notice"><div class="aa_close"><a href="<?php echo $_SERVER['REQUEST_URI']; ?>&readygraph_upgrade_notice=dismiss"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/dialog_close.png"></a></div>
-	<div class="upgrade-notice-text">Want to grow your users even faster? Try <a href="https://readygraph.com/accounts/payment/?email=<?php echo get_option('readygraph_email', ''); ?>" target="_blank">ReadyGraph Premium</a> for free.</div>
-	</div>
-	<? } ?>
+	
 	<div class="tutorial-false" style="margin: 2% auto; width: 90%">
 		<h3 style="font-weight: normal; text-align: center;">Settings - Make adjustments to grow and engage your userbase</h3>
 			<div style="float: left;width: 75%;">

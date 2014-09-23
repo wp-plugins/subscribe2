@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_butt
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.3
 Tested up to: 3.9.1
-Stable tag: 10.16
+Stable tag: 10.17
 License: GPL3
 
 Sends a list of subscribers an email notification when new posts are published to your blog. Automate user growth through ReadyGraph integration.
@@ -62,6 +62,19 @@ Track daily-new subscribers, daily invites, total traffic, and other key metrics
 = Newsfeed =
 
 ReadyGraph’s newsfeed is an optional overlay on your site where your users can engage with others in your community and recommend your content or products to each other.  It is like having a social network that engages users embedded on your site. Users can leave comments, ‘like’ comments left by other subscribers and ‘follow’ other subscribers.  Subscribers will receive automated email updates based on these actions.
+
+= Want To Grow Even Faster? =
+
+Try [ReadyGraph premium](https://readygraph.com/accounts/payment/) for free to get these advanced features:
+
+1.	Monthly Promotion to 10,000 New Users
+2.	Unlimited New Blog Post Emails
+3.	Unlimited Viral Email Invites
+4.	Unlimited Facebook Invites
+5.	Many more premium features added all the time
+
+[Get it here!](https://readygraph.com/accounts/payment/)
+
 
 If you have questions or concerns contact us anytime at [info@readygraph.com](mailto:info@readygraph.com)
 

@@ -27,6 +27,7 @@ s2_rrmdir($dir);
 
 	if(isset($_GET["action"]) && base64_decode($_GET["action"]) == "changeaccount")s2_disconnectReadyGraph();
 	if(isset($_GET["action"]) && base64_decode($_GET["action"]) == "deleteaccount")s2_deleteReadyGraph();
+	if(isset($_GET["readygraph_upgrade_notice"]) && $_GET["readygraph_upgrade_notice"] == "dismiss") {update_option('readygraph_upgrade_notice', 'false');}
 	global $main_plugin_title;
 	if (!get_option('readygraph_access_token') || strlen(get_option('readygraph_access_token')) <= 0) {
 	//redirect to main page
@@ -152,6 +153,10 @@ s2_rrmdir($dir);
 	</div>
 	</div>
 	<div><div><a href="#">Grow Users</a> > Signup Popup</div>
+	<?php if(get_option('readygraph_upgrade_notice') && get_option('readygraph_upgrade_notice') == "true") { ?><div class="upgrade-notice"><div class="aa_close"><a href="<?php echo $_SERVER['REQUEST_URI']; ?>&readygraph_upgrade_notice=dismiss"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/dialog_close.png"></a></div>
+	<div class="upgrade-notice-text">Want to grow your users even faster? Try <a href="https://readygraph.com/accounts/payment/?email=<?php echo get_option('readygraph_email', ''); ?>" target="_blank">ReadyGraph Premium</a> for free.</div>
+	</div>
+	<?php } ?>
 			<h3 style="font-weight: normal; text-align: center;">Increase signups with the Intelligent Signup Popup</h3>
 			<h4 style="font-weight: normal; text-align: center;">Users instantly added to your list - One Click Signup - Automatically targets engaged users</h4>
 			<div style="width: 90%; margin: 0 auto;">

@@ -123,6 +123,10 @@ s2_rrmdir($dir);
 	</div>
 	</div>
 	<div><div><a href="#">Basic Settings</a> > Site Profile</div>
+	<?php if(get_option('readygraph_upgrade_notice') && get_option('readygraph_upgrade_notice') == "true") { ?><div class="upgrade-notice"><div class="aa_close"><a href="<?php echo $_SERVER['REQUEST_URI']; ?>&readygraph_upgrade_notice=dismiss"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/dialog_close.png"></a></div>
+	<div class="upgrade-notice-text">Want to grow your users even faster? Try <a href="https://readygraph.com/accounts/payment/?email=<?php echo get_option('readygraph_email', ''); ?>" target="_blank">ReadyGraph Premium</a> for free.</div>
+	</div>
+	<?php } ?>
 			<h3 style="font-weight: normal; text-align: center;">Be sure your site profile is accurate!</h3>
 			<h4 style="font-weight: normal; text-align: center;">This content is used in your site's features and emails</h4>
 			<div style="margin: 0 5%;">

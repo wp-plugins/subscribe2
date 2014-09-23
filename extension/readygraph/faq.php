@@ -160,6 +160,7 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
 		<p><a href="https://readygraph.com/accounts/payment/?email=<?php echo get_option('readygraph_email', '') ?>" target="_blank" style="color: #b1c1ca" ><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/go-premium.png" height="40px" style="margin:5px" /></a></p>
 	</div>
 	</div>
+	
 	<div class="tutorial-true" style="margin: 5% auto;">
 		<h3 style="font-weight: normal; text-align: center;">Frequenty Asked Questions</h3>
 		
