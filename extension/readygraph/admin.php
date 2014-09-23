@@ -185,13 +185,13 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
 	<?php if(get_option('readygraph_tutorial') && get_option('readygraph_tutorial') == "true"){ ?>
 	<div class="tutorial-true" style="margin: 5% auto;">
 		<h3 style="font-weight: normal; text-align: center;"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/check.png"/>Congratulations! <?php echo $main_plugin_title; ?>'s ReadyGraph growth engine is now active.</h3>
-		<h4 style="font-weight: normal; text-align: center;">Next take our tutorial to customize settings for:</h4>
-			<div style="width: 225px; margin: 0 auto;"><h4 class="rg-h4"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/2.png" class="rg-small-icon"/>Optimized Signup Form</h4>
-			<h4 class="rg-h4"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/3.png" class="rg-small-icon"/>Viral Friend Invites</h4>
-			<h4 class="rg-h4"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/4.png" class="rg-small-icon"/>Automated Emails</h4>
+		<h3 style="font-weight: normal; text-align: center;">Consider going premium to grow even faster!</h3>
+			<div style="width: 60%; margin: 0 auto;"><h4 class="rg-h4"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/round-check.png" class="rg-small-icon"/>Your site promoted to 10,000 New Users Every Month in our Community Email Update</h4>
+			<h4 class="rg-h4"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/round-check.png" class="rg-small-icon"/>Unlimited Viral Email/Facebook Invites</h4>
+			<h4 class="rg-h4"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/round-check.png" class="rg-small-icon"/>Unlimited Blog Post Notifications and More!</h4>
 			
-			<div class="save-changes" style="font-weight: normal; text-align: center;"><button type="submit" class="btn btn-large btn-warning save-next" formaction="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=signup-popup&source=basic-settings" style="margin: 15px">Customize</button><br>
-			<a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=basic-settings" style="margin: 15px">Skip</a>
+			<div class="save-changes" style="font-weight: normal; text-align: center;"><button type="submit" class="btn btn-large btn-warning save-next" formaction="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=signup-popup&source=basic-settings" style="margin: 15px">Learn more about Premium</button><br>
+			<strong>Or take <a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=signup-popup&source=basic-settings">the tutorial</a> to customize your ReadyGraph settings</strong>
 			</div></div>
 	</div>
 	<?php } else { ?>
