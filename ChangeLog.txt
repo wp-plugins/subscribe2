@@ -1,3 +1,8 @@
+= 10.17.2 =
+
+* Disconnect/Delete Readygraph Link fix
+* Deactivation confirmation message
+
 = 10.17.1 =
 
 * link fix

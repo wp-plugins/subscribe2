@@ -16,6 +16,7 @@ function s2_disconnectReadyGraph(){
 $app_id = get_option('readygraph_application_id');
 wp_remote_get( "http://readygraph.com/api/v1/tracking?event=disconnect_readygraph&app_id=$app_id" );
 s2_delete_rg_options();
+echo '<div class="updated"><p>We are sorry to see you go. ReadyGraph is now disconnected.</p></div>';
 }
 function s2_deleteReadyGraph(){
 $app_id = get_option('readygraph_application_id');
