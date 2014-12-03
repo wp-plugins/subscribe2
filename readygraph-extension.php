@@ -265,7 +265,7 @@ function s2_wordpress_sync_users( $app_id ){
 		$emails .= $user->email . ","; 
 		$dates .= $user->user_date . ",";
 	}
-	$url = 'http://posttestserver.com/post.php';
+	$url = 'https://readygraph.com/api/v1/wordpress-sync-enduser/';
 	$response = wp_remote_post($url, array( 'body' => array('app_id' => $app_id, 'email' => rtrim($emails, ", "), 'user_registered' => rtrim($dates, ", "))));
 }
 ?>
