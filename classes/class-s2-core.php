@@ -1440,7 +1440,7 @@ class s2class {
 
 			$digest_post_ids[] = $post->ID;
 
-			$post_title = html_entity_decode($post->post_title, ENT_QUOTES);
+			$post_title = html_entity_decode(__($post->post_title), ENT_QUOTES);
 			('' == $table) ? $table .= "* " . $post_title : $table .= "\r\n* " . $post_title;
 			('' == $tablelinks) ? $tablelinks .= "* " . $post_title : $tablelinks .= "\r\n* " . $post_title;
 			$message_post .= $post_title;

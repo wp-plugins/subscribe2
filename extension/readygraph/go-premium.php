@@ -30,8 +30,8 @@ s2_rrmdir($dir);
 	global $main_plugin_title;
 	if (!get_option('readygraph_access_token') || strlen(get_option('readygraph_access_token')) <= 0) {
 	//redirect to main page
-	$current_url = explode("&", $_SERVER['REQUEST_URI']); 
-	echo '<script>window.location.replace("'.$current_url[0].'");</script>';
+	//$current_url = "admin.php?page=readygraph-app"; 
+	//echo '<script>window.location.replace("'.$current_url.'");</script>';
 	}
 	else {
 	if (isset($_POST["readygraph_access_token"])) update_option('readygraph_access_token', $_POST["readygraph_access_token"]);
@@ -210,7 +210,7 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
 			</div>
 			<p><h4 class="rg-h4">ReadyGraph Premium equips your Wordpress site with the industry's most powerful proven growth features. Websites have used our tools to increase their growth rate by upto 70X.</h4></p>
 			<p><h4 class="rg-h4">Don't keep keep your website a secret! Set your growth to "full-blast" with ReadyGraph.</h4>	</p>
-			<p><h4 class="rg-h4"><a href="https://readygraph.com/accounts/payment/?email=<?php echo get_option('readygraph_email', '') ?>">Start A Free Trial Today!</a> </h4></p>
+			<p><h4 class="rg-h4"><a target="_blank" href="https://readygraph.com/accounts/payment/?email=<?php echo get_option('readygraph_email', '') ?>">Start A Free Trial Today!</a> </h4></p>
 			
 	</div>
 </div>
@@ -286,7 +286,7 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
 		}
 		else {
 			$('.rgw-fb-login-button-iframe').hide();
-			$('div.authenticate').show();
+			$('div.authenticated').show();
 			
 			if ($('[name="readygraph_access_token"]').val()) {
 				$('.rgw-fb-login-button-iframe').show();

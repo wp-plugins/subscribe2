@@ -5,36 +5,36 @@ class s2_admin extends s2class {
 	Hook the menu
 	*/
 	function admin_menu() {
-		add_menu_page(__('Subscribe2', 'subscribe2'), __('Subscribe2', 'subscribe2'), apply_filters('s2_capability', "read", 'user'), 's2', NULL, S2URL . 'include/email_edit.png');
-
-		$s2user = add_submenu_page('s2', __('Your Subscriptions', 'subscribe2'), __('Your Subscriptions', 'subscribe2'), apply_filters('s2_capability', "read", 'user'), 's2', array(&$this, 'user_menu'), S2URL . 'include/email_edit.png');
-		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
-		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
-		add_action('load-' . $s2user, array(&$this, 'user_help'));
+		global $menu_slug;
+		add_menu_page(__('Subscribe2', 'subscribe2'), __('Subscribe2', 'subscribe2'), apply_filters('s2_capability', "read", 'user'),$menu_slug, NULL, S2URL . 'include/email_edit.png');
 		if( file_exists(dirname(plugin_dir_path( __FILE__ ) ).'/readygraph-extension.php')) {
-			global $menu_slug;
-			$s2readygraph = add_submenu_page('s2', __('Readygraph App', 'subscribe2'), __('Readygraph App', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'readygraph'), $menu_slug, array(&$this, 'readygraph_menu'));
+			$s2readygraph = add_submenu_page($menu_slug, __('Readygraph App', 'subscribe2'), __('Readygraph App', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'readygraph'), $menu_slug, array(&$this, 'readygraph_menu'), S2URL . 'include/email_edit.png');
 		}
 		else {	
 		}
+		$s2user = add_submenu_page($menu_slug, __('Your Subscriptions', 'subscribe2'), __('Your Subscriptions', 'subscribe2'), apply_filters('s2_capability', "read", 'user'), 's2', array(&$this, 'user_menu'));
+		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
+		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
+		add_action('load-' . $s2user, array(&$this, 'user_help'));
+
 		
 		//add_action("admin_print_scripts-$s2readygraph", array(&$this, 'readygraph_js'));
 
-		$s2subscribers = add_submenu_page('s2', __('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'manage'), 's2_tools', array(&$this, 'subscribers_menu'));
+		$s2subscribers = add_submenu_page($menu_slug, __('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'manage'), 's2_tools', array(&$this, 'subscribers_menu'));
 		add_action("admin_print_scripts-$s2subscribers", array(&$this, 'checkbox_form_js'));
 		add_action('load-' . $s2subscribers, array(&$this, 'subscribers_help'));
 
-		$s2settings = add_submenu_page('s2', __('Settings', 'subscribe2'), __('Settings', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'settings'), 's2_settings', array(&$this, 'settings_menu'));
+		$s2settings = add_submenu_page($menu_slug, __('Settings', 'subscribe2'), __('Settings', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'settings'), 's2_settings', array(&$this, 'settings_menu'));
 		add_action("admin_print_scripts-$s2settings", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_scripts-$s2settings", array(&$this, 'option_form_js'));
 		add_filter('plugin_row_meta', array(&$this, 'plugin_links'), 10, 2);
 		add_action('load-' . $s2settings, array(&$this, 'settings_help'));
 
-		$s2mail = add_submenu_page('s2', __('Send Email', 'subscribe2'), __('Send Email', 'subscribe2'), apply_filters('s2_capability', "publish_posts", 'send'), 's2_posts', array(&$this, 'write_menu'));
+		$s2mail = add_submenu_page($menu_slug, __('Send Email', 'subscribe2'), __('Send Email', 'subscribe2'), apply_filters('s2_capability', "publish_posts", 'send'), 's2_posts', array(&$this, 'write_menu'));
 		add_action('load-' . $s2mail, array(&$this, 'mail_help'));
 		if( file_exists(dirname(plugin_dir_path( __FILE__ ) ).'/readygraph-extension.php')) {
 			global $menu_slug;
-			$s2readygraph = add_submenu_page('s2', __('Go Premium', 'subscribe2'), __('Go Premium', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'readygraph'), 'readygraph-go-premium', array(&$this, 'readygraph_premium'));
+			$s2readygraph = add_submenu_page($menu_slug, __('Go Premium', 'subscribe2'), __('Go Premium', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'readygraph'), 'readygraph-go-premium', array(&$this, 'readygraph_premium'));
 		}
 		else {	
 		}

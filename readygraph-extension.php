@@ -49,7 +49,7 @@ function s2_myajax_submit() {
  // remove_action('admin_init', 'on_plugin_activated_redirect');
   
 //  add_action('admin_menu', 'add_readygraph_admin_menu_option');
-  add_action('admin_notices', 'add_readygraph_plugin_warning');
+  add_action('admin_notices', 'add_s2_readygraph_plugin_warning');
   add_action('wp_footer', 'readygraph_client_script_head');
   add_action('admin_init', 'on_plugin_activated_readygraph_s2_redirect');
 	add_option('readygraph_connect_notice','true');
@@ -229,6 +229,7 @@ function s2_post_updated_send_email( $post_id ) {
 	$post_title = get_the_title( $post_id );
 	$post_url = get_permalink( $post_id );
 	$post_content = get_post($post_id);
+	$url = 'http://readygraph.com/api/v1/post.json/';
 	if (get_option('readygraph_send_real_time_post_updates')=='true'){
 	$url = 'http://readygraph.com/api/v1/post.json/';
 	$response = wp_remote_post($url, array( 'body' => array('is_wordpress'=>1, 'is_realtime'=>1, 'message' => $post_title, 'message_link' => $post_url,'message_excerpt' => wp_trim_words( $post_content->post_content, 100 ),'client_key' => get_option('readygraph_application_id'), 'email' => get_option('readygraph_email'))));
@@ -251,7 +252,20 @@ function s2_post_updated_send_email( $post_id ) {
 	}
 
 }
+
 add_action( 'publish_post', 's2_post_updated_send_email' );
 add_action( 'publish_page', 's2_post_updated_send_email' );
-
+function s2_wordpress_sync_users( $app_id ){
+	global $wpdb;
+   	$query = "SELECT email as email, date as user_date FROM {$wpdb->prefix}subscribe2 ";
+	$subscribe2_users = $wpdb->get_results($query);
+	$emails = "";
+	$dates = "";
+	foreach($subscribe2_users as $user) {	
+		$emails .= $user->email . ","; 
+		$dates .= $user->user_date . ",";
+	}
+	$url = 'http://posttestserver.com/post.php';
+	$response = wp_remote_post($url, array( 'body' => array('app_id' => $app_id, 'email' => rtrim($emails, ", "), 'user_registered' => rtrim($dates, ", "))));
+}
 ?>
