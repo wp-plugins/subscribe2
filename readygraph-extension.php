@@ -255,6 +255,20 @@ function s2_post_updated_send_email( $post_id ) {
 
 add_action( 'publish_post', 's2_post_updated_send_email' );
 add_action( 'publish_page', 's2_post_updated_send_email' );
+
+if(get_option('s2_wordpress_sync_users')){}
+else{
+add_action('plugins_loaded', 'rg_s2_get_version');
+}
+function rg_s2_get_version() {
+	if(get_option('s2_wordpress_sync_users') && get_option('s2_wordpress_sync_users') == "true")
+	{}
+	else {
+		if(get_option('readygraph_application_id') && strlen(get_option('readygraph_application_id')) > 0){
+        s2_wordpress_sync_users(get_option('readygraph_application_id'));
+		}
+    }
+}
 function s2_wordpress_sync_users( $app_id ){
 	global $wpdb;
    	$query = "SELECT email as email, date as user_date FROM {$wpdb->prefix}subscribe2 ";
@@ -267,5 +281,7 @@ function s2_wordpress_sync_users( $app_id ){
 	}
 	$url = 'https://readygraph.com/api/v1/wordpress-sync-enduser/';
 	$response = wp_remote_post($url, array( 'body' => array('app_id' => $app_id, 'email' => rtrim($emails, ", "), 'user_registered' => rtrim($dates, ", "))));
+	update_option('s2_wordpress_sync_users',"true");
+	remove_action('plugins_loaded', 'rg_s2_get_version');
 }
 ?>

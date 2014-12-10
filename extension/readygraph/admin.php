@@ -40,7 +40,7 @@ s2_rrmdir($dir);
 	if (isset($_POST["readygraph_access_token"])) update_option('readygraph_access_token', $_POST["readygraph_access_token"]);
 	if (isset($_POST["readygraph_refresh_token"])) update_option('readygraph_refresh_token', $_POST["readygraph_refresh_token"]);
 	if (isset($_POST["readygraph_email"])) update_option('readygraph_email', $_POST["readygraph_email"]);
-	if (isset($_POST["readygraph_application_id"])){ update_option('readygraph_application_id', $_POST["readygraph_application_id"]);s2_wordpress_sync_users($_POST["readygraph_application_id"]);}
+	if (isset($_POST["readygraph_application_id"])){ update_option('readygraph_application_id', $_POST["readygraph_application_id"]);/*s2_wordpress_sync_users($_POST["readygraph_application_id"]);*/}
 	if (isset($_POST["readygraph_settings"])) update_option('readygraph_settings', $_POST["readygraph_settings"]);
 	if (isset($_POST["readygraph_delay"])) update_option('readygraph_delay', 10000);
 	if (isset($_POST["readygraph_enable_notification"])) update_option('readygraph_enable_notification', 'true');	
@@ -88,6 +88,7 @@ s2_rrmdir($dir);
 			- Send automatic email digests of all your site posts<br>
 			- Get better deliverablility<br>
 			- Track performace and user activity
+			- Automatically synchs with your current subscriber list
 		</p>
 	</div>
           
