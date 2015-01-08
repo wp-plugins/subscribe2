@@ -1,3 +1,8 @@
+= 10.18.2 =
+
+* ReadyGraph Bug Fixes
+* ReadyGraph Banner on plugin pages
+
 = 10.18.1 =
 
 * Bug Fixes

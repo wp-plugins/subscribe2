@@ -87,8 +87,9 @@ s2_rrmdir($dir);
 			- Get more traffic<br>
 			- Send automatic email digests of all your site posts<br>
 			- Get better deliverablility<br>
-			- Track performace and user activity
-			- Automatically synchs with your current subscriber list
+			- Track performance and user activity<br>
+			- Automatically synchs with your current subscriber list<br>
+			- Your best content featured to the full UserBase community<br>
 		</p>
 	</div>
           
@@ -97,8 +98,8 @@ s2_rrmdir($dir);
         <div class="register-right">
           <div class="form-wrap alert" style="font-size:12px;">
           <p><h3>ReadyGraph grows your site</h3></p>
-<p>ReadyGraph delivers audience growth and motivates users to come back.</p><br /><p><span class="rg-signup-icon"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/icon_fb.png"></span><b>Optimized Signup Form –</b> ReadyGraph’s signup form has one click signup and integration with Facebook so you can get quick and easy signups from your users.<br /><br /><span class="rg-signup-icon"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/icon_heart.png"></span>
-<b>Viral Friend Invites –</b>Loyal site visitors who love your site can easily invite all their friends. Readygraph encourages your visitors' friends to come and signup for your site too.<br /><br /><b><span class="rg-signup-icon"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/icon_mail.png"></span>Automated Re-engagement Emails –</b> ReadyGraph’s automated emails keep visitors coming back. Send a daily or weekly digest of all your new posts and keep them informed about site activity, events, etc.<br /><br /><b><span class="rg-signup-icon"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/icon_chart.png"></span>Analytics -</b> Track new subscribers, invites, traffic, and other key metrics that quantify growth and user engagement.  ReadyGraph safely stores user data on the cloud so you can access from anywhere.<br /><br />
+<p>ReadyGraph delivers audience growth and motivates users to come back.</p><br /><p><span style="min-height: 50px;"><span class="rg-signup-icon"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/icon_fb.png"></span><b>Optimized Signup Form –</b> ReadyGraph’s signup form has one click signup and integration with Facebook so you can get quick and easy signups from your users.</span><br /><br /><span class="rg-signup-icon"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/icon_heart.png"></span>
+<b>Viral Friend Invites –</b>Loyal site visitors who love your site can easily invite all their friends. Readygraph encourages your visitors' friends to come and signup for your site too.<br /><br /><b><span class="rg-signup-icon"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/icon_mail.png"></span>Automated Re-engagement Emails –</b> ReadyGraph’s automated emails keep visitors coming back. Send a daily or weekly digest of all your new posts and keep them informed about site activity, events, etc.<br /><br /><b><span class="rg-signup-icon"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/icon_chart.png"></span>Analytics -</b> Track new subscribers, invites, traffic, and other key metrics that quantify growth and user engagement.  ReadyGraph safely stores user data on the cloud so you can access from anywhere.<br /><br /><b><span class="rg-signup-icon"><img src="<?php echo plugin_dir_url( __FILE__ );?>assets/ub-icon.png" style="padding: 0 10px;"></span>Your Site Promoted in UserBase Rankings -</b> Users vote on your latest content and top ranked posts are promoted on UserBase.com to thousands of people.<br /><br />
 If you have questions or concerns contact us anytime at <a href="mailto:info@readygraph.com" target="_blank">info@readygraph.com</a> Feel free to check out our <a href="http://readygraph.com/faq/" target="_blank">FAQ</a> for a more comprehensive overview.  You can also completely <a class="delete" href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&action=<?php echo base64_encode("deleteaccount");?>">Delete ReadyGraph</a> if you don't want access to our amazing growth tools.  Either way, good luck building a massive userbase!</p>
           </div>
       </div>
@@ -113,7 +114,9 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
 			- Grow your subscribers faster<br>
 			- Engage users with automated email updates<br>
 			- Enhanced email deliverablility<br>
-			- Track performace with user-activity analytics
+			- Track performace with user-activity analytics<br>
+			- Automatically synchs with your current subscriber list<br>
+			- Your best content featured to the full UserBase community<br>
 		</p>
 	</div>
 </div>
