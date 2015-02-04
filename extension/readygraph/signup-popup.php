@@ -24,7 +24,17 @@ s2_delete_rg_options();
 $dir = plugin_dir_path( __FILE__ );
 s2_rrmdir($dir);
 }
-
+function siteprofile_sync(){
+	$app_id = get_option('readygraph_application_id');
+	$email = get_option('readygraph_email');
+	$site_name = get_option('readygraph_site_name');
+	$site_url = get_option('readygraph_site_url');
+	$site_description = get_option('readygraph_site_description');
+	$site_category = get_option('readygraph_site_category');
+	$site_language = get_option('readygraph_site_language');
+	$url = 'https://readygraph.com/api/v1/wordpress-sync-siteprofile/';
+	$response = wp_remote_post($url, array( 'body' => array('app_id' => $app_id, 'email' => $email, 'site_profile_name' => $site_name, 'site_profile_url' => $site_url, 'site_description' => $site_description, 'site_category' => $site_category, 'site_language' => $site_language)));
+}
 	if(isset($_GET["action"]) && base64_decode($_GET["action"]) == "changeaccount")s2_disconnectReadyGraph();
 	if(isset($_GET["action"]) && base64_decode($_GET["action"]) == "deleteaccount")s2_deleteReadyGraph();
 	if(isset($_GET["readygraph_upgrade_notice"]) && $_GET["readygraph_upgrade_notice"] == "dismiss") {update_option('readygraph_upgrade_notice', 'false');}
@@ -43,6 +53,13 @@ s2_rrmdir($dir);
 			if (isset($_POST["readygraph_refresh_token"])) update_option('readygraph_refresh_token', $_POST["readygraph_refresh_token"]);
 			if (isset($_POST["readygraph_email"])) update_option('readygraph_email', $_POST["readygraph_email"]);
 			if (isset($_POST["readygraph_application_id"])) update_option('readygraph_application_id', $_POST["readygraph_application_id"]);
+			
+			if (isset($_POST["sitedesceditor"])) update_option('readygraph_site_description', $_POST["sitedesceditor"]);
+			if (isset($_POST["site_profile_name"])) update_option('readygraph_site_name', $_POST["site_profile_name"]);
+			if (isset($_POST["site_profile_url"])) update_option('readygraph_site_url', $_POST["site_profile_url"]);
+			if (isset($_POST["site_category"])) update_option('readygraph_site_category', $_POST["site_category"]);
+			if (isset($_POST["site_language"])) {update_option('readygraph_site_language', $_POST["site_language"]);siteprofile_sync();}
+
 			if (isset($_POST["readygraph_settings"])) update_option('readygraph_settings', $_POST["readygraph_settings"]);
 			if (isset($_POST["readygraph_delay"])) {
 			update_option('readygraph_delay', $_POST["delay"]);
@@ -136,7 +153,7 @@ s2_rrmdir($dir);
   </li>
   <li>Basic Settings
     <ul>
-		<li><a href="#">Site Profile</a></li>
+		<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=site-profile">Site Profile</a></li>
 		<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=feature-settings">Feature Settings</a></li>
 	</ul>
   </li>
@@ -240,7 +257,7 @@ s2_rrmdir($dir);
 								</div>
 								<div class="save-changes"><?php if(get_option('readygraph_tutorial') && get_option('readygraph_tutorial') == "true"){ ?><button type="submit" class="btn btn-large btn-warning save-next" formaction="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=social-feed&source=signup-popup" style="float: right;margin: 15px">Save Changes & Next</button> <?php } ?>
 								<button type="submit" class="btn btn-large btn-warning save" formaction="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=signup-popup" style="float: right;margin: 15px">Save Changes</button>
-								<?php if(get_option('readygraph_tutorial') && get_option('readygraph_tutorial') == "true"){ ?><button type="submit" class="btn btn-large btn-warning save-previous" formaction="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=basic-settings&tutorial=true" style="float: right;margin: 15px">Previous</button> <?php } ?>
+								<?php if(get_option('readygraph_tutorial') && get_option('readygraph_tutorial') == "true"){ ?><button type="submit" class="btn btn-large btn-warning save-previous" formaction="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=site-profile" style="float: right;margin: 15px">Previous</button> <?php } ?>
 								</div>
 							</div>
 			</div>
