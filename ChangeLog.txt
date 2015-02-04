@@ -1,3 +1,8 @@
+= 10.18.3 =
+
+* Readygraph premium plan selections
+* Site profile for readygraph promotions
+
 = 10.18.2 =
 
 * ReadyGraph Bug Fixes
