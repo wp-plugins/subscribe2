@@ -58,6 +58,7 @@ function siteprofile_sync(){
 		siteprofile_sync();
 	}
 	}
+	if(isset($_GET["readygraph_plan"]) && $_GET["readygraph_plan"] != ""){update_option('readygraph_plan',$_GET["readygraph_plan"]);}
 	
  ?>	
 
@@ -78,8 +79,8 @@ $(function(){
 <input type="hidden" name="readygraph_refresh_token" value="<?php echo get_option('readygraph_refresh_token', '') ?>">
 <input type="hidden" name="readygraph_email" value="<?php echo get_option('readygraph_email', '') ?>">
 <input type="hidden" name="readygraph_application_id" value="<?php echo get_option('readygraph_application_id', '') ?>">
-
-
+<input type="hidden" name="readygraph_site_category" value="<?php echo get_option('readygraph_site_category', '') ?>">
+<input type="hidden" name="readygraph_site_language" value="<?php echo get_option('readygraph_site_language', '') ?>">
 
 <style>a.help-tooltip {outline:none; }a.help-tooltip strong {line-height:30px;}a.help-tooltip:hover {text-decoration:none;} a.help-tooltip span {    z-index:10;display:none; padding:14px 20px;    margin-top:40px; margin-left:-150px;    width:300px; line-height:16px;}a.help-tooltip:hover span{    display:inline; position:absolute;     border:2px solid #FFF;    background:#fff;	text-align: justify;	z-index:1000000000;}.callout {z-index:1000000000;position:absolute;border:0;top:-14px;left:120px;}    /*CSS3 extras*/a.help-tooltip span{    border-radius:2px;    -moz-border-radius: 2px;    -webkit-border-radius: 2px;            -moz-box-shadow: 0px 0px 8px 4px #666;    -webkit-box-shadow: 0px 0px 8px 4px #666;    box-shadow: 0px 0px 8px 4px #666;}</style>
 <div class="authenticated" style="display: none;">
@@ -436,6 +437,17 @@ wp_editor( $content, $editor_id, $settings );
 </form>
 <script type="text/javascript" src="https://readygraph.com/scripts/readygraph.js"></script>
 
+<script type="text/javascript" charset="utf-8">
+var $ = jQuery;
+var category = $('[name="readygraph_site_category"]').val();
+if (category != ""){
+	$('.site_category').val(category);
+}
+var language = $('[name="readygraph_site_language"]').val();
+if (language != ""){
+	$('.site_language').val(language);
+}
+</script>
 <script type="text/javascript" charset="utf-8">
 	var $ = jQuery;
 	$(function () {
