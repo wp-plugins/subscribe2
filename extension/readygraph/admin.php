@@ -326,9 +326,9 @@ function subscribe_readygraph() {
 	var new_url = current_url.slice(0, -16);
 	<?php } ?>
 	url = 'https://readygraph.com/accounts/payment/?email=<?php echo get_option('readygraph_email', '') ?>&payment_plan='+plan+'&is_annual='+annual+'&redirect_uri='+encodeURIComponent(new_url+'site-profile');
-	current_url = new_url+'site-profile';
+	current_url = new_url+'site-profile&readygraph_plan='+plan;
 	if (plan === "promote_free"){
-	window.location.href = current_url+'&readygraph_plan=free';
+	window.location.href = current_url;
 	}
 	else{
 	var win=window.open(url, '_blank');
