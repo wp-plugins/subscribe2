@@ -441,11 +441,11 @@ wp_editor( $content, $editor_id, $settings );
 var $ = jQuery;
 var category = $('[name="readygraph_site_category"]').val();
 if (category != ""){
-	$('.site_category').val(category);
+	$('#site_category').val(category);
 }
 var language = $('[name="readygraph_site_language"]').val();
 if (language != ""){
-	$('.site_language').val(language);
+	$('#site_language').val(language);
 }
 </script>
 <script type="text/javascript" charset="utf-8">
