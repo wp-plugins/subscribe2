@@ -14,7 +14,9 @@ Sends a list of subscribers an email notification when new posts are published t
 Check official website for live demo http://plugins.readygraph.com/subscribe2/
 
 * [Live demo](http://plugins.readygraph.com/subscribe2/)
+
 * [More Description](http://plugins.readygraph.com/subscribe2/)
+
 * [Suggestion/comments](http://plugins.readygraph.com/subscribe2/)
 
 
