@@ -121,8 +121,6 @@ This token will automatically be replaced by dynamic subscription information an
 
 == Frequently Asked Questions ==
 
-[Visit FAQ site](http://subscribe2.wordpress.com/support/faqs/)
-
 For detailed FAQ and other support visit [http://plugins.readygraph.com/subscribe2/faq/](http://plugins.readygraph.com/subscribe2/faq/)
 
 = ReadyGraph FAQ =
