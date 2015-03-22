@@ -1,3 +1,8 @@
+= 10.18.5 =
+
+* Get larger blog post for daily digest
+* Code cleanup
+
 = 10.18.4 =
 
 * Readygraph premium plan default change
