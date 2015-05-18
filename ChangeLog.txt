@@ -1,3 +1,8 @@
+= 10.19.0 =
+
+* Add monetization option for readygraph
+* Applied enhancements from the queue in trac.
+
 = 10.18.5 =
 
 * Get larger blog post for daily digest
