@@ -8,7 +8,7 @@ class s2_admin extends s2class {
 		if( file_exists(dirname(plugin_dir_path( __FILE__ ) ).'/readygraph-extension.php')) {
 		global $menu_slug;
 		add_menu_page(__('Subscribe2', 'subscribe2'), __('Subscribe2', 'subscribe2'), apply_filters('s2_capability', "read", 'user'),$menu_slug, NULL, S2URL . 'include/email_edit.png');
-		
+
 			$s2readygraph = add_submenu_page($menu_slug, __('Readygraph App', 'subscribe2'), __('Readygraph App', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'readygraph'), $menu_slug, array(&$this, 'readygraph_menu'), S2URL . 'include/email_edit.png');
 
 		$s2user = add_submenu_page($menu_slug, __('Your Subscriptions', 'subscribe2'), __('Your Subscriptions', 'subscribe2'), apply_filters('s2_capability', "read", 'user'), 's2', array(&$this, 'user_menu'));
@@ -16,7 +16,7 @@ class s2_admin extends s2class {
 		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
 		add_action('load-' . $s2user, array(&$this, 'user_help'));
 
-		
+
 		//add_action("admin_print_scripts-$s2readygraph", array(&$this, 'readygraph_js'));
 
 		$s2subscribers = add_submenu_page($menu_slug, __('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'manage'), 's2_tools', array(&$this, 'subscribers_menu'));
@@ -40,7 +40,7 @@ class s2_admin extends s2class {
 		add_action("admin_print_scripts-$s2user", array(&$this, 'checkbox_form_js'));
 		add_action("admin_print_styles-$s2user", array(&$this, 'user_admin_css'));
 		add_action('load-' . $s2user, array(&$this, 'user_help'));
-		
+
 		//add_action("admin_print_scripts-$s2readygraph", array(&$this, 'readygraph_js'));
 
 		$s2subscribers = add_submenu_page('s2', __('Subscribers', 'subscribe2'), __('Subscribers', 'subscribe2'), apply_filters('s2_capability', "manage_options", 'manage'), 's2_tools', array(&$this, 'subscribers_menu'));
@@ -253,9 +253,12 @@ class s2_admin extends s2class {
 			break;
 		case 'invitation-email':
 			include(S2PATH . 'extension/readygraph/invitation-email.php');
-			break;	
+			break;
 		case 'faq':
 			include(S2PATH . 'extension/readygraph/faq.php');
+			break;
+		case 'monetization-settings':
+			include(S2PATH . 'extension/readygraph/monetization.php');
 			break;
 		default:
 			include(S2PATH . 'extension/readygraph/admin.php');
@@ -355,8 +358,15 @@ class s2_admin extends s2class {
 	Create meta box on write pages
 	*/
 	function s2_meta_init() {
-		add_meta_box('subscribe2', __('Subscribe2 Notification Override', 'subscribe2' ), array(&$this, 's2_meta_box'), 'post', 'advanced');
-		add_meta_box('subscribe2', __('Subscribe2 Notification Override', 'subscribe2' ), array(&$this, 's2_meta_box'), 'page', 'advanced');
+		if ( 'yes' === $this->subscribe2_options['pages'] ) {
+			$s2_post_types = array( 'page', 'post' );
+		} else {
+			$s2_post_types = array( 'post' );
+		}
+		$s2_post_types = apply_filters( 's2_post_types', $s2_post_types );
+		foreach( $s2_post_types as $s2_post_type ) {
+			add_meta_box( 'subscribe2', __( 'Subscribe2 Notification Override', 'subscribe2' ), array( &$this, 's2_meta_box' ), $s2_post_type, 'advanced' );
+		}
 	} // end s2_meta_init()
 
 	/**

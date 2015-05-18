@@ -169,6 +169,7 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
     <ul>
 		<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=site-profile">Site Profile</a></li>
 		<li><a href="<?php $current_url = explode("?", $_SERVER['REQUEST_URI']); echo $current_url[0];?>?page=readygraph-app&ac=feature-settings">Feature Settings</a></li>
+		<li><a href="<?php $current_url = explode("?", $_SERVER['REQUEST_URI']); echo $current_url[0];?>?page=readygraph-app&ac=monetization-settings">Monetization Settings</a></li>
 	</ul>
   </li>
 </ul>

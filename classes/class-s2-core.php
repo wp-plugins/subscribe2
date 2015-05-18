@@ -513,7 +513,7 @@ class s2class {
 
  		$plaintext = trim(strip_tags($plaintext));
 
-		if ( strstr($mailtext, "{REFERENCELINKS}") && $plaintext_links != '' ) {
+		if ( isset( $plaintext_links ) && '' !== $plaintext_links ) {
 			$plaintext .= "\r\n\r\n" . trim($plaintext_links);
 		}
 
@@ -1365,7 +1365,9 @@ class s2class {
 			}
 		} else {
 			// we are sending a preview
-			$posts = get_posts('numberposts=1');
+			// $posts = get_posts('numberposts=1');
+			$posts = get_posts('numberposts=3');
+			$posts = apply_filters('s2_cron_preview_posts', $posts, $this);
 		}
 
 		// Collect sticky posts if desired
@@ -1510,16 +1512,18 @@ class s2class {
 			$message_posttime .= $excerpt . "\r\n\r\n";
 		}
 
-		// update post_meta data for sent ids but not sticky posts
-		foreach ( $ids as $id ) {
-			if ( !empty($sticky_ids) && !in_array($id, $sticky_ids) ) {
-				update_post_meta($id, '_s2_digest_post_status', 'done');
-			} else {
-				update_post_meta($id, '_s2_digest_post_status', 'done');
+		// we are not sending a preview so update post_meta data for sent ids but not sticky posts
+		if ( '' === $preview ) {
+			foreach ( $ids as $id ) {
+				if ( ! empty( $sticky_ids ) && ! in_array( $id, $sticky_ids ) ) {
+					update_post_meta( $id, '_s2_digest_post_status', 'done' );
+				} else {
+					update_post_meta( $id, '_s2_digest_post_status', 'done' );
+				}
 			}
+			$this->subscribe2_options['last_s2cron'] = implode( ',', $digest_post_ids );
+			update_option( 'subscribe2_options', $this->subscribe2_options );
 		}
-		$this->subscribe2_options['last_s2cron'] = implode(',', $digest_post_ids);
-		update_option('subscribe2_options', $this->subscribe2_options);
 
 		// we add a blank line after each post excerpt now trim white space that occurs for the last post
 		$message_post = trim($message_post);
