@@ -7,7 +7,7 @@ Tested up to: 4.1
 Stable tag: 10.19.0
 License: GPL3
 
-Sends a list of subscribers an email notification when new posts are published to your blog. Automate user growth through ReadyGraph integration.
+Sends a list of subscribers emails when you publish new posts. Automate user growth and revenue with ReadyGraph integration.
 
 == Description ==
 
@@ -75,6 +75,10 @@ ReadyGraph’s newsfeed is an optional overlay on your site where your users can
 = Content Voting and Ranking =
 
 ReadyGraph allows your subscribers to vote on your latest content. The top content from our network of sites is then ranked on UserBase.com by the number of votes that it has received in the past 7 days.
+
+= Monetization Through Sponsored Units =
+
+Due to popular demand, we are excited to announce that we have now added a new layer onto the ReadyGraph product: monetization. For quality sites with enough users and traffic to qualify, we will enable you to earn revenue through a set of elegant, unobtrusive sponsorship units.The ad units will be shown occasionally (much of the time they won't be noticeable) and are highly targeted based on user interests. Most importantly, they can be turned off or on at any time. In addition to helping qualifying sites support themselves, this initiative will allow us to continue to put resources towards enhancing the free features we offer each and every site owner.  Sites qualify on the basis of quality and a minimum traffic threshold.  You can view, adjust, or opt out through your site monetization settings page.
 
 = Want To Grow Even Faster? =
 
@@ -158,6 +162,10 @@ You can contact us at info@readygraph.com. We appreciate all feedback.
 **I’m having problems with the latest version of the plug-in; can I switch back to an older version?**
 
 Yes, just navigate to the “Developers” tab on the wordpress.org plug-in page, and select the version that works for you.
+
+**Does this plugin help me earn revenue?**
+
+Due to popular demand, we are excited to announce that we have now added a new layer onto the ReadyGraph product: monetization. For quality sites with enough users and traffic to qualify, we will enable you to earn revenue through a set of elegant, unobtrusive sponsorship units.The ad units will be shown occasionally (much of the time they won't be noticeable) and are highly targeted based on user interests. Most importantly, they can be turned off or on at any time. In addition to helping qualifying sites support themselves, this initiative will allow us to continue to put resources towards enhancing the free features we offer each and every site owner.  Sites qualify on the basis of quality and a minimum traffic threshold.  You can view, adjust, or opt out through your site monetization settings page.
 
 = ACCOUNT QUESTIONS: =
 
