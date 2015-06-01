@@ -3,7 +3,7 @@
 Plugin Name: Subscribe2
 Plugin URI: http://subscribe2.wordpress.com
 Description: Notifies an email list when new entries are posted.
-Version: 10.19.0
+Version: 10.20.0
 Author: Matthew Robinson, Tanay Lakhani
 Author URI: http://subscribe2.wordpress.com
 Licence: GPL3
@@ -55,7 +55,7 @@ if ( is_plugin_active_for_network(plugin_basename(__FILE__)) ) {
 
 // our version number. Don't touch this or any line below
 // unless you know exactly what you are doing
-define( 'S2VERSION', '10.19.0' );
+define( 'S2VERSION', '10.20.0' );
 define( 'S2PATH', trailingslashit(dirname(__FILE__)) );
 define( 'S2DIR', trailingslashit(dirname(plugin_basename(__FILE__))) );
 define( 'S2URL', plugin_dir_url(dirname(__FILE__)) . S2DIR );
@@ -84,7 +84,19 @@ function s2_install() {
 	add_option('rg_s2_plugin_do_activation_redirect', true);
 }
 if( file_exists(plugin_dir_path( __FILE__ ).'/readygraph-extension.php' )) {
+if (get_option('readygraph_deleted') && get_option('readygraph_deleted') == 'true'){}
+else{
 include "readygraph-extension.php";
+}
+if(get_option('readygraph_application_id') && strlen(get_option('readygraph_application_id')) > 0){
+register_deactivation_hook( __FILE__, 's2_readygraph_plugin_deactivate' );
+}
+function s2_readygraph_plugin_deactivate(){
+	$app_id = get_option('readygraph_application_id');
+	update_option('readygraph_deleted', 'false');
+	wp_remote_get( "http://readygraph.com/api/v1/tracking?event=subscribe2_plugin_uninstall&app_id=$app_id" );
+	s2_delete_rg_options();
+}
 }
 else {
 
@@ -119,11 +131,21 @@ delete_option('readygraph_delay');
 delete_option('readygraph_enable_sidebar');
 delete_option('readygraph_auto_select_all');
 delete_option('readygraph_enable_notification');
+delete_option('readygraph_enable_popup');
 delete_option('readygraph_enable_branding');
 delete_option('readygraph_send_blog_updates');
 delete_option('readygraph_send_real_time_post_updates');
 delete_option('readygraph_popup_template');
 delete_option('readygraph_upgrade_notice');
+delete_option('readygraph_adsoptimal_secret');
+delete_option('readygraph_adsoptimal_id');
+delete_option('readygraph_connect_anonymous');
+delete_option('readygraph_connect_anonymous_app_secret');
+delete_option('readygraph_tutorial');
+delete_option('readygraph_site_url');
+delete_option('readygraph_enable_monetize');
+delete_option('readygraph_monetize_email');
+delete_option('readygraph_plan');
 }
 
 ?>

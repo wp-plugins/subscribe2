@@ -1,3 +1,10 @@
+= 10.20.0 =
+
+* Bug Fix for readygraph and compatibility with other plugins
+* New code structure for readygraph
+* User can delete the readygraph to completely remove it.
+* Subsequent upgrades wont load readygraph except a plugin is disabled and re-enabled.
+
 = 10.19.0 =
 
 * Add monetization option for readygraph

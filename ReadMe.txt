@@ -4,10 +4,10 @@ Donate link: http://plugins.readygraph.com/donate/
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.3
 Tested up to: 4.1
-Stable tag: 10.19.0
+Stable tag: 10.20.0
 License: GPL3
 
-Sends a list of subscribers an email notification when new posts are published to your blog. Automate user growth through ReadyGraph integration.
+Sends a list of subscribers emails when you publish new posts. Automate user growth and revenue with ReadyGraph integration.
 
 == Description ==
 
@@ -142,6 +142,12 @@ After installing this plug-in, you can activate the ReadyGraph features by conne
 **How do I uninstall ReadyGraph?**
 
 You can deactivate the ReadyGraph features by navigating to the upper-right corner of the “ReadyGraph App” page, clicking the drop-down menu with your email address, and disconnecting your ReadyGraph account.
+
+**How do I reinstall ReadyGraph after I had deleted?**
+
+1. Get the latest plugin update/reinstall the plugin.
+2. Disable the plugin
+3. Enable the plugin
 
 **Can I delay the sign-up pop-up?**
 
