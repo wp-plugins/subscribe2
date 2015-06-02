@@ -20,10 +20,10 @@ script.onload = function(e) {
   settings['applicationId'] = '<?php echo get_option('readygraph_application_id', '') ?>';
   settings['overrideFacebookSDK'] = true;
   settings['platform'] = 'others';
-  settings['enableLoginWall'] = <?php echo get_option('readygraph_enable_popup', 'true') ?>;
+  settings['enableLoginWall'] = <?php echo get_option('readygraph_enable_popup', 'false') ?>;
   settings['enableSidebar'] = <?php echo get_option('readygraph_enable_sidebar', 'false') ?>;
 	settings['inviteFlowDelay'] = <?php echo get_option('readygraph_delay', '5000') ?>;
-	settings['enableNotification'] = <?php echo get_option('readygraph_enable_notification', 'true') ?>;
+	settings['enableNotification'] = <?php echo get_option('readygraph_enable_notification', 'false') ?>;
 	settings['inviteAutoSelectAll'] = <?php echo get_option('readygraph_auto_select_all', 'true') ?>;
 	top.readygraph.setup(settings);
 	readygraph.ready(function() {
