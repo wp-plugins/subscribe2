@@ -136,7 +136,11 @@ function add_s2_readygraph_plugin_warning() {
 }
   
 	add_action('admin_notices', 'add_s2_readygraph_plugin_warning');
+if(get_option('readygraph_application_id') && strlen(get_option('readygraph_application_id')) > 0){
+	if ((get_option('readygraph_access_token') && strlen(get_option('readygraph_access_token')) > 0) || (get_option('readygraph_enable_monetize') && get_option('readygraph_enable_monetize') == "true")){
 	add_action('wp_footer', 's2_readygraph_client_script_head', 5);
+	}
+}
 	add_action('admin_init', 'on_plugin_activated_readygraph_s2_redirect');
 	add_option('readygraph_connect_notice','true');
 
