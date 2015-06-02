@@ -1,3 +1,7 @@
+= 10.20.1 =
+
+* Bug Fix
+
 = 10.20.0 =
 
 * Bug Fix for readygraph and compatibility with other plugins
