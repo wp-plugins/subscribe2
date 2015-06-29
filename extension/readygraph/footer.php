@@ -79,6 +79,7 @@
 			var url = authHost + '/oauth/authenticate?client_id=' + settings.clientId + '&redirect_uri=' + encodeURIComponent(location.href.replace('#' + location.hash,"")) + '&response_type=token&monetization=true';
 			}
 			else{
+			$.post(ajaxurl,{action : 's2-myajax-submit',readygraph_monetize : "false"},function() {});
 			var url = authHost + '/oauth/authenticate?client_id=' + settings.clientId + '&redirect_uri=' + encodeURIComponent(location.href.replace('#' + location.hash,"")) + '&response_type=token';
 			}
 			openPopup(url);
