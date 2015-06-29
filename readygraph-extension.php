@@ -10,8 +10,7 @@
 function s2_myajax_submit() {
 	if ($_POST['adsoptimal_id']) update_option('readygraph_adsoptimal_id',$_POST['adsoptimal_id']);
 	if ($_POST['adsoptimal_secret']) update_option('readygraph_adsoptimal_secret',$_POST['adsoptimal_secret']);
-	if ($_POST['readygraph_monetize'] && $_POST['readygraph_monetize']== "true") update_option('readygraph_enable_monetize',$_POST['readygraph_monetize']);
-	else update_option('readygraph_enable_monetize',"false");
+	if (isset($_POST['readygraph_monetize'])) update_option('readygraph_enable_monetize',$_POST['readygraph_monetize']);
 	$email = $_POST['email'];
 	if ($email){
 	global $wpdb;
