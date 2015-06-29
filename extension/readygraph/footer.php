@@ -69,29 +69,18 @@
 		});	
 		
 		$("a.connect").click(function() {
+			if(document.getElementById('readygraph_monetize').checked) {
+			enable_monetize = true;
+			} else {
+			enable_monetize = false;
+			}
 			if (enable_monetize){
-			if(app_id.length > 0) {
-			$.ajax({
-				url: resourceHost + '/api/v1/wp-monetize/'
-			, method: 'POST'
-			, data: {
-            app_id: $('[name="readygraph_application_id"]').val(),
-			monetize: "true",
-            client_id: settings.clientId
-					}
-			, success: function (response) {
-					var monetize_adsoptimal_id = response.data.adsoptimal_id;
-					var monetize_adsoptimal_secret = response.data.adsoptimal_secret;
-					jQuery.post(ajaxurl,{action : 's2-myajax-submit',readygraph_monetize : "true",adsoptimal_id : monetize_adsoptimal_id, adsoptimal_secret : monetize_adsoptimal_secret},function() {});
-					/* future processing for sites opted in for monetization */
-				}
-			, error: function (response) {
-					console.log(response);
-					/* future process */
+			$.post(ajaxurl,{action : 's2-myajax-submit',readygraph_monetize : "true"},function() {});
+			var url = authHost + '/oauth/authenticate?client_id=' + settings.clientId + '&redirect_uri=' + encodeURIComponent(location.href.replace('#' + location.hash,"")) + '&response_type=token&monetization=true';
 			}
-			});}
+			else{
+			var url = authHost + '/oauth/authenticate?client_id=' + settings.clientId + '&redirect_uri=' + encodeURIComponent(location.href.replace('#' + location.hash,"")) + '&response_type=token';
 			}
-			var url = authHost + '/oauth/authenticate?client_id=' + settings.clientId + '&redirect_uri=' + encodeURIComponent(location.href.replace('#' + location.hash,"")) + '&response_type=token&app_id='+app_id+'&app_secret='+app_secret;
 			openPopup(url);
 			$(document.body).bind('focus', parent_disable);
 			$(document.body).bind('click', parent_disable);
@@ -217,7 +206,7 @@
 							$('.result').text(response.data.subscribers + ((response.data.subscribers == 0) ? ' Subscriber' : ' Subscribers'));
 						}
 					, error: function (response) {
-							alert('We couldn\'t authenticate your account. Please check your internet connection.');
+							alert('We couldn\'t authenticate your account. Please re-connect to ReadyGraph using different browser');
 							$('div.authenticate').show();
 							$('div.authenticating').hide();
 							$('div.authenticated').hide();

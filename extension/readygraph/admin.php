@@ -13,7 +13,7 @@
  */
 
 include("header.php");
-	if (!get_option('readygraph_application_id') || strlen(get_option('readygraph_application_id')) <= 0)s2_rg_connect();
+	/*if (!get_option('readygraph_application_id') || strlen(get_option('readygraph_application_id')) <= 0)s2_rg_connect();*/
 	if(isset($_GET["tutorial"]) && $_GET["tutorial"] == "true"){update_option('readygraph_tutorial',"true");}
 	else{update_option('readygraph_tutorial',"false");}
 	if(isset($_GET["readygraph_upgrade_notice"]) && $_GET["readygraph_upgrade_notice"] == "dismiss") {update_option('readygraph_upgrade_notice', 'false');}
@@ -204,11 +204,7 @@ include("header.php");
 
 <script type="text/javascript" charset="utf-8">
 var enable_monetize;
-if(document.getElementById('readygraph_monetize').checked) {
-    enable_monetize = true;
-} else {
-    enable_monetize = false;
-}
+
 
 function subscribe_readygraph() {
     var radios = document.getElementsByName("select-plan");
