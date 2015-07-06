@@ -1,4 +1,5 @@
 <?php
+	if ( ! defined( 'ABSPATH' ) ) exit;
   // Extension Configuration
 	$s2_plugin_slug = basename(dirname(__FILE__));
 	$s2_menu_slug = 'readygraph-app';

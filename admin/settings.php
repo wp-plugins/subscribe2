@@ -157,10 +157,11 @@ echo "<div class=\"wrap\">";
 if ( version_compare($GLOBALS['wp_version'], '3.8', '<=') ) {
 	echo "<div id=\"icon-options-general\" class=\"icon32\"></div>";
 }
-if( file_exists(plugin_dir_path( __FILE__ ).'/readygraph-extension.php' )) {
+
+if( file_exists(plugin_dir_path(dirname(__FILE__ )).'readygraph-extension.php') && (!get_option('readygraph_access_token') || strlen(get_option('readygraph_access_token')) <= 0)) {
 wp_enqueue_style('s2_rg_admin_template', S2URL . 'extension/readygraph/assets/css/upgrade.css');
 
-echo '<div class="rg_info rg_message"><img src="'.S2URL . 'include/Sign-Alert-icon.png" style="float: left;height: 50px;padding-right: 10px;"><a href="admin.php?page=readygraph-app"><button class="button-warning pure-button" style="float: right; margin-right: 15px;">Connect ReadyGraph</button></a><h3 style="color:white">Grow your site traffic faster: Activate Subscribe2\'s User Growth Engine (ReadyGraph)</h3><p style="color: whitesmoke">Promotion to New Users | Viral Signup Form | Site Update emails | Import Existing Users</p></div>';}
+echo '<div class="rg_info rg_message"><img src="'.S2URL . 'include/Sign-Alert-icon.png" style="float: left;height: 50px;padding-right: 10px;"><a href="admin.php?page=readygraph-app"><button class="button-warning pure-button" style="float: right; margin-right: 15px;">Connect ReadyGraph</button></a><h3 style="color:white">Grow your site traffic faster: Activate Subscribe2\'s User Growth Engine (ReadyGraph)</h3><p style="color: whitesmoke">Promotion to New Users | Viral Signup Form | Site Update emails | Import Existing Users</p><div class="aa_close"><a href="' . $_SERVER["PHP_SELF"] . '&readygraph_notice=dismiss"><img src="'.S2URL.'extension/readygraph/assets/dialog_close.png"></a></div></div>';}
 
 $tabs = array('email' => __('Email Settings', 'subscribe2'),
 	'templates' => __('Templates', 'subscribe2'),
