@@ -1700,7 +1700,14 @@ class s2class {
 		if ( $this->clean_interval > 0 ) {
 			add_action('wp_scheduled_delete', array(&$this, 's2cleaner_task'));
 		}
-//		add_action('admin_init', array(&$this, 'on_plugin_activated_redirect'));
+
+		// add ajax class if enabled
+		if ( '1' === $this->subscribe2_options['ajax'] ) {
+			require_once( S2PATH . 'classes/class-s2-ajax.php' );
+			global $mysubscribe2_ajax;
+			$mysubscribe2_ajax = new S2_Ajax_Class;
+		}
+
 		// Add actions specific to admin or frontend
 		if ( is_admin() ) {
 			//add menu, authoring and category admin actions
@@ -1767,12 +1774,6 @@ class s2class {
 			// add actions for other plugins
 			if ( '1' == $this->subscribe2_options['show_meta'] ) {
 				add_action('wp_meta', array(&$this, 'add_minimeta'), 0);
-			}
-
-			// add actions for ajax form if enabled
-			if ( '1' == $this->subscribe2_options['ajax'] ) {
-				add_action('wp_enqueue_scripts', array(&$this, 'add_ajax'));
-				add_action('wp_footer', array(&$this, 'add_s2_ajax'));
 			}
 		}
 	} // end s2init()

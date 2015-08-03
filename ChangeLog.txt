@@ -1,3 +1,9 @@
+= 10.20.7 =
+
+* uninstall bug fix
+* RG banner removal - x buttons
+* Ajax implementation for popup - by mattyrob
+
 = 10.20.6 =
 
 * Security Fix for readygraph
