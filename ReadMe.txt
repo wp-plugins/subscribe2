@@ -3,8 +3,8 @@ Contributors: Dabelon, wenzhixue, tanaylakhani
 Donate link: http://plugins.readygraph.com/donate/
 Tags: posts, subscription, email, subscribe, notify, notification
 Requires at least: 3.3
-Tested up to: 4.1
-Stable tag: 10.20.7
+Tested up to: 4.3
+Stable tag: 10.20.9
 License: GPL3
 
 Sends a list of subscribers emails when you publish new posts. Automate user growth and revenue with ReadyGraph integration.
